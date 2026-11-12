@@ -115,3 +115,17 @@ traps) and answers the same checks.
 The rules every course repo follows, and the check that enforces each one, are in [STANDARD.md](STANDARD.md).
 Model ids and the dated price table live only in [config/models.ts](config/models.ts). The checker library is
 described in [checks/lib/README.md](checks/lib/README.md).
+
+## Models
+
+Code asks [config/models.ts](config/models.ts) for a role (`fast`, `smart` or `judge`), never for a model by name.
+`LLM_PROVIDER` picks who answers: `replay` (the default, recorded replies, no key), `anthropic`, `openrouter` or
+`openai`. Copy `.env.example` to `.env` and fill in the key for the provider you pick. Check every role with one
+tiny call each:
+
+```bash
+bun run models
+```
+
+Expect: `Provider: replay`, a `pass` line for `fast`, `smart` and `judge` with its cost, then `Every role answered.`
+A model with no price in the table shows its cost as unknown, never as zero.
