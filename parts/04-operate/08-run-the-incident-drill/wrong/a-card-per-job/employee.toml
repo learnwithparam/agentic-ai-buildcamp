@@ -1,0 +1,15 @@
+# A planted mistake: one incident card per paused job.
+# The checker reads this file to start the employee. See reference/CONTRACT.md.
+
+[hire]
+name = "freight-audit-clerk"
+outcome = "Each carrier invoice is paid once at the rate confirmation's amount, or disputed with a reason code the papers support"
+starts_by = ["person"]
+lives = "one job"
+
+[contract]
+version = "1"
+mode = "http"
+start = "bun ../../../kit/start.ts a-card-per-job"
+url = "http://localhost:7701"
+traces = "traces"
