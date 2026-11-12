@@ -1,0 +1,4 @@
+# One row per run you read in the trace viewer. label is pass or fail. The note says what the ledger shows.
+run_id,label,note
+run-30c38c20,pass,"Paid once, USD 4305, matches the rate."
+run-f5d0ecd5,pass,"Paid once, USD 2765, matches the rate."

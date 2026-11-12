@@ -6,6 +6,7 @@ sessions = [
   { name = "first block", parts = ["meet-the-world", "design"], minutes = 220, live_minutes = 150, home_minutes = 70 },
   { name = "second block", parts = ["build"], minutes = 285, live_minutes = 150, home_minutes = 135 },
   { name = "third block", parts = ["deploy"], minutes = 215, live_minutes = 150, home_minutes = 65 },
+  { name = "fourth block", parts = ["operate"], minutes = 225, live_minutes = 150, home_minutes = 75 },
 ]
 
 [one-day]
@@ -14,6 +15,7 @@ sessions = [
   { name = "the design block", parts = ["meet-the-world", "design"], minutes = 220, core_minutes = 130, core = ["run-the-finished-system", "place-it-on-the-map", "write-the-hire-letter", "turn-the-hire-into-tests", "price-the-outcome"] },
   { name = "the build block", parts = ["build"], minutes = 285 },
   { name = "the deploy block", parts = ["deploy"], minutes = 215 },
+  { name = "the operate block", parts = ["operate"], minutes = 225 },
 ]
 
 [four-evenings]
@@ -21,6 +23,7 @@ sessions = [
   { name = "first evening", parts = ["meet-the-world", "design"], minutes = 220, live_step_minutes = 160, qa_minutes = 20, home_minutes = 60 },
   { name = "second evening", parts = ["build"], minutes = 285, live_step_minutes = 160, qa_minutes = 20, home_minutes = 105 },
   { name = "third evening", parts = ["deploy"], minutes = 215, live_step_minutes = 160, qa_minutes = 20, home_minutes = 35 },
+  { name = "fourth evening", parts = ["operate"], minutes = 225, live_step_minutes = 160, qa_minutes = 20, home_minutes = 45 },
 ]
 
 [twelve-saturdays]
@@ -29,4 +32,5 @@ sessions = [
   { name = "first sessions", parts = ["meet-the-world", "design"], minutes = 220, split = [70, 90, 60] },
   { name = "build sessions", parts = ["build"], minutes = 285, split = [95, 95, 95] },
   { name = "deploy sessions", parts = ["deploy"], minutes = 215, split = [70, 75, 70] },
+  { name = "operate sessions", parts = ["operate"], minutes = 225, split = [75, 75, 75] },
 ]

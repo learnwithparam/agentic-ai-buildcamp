@@ -1,0 +1,32 @@
+{
+  "decision": "allow",
+  "reasons": [],
+  "current": {
+    "model": "smart",
+    "role": "smart",
+    "trials": 3,
+    "runs": 36,
+    "passShare": 1,
+    "evalFails": [],
+    "acceptanceFails": [],
+    "mustNever": [],
+    "spend": 0.013945999999999998,
+    "outcomes": 11,
+    "costPerOutcome": 0.0012678181818181816,
+    "unknownModels": []
+  },
+  "candidate": {
+    "model": "fast",
+    "role": "fast",
+    "trials": 3,
+    "runs": 36,
+    "passShare": 1,
+    "evalFails": [],
+    "acceptanceFails": [],
+    "mustNever": [],
+    "spend": 0.0006973,
+    "outcomes": 11,
+    "costPerOutcome": 0.00006339090909090908,
+    "unknownModels": []
+  }
+}
