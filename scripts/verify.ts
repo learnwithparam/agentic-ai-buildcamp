@@ -1,11 +1,12 @@
 // bun run verify <step-name>            check your work on one step, then show progress on every step
 // bun run verify <step-name> solution   check the sample solution instead
+// bun run verify part <part-name>      check every step in one part (a deliverable)
 // bun run verify --report               write verify-report.json for cohort grading
 // bun run verify --all                  CI: each check fails on its starter and wrong answers, passes on its solution
 // Exit codes: 0 pass, 1 fail, 2 the check could not run.
 import { join } from "node:path";
 import { existsSync, readdirSync, writeFileSync } from "node:fs";
-import { ROOT, allSteps, findStep, type Step } from "./structure";
+import { ROOT, allSteps, findStep, parts, type Step } from "./structure";
 
 export type Rule = { says: string; test: (dir: string) => boolean | Promise<boolean>; tryNext: string };
 type Result = { step: string; status: "pass" | "fail" | "error"; passed: number; total: number; failed: string[] };
@@ -67,6 +68,25 @@ if (arg === "--report") {
   writeFileSync(out, JSON.stringify({ version: 1, at: new Date().toISOString(), results }, null, 2) + "\n");
   console.log(`Wrote verify-report.json: ${results.filter((r) => r.status === "pass").length} of ${results.length} steps pass.`);
   process.exit(0);
+}
+
+if (arg === "part") {
+  const p = parts().find((x) => x.name === which);
+  if (!p) {
+    console.log(which ? `There is no part called "${which}". Parts:` : "Name a part. Parts:");
+    for (const x of parts()) console.log(`  bun run verify part ${x.name}`);
+    process.exit(1);
+  }
+  console.log(`Part ${p.name}:`);
+  const rs = [];
+  for (const s of p.steps) {
+    const r = await run(s, work(s));
+    rs.push(r);
+    console.log(`  ${r.status.toUpperCase().padEnd(5)}  ${s.name}  (${r.passed}/${r.total} rules)`);
+  }
+  const done = rs.filter((r) => r.status === "pass").length;
+  console.log(done === rs.length ? `Part ${p.name} is done: ${done}/${rs.length} steps pass.` : `${done}/${rs.length} steps pass. Run bun run verify <step-name> on a FAIL line to see why.`);
+  process.exit(rs.some((r) => r.status === "error") ? 2 : done === rs.length ? 0 : 1);
 }
 
 const step = arg && findStep(arg);
