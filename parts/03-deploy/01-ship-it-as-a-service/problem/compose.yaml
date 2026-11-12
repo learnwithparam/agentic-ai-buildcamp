@@ -1,0 +1,17 @@
+# Starter: copy to employee/compose.yaml, then run: docker compose up -d --build --wait
+services:
+  employee:
+    build:
+      context: ..
+      dockerfile: employee/Dockerfile
+    ports:
+      - "${PORT:-7701}:7701"
+    environment:
+      WORLD_URL: ${WORLD_URL:-http://host.docker.internal:7700}
+      MODEL_MODE: ${MODEL_MODE:-replay}
+      # TODO: the model key, read from the environment or .env, never written here.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    # TODO: a named volume on TRACE_DIR and one on STATE_DIR.
+    # TODO: a healthcheck whose test calls http://localhost:7701/health.
+    # TODO: a restart policy.

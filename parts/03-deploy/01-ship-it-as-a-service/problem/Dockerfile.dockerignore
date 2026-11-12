@@ -1,0 +1,4 @@
+# Starter: copy to employee/Dockerfile.dockerignore. Docker reads it for the Dockerfile beside it.
+node_modules
+.git
+# TODO: keep .env (and **/.env) out of the build, and local state and traces too.
