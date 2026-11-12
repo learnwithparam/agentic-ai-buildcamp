@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "acceptance.yaml",
-  "description": "Acceptance cases for one AI employee. Each case expects rows in the system of record, never a reply.",
+  "description": "Acceptance cases for one AI employee. Each case expects rows in the system of record (table), or the jobs waiting for a person in the contract's GET /approvals (route), never a reply.",
   "type": "object",
   "required": ["employee", "cases"],
   "additionalProperties": false,
@@ -26,10 +26,11 @@
             "minItems": 1,
             "items": {
               "type": "object",
-              "required": ["table", "where", "rows"],
+              "required": ["where", "rows"],
               "additionalProperties": false,
               "properties": {
                 "table": { "type": "string", "pattern": "^[a-z_]+$" },
+                "route": { "type": "string", "pattern": "^GET /approvals(\\?status=(waiting|approved|declined))?$" },
                 "where": { "type": "object" },
                 "rows": { "type": "integer", "minimum": 0 },
                 "values": { "type": "object" }

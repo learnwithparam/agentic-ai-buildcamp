@@ -35,7 +35,7 @@
       "additionalProperties": false,
       "properties": {
         "role": { "enum": ["fast", "smart", "judge"] },
-        "provider": { "enum": ["anthropic", "openrouter", "openai", "ollama"] },
+        "provider": { "enum": ["anthropic", "openrouter", "openai"] },
         "checked_on": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
         "source": { "type": "string", "pattern": "^https://" },
         "input_usd_per_million": { "type": "number", "minimum": 0 },

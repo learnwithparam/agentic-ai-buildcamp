@@ -22,9 +22,10 @@ flowchart LR
 
 Fill in `employee.toml` in this folder. Later steps read it, so keep it here.
 
-Shape of `[hire]`: `employee`, `outcome`, `starts_by` (person, event, schedule or agent), `lives` (one job, one case
-or always on), `[hire.metric]` with `name` and `query`, `[hire.must_never]` with `rule`, `write` (a tool name like
-`pay_invoice`) and `check` (a SELECT that returns the bad rows).
+Shape of `[hire]`, the same block as in `reference/CONTRACT.md`: `name`, `outcome`, `starts_by` (a list of person,
+event, schedule or agent), `lives` (one job, one case or always on), `[hire.metric]` with `name` and `query`,
+`[hire.must_never]` with `rule`, `write` (a tool name like `pay_invoice`) and `check` (a SELECT that returns the
+bad rows).
 
 | Employee | Must never |
 |---|---|

@@ -25,6 +25,9 @@ Fill in `acceptance.yaml` in this folder with at least five cases for your emplo
 
 Shape of each case (from `acceptance.schema.json`): `name`, `kind` (outcome, must-never, approval or edge),
 `given`, `job`, optional `forbids` and `approver`, and `expect`: a list of `{ table, where, rows, values }`.
+`job` is the contract's job input, such as `{ invoice_id: INV-2045 }`, plus `decide: { decision, by }` when a person
+answers the approval. A job that waits for a person is not in the ledger yet: it is in your employee's
+`GET /approvals`, so that row says `route: "GET /approvals?status=waiting"` in place of `table`.
 
 | Employee | Trap case to write |
 |---|---|

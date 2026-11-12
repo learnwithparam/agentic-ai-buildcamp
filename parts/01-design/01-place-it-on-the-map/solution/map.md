@@ -18,10 +18,10 @@ mix of these in advance, so the model reads the papers and picks the next tool.
 
 Who decides the next step: the model
 
-Code still holds the lines it must never cross: the pay tool refuses a second payment for the same load, and any
-payment over USD 5,000 waits for Lena.
+Code still holds the lines it must never cross: a policy gate before the pay tool refuses a second payment for
+the same load, and any payment over USD 5,000 waits for Lena.
 
 ## Starts by
 
-An event: a new invoice arrives in the ledger. It lives for one case: one invoice, from arrival to paid or
+A person: Ravi hands it a new invoice as a job. It lives for one job: one invoice, from arrival to paid or
 disputed.

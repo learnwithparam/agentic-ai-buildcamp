@@ -1,8 +1,8 @@
-# Your hire letter. Replace every TODO. The README shows a filled one.
+# Your hire letter: the [hire] block of employee.toml. Replace every TODO. The README shows a filled one.
 [hire]
-employee = "TODO: a short name, like freight-audit-clerk"
+name = "TODO: a short name, like freight-audit-clerk"
 outcome = "TODO: the result a person can see in the system of record"
-starts_by = "TODO: person, event, schedule or agent"
+starts_by = ["TODO: person, event, schedule or agent"]
 lives = "TODO: one job, one case or always on"
 
 [hire.metric]

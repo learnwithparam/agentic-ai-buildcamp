@@ -22,8 +22,10 @@ export default [
   },
   {
     says: "every case states rows in the system of record, never the reply",
-    test: (d) => cases(d).length > 0 && cases(d).every((c) => Array.isArray(c.expect) && !mentionsReply(c.expect)),
-    tryNext: "replace any reply or message under expect with the table, the where and the row count you expect",
+    test: (d) =>
+      cases(d).length > 0 &&
+      cases(d).every((c) => Array.isArray(c.expect) && !mentionsReply(c.expect) && c.expect.every((r: any) => !!r?.table !== !!r?.route)),
+    tryNext: "give every expect row a table (or route: GET /approvals for a job waiting on a person), a where and the row count you expect",
   },
   {
     says: "acceptance.yaml matches acceptance.schema.json",

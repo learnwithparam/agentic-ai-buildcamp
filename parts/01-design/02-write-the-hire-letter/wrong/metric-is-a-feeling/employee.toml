@@ -1,8 +1,8 @@
 [hire]
-employee = "freight-audit-clerk"
+name = "freight-audit-clerk"
 outcome = "Each carrier invoice is paid or disputed per the rate confirmation and the proof of delivery"
-starts_by = "event"
-lives = "one case"
+starts_by = ["person"]
+lives = "one job"
 
 [hire.metric]
 name = "carriers are happier and the finance team saves time"
@@ -11,4 +11,4 @@ query = "ask Lena at the end of the quarter"
 [hire.must_never]
 rule = "Pay the same load twice"
 write = "pay_invoice"
-check = "SELECT load_id FROM payments GROUP BY load_id HAVING COUNT(*) > 1"
+check = "SELECT i.load_id, COUNT(*) AS payments FROM payments p JOIN invoices i ON i.invoice_id = p.invoice_id GROUP BY i.load_id HAVING COUNT(*) > 1"

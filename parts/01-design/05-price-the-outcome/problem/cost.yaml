@@ -15,7 +15,7 @@ tokens_per_call:
 
 price:
   role: TODO                # fast, smart or judge: the role in config/models.ts this employee calls
-  provider: TODO            # anthropic, openrouter, openai or ollama
+  provider: TODO            # anthropic, openrouter or openai: LLM_PROVIDER in config/models.ts
   checked_on: "YYYY-MM-DD"
   source: TODO the pricing page you read
   input_usd_per_million: 0

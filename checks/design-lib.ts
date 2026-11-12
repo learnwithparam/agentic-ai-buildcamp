@@ -2,6 +2,7 @@
 // bun run cost <path-to-cost.yaml>   prints cost per outcome with the arithmetic shown line by line.
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { basename, dirname, join } from "node:path";
+import { IDS, PRICES, PRICES_AS_OF } from "../config/models";
 
 export const text = (dir: string, name: string) => readFileSync(join(dir, name), "utf8");
 export const has = (dir: string, name: string) => existsSync(join(dir, name));
@@ -124,6 +125,12 @@ if (import.meta.main) {
   const { lines, perOutcome } = costOf(c);
   console.log(`Cost per outcome for ${c.employee} (${c.outcome})`);
   console.log(`Prices: the ${c.price.role} role on ${c.price.provider}, checked on ${c.price.checked_on}`);
+  // The course's own price for that role, so a learner sees when theirs differs. The model behind the role stays unnamed.
+  const known = (IDS as any)[c.price.provider]?.[c.price.role];
+  const p = known ? PRICES[known] : undefined;
+  if (known && !p) console.log(`  config/models.ts has no price for the ${c.price.role} role on ${c.price.provider}: its cost is unknown there.`);
+  else if (p && (p.input !== c.price.input_usd_per_million || p.output !== c.price.output_usd_per_million))
+    console.log(`  config/models.ts prices the ${c.price.role} role on ${c.price.provider} at USD ${p.input} in, ${p.output} out (read ${PRICES_AS_OF}); your file says ${c.price.input_usd_per_million} in, ${c.price.output_usd_per_million} out.`);
   for (const l of lines) console.log(`  ${l.what.padEnd(18)} = ${l.how.padEnd(36)} = ${l.value}`);
   const said = c.cost_per_outcome_usd;
   const ok = within(said, perOutcome, 0.01);

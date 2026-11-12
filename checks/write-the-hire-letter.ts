@@ -17,9 +17,12 @@ export default [
     tryNext: "fill every key under [hire]; replace each TODO with your own words",
   },
   {
-    says: "starts_by is person, event, schedule or agent",
-    test: (d) => ["person", "event", "schedule", "agent"].includes(hire(d).starts_by),
-    tryNext: "set starts_by to one of: person, event, schedule, agent",
+    says: "starts_by lists person, event, schedule or agent",
+    test: (d) => {
+      const s = hire(d).starts_by;
+      return Array.isArray(s) && s.length > 0 && s.every((x) => ["person", "event", "schedule", "agent"].includes(x));
+    },
+    tryNext: "set starts_by to a list of one or more of: person, event, schedule, agent, like starts_by = [\"person\"]",
   },
   {
     says: "lives is one job, one case or always on",
