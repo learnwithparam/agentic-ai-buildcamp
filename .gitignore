@@ -1,2 +1,8 @@
 verify-report.json
 node_modules
+.world/
+.state/
+traces/
+.venv/
+__pycache__/
+.env

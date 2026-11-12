@@ -1,0 +1,7 @@
+{
+  "role": "smart",
+  "prompt": "Reply with the single word: pass",
+  "reply": "pass",
+  "usage": { "input_tokens": 14, "output_tokens": 2, "cache_read_input_tokens": 0 },
+  "source": "written by hand for replay mode; the build had no model key. Replace with MODEL_MODE=record bun run models."
+}

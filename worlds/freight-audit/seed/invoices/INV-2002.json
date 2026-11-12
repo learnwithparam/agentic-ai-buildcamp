@@ -1,0 +1,21 @@
+{
+  "invoice_id": "INV-2002",
+  "tenant": "kaas-freight",
+  "carrier_id": "CAR-09",
+  "load_id": "L-1002",
+  "carrier_invoice_number": "TAM-88026",
+  "received_at": "2026-10-26T10:00:00Z",
+  "currency": "USD",
+  "lines": [
+    {
+      "kind": "linehaul",
+      "amount_usd": 2460
+    },
+    {
+      "kind": "fuel",
+      "amount_usd": 305
+    }
+  ],
+  "total_usd": 2765,
+  "scan": "scans/INV-2002.pdf"
+}

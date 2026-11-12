@@ -1,0 +1,26 @@
+{
+  "invoice_id": "INV-2027",
+  "tenant": "kaas-freight",
+  "carrier_id": "CAR-01",
+  "load_id": "L-1026",
+  "carrier_invoice_number": "MAR-88351",
+  "received_at": "2026-10-27T08:00:00Z",
+  "currency": "USD",
+  "lines": [
+    {
+      "kind": "linehaul",
+      "amount_usd": 2500
+    },
+    {
+      "kind": "fuel",
+      "amount_usd": 235
+    },
+    {
+      "kind": "detention",
+      "hours": 2,
+      "amount_usd": 150
+    }
+  ],
+  "total_usd": 2885,
+  "scan": "scans/INV-2027.pdf"
+}

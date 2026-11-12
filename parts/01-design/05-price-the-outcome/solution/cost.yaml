@@ -1,0 +1,24 @@
+# Cost model for the freight audit clerk. Run: bun run cost <this file>
+employee: freight-audit-clerk
+outcome: one carrier invoice settled (paid or disputed)
+value_per_outcome_usd: 4.00
+value_reason: Ravi spends about six minutes on a clean invoice, which costs KaaS Freight about USD 4 in his time
+
+runs:
+  good_per_outcome: 1       # the run that settles the invoice
+  failed_per_outcome: 0.25  # runs that fail, stop or get killed, per settled invoice; a guess until traces say otherwise
+
+calls_per_run: 6            # read invoice, rate confirmation, proof of delivery, find load, decide, pay or dispute
+tokens_per_call:
+  input: 4000               # the invoice text and the papers grow the prompt
+  output: 400
+
+price:
+  role: fast                # the fast role in config/models.ts; this price holds for prompts up to 100,000 tokens
+  provider: anthropic
+  checked_on: "2026-11-12"
+  source: https://claude.com/pricing
+  input_usd_per_million: 0.10
+  output_usd_per_million: 0.50
+
+cost_per_outcome_usd: 0.0045

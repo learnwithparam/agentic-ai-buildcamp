@@ -1,0 +1,42 @@
+[
+  {
+    "person_id": "lena",
+    "name": "Lena Ortiz",
+    "tenant": "kaas-freight",
+    "role": "finance_lead",
+    "may_approve": true,
+    "pay_limit_usd": null,
+    "dispute_limit_usd": null,
+    "note": "Approves any payment over USD 5,000 and any dispute over USD 1,000."
+  },
+  {
+    "person_id": "ravi",
+    "name": "Ravi Shah",
+    "tenant": "kaas-freight",
+    "role": "ap_clerk",
+    "may_approve": true,
+    "pay_limit_usd": 5000,
+    "dispute_limit_usd": 1000,
+    "note": "May approve payments up to USD 5,000 and disputes up to USD 1,000."
+  },
+  {
+    "person_id": "jo",
+    "name": "Jo Park",
+    "tenant": "kaas-freight",
+    "role": "contractor",
+    "may_approve": false,
+    "pay_limit_usd": 0,
+    "dispute_limit_usd": 0,
+    "note": "A contractor. Can read the ledger, may not approve anything."
+  },
+  {
+    "person_id": "mara",
+    "name": "Mara Quinn",
+    "tenant": "kaas-dairy",
+    "role": "finance_lead",
+    "may_approve": true,
+    "pay_limit_usd": null,
+    "dispute_limit_usd": null,
+    "note": "Finance lead for KaaS Dairy. Approves KaaS Dairy payments over USD 5,000."
+  }
+]

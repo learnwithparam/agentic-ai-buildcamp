@@ -1,0 +1,8 @@
+flowchart LR
+  T1[Starts by: a person, an event, a schedule or an agent] --> W
+  subgraph Map[Who decides the next step]
+    W[Workflow: code decides] --> A[Agent: the model decides]
+    A --> S[Agentic system: models hand work to models]
+  end
+  F[Freight audit clerk: Ravi hands it a new invoice] -.placed here.-> A
+  A --> G[Code still guards the must-never: no second payment for one load]

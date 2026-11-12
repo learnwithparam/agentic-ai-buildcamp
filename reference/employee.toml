@@ -1,0 +1,29 @@
+# The reference employee's file. Yours has the same shape. See reference/CONTRACT.md.
+
+[hire]
+name = "freight-audit-clerk"
+outcome = "Each carrier invoice is paid once at the rate confirmation's amount, or disputed with a reason code the papers support"
+starts_by = ["person"]
+lives = "one job"
+
+[hire.metric]
+name = "cost per invoice settled"
+query = "SELECT COUNT(*) AS settled FROM invoices i WHERE i.tenant = 'kaas-freight' AND (EXISTS (SELECT 1 FROM payments p WHERE p.invoice_id = i.invoice_id) OR EXISTS (SELECT 1 FROM disputes d WHERE d.invoice_id = i.invoice_id))"
+note = "Model spend divided by this count. Also watch the share settled with no human."
+
+[hire.must_never]
+rule = "Pay the same load twice, or pay above the rate confirmation without Lena's approval"
+write = "pay_invoice"
+check = "SELECT i.load_id, COUNT(*) AS payments FROM payments p JOIN invoices i ON i.invoice_id = p.invoice_id GROUP BY i.load_id HAVING COUNT(*) > 1"
+
+[contract]
+version = "1"
+mode = "http"
+start = "bun start.ts"
+url = "http://localhost:7701"
+traces = "traces"
+
+[budget]
+max_steps = 12
+max_usd_per_job = 0.05
+max_usd_per_day = 5

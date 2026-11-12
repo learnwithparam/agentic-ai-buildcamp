@@ -1,0 +1,23 @@
+employee: freight-audit-clerk
+outcome: one carrier invoice settled (paid or disputed)
+value_per_outcome_usd: 4.00
+value_reason: Ravi spends about six minutes on a clean invoice, which costs KaaS Freight about USD 4 in his time
+
+runs:
+  good_per_outcome: 1
+  failed_per_outcome: 0
+
+calls_per_run: 6
+tokens_per_call:
+  input: 4000
+  output: 400
+
+price:
+  role: fast                # the fast role in config/models.ts; this price holds for prompts up to 100,000 tokens
+  provider: anthropic
+  checked_on: "2026-11-12"
+  source: https://claude.com/pricing
+  input_usd_per_million: 0.10
+  output_usd_per_million: 0.50
+
+cost_per_outcome_usd: 0.0036

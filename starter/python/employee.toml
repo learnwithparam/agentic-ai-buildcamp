@@ -1,0 +1,17 @@
+# Your employee's file. The checker reads it to start your employee. See reference/CONTRACT.md.
+
+[hire]
+name = "freight-audit-clerk"
+# outcome, metric, must_never, starts_by and lives come in the Design part.
+
+[contract]
+version = "1"
+mode = "http"
+start = "uv run --quiet python -m employee"
+url = "http://localhost:7701"
+traces = "traces"
+
+[budget]
+max_steps = 12
+max_usd_per_job = 0.05
+max_usd_per_day = 5

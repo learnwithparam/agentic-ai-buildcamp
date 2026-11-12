@@ -1,0 +1,21 @@
+{
+  "invoice_id": "INV-2009",
+  "tenant": "kaas-freight",
+  "carrier_id": "CAR-08",
+  "load_id": "L-1009",
+  "carrier_invoice_number": "SAB-88117",
+  "received_at": "2026-10-26T08:00:00Z",
+  "currency": "USD",
+  "lines": [
+    {
+      "kind": "linehaul",
+      "amount_usd": 3330
+    },
+    {
+      "kind": "fuel",
+      "amount_usd": 280
+    }
+  ],
+  "total_usd": 3610,
+  "scan": "scans/INV-2009.pdf"
+}

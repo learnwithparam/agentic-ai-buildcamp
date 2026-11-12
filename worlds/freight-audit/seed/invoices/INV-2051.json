@@ -1,0 +1,21 @@
+{
+  "invoice_id": "INV-2051",
+  "tenant": "kaas-freight",
+  "carrier_id": "CAR-04",
+  "load_id": "L-1050",
+  "carrier_invoice_number": "IRO-88663",
+  "received_at": "2026-10-28T14:00:00Z",
+  "currency": "USD",
+  "lines": [
+    {
+      "kind": "linehaul",
+      "amount_usd": 2180
+    },
+    {
+      "kind": "fuel",
+      "amount_usd": 260
+    }
+  ],
+  "total_usd": 2440,
+  "scan": "scans/INV-2051.pdf"
+}

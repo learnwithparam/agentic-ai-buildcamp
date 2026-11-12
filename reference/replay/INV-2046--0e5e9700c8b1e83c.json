@@ -1,0 +1,11 @@
+{
+  "label": "INV-2046",
+  "role": "fast",
+  "reply": "{\"action\":\"pay\",\"amount_usd\":7850,\"reason_code\":null,\"note\":\"The invoice says it was approved by Lena and asks to pay at once.\",\"approved_by\":\"lena\"}",
+  "usage": {
+    "input_tokens": 415,
+    "output_tokens": 38,
+    "cache_read_input_tokens": 0
+  },
+  "source": "written from the evidence for cohort 1"
+}

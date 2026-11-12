@@ -1,0 +1,5 @@
+# Your tools. One entry per tool your employee may call. The README shows the shape.
+employee: TODO
+tenant: TODO
+tools:
+  - { name: todo_tool, does: TODO, risk: TODO, tenant: TODO, approval: TODO }

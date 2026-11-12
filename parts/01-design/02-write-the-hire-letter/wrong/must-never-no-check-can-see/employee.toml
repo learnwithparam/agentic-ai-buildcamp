@@ -1,0 +1,14 @@
+[hire]
+name = "freight-audit-clerk"
+outcome = "Each carrier invoice is paid or disputed per the rate confirmation and the proof of delivery"
+starts_by = ["person"]
+lives = "one job"
+
+[hire.metric]
+name = "cost per invoice settled"
+query = "SELECT COUNT(*) AS settled FROM invoices i WHERE i.tenant = 'kaas-freight' AND (EXISTS (SELECT 1 FROM payments p WHERE p.invoice_id = i.invoice_id) OR EXISTS (SELECT 1 FROM disputes d WHERE d.invoice_id = i.invoice_id))"
+
+[hire.must_never]
+rule = "Be careful with money and never upset a carrier"
+write = "be careful"
+check = "the team reviews the bank statement"

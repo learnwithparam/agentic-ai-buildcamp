@@ -1,0 +1,21 @@
+{
+  "invoice_id": "INV-2026",
+  "tenant": "kaas-freight",
+  "carrier_id": "CAR-03",
+  "load_id": "L-1025",
+  "carrier_invoice_number": "COR-88338",
+  "received_at": "2026-10-27T16:00:00Z",
+  "currency": "USD",
+  "lines": [
+    {
+      "kind": "linehaul",
+      "amount_usd": 1860
+    },
+    {
+      "kind": "fuel",
+      "amount_usd": 205
+    }
+  ],
+  "total_usd": 2065,
+  "scan": "scans/INV-2026.pdf"
+}

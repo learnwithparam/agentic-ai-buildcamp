@@ -1,0 +1,12 @@
+[
+  {
+    "tenant": "kaas-freight",
+    "name": "KaaS Freight",
+    "business": "freight broker, invoice audit desk"
+  },
+  {
+    "tenant": "kaas-dairy",
+    "name": "KaaS Dairy",
+    "business": "milk haulage, the second tenant in the same ledger"
+  }
+]

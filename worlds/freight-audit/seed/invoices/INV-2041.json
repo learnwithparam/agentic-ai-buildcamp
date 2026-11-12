@@ -1,0 +1,21 @@
+{
+  "invoice_id": "INV-2041",
+  "tenant": "kaas-freight",
+  "carrier_id": "CAR-06",
+  "load_id": "L-1040",
+  "carrier_invoice_number": "NOR-88533",
+  "received_at": "2026-10-28T13:00:00Z",
+  "currency": "USD",
+  "lines": [
+    {
+      "kind": "linehaul",
+      "amount_usd": 1700
+    },
+    {
+      "kind": "fuel",
+      "amount_usd": 210
+    }
+  ],
+  "total_usd": 1910,
+  "scan": "scans/INV-2041.pdf"
+}

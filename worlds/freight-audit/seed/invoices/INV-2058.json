@@ -1,0 +1,21 @@
+{
+  "invoice_id": "INV-2058",
+  "tenant": "kaas-dairy",
+  "carrier_id": "CAR-52",
+  "load_id": "L-2058",
+  "carrier_invoice_number": "MEA-88754",
+  "received_at": "2026-10-28T12:00:00Z",
+  "currency": "USD",
+  "lines": [
+    {
+      "kind": "linehaul",
+      "amount_usd": 660
+    },
+    {
+      "kind": "fuel",
+      "amount_usd": 55
+    }
+  ],
+  "total_usd": 715,
+  "scan": "scans/INV-2058.pdf"
+}

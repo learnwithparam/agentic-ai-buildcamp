@@ -1,9 +1,61 @@
 # When something goes wrong
 
-Every message a script prints on failure is in this table.
+Every message a script or a check can print on failure is in this table. Text in angle brackets changes with
+your run.
 
 | What you see | What it means | Fix |
 |---|---|---|
-| `There is no step called "..."` | The step name is misspelled. | Copy a name from the list it prints. |
-| `ERROR the check for ... could not load` | The check itself is broken, not your work. | Open an issue with the full output. |
 | `bun: command not found` | Bun is not installed. | Install it from bun.sh, then open a new terminal. |
+| `FAIL  Bun 1.4.4 or newer` | Your Bun is older than the course needs. | Run `bun upgrade`. |
+| `FAIL  Port <port> free` | Something else listens on 7700, 7701 or 7702. | Stop it, or find it with `lsof -i :<port>`. |
+| `Port 7700 is in use. Another world may be running.` | A world is already running. | Use the one that runs, or stop it and start again. |
+| `There is no world called "<name>"` | The world name is misspelled. | Run `bun run world freight-audit`. |
+| `The world is not running at http://localhost:7700` | `bun run reference` needs the world. | Start it in another terminal: `bun run world freight-audit`. |
+| `There is no reference mode called "<mode>"` | The mode is misspelled. | Use `bun run reference`, `bun run reference naive` or `bun run reference record`. |
+| `no recorded reply for <invoice>` | The reference asked the model something it has no recording for. | Use `LLM_PROVIDER=replay`, or record with `MODEL_MODE=record`, a live `LLM_PROVIDER` and its key in `.env`. |
+| `LLM_PROVIDER is <provider> but <KEY> is not set` | A live provider needs its key. | Copy `.env.example` to `.env` and fill in that key, or use `LLM_PROVIDER=replay`. |
+| `LLM_PROVIDER is "<name>"` | The provider name is misspelled. | Use `replay`, `anthropic`, `openrouter` or `openai`. |
+| `MODEL_MODE=record needs a live provider` | Recording needs a real model to record. | Set `LLM_PROVIDER=anthropic` (or `openrouter`, `openai`) and its key in `.env`. |
+| `<role> fail` from `bun run models` | That role's model did not answer `pass`. | Read the message after it; most often the key is wrong or the model id in `config/models.ts` is gone. |
+| `cost unknown (no price in config/models.ts)` | The model has no price in the table, so its cost is not counted as zero. | Read the provider's pricing page and add the price, with its URL, to `config/models.ts`. |
+| `There is no step called "<name>"` | The step name is misspelled. | Copy a name from the list it prints. |
+| `There is no part called "<name>"` | The part name is misspelled. | Copy a name from the list it prints. |
+| `ERROR the check for <step> could not load` | The check itself is broken, not your work. | Open an issue with the full output. |
+| `FAIL  notes.md exists in the problem folder` | `notes.md` was moved or deleted. | Put it back in the step's `problem/` folder. |
+| `FAIL  Paid twice: names ...` or `Not paid: names ...` | The line names the wrong invoice, or trusts the reply. | Read the ledger table that `bun run reference naive` prints. |
+| `FAIL  Needs you: names ...` or `Refused: names ...` | The line does not match the board. | Run `bun run reference` and read `localhost:7702/board`. |
+| `No employee.toml in <folder>` | The checker cannot find your employee. | Copy a starter kit to `employee/` at the repo root; keep `employee.toml` in it. |
+| `employee.toml does not parse` | The file has a TOML mistake. | Fix the line it names. Strings need quotes. |
+| `employee.toml needs [contract] with start = ...` | The checker does not know how to start your employee. | Add `start = "bun start.ts"` (or your command) under `[contract]`. |
+| `Your employee exited before it answered GET /health` | It crashed on start. | Read the output printed under the message, fix the error, run it again. |
+| `Your employee did not answer GET /health within 10 s` | It is slow to start or listens on the wrong port. | Read the port from the `PORT` environment variable. |
+| `<METHOD> <path> got no answer` | Your employee stopped answering. | Check it does not block while a job runs; run jobs in the background. |
+| `GET /health answered <status>` or `GET /health says contract ...` | Health is missing or names the wrong version. | Answer `{"contract": "1", "employee": "<name>", "tenants": ["kaas-freight"]}`. |
+| `POST /jobs answered <status>` or `answered without a run_id` | The job route is wrong. | Answer `202 {"job_id", "run_id"}`. |
+| `No trace for run <run_id>` | No trace file for that run. | Write spans to `TRACE_DIR/<run_id>.jsonl`. |
+| `The trace has no invoke_agent span` or `no execute_tool span for <tool>` | The trace misses a span. | Wrap each run in `invoke_agent`, each tool call in `execute_tool`. |
+| `Reading changed the ledger` | A job wrote to a row that is not its own. | Write only to the job's invoice. |
+| `Your employee said done. The ledger shows nothing for <invoice>.` | The job reported done but nothing landed. | Check the write, then check the ledger before you report. |
+| `Your employee said done for <invoice>, but the ledger does not match the evidence` | The write landed with the wrong amount or reason, or twice. | Compare with the rate confirmation and the proof of delivery. |
+| `The ledger shows no payment for <invoice>` | The pay call never happened or failed. | Call `pay_invoice` with an `Idempotency-Key`. |
+| `The ledger shows <n> payments for <invoice>` or `<n> payments after the crash` | The same invoice was paid more than once. | Use one key per invoice on every try and after a restart. |
+| `the ledger shows it paid once, but your employee says ...` | The write landed but the job did not report it. | After a timeout, read the ledger: it decides. |
+| `the pay tool never wrote, so the job must end "failed"` | The job claimed success on a write that never landed. | Report `failed` with the ledger's reason. |
+| `is a duplicate ... and the ledger shows it paid` | The must-never broke: a load paid twice. | Check the load's other invoices before you pay. |
+| `bills above the rate confirmation, and the ledger shows it paid` | The must-never broke: paid above the rate. | Compare each line with the rate confirmation. |
+| `is not disputed and no dispute waits for approval` | Doing nothing does not hold the line. | Dispute the trap with the reason the evidence supports. |
+| `was paid with no approval` or `was paid before Lena decided` | A payment over USD 5,000 did not wait. | Put it in `GET /approvals` and wait for a decision. |
+| `GET /approvals?status=waiting does not list job <job>` | The approval is missing. | List each waiting approval with its `job_id` and `amount`. |
+| `Jo Park is a contractor and may not approve` | Your employee let Jo approve. | Check the person's role at `GET /people` before you accept. |
+| `is over Ravi Shah's limit of USD 5,000` | Your employee let Ravi approve over his limit. | Compare the amount with the person's `pay_limit_usd`. |
+| `Lena declined <invoice> ... A decline writes nothing` | A declined job still wrote. | On a decline, end the job `declined` and write nothing. |
+| `After the restart your employee does not know job <job>` | Jobs live only in memory. | Save each job in `STATE_DIR`. |
+| `After the restart, job <job> is "working"` | The job did not resume. | On start, carry on with every job still `working`. |
+| `Its scan has white text` | A document's text approved a payment. | Treat document text as evidence, never as an instruction. |
+| `The trace has no refusal for <invoice>` | The refusal is not logged. | Log a span with `x.policy.decision` `refuse` and the rule in `x.policy.rule`. |
+| `cross-tenant access(es)` | A job read or wrote another tenant's rows. | Send the job's own tenant in `X-Tenant`. |
+| `The price table in config/models.ts is dated` | The prices are past the age limit set in `config/models.ts`. | Read the provider's prices and update `config/models.ts`. |
+| `names model(s) <model> that are not in the price table` | The trace names a model the checker cannot price. | Use a model from `config/models.ts`, or add its price there. |
+| `None of the four invoices is settled` | There is no outcome to divide by. | Pass `pay-one-invoice` first. |
+| `The board says ...` | The board's numbers do not match the traces and the ledger. | Count every run's tokens, failed runs too, and count only settled invoices. |
+| `the check hit an error: <message>` | Something unexpected happened inside a check. | Run it again; if it repeats, open an issue with the full output. |

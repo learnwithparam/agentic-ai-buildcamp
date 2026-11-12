@@ -1,0 +1,27 @@
+# Every tool the freight audit clerk may call. The world serves these on localhost:7700.
+employee: freight-audit-clerk
+tenant: kaas-freight
+tools:
+  - { name: find_load, does: reads, risk: read, tenant: own, approval: none }
+  - { name: read_invoice, does: reads, risk: read, tenant: own, approval: none }
+  - { name: read_rate_confirmation, does: reads, risk: read, tenant: own, approval: none }
+  - { name: read_proof_of_delivery, does: reads, risk: read, tenant: own, approval: none }
+  - name: email_carrier
+    does: writes
+    risk: undoable write
+    tenant: own
+    approval: none
+    note: A wrong email is fixed with a second email. Nothing leaves the bank.
+  - name: open_dispute
+    does: writes
+    risk: undoable write
+    tenant: own
+    approval: Ravi up to USD 1,000; Lena above
+    note: A dispute can be withdrawn, but it tells the carrier we will not pay.
+  - name: pay_invoice
+    does: writes
+    risk: final write
+    tenant: own
+    approval: Ravi up to USD 5,000; Lena above, and above the rate confirmation
+    must_never: Pay the same load twice
+    note: Money out of the door. Send an Idempotency-Key with every call.
