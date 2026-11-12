@@ -1,0 +1,26 @@
+{
+  "invoice_id": "INV-2039",
+  "tenant": "kaas-freight",
+  "carrier_id": "CAR-03",
+  "load_id": "L-1038",
+  "carrier_invoice_number": "COR-88507",
+  "received_at": "2026-10-27T11:00:00Z",
+  "currency": "USD",
+  "lines": [
+    {
+      "kind": "linehaul",
+      "amount_usd": 3990
+    },
+    {
+      "kind": "fuel",
+      "amount_usd": 385
+    },
+    {
+      "kind": "detention",
+      "hours": 3,
+      "amount_usd": 225
+    }
+  ],
+  "total_usd": 4600,
+  "scan": "scans/INV-2039.pdf"
+}

@@ -1,0 +1,592 @@
+[
+  {
+    "load_id": "L-1001",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-08",
+    "shipper": "Orrin Tools",
+    "origin": "Kansas City, MO",
+    "destination": "Allentown, PA",
+    "pickup_date": "2026-10-01",
+    "delivery_date": "2026-10-03"
+  },
+  {
+    "load_id": "L-1002",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-09",
+    "shipper": "Pike Street Paper",
+    "origin": "Fresno, CA",
+    "destination": "Reno, NV",
+    "pickup_date": "2026-10-09",
+    "delivery_date": "2026-10-11"
+  },
+  {
+    "load_id": "L-1003",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-10",
+    "shipper": "Pike Street Paper",
+    "origin": "Laredo, TX",
+    "destination": "Kansas City, MO",
+    "pickup_date": "2026-10-18",
+    "delivery_date": "2026-10-20"
+  },
+  {
+    "load_id": "L-1004",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-09",
+    "shipper": "Orrin Tools",
+    "origin": "Columbus, OH",
+    "destination": "Memphis, TN",
+    "pickup_date": "2026-10-20",
+    "delivery_date": "2026-10-22"
+  },
+  {
+    "load_id": "L-1005",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-05",
+    "shipper": "Halvorsen Foods",
+    "origin": "Columbus, OH",
+    "destination": "Laredo, TX",
+    "pickup_date": "2026-10-25",
+    "delivery_date": "2026-10-27"
+  },
+  {
+    "load_id": "L-1006",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-05",
+    "shipper": "Halvorsen Foods",
+    "origin": "Denver, CO",
+    "destination": "Fresno, CA",
+    "pickup_date": "2026-10-08",
+    "delivery_date": "2026-10-10"
+  },
+  {
+    "load_id": "L-1007",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-09",
+    "shipper": "Pike Street Paper",
+    "origin": "Savannah, GA",
+    "destination": "Allentown, PA",
+    "pickup_date": "2026-10-09",
+    "delivery_date": "2026-10-11"
+  },
+  {
+    "load_id": "L-1008",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-10",
+    "shipper": "Orrin Tools",
+    "origin": "Allentown, PA",
+    "destination": "Kansas City, MO",
+    "pickup_date": "2026-10-25",
+    "delivery_date": "2026-10-27"
+  },
+  {
+    "load_id": "L-1009",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-08",
+    "shipper": "Greenmarsh Garden Supply",
+    "origin": "Kansas City, MO",
+    "destination": "Fresno, CA",
+    "pickup_date": "2026-10-09",
+    "delivery_date": "2026-10-11"
+  },
+  {
+    "load_id": "L-1010",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-08",
+    "shipper": "Tallis Appliances",
+    "origin": "Allentown, PA",
+    "destination": "Kansas City, MO",
+    "pickup_date": "2026-10-14",
+    "delivery_date": "2026-10-16"
+  },
+  {
+    "load_id": "L-1011",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-06",
+    "shipper": "Pike Street Paper",
+    "origin": "Fresno, CA",
+    "destination": "Kansas City, MO",
+    "pickup_date": "2026-10-11",
+    "delivery_date": "2026-10-13"
+  },
+  {
+    "load_id": "L-1012",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-05",
+    "shipper": "Tallis Appliances",
+    "origin": "Laredo, TX",
+    "destination": "Columbus, OH",
+    "pickup_date": "2026-10-24",
+    "delivery_date": "2026-10-26"
+  },
+  {
+    "load_id": "L-1013",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-06",
+    "shipper": "Tallis Appliances",
+    "origin": "Kansas City, MO",
+    "destination": "Savannah, GA",
+    "pickup_date": "2026-10-22",
+    "delivery_date": "2026-10-24"
+  },
+  {
+    "load_id": "L-1014",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-04",
+    "shipper": "Orrin Tools",
+    "origin": "Joliet, IL",
+    "destination": "Allentown, PA",
+    "pickup_date": "2026-10-01",
+    "delivery_date": "2026-10-03"
+  },
+  {
+    "load_id": "L-1015",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-03",
+    "shipper": "Greenmarsh Garden Supply",
+    "origin": "Kansas City, MO",
+    "destination": "Savannah, GA",
+    "pickup_date": "2026-10-20",
+    "delivery_date": "2026-10-22"
+  },
+  {
+    "load_id": "L-1016",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-04",
+    "shipper": "Greenmarsh Garden Supply",
+    "origin": "Allentown, PA",
+    "destination": "Columbus, OH",
+    "pickup_date": "2026-10-16",
+    "delivery_date": "2026-10-18"
+  },
+  {
+    "load_id": "L-1017",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-09",
+    "shipper": "Greenmarsh Garden Supply",
+    "origin": "Columbus, OH",
+    "destination": "Laredo, TX",
+    "pickup_date": "2026-10-02",
+    "delivery_date": "2026-10-04"
+  },
+  {
+    "load_id": "L-1018",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-10",
+    "shipper": "Pike Street Paper",
+    "origin": "Laredo, TX",
+    "destination": "Reno, NV",
+    "pickup_date": "2026-10-21",
+    "delivery_date": "2026-10-23"
+  },
+  {
+    "load_id": "L-1019",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-03",
+    "shipper": "Halvorsen Foods",
+    "origin": "Reno, NV",
+    "destination": "Fresno, CA",
+    "pickup_date": "2026-10-09",
+    "delivery_date": "2026-10-11"
+  },
+  {
+    "load_id": "L-1020",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-06",
+    "shipper": "Pike Street Paper",
+    "origin": "Columbus, OH",
+    "destination": "Allentown, PA",
+    "pickup_date": "2026-10-03",
+    "delivery_date": "2026-10-05"
+  },
+  {
+    "load_id": "L-1021",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-05",
+    "shipper": "Halvorsen Foods",
+    "origin": "Columbus, OH",
+    "destination": "Joliet, IL",
+    "pickup_date": "2026-10-08",
+    "delivery_date": "2026-10-10"
+  },
+  {
+    "load_id": "L-1022",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-09",
+    "shipper": "Orrin Tools",
+    "origin": "Kansas City, MO",
+    "destination": "Memphis, TN",
+    "pickup_date": "2026-10-04",
+    "delivery_date": "2026-10-06"
+  },
+  {
+    "load_id": "L-1023",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-09",
+    "shipper": "Orrin Tools",
+    "origin": "Joliet, IL",
+    "destination": "Allentown, PA",
+    "pickup_date": "2026-10-20",
+    "delivery_date": "2026-10-22"
+  },
+  {
+    "load_id": "L-1024",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-10",
+    "shipper": "Tallis Appliances",
+    "origin": "Allentown, PA",
+    "destination": "Joliet, IL",
+    "pickup_date": "2026-10-05",
+    "delivery_date": "2026-10-07"
+  },
+  {
+    "load_id": "L-1025",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-03",
+    "shipper": "Pike Street Paper",
+    "origin": "Allentown, PA",
+    "destination": "Fresno, CA",
+    "pickup_date": "2026-10-18",
+    "delivery_date": "2026-10-20"
+  },
+  {
+    "load_id": "L-1026",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-01",
+    "shipper": "Tallis Appliances",
+    "origin": "Fresno, CA",
+    "destination": "Columbus, OH",
+    "pickup_date": "2026-10-14",
+    "delivery_date": "2026-10-16"
+  },
+  {
+    "load_id": "L-1027",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-10",
+    "shipper": "Greenmarsh Garden Supply",
+    "origin": "Kansas City, MO",
+    "destination": "Denver, CO",
+    "pickup_date": "2026-10-23",
+    "delivery_date": "2026-10-25"
+  },
+  {
+    "load_id": "L-1028",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-03",
+    "shipper": "Tallis Appliances",
+    "origin": "Kansas City, MO",
+    "destination": "Fresno, CA",
+    "pickup_date": "2026-10-08",
+    "delivery_date": "2026-10-10"
+  },
+  {
+    "load_id": "L-1029",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-10",
+    "shipper": "Pike Street Paper",
+    "origin": "Joliet, IL",
+    "destination": "Columbus, OH",
+    "pickup_date": "2026-10-04",
+    "delivery_date": "2026-10-06"
+  },
+  {
+    "load_id": "L-1030",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-04",
+    "shipper": "Orrin Tools",
+    "origin": "Savannah, GA",
+    "destination": "Columbus, OH",
+    "pickup_date": "2026-10-08",
+    "delivery_date": "2026-10-10"
+  },
+  {
+    "load_id": "L-1031",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-02",
+    "shipper": "Greenmarsh Garden Supply",
+    "origin": "Laredo, TX",
+    "destination": "Fresno, CA",
+    "pickup_date": "2026-10-03",
+    "delivery_date": "2026-10-05"
+  },
+  {
+    "load_id": "L-1032",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-01",
+    "shipper": "Orrin Tools",
+    "origin": "Fresno, CA",
+    "destination": "Laredo, TX",
+    "pickup_date": "2026-10-23",
+    "delivery_date": "2026-10-25"
+  },
+  {
+    "load_id": "L-1033",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-03",
+    "shipper": "Tallis Appliances",
+    "origin": "Joliet, IL",
+    "destination": "Kansas City, MO",
+    "pickup_date": "2026-10-01",
+    "delivery_date": "2026-10-03"
+  },
+  {
+    "load_id": "L-1034",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-03",
+    "shipper": "Orrin Tools",
+    "origin": "Memphis, TN",
+    "destination": "Joliet, IL",
+    "pickup_date": "2026-10-12",
+    "delivery_date": "2026-10-14"
+  },
+  {
+    "load_id": "L-1035",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-01",
+    "shipper": "Tallis Appliances",
+    "origin": "Fresno, CA",
+    "destination": "Reno, NV",
+    "pickup_date": "2026-10-09",
+    "delivery_date": "2026-10-11"
+  },
+  {
+    "load_id": "L-1036",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-09",
+    "shipper": "Pike Street Paper",
+    "origin": "Columbus, OH",
+    "destination": "Denver, CO",
+    "pickup_date": "2026-10-13",
+    "delivery_date": "2026-10-15"
+  },
+  {
+    "load_id": "L-1037",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-06",
+    "shipper": "Tallis Appliances",
+    "origin": "Denver, CO",
+    "destination": "Allentown, PA",
+    "pickup_date": "2026-10-02",
+    "delivery_date": "2026-10-04"
+  },
+  {
+    "load_id": "L-1038",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-03",
+    "shipper": "Pike Street Paper",
+    "origin": "Denver, CO",
+    "destination": "Fresno, CA",
+    "pickup_date": "2026-10-13",
+    "delivery_date": "2026-10-15"
+  },
+  {
+    "load_id": "L-1039",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-03",
+    "shipper": "Orrin Tools",
+    "origin": "Allentown, PA",
+    "destination": "Joliet, IL",
+    "pickup_date": "2026-10-13",
+    "delivery_date": "2026-10-15"
+  },
+  {
+    "load_id": "L-1040",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-06",
+    "shipper": "Pike Street Paper",
+    "origin": "Memphis, TN",
+    "destination": "Joliet, IL",
+    "pickup_date": "2026-10-14",
+    "delivery_date": "2026-10-16"
+  },
+  {
+    "load_id": "L-1041",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-01",
+    "shipper": "Pike Street Paper",
+    "origin": "Allentown, PA",
+    "destination": "Laredo, TX",
+    "pickup_date": "2026-10-10",
+    "delivery_date": "2026-10-12"
+  },
+  {
+    "load_id": "L-1042",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-05",
+    "shipper": "Greenmarsh Garden Supply",
+    "origin": "Joliet, IL",
+    "destination": "Fresno, CA",
+    "pickup_date": "2026-10-25",
+    "delivery_date": "2026-10-27"
+  },
+  {
+    "load_id": "L-1043",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-08",
+    "shipper": "Greenmarsh Garden Supply",
+    "origin": "Kansas City, MO",
+    "destination": "Allentown, PA",
+    "pickup_date": "2026-10-04",
+    "delivery_date": "2026-10-06"
+  },
+  {
+    "load_id": "L-1044",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-10",
+    "shipper": "Halvorsen Foods",
+    "origin": "Joliet, IL",
+    "destination": "Kansas City, MO",
+    "pickup_date": "2026-10-14",
+    "delivery_date": "2026-10-16"
+  },
+  {
+    "load_id": "L-1045",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-02",
+    "shipper": "Greenmarsh Garden Supply",
+    "origin": "Savannah, GA",
+    "destination": "Kansas City, MO",
+    "pickup_date": "2026-10-18",
+    "delivery_date": "2026-10-20"
+  },
+  {
+    "load_id": "L-1046",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-01",
+    "shipper": "Tallis Appliances",
+    "origin": "Allentown, PA",
+    "destination": "Denver, CO",
+    "pickup_date": "2026-10-02",
+    "delivery_date": "2026-10-04"
+  },
+  {
+    "load_id": "L-1047",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-02",
+    "shipper": "Halvorsen Foods",
+    "origin": "Joliet, IL",
+    "destination": "Denver, CO",
+    "pickup_date": "2026-10-09",
+    "delivery_date": "2026-10-11"
+  },
+  {
+    "load_id": "L-1048",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-04",
+    "shipper": "Tallis Appliances",
+    "origin": "Savannah, GA",
+    "destination": "Memphis, TN",
+    "pickup_date": "2026-10-05",
+    "delivery_date": "2026-10-07"
+  },
+  {
+    "load_id": "L-1049",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-03",
+    "shipper": "Tallis Appliances",
+    "origin": "Fresno, CA",
+    "destination": "Columbus, OH",
+    "pickup_date": "2026-10-07",
+    "delivery_date": "2026-10-09"
+  },
+  {
+    "load_id": "L-1050",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-04",
+    "shipper": "Tallis Appliances",
+    "origin": "Columbus, OH",
+    "destination": "Laredo, TX",
+    "pickup_date": "2026-10-13",
+    "delivery_date": "2026-10-15"
+  },
+  {
+    "load_id": "L-1051",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-06",
+    "shipper": "Halvorsen Foods",
+    "origin": "Reno, NV",
+    "destination": "Savannah, GA",
+    "pickup_date": "2026-10-23",
+    "delivery_date": "2026-10-25"
+  },
+  {
+    "load_id": "L-2053",
+    "tenant": "kaas-dairy",
+    "carrier_id": "CAR-51",
+    "shipper": "Morrow Fields",
+    "origin": "Morrow Fields, WI",
+    "destination": "KaaS Dairy plant, Eau Claire, WI",
+    "pickup_date": "2026-10-17",
+    "delivery_date": "2026-10-19"
+  },
+  {
+    "load_id": "L-2054",
+    "tenant": "kaas-dairy",
+    "carrier_id": "CAR-51",
+    "shipper": "Ash Lane Dairy",
+    "origin": "Ash Lane Dairy, WI",
+    "destination": "KaaS Dairy plant, Eau Claire, WI",
+    "pickup_date": "2026-10-23",
+    "delivery_date": "2026-10-25"
+  },
+  {
+    "load_id": "L-2055",
+    "tenant": "kaas-dairy",
+    "carrier_id": "CAR-53",
+    "shipper": "Brookhollow Farm",
+    "origin": "Brookhollow Farm, WI",
+    "destination": "KaaS Dairy plant, Eau Claire, WI",
+    "pickup_date": "2026-10-18",
+    "delivery_date": "2026-10-20"
+  },
+  {
+    "load_id": "L-2056",
+    "tenant": "kaas-dairy",
+    "carrier_id": "CAR-52",
+    "shipper": "Kettle Hill Farm",
+    "origin": "Kettle Hill Farm, WI",
+    "destination": "KaaS Dairy plant, Eau Claire, WI",
+    "pickup_date": "2026-10-08",
+    "delivery_date": "2026-10-10"
+  },
+  {
+    "load_id": "L-2057",
+    "tenant": "kaas-dairy",
+    "carrier_id": "CAR-51",
+    "shipper": "Morrow Fields",
+    "origin": "Morrow Fields, WI",
+    "destination": "KaaS Dairy plant, Eau Claire, WI",
+    "pickup_date": "2026-10-17",
+    "delivery_date": "2026-10-19"
+  },
+  {
+    "load_id": "L-2058",
+    "tenant": "kaas-dairy",
+    "carrier_id": "CAR-52",
+    "shipper": "Morrow Fields",
+    "origin": "Morrow Fields, WI",
+    "destination": "KaaS Dairy plant, Eau Claire, WI",
+    "pickup_date": "2026-10-06",
+    "delivery_date": "2026-10-08"
+  },
+  {
+    "load_id": "L-2059",
+    "tenant": "kaas-dairy",
+    "carrier_id": "CAR-51",
+    "shipper": "Kettle Hill Farm",
+    "origin": "Kettle Hill Farm, WI",
+    "destination": "KaaS Dairy plant, Eau Claire, WI",
+    "pickup_date": "2026-10-14",
+    "delivery_date": "2026-10-16"
+  },
+  {
+    "load_id": "L-2060",
+    "tenant": "kaas-dairy",
+    "carrier_id": "CAR-53",
+    "shipper": "Ash Lane Dairy",
+    "origin": "Ash Lane Dairy, WI",
+    "destination": "KaaS Dairy plant, Eau Claire, WI",
+    "pickup_date": "2026-10-14",
+    "delivery_date": "2026-10-16"
+  }
+]

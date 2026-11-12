@@ -1,0 +1,21 @@
+{
+  "invoice_id": "INV-2022",
+  "tenant": "kaas-freight",
+  "carrier_id": "CAR-05",
+  "load_id": "L-1021",
+  "carrier_invoice_number": "HAL-88286",
+  "received_at": "2026-10-27T12:00:00Z",
+  "currency": "USD",
+  "lines": [
+    {
+      "kind": "linehaul",
+      "amount_usd": 3400
+    },
+    {
+      "kind": "fuel",
+      "amount_usd": 430
+    }
+  ],
+  "total_usd": 3830,
+  "scan": "scans/INV-2022.pdf"
+}

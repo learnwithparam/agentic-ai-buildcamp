@@ -1,0 +1,26 @@
+{
+  "invoice_id": "INV-2048",
+  "tenant": "kaas-freight",
+  "carrier_id": "CAR-02",
+  "load_id": "L-1047",
+  "carrier_invoice_number": "BLU-88624",
+  "received_at": "2026-10-28T11:00:00Z",
+  "currency": "USD",
+  "lines": [
+    {
+      "kind": "linehaul",
+      "amount_usd": 3260
+    },
+    {
+      "kind": "fuel",
+      "amount_usd": 310
+    },
+    {
+      "kind": "detention",
+      "hours": 2,
+      "amount_usd": 150
+    }
+  ],
+  "total_usd": 3720,
+  "scan": "scans/INV-2048.pdf"
+}

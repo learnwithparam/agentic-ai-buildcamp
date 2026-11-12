@@ -1,0 +1,592 @@
+[
+  {
+    "rate_id": "RC-1001",
+    "load_id": "L-1001",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-08",
+    "linehaul_usd": 3920,
+    "fuel_surcharge_cap_usd": 400,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1002",
+    "load_id": "L-1002",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-09",
+    "linehaul_usd": 2460,
+    "fuel_surcharge_cap_usd": 335,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1003",
+    "load_id": "L-1003",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-10",
+    "linehaul_usd": 3260,
+    "fuel_surcharge_cap_usd": 395,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1004",
+    "load_id": "L-1004",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-09",
+    "linehaul_usd": 2790,
+    "fuel_surcharge_cap_usd": 250,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1005",
+    "load_id": "L-1005",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-05",
+    "linehaul_usd": 1360,
+    "fuel_surcharge_cap_usd": 265,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1006",
+    "load_id": "L-1006",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-05",
+    "linehaul_usd": 1430,
+    "fuel_surcharge_cap_usd": 215,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1007",
+    "load_id": "L-1007",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-09",
+    "linehaul_usd": 1230,
+    "fuel_surcharge_cap_usd": 185,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1008",
+    "load_id": "L-1008",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-10",
+    "linehaul_usd": 3590,
+    "fuel_surcharge_cap_usd": 435,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1009",
+    "load_id": "L-1009",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-08",
+    "linehaul_usd": 3330,
+    "fuel_surcharge_cap_usd": 310,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1010",
+    "load_id": "L-1010",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-08",
+    "linehaul_usd": 2100,
+    "fuel_surcharge_cap_usd": 310,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1011",
+    "load_id": "L-1011",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-06",
+    "linehaul_usd": 3680,
+    "fuel_surcharge_cap_usd": 580,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1012",
+    "load_id": "L-1012",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-05",
+    "linehaul_usd": 2420,
+    "fuel_surcharge_cap_usd": 305,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1013",
+    "load_id": "L-1013",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-06",
+    "linehaul_usd": 2320,
+    "fuel_surcharge_cap_usd": 300,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1014",
+    "load_id": "L-1014",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-04",
+    "linehaul_usd": 3290,
+    "fuel_surcharge_cap_usd": 395,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1015",
+    "load_id": "L-1015",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-03",
+    "linehaul_usd": 2760,
+    "fuel_surcharge_cap_usd": 420,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1016",
+    "load_id": "L-1016",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-04",
+    "linehaul_usd": 3160,
+    "fuel_surcharge_cap_usd": 415,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1017",
+    "load_id": "L-1017",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-09",
+    "linehaul_usd": 1840,
+    "fuel_surcharge_cap_usd": 305,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1018",
+    "load_id": "L-1018",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-10",
+    "linehaul_usd": 3870,
+    "fuel_surcharge_cap_usd": 615,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1019",
+    "load_id": "L-1019",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-03",
+    "linehaul_usd": 2560,
+    "fuel_surcharge_cap_usd": 260,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1020",
+    "load_id": "L-1020",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-06",
+    "linehaul_usd": 1660,
+    "fuel_surcharge_cap_usd": 265,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1021",
+    "load_id": "L-1021",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-05",
+    "linehaul_usd": 3400,
+    "fuel_surcharge_cap_usd": 440,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1022",
+    "load_id": "L-1022",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-09",
+    "linehaul_usd": 3800,
+    "fuel_surcharge_cap_usd": 340,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1023",
+    "load_id": "L-1023",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-09",
+    "linehaul_usd": 3930,
+    "fuel_surcharge_cap_usd": 470,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1024",
+    "load_id": "L-1024",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-10",
+    "linehaul_usd": 1540,
+    "fuel_surcharge_cap_usd": 155,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1025",
+    "load_id": "L-1025",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-03",
+    "linehaul_usd": 1860,
+    "fuel_surcharge_cap_usd": 215,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1026",
+    "load_id": "L-1026",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-01",
+    "linehaul_usd": 2500,
+    "fuel_surcharge_cap_usd": 295,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1027",
+    "load_id": "L-1027",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-10",
+    "linehaul_usd": 2250,
+    "fuel_surcharge_cap_usd": 320,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1028",
+    "load_id": "L-1028",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-03",
+    "linehaul_usd": 3530,
+    "fuel_surcharge_cap_usd": 415,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1029",
+    "load_id": "L-1029",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-10",
+    "linehaul_usd": 2630,
+    "fuel_surcharge_cap_usd": 235,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1030",
+    "load_id": "L-1030",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-04",
+    "linehaul_usd": 3390,
+    "fuel_surcharge_cap_usd": 430,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1031",
+    "load_id": "L-1031",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-02",
+    "linehaul_usd": 3570,
+    "fuel_surcharge_cap_usd": 495,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1032",
+    "load_id": "L-1032",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-01",
+    "linehaul_usd": 2350,
+    "fuel_surcharge_cap_usd": 320,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1033",
+    "load_id": "L-1033",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-03",
+    "linehaul_usd": 3400,
+    "fuel_surcharge_cap_usd": 515,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1034",
+    "load_id": "L-1034",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-03",
+    "linehaul_usd": 3290,
+    "fuel_surcharge_cap_usd": 495,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1035",
+    "load_id": "L-1035",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-01",
+    "linehaul_usd": 3370,
+    "fuel_surcharge_cap_usd": 440,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1036",
+    "load_id": "L-1036",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-09",
+    "linehaul_usd": 3130,
+    "fuel_surcharge_cap_usd": 340,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1037",
+    "load_id": "L-1037",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-06",
+    "linehaul_usd": 1940,
+    "fuel_surcharge_cap_usd": 275,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1038",
+    "load_id": "L-1038",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-03",
+    "linehaul_usd": 3990,
+    "fuel_surcharge_cap_usd": 455,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1039",
+    "load_id": "L-1039",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-03",
+    "linehaul_usd": 2910,
+    "fuel_surcharge_cap_usd": 275,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1040",
+    "load_id": "L-1040",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-06",
+    "linehaul_usd": 1700,
+    "fuel_surcharge_cap_usd": 290,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1041",
+    "load_id": "L-1041",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-01",
+    "linehaul_usd": 1410,
+    "fuel_surcharge_cap_usd": 195,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1042",
+    "load_id": "L-1042",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-05",
+    "linehaul_usd": 1400,
+    "fuel_surcharge_cap_usd": 245,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1043",
+    "load_id": "L-1043",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-08",
+    "linehaul_usd": 1290,
+    "fuel_surcharge_cap_usd": 215,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1044",
+    "load_id": "L-1044",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-10",
+    "linehaul_usd": 5700,
+    "fuel_surcharge_cap_usd": 550,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1045",
+    "load_id": "L-1045",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-02",
+    "linehaul_usd": 7200,
+    "fuel_surcharge_cap_usd": 700,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1046",
+    "load_id": "L-1046",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-01",
+    "linehaul_usd": 3140,
+    "fuel_surcharge_cap_usd": 380,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1047",
+    "load_id": "L-1047",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-02",
+    "linehaul_usd": 3260,
+    "fuel_surcharge_cap_usd": 320,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1048",
+    "load_id": "L-1048",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-04",
+    "linehaul_usd": 4950,
+    "fuel_surcharge_cap_usd": 500,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1049",
+    "load_id": "L-1049",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-03",
+    "linehaul_usd": 3800,
+    "fuel_surcharge_cap_usd": 460,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1050",
+    "load_id": "L-1050",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-04",
+    "linehaul_usd": 2180,
+    "fuel_surcharge_cap_usd": 280,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-1051",
+    "load_id": "L-1051",
+    "tenant": "kaas-freight",
+    "carrier_id": "CAR-06",
+    "linehaul_usd": 3980,
+    "fuel_surcharge_cap_usd": 355,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-2053",
+    "load_id": "L-2053",
+    "tenant": "kaas-dairy",
+    "carrier_id": "CAR-51",
+    "linehaul_usd": 1020,
+    "fuel_surcharge_cap_usd": 115,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-2054",
+    "load_id": "L-2054",
+    "tenant": "kaas-dairy",
+    "carrier_id": "CAR-51",
+    "linehaul_usd": 1160,
+    "fuel_surcharge_cap_usd": 250,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-2055",
+    "load_id": "L-2055",
+    "tenant": "kaas-dairy",
+    "carrier_id": "CAR-53",
+    "linehaul_usd": 1000,
+    "fuel_surcharge_cap_usd": 180,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-2056",
+    "load_id": "L-2056",
+    "tenant": "kaas-dairy",
+    "carrier_id": "CAR-52",
+    "linehaul_usd": 690,
+    "fuel_surcharge_cap_usd": 80,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-2057",
+    "load_id": "L-2057",
+    "tenant": "kaas-dairy",
+    "carrier_id": "CAR-51",
+    "linehaul_usd": 1020,
+    "fuel_surcharge_cap_usd": 185,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-2058",
+    "load_id": "L-2058",
+    "tenant": "kaas-dairy",
+    "carrier_id": "CAR-52",
+    "linehaul_usd": 660,
+    "fuel_surcharge_cap_usd": 65,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-2059",
+    "load_id": "L-2059",
+    "tenant": "kaas-dairy",
+    "carrier_id": "CAR-51",
+    "linehaul_usd": 880,
+    "fuel_surcharge_cap_usd": 220,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  },
+  {
+    "rate_id": "RC-2060",
+    "load_id": "L-2060",
+    "tenant": "kaas-dairy",
+    "carrier_id": "CAR-53",
+    "linehaul_usd": 1010,
+    "fuel_surcharge_cap_usd": 185,
+    "detention_usd_per_hour": 75,
+    "detention_needs_signed_delay": true
+  }
+]

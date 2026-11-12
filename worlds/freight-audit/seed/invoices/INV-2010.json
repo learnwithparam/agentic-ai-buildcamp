@@ -1,0 +1,26 @@
+{
+  "invoice_id": "INV-2010",
+  "tenant": "kaas-freight",
+  "carrier_id": "CAR-08",
+  "load_id": "L-1010",
+  "carrier_invoice_number": "SAB-88130",
+  "received_at": "2026-10-26T09:00:00Z",
+  "currency": "USD",
+  "lines": [
+    {
+      "kind": "linehaul",
+      "amount_usd": 2100
+    },
+    {
+      "kind": "fuel",
+      "amount_usd": 240
+    },
+    {
+      "kind": "detention",
+      "hours": 2,
+      "amount_usd": 150
+    }
+  ],
+  "total_usd": 2490,
+  "scan": "scans/INV-2010.pdf"
+}

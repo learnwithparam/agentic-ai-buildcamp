@@ -1,0 +1,80 @@
+[
+  {
+    "carrier_id": "CAR-01",
+    "tenant": "kaas-freight",
+    "name": "Marten Road Transport",
+    "email": "billing@marten.example"
+  },
+  {
+    "carrier_id": "CAR-02",
+    "tenant": "kaas-freight",
+    "name": "Bluegate Haulage",
+    "email": "billing@bluegate.example"
+  },
+  {
+    "carrier_id": "CAR-03",
+    "tenant": "kaas-freight",
+    "name": "Corvo Logistics",
+    "email": "billing@corvo.example"
+  },
+  {
+    "carrier_id": "CAR-04",
+    "tenant": "kaas-freight",
+    "name": "Ironline Freight",
+    "email": "billing@ironline.example"
+  },
+  {
+    "carrier_id": "CAR-05",
+    "tenant": "kaas-freight",
+    "name": "Halden Trucking",
+    "email": "billing@halden.example"
+  },
+  {
+    "carrier_id": "CAR-06",
+    "tenant": "kaas-freight",
+    "name": "Northpine Carriers",
+    "email": "billing@northpine.example"
+  },
+  {
+    "carrier_id": "CAR-07",
+    "tenant": "kaas-freight",
+    "name": "Redfield Express",
+    "email": "billing@redfield.example"
+  },
+  {
+    "carrier_id": "CAR-08",
+    "tenant": "kaas-freight",
+    "name": "Sable Creek Transport",
+    "email": "billing@sable.example"
+  },
+  {
+    "carrier_id": "CAR-09",
+    "tenant": "kaas-freight",
+    "name": "Tamsin Lines",
+    "email": "billing@tamsin.example"
+  },
+  {
+    "carrier_id": "CAR-10",
+    "tenant": "kaas-freight",
+    "name": "Westbury Haul",
+    "email": "billing@westbury.example"
+  },
+  {
+    "carrier_id": "CAR-51",
+    "tenant": "kaas-dairy",
+    "name": "Clover Tankers",
+    "email": "accounts@clover.example"
+  },
+  {
+    "carrier_id": "CAR-52",
+    "tenant": "kaas-dairy",
+    "name": "Meadowline Milk Haulage",
+    "email": "accounts@meadowline.example"
+  },
+  {
+    "carrier_id": "CAR-53",
+    "tenant": "kaas-dairy",
+    "name": "Pasture Run Transport",
+    "email": "accounts@pasture.example"
+  }
+]

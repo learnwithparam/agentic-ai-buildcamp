@@ -1,10 +1,12 @@
 {
-  "name": "workshop-template",
+  "name": "agentic-ai-buildcamp",
   "private": true,
   "type": "module",
   "packageManager": "bun@1.4.4",
   "scripts": {
-    "check": "bun scripts/check.ts && bun scripts/verify.ts --all",
-    "verify": "bun scripts/verify.ts"
+    "check": "bun scripts/check.ts && bun scripts/verify.ts --all && bun test",
+    "verify": "bun scripts/verify.ts",
+    "world": "bun worlds/run.ts",
+    "reference": "bun reference/run.ts"
   }
 }

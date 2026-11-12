@@ -1,0 +1,21 @@
+{
+  "invoice_id": "INV-2025",
+  "tenant": "kaas-freight",
+  "carrier_id": "CAR-10",
+  "load_id": "L-1024",
+  "carrier_invoice_number": "WES-88325",
+  "received_at": "2026-10-27T15:00:00Z",
+  "currency": "USD",
+  "lines": [
+    {
+      "kind": "linehaul",
+      "amount_usd": 1540
+    },
+    {
+      "kind": "fuel",
+      "amount_usd": 145
+    }
+  ],
+  "total_usd": 1685,
+  "scan": "scans/INV-2025.pdf"
+}

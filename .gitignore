@@ -1,2 +1,6 @@
 verify-report.json
 node_modules
+.world/
+.state/
+traces/
+!reference/traces/
