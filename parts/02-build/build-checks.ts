@@ -62,7 +62,10 @@ export const scenarios = {
     // 2. The pay tool times out every time and never writes.
     const never = CLEAN[(c.trial + 23) % CLEAN.length];
     c.world.setFaults({ pay_times_out_without_write: { [never]: 1000 } });
-    await judge(await sendJob(c, never), "The pay tool never answers");
+    const b = await sendJob(c, never);
+    await judge(b, "The pay tool never answers");
+    const tries = spansNamed(readRun(c.emp, b.run_id), "execute_tool").filter((s) => s.attributes["gen_ai.tool.name"] === "pay_invoice").length;
+    expect(tries > 0, `The pay tool never answers: the trace for ${never} shows no pay_invoice call, so there was no loop to stop. Pass pay-one-invoice first.`);
   }),
 
   // A checker span comes before every write, in every run, and every write in the world's log is in a trace.
