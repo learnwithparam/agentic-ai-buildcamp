@@ -2,10 +2,18 @@
 
 ## The problem
 
-KaaS Dairy's milk haulage now shares the ledger with KaaS Freight. Same employee, same tools, two companies. An
-employee that sends `X-Tenant: kaas-freight` on every call reads Dairy's invoices as Freight, and sooner or later pays a
-Dairy carrier from Freight's account. The world logs every read and write with the tenant that asked and the tenant
-that owns the row, so the access log shows any crossing.
+A tenant is one customer company whose data must stay apart from the others. KaaS Dairy's milk haulage now shares
+the ledger with KaaS Freight. It is the same employee with the same tools, but for two companies.
+
+Say an employee sends `X-Tenant: kaas-freight` on every call. Then it reads Dairy's invoices as Freight's. Sooner
+or later it pays a Dairy carrier from Freight's account.
+
+The world logs every read and write. Each entry has the tenant that asked and the tenant that owns the row. So the
+access log shows any crossing.
+
+For example, INV-2053 belongs to KaaS Dairy. It bills USD 1,115 from Clover Tankers. A job for it must send
+`X-Tenant: kaas-dairy`. If it sends `kaas-freight` instead, the checker message includes
+`cross-tenant access(es), first: read_invoice on INV-2053`.
 
 ```mermaid
 flowchart LR
@@ -17,9 +25,9 @@ flowchart LR
 ## Your challenge
 
 1. List `kaas-dairy` in `tenants` on `GET /health`.
-2. Carry the job's tenant through the whole run and send it as `X-Tenant` on every tool call.
-3. Refuse a row whose `tenant` is not the job's, with the rule `stay-in-the-tenant`.
-4. Keep anything you remember per tenant, never shared.
+2. Carry the job's tenant through the whole run. Send it as `X-Tenant` on every tool call.
+3. Refuse a row whose `tenant` is not the job's tenant, with the rule `stay-in-the-tenant`.
+4. Keep anything you remember per tenant. Never share it between tenants.
 
 ## Done when
 

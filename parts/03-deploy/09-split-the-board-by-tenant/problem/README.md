@@ -3,8 +3,16 @@
 ## The problem
 
 Finance asks what KaaS Dairy costs. The board shows one number for everyone, so nobody can say. Worse, Dairy's
-failed runs hide inside Freight's cost per invoice. Each tenant needs its own outcomes, spend and cost per outcome,
-and those numbers must match the traces, not a counter the employee keeps for itself.
+failed runs hide inside Freight's cost per invoice.
+
+Each tenant needs its own three numbers: outcomes, spend, and cost per outcome. An outcome is an invoice that the
+ledger shows settled the right way. Those numbers must match the traces, not a counter the employee keeps for
+itself.
+
+For example, the checker settles some KaaS Freight invoices and some KaaS Dairy invoices, such as INV-2053.
+`GET /board` must then show one row for `kaas-freight` and one for `kaas-dairy`. Say the ledger shows 2 Dairy
+invoices settled. Then the Dairy row must say 2 outcomes, not 4. Its spend must match the cost of Dairy's model
+calls in the traces.
 
 ```mermaid
 flowchart LR
@@ -16,14 +24,16 @@ flowchart LR
 
 ## Your challenge
 
-Group `GET /board` by each job's tenant: one entry in `tenants` per tenant, each with `outcomes`, `spend_usd` and
-`cost_per_outcome_usd`. Count every run's spend, failed and waiting runs too. Put `x.tenant` on every root span so
-the checker can add up the same numbers from your traces.
+Group `GET /board` by each job's tenant. Put one entry in `tenants` for each tenant. Give each entry `outcomes`,
+`spend_usd` and `cost_per_outcome_usd`.
+
+Count the spend of every run, failed and waiting runs too. Put `x.tenant` on every root span. Then the checker can
+add up the same numbers from your traces.
 
 ## Done when
 
 - `GET /board` has a row for `kaas-freight` and one for `kaas-dairy`.
-- Each row's outcomes match the ledger, and its spend and cost per outcome match the traces within 2%.
+- Each row's outcomes match the ledger. Its spend and cost per outcome match the traces within 2%.
 
 ```bash
 bun run verify split-the-board-by-tenant
@@ -43,5 +53,6 @@ Expect: `Done. All 1 rules pass.`
 
 ## Words you will use
 
-- **Cost per outcome**: spend divided by outcomes the ledger agrees with.
-- **Dated price table**: prices in `config/models.ts` with the date they were read; the checker refuses one too old.
+- **Cost per outcome**: spend divided by the outcomes the ledger agrees with.
+- **Dated price table**: prices in `config/models.ts`, with the date they were read. The checker refuses a table
+  that is too old.
