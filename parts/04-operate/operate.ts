@@ -36,6 +36,7 @@ if (cmd === "traces") {
     const lf = fails.filter((r) => labels.get(r.run_id) === "fail").length, lp = fails.filter((r) => labels.get(r.run_id) === "pass").length;
     console.log(`  ${e.mode.padEnd(32)} ${String(fails.length).padStart(8)}  ${String(lf).padStart(13)}  ${String(lp).padStart(13)}${lp ? "   fails a run you labelled pass" : ""}`);
   }
+  process.exit(0);
 } else if (cmd === "gate") {
   const { config, problems } = readGate(folder(arg));
   if (!config || problems.length) { console.log("The gate cannot run:"); for (const p of problems) console.log(`  - ${p}`); process.exit(2); }
@@ -47,6 +48,7 @@ if (cmd === "traces") {
   process.exit(r.decision === "allow" ? 0 : 1);
 } else if (cmd === "record-runs") {
   await recordRuns();
+  process.exit(0);
 } else {
   console.log("Try: bun parts/04-operate/operate.ts traces | evals <folder> | gate <folder> [model]");
   process.exit(cmd ? 1 : 0);
