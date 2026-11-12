@@ -42,6 +42,7 @@ bun run verify meet-the-world --setup
 Expect: a table that ends with `Ready. Next: bun run world freight-audit`. For example:
 
 ```
+Checking meet-the-world (your work):
 Setup for the Agentic AI Buildcamp:
   PASS  Bun 1.4.4 or newer     Bun 1.4.4
   SKIP  Model key (optional)   not set

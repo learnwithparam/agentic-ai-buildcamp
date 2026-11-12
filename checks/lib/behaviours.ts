@@ -190,7 +190,7 @@ export const behaviours = {
 
   // GET /board reports spend and cost per outcome that the checker can recompute from the traces within 2%.
   "show-cost-per-outcome": (dir: string) => passK(dir, async (c) => {
-    expect(!priceTableTooOld(), `The price table in config/models.ts is dated ${PRICES_AS_OF}, ${priceTableAgeDays()} days ago. Read today's prices and update it.`);
+    expect(!priceTableTooOld(), `The price table in config/models.ts is dated ${PRICES_AS_OF}, past its age limit. Read today's prices and update it.`);
     const fail = CLEAN[(c.trial + 17) % CLEAN.length];
     c.world.setFaults({ pay_times_out_without_write: { [fail]: 1000 } });
     const invs = [CLEAN[(c.trial + 15) % CLEAN.length], CLEAN[(c.trial + 16) % CLEAN.length], TRAPS.above_rate.invoice_id, fail];

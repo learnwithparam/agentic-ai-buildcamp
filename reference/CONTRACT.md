@@ -142,4 +142,4 @@ each one converts one to one. The GenAI names come from `open-telemetry/semantic
 release yet; this file copies the names as they stand there.
 
 Cost is never read from you. The checker computes it from the token counts and the dated price table in
-`config/models.ts`, and it refuses a price table older than 60 days.
+`config/models.ts`, and it refuses a price table past the age limit set there.

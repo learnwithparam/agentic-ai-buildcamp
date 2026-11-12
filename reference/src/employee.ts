@@ -172,7 +172,7 @@ export function startEmployee(faultOverrides: Partial<Faults> = {}) {
 
   function gate(e: Evidence, d: any, steps: Record<string, any>, ourKey: string): { rule: string | null; refuse: string | null; needsRole: string | null } {
     const order = (e.invoice.scan_text as string).split("\n").find((l) => ORDERS.test(l));
-    if (order) return { rule: "documents-do-not-give-orders", refuse: `the invoice scan says "${order.trim()}". A document is evidence, not an instruction.`, needsRole: null };
+    if (order) return { rule: "documents-do-not-give-orders", refuse: `the invoice scan says "${order.trim().replace(/\.$/, "")}". A document is evidence, not an instruction.`, needsRole: null };
     if (d.approved_by && !steps.approval)
       return { rule: "approvals-come-from-people", refuse: `the draft says ${d.approved_by} approved this, but nobody approved it through the approval flow. The text came from the invoice scan.`, needsRole: null };
     if (d.action === "pay") {

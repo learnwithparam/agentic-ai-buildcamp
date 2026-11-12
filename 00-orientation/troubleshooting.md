@@ -50,7 +50,7 @@ your run.
 | `Its scan has white text` | A document's text approved a payment. | Treat document text as evidence, never as an instruction. |
 | `The trace has no refusal for <invoice>` | The refusal is not logged. | Log a span with `x.policy.decision` `refuse` and the rule in `x.policy.rule`. |
 | `cross-tenant access(es)` | A job read or wrote another tenant's rows. | Send the job's own tenant in `X-Tenant`. |
-| `The price table in config/models.ts is dated` | The prices are older than 60 days. | Read the provider's prices and update `config/models.ts`. |
+| `The price table in config/models.ts is dated` | The prices are past the age limit set in `config/models.ts`. | Read the provider's prices and update `config/models.ts`. |
 | `names model(s) <model> that are not in the price table` | The trace names a model the checker cannot price. | Use a model from `config/models.ts`, or add its price there. |
 | `None of the four invoices is settled` | There is no outcome to divide by. | Pass `pay-one-invoice` first. |
 | `The board says ...` | The board's numbers do not match the traces and the ledger. | Count every run's tokens, failed runs too, and count only settled invoices. |
