@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "cost.yaml",
+  "description": "The cost model for one AI employee: what one outcome costs in model spend, and what it is worth.",
+  "type": "object",
+  "required": ["employee", "outcome", "value_per_outcome_usd", "value_reason", "runs", "calls_per_run", "tokens_per_call", "price", "cost_per_outcome_usd"],
+  "additionalProperties": false,
+  "properties": {
+    "employee": { "type": "string", "minLength": 1 },
+    "outcome": { "type": "string", "minLength": 3 },
+    "value_per_outcome_usd": { "type": "number", "exclusiveMinimum": 0 },
+    "value_reason": { "type": "string", "minLength": 10 },
+    "runs": {
+      "type": "object",
+      "required": ["good_per_outcome", "failed_per_outcome"],
+      "additionalProperties": false,
+      "properties": {
+        "good_per_outcome": { "type": "number", "minimum": 1 },
+        "failed_per_outcome": { "type": "number", "minimum": 0 }
+      }
+    },
+    "calls_per_run": { "type": "number", "exclusiveMinimum": 0 },
+    "tokens_per_call": {
+      "type": "object",
+      "required": ["input", "output"],
+      "additionalProperties": false,
+      "properties": {
+        "input": { "type": "number", "exclusiveMinimum": 0 },
+        "output": { "type": "number", "exclusiveMinimum": 0 }
+      }
+    },
+    "price": {
+      "type": "object",
+      "required": ["model", "checked_on", "source", "input_usd_per_million", "output_usd_per_million"],
+      "additionalProperties": false,
+      "properties": {
+        "model": { "type": "string", "minLength": 1 },
+        "checked_on": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+        "source": { "type": "string", "pattern": "^https://" },
+        "input_usd_per_million": { "type": "number", "minimum": 0 },
+        "output_usd_per_million": { "type": "number", "minimum": 0 }
+      }
+    },
+    "cost_per_outcome_usd": { "type": "number", "minimum": 0 }
+  }
+}

@@ -1,0 +1,14 @@
+[hire]
+employee = "freight-audit-clerk"
+outcome = "Each carrier invoice is paid or disputed per the rate confirmation and the proof of delivery"
+starts_by = "event"
+lives = "one case"
+
+[hire.metric]
+name = "carriers are happier and the finance team saves time"
+query = "ask Lena at the end of the quarter"
+
+[hire.must_never]
+rule = "Pay the same load twice"
+write = "pay_invoice"
+check = "SELECT load_id FROM payments GROUP BY load_id HAVING COUNT(*) > 1"

@@ -1,0 +1,10 @@
+# Your acceptance cases. Copy the shape below once per case, then fill it for your employee.
+# The README lists what the five cases must cover.
+employee: TODO
+cases:
+  - name: todo-name-this-case
+    kind: outcome
+    given: TODO what is true in the system of record before the job
+    job: {}
+    expect:
+      - { table: todo, where: {}, rows: 1 }

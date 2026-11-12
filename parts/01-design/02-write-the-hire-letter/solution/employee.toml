@@ -1,0 +1,16 @@
+# The hire letter for the freight audit clerk. Build adds [contract] below it.
+[hire]
+employee = "freight-audit-clerk"
+outcome = "Each carrier invoice is paid once at the rate confirmation's amount, or disputed with a reason code the papers support"
+starts_by = "event"
+lives = "one case"
+
+[hire.metric]
+name = "cost per invoice settled"
+query = "SELECT COUNT(*) AS settled FROM invoices WHERE tenant = 'kaas-freight' AND status IN ('paid', 'disputed')"
+note = "Model spend divided by this count. Also watch the share settled with no human."
+
+[hire.must_never]
+rule = "Pay the same load twice, or pay above the rate confirmation without Lena's approval"
+write = "pay_invoice"
+check = "SELECT load_id FROM payments GROUP BY load_id HAVING COUNT(*) > 1"
