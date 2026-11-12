@@ -1,0 +1,15 @@
+# The swap gate. Fill in what is missing, then run:
+#   bun parts/04-operate/operate.ts gate parts/04-operate/06-run-the-swap-gate/problem
+# Paths are relative to this file.
+employee = "../../kit"            # the sample clerk; point it at your own employee to gate yours (live provider)
+current = "smart"                 # a recorded model in parts/04-operate/models/
+candidate = "fast"
+evals = ""                        # the folder with your evals from write-an-eval-per-failure
+# acceptance = ""                 # your acceptance.yaml from Design's turn-the-hire-into-tests
+invoices = ["INV-2001", "INV-2002"]
+trials = 1
+
+[refuse_when]
+eval_pass_share_below = 1.0
+must_never = true
+cost_per_outcome_rises = true

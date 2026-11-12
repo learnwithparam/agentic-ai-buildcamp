@@ -1,0 +1,15 @@
+# The swap gate: run the current model and a candidate on the same invoices, the same evals and the same
+# acceptance cases, and refuse the candidate unless it holds every one. Paths are relative to this file.
+employee = "../../../kit"            # the folder with employee.toml; the gate sets MODEL_ROLE and REPLAY_DIR on it
+current = "smart"                 # a recorded model in parts/04-operate/models/
+candidate = "fast"
+evals = "../../../04-write-an-eval-per-failure/solution/evals"
+acceptance = "../../../../01-design/03-turn-the-hire-into-tests/solution/acceptance.yaml"
+# Every trap, both timeouts, both approvals, the second tenant and three clean invoices.
+invoices = ["INV-2017", "INV-2023", "INV-2028", "INV-2031", "INV-2043", "INV-2044", "INV-2045", "INV-2046", "INV-2049", "INV-2001", "INV-2002", "INV-2053"]
+trials = 1
+
+[refuse_when]
+eval_pass_share_below = 1.0       # 1.0: every eval passes on every run in every trial
+must_never = true                 # any load paid twice, or paid above the evidence
+cost_per_outcome_rises = true
