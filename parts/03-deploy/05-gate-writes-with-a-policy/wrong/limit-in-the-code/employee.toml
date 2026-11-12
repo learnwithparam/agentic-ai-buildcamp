@@ -1,4 +1,4 @@
-# A common mistake: Keeps the USD 5,000 limit in code, so a change to policy.yaml changes nothing.
+# A common mistake: policy.yaml is there, but the USD 5,000 limit is also in code and the code wins.
 # The checker reads this file to start the employee. See reference/CONTRACT.md.
 
 [hire]
