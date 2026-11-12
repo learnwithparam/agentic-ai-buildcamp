@@ -136,8 +136,10 @@ export async function loadEvals(dir: string | null): Promise<Eval[]> {
   if (!dir || !existsSync(dir)) return [];
   const out: Eval[] = [];
   for (const f of readdirSync(dir).filter((f) => f.endsWith(".ts") && !f.startsWith("_")).sort()) {
-    const m = await import(join(dir, f));
-    if (typeof m.default === "function") out.push({ mode: f.replace(/\.ts$/, ""), file: join(dir, f), check: m.default });
+    const file = resolve(dir, f);
+    let m: any;
+    try { m = await import(file); } catch (e) { m = { default: () => { throw new Error(`the file does not load: ${(e as Error).message}`); } }; }
+    if (typeof m.default === "function") out.push({ mode: f.replace(/\.ts$/, ""), file, check: m.default });
   }
   return out;
 }
