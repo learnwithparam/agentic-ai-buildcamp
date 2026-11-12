@@ -7,9 +7,7 @@
 //   LLM_PROVIDER=openai      needs OPENAI_API_KEY
 //
 // MODEL_MODE=replay (what the checker sets, see reference/CONTRACT.md) forces replay whatever LLM_PROVIDER says.
-import { createAnthropic } from "@ai-sdk/anthropic";
-import { createOpenAI } from "@ai-sdk/openai";
-import { createOpenRouter } from "@openrouter/ai-sdk-provider";
+// The AI SDK packages load only when a live provider is used, so replay, the checks and CI need no install.
 import type { LanguageModel } from "ai";
 
 export const ROLES = ["fast", "smart", "judge"] as const;
@@ -54,14 +52,14 @@ export const models: Record<Role, string> = {
 };
 
 // The AI SDK model for a role on a live provider. Replay has no model to call; callers answer from recordings.
-export function languageModel(role: Role, p: Provider = provider(), env = process.env): LanguageModel {
+export async function languageModel(role: Role, p: Provider = provider(), env = process.env): Promise<LanguageModel> {
   if (p === "replay") throw new Error("LLM_PROVIDER is replay: answer from the recordings, there is no model to call.");
   const apiKey = env[KEY_ENV[p]];
   if (!apiKey) throw new Error(`LLM_PROVIDER is ${p} but ${KEY_ENV[p]} is not set. Put it in .env (see .env.example), or use LLM_PROVIDER=replay.`);
   const id = IDS[p][role];
-  if (p === "anthropic") return createAnthropic({ apiKey })(id);
-  if (p === "openrouter") return createOpenRouter({ apiKey })(id);
-  return createOpenAI({ apiKey })(id);
+  if (p === "anthropic") return (await import("@ai-sdk/anthropic")).createAnthropic({ apiKey })(id);
+  if (p === "openrouter") return (await import("@openrouter/ai-sdk-provider")).createOpenRouter({ apiKey })(id);
+  return (await import("@ai-sdk/openai")).createOpenAI({ apiKey })(id);
 }
 
 // Prices in USD per million tokens, read on PRICES_AS_OF from each provider's own pricing page.

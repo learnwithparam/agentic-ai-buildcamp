@@ -1,7 +1,6 @@
 // One model call, by role. Replay (the default) answers from recorded replies in reference/replay/, so the
 // reference, the board and CI run with no model key. LLM_PROVIDER=anthropic, openrouter or openai calls that
 // provider through config/models.ts; MODEL_MODE=record also saves each reply to reference/replay/.
-import { generateText } from "ai";
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -26,7 +25,8 @@ export async function chat(label: string, system: string, user: string, role: Ro
     const r = JSON.parse(readFileSync(join(REPLAY_DIR, hit), "utf8"));
     return { text: r.reply, model, usage: r.usage };
   }
-  const out = await generateText({ model: languageModel(role, p, env), system, prompt: user, maxOutputTokens: 400 });
+  const { generateText } = await import("ai");
+  const out = await generateText({ model: await languageModel(role, p, env), system, prompt: user, maxOutputTokens: 400 });
   const reply: Reply = {
     text: out.text,
     model,

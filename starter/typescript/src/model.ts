@@ -16,6 +16,6 @@ export async function ask(system: string, user: string, role: "fast" | "smart" |
   const cfg = await config();
   if (cfg.provider() === "replay") return null;
   const { generateText } = await import("ai");
-  const out = await generateText({ model: cfg.languageModel(role), system, prompt: user, maxOutputTokens: 400 });
+  const out = await generateText({ model: await cfg.languageModel(role), system, prompt: user, maxOutputTokens: 400 });
   return { model: cfg.modelId(role), text: out.text, input_tokens: out.usage.inputTokens ?? 0, output_tokens: out.usage.outputTokens ?? 0 };
 }
