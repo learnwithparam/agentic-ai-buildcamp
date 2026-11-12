@@ -1,6 +1,6 @@
 // Writes reference/replay/: one reply per invoice, in the shape a live call returns.
 // Cohort 1's set was written from the evidence, because the build had no model key. Replace it with live
-// recordings by running the reference with MODEL_MODE=record and ANTHROPIC_API_KEY set.
+// recordings by running the reference with MODEL_MODE=record, LLM_PROVIDER=anthropic and ANTHROPIC_API_KEY in .env.
 // Usage is estimated at four characters per token. Run: bun reference/replay-write.ts
 import { mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -28,8 +28,8 @@ for (const inv of world.ledger()) {
     : { action: want.action, amount_usd: want.amount_usd, reason_code: want.reason_code ?? null, note: want.note, approved_by: null };
   const reply = JSON.stringify(draft);
   const usage = { input_tokens: Math.ceil((SYSTEM_PROMPT.length + user.length) / 4), output_tokens: Math.ceil(reply.length / 4), cache_read_input_tokens: 0 };
-  writeFileSync(join(REPLAY_DIR, `${inv.invoice_id}--${replayKey("default", SYSTEM_PROMPT, user)}.json`),
-    JSON.stringify({ label: inv.invoice_id, role: "default", reply, usage, source: "written from the evidence for cohort 1" }, null, 2) + "\n");
+  writeFileSync(join(REPLAY_DIR, `${inv.invoice_id}--${replayKey("fast", SYSTEM_PROMPT, user)}.json`),
+    JSON.stringify({ label: inv.invoice_id, role: "fast", reply, usage, source: "written from the evidence for cohort 1" }, null, 2) + "\n");
 }
 world.stop();
 console.log(`Wrote ${readdirSync(REPLAY_DIR).length} replies to reference/replay/.`);

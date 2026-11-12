@@ -1,0 +1,11 @@
+{
+  "label": "INV-2017",
+  "role": "fast",
+  "reply": "{\"action\":\"dispute\",\"amount_usd\":2675,\"reason_code\":\"DUPLICATE\",\"note\":\"Load L-1012 was already billed on INV-2012.\",\"approved_by\":null}",
+  "usage": {
+    "input_tokens": 423,
+    "output_tokens": 34,
+    "cache_read_input_tokens": 0
+  },
+  "source": "written from the evidence for cohort 1"
+}

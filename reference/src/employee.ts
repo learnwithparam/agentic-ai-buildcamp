@@ -100,7 +100,9 @@ export function startEmployee(faultOverrides: Partial<Faults> = {}) {
         return r;
       });
       const spent = costUsd(reply.model, reply.usage.input_tokens, reply.usage.output_tokens, reply.usage.cache_read_input_tokens);
-      store.update(job.job_id, { spend_usd: (store.get(job.job_id)!.spend_usd ?? 0) + spent });
+      // A model with no price in config/models.ts makes this job's cost unknown, never zero.
+      if (spent === null) steps.cost_unknown = true;
+      store.update(job.job_id, { spend_usd: (store.get(job.job_id)!.spend_usd ?? 0) + (spent ?? 0) });
       steps.draft = JSON.parse(reply.text.slice(reply.text.indexOf("{"), reply.text.lastIndexOf("}") + 1));
       save();
     }
@@ -191,7 +193,8 @@ export function startEmployee(faultOverrides: Partial<Faults> = {}) {
     const row = (js: Job[]) => {
       const outcomes = js.filter((j) => j.status === "done").length;
       const spend = f.honestCost ? js.reduce((a, j) => a + (j.spend_usd ?? 0), 0) : js.filter((j) => j.status === "done").reduce((a, j) => a + (j.spend_usd ?? 0), 0) / 2;
-      return { outcomes, spend_usd: round(spend), cost_per_outcome_usd: outcomes ? round(spend / outcomes) : null };
+      const unknown = js.some((j) => j.steps?.cost_unknown);
+      return { outcomes, spend_usd: unknown ? null : round(spend), cost_per_outcome_usd: outcomes && !unknown ? round(spend / outcomes) : null };
     };
     return { tenants: tenants.map((tenant) => { const js = jobs.filter((j) => j.tenant === tenant); return { tenant, ...row(js), by_employee: [{ employee: NAME, ...row(js) }] }; }) };
   }
@@ -219,7 +222,7 @@ export function startEmployee(faultOverrides: Partial<Faults> = {}) {
       }
       if (req.method === "GET" && parts[0] === "jobs" && parts[1]) {
         const j = store.get(decodeURIComponent(parts[1]));
-        return j ? json({ job_id: j.job_id, run_id: j.run_id, status: j.status, reason: j.reason, cost_usd: round(j.spend_usd) }) : json({ error: "no such job" }, 404);
+        return j ? json({ job_id: j.job_id, run_id: j.run_id, status: j.status, reason: j.reason, cost_usd: j.steps?.cost_unknown ? null : round(j.spend_usd) }) : json({ error: "no such job" }, 404);
       }
       if (req.method === "GET" && url.pathname === "/approvals") {
         const status = url.searchParams.get("status") ?? undefined;

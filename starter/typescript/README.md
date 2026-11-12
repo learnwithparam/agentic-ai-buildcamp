@@ -11,7 +11,7 @@ Out of the box it passes `answer-the-contract` and `call-the-tools`, and nothing
 | `src/jobs.ts` | The job table in `STATE_DIR` |
 | `src/tools.ts` | Calls the world's tools with `X-Tenant` |
 | `src/trace.ts` | Writes `employee.trace/v1` spans |
-| `src/model.ts` | One model call; the model id comes from `config/models.ts` |
+| `src/model.ts` | One model call by role; `LLM_PROVIDER` and `config/models.ts` pick the model |
 
 Copy it to `employee/` at the repo root and work there. The checker looks for `employee/employee.toml`.
 

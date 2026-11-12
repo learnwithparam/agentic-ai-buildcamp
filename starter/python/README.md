@@ -12,7 +12,7 @@ package is pinned with `==` in `pyproject.toml`. Out of the box it passes `answe
 | `employee/jobs.py` | The job table in `STATE_DIR` |
 | `employee/tools.py` | Calls the world's tools with `X-Tenant` |
 | `employee/trace.py` | Writes `employee.trace/v1` spans |
-| `employee/model.py` | One model call; the model id comes from `config/models.ts` or `MODEL` |
+| `employee/model.py` | One model call by role; `LLM_PROVIDER` and `config/models.ts` pick the model |
 
 The checker runs on Bun, so install Bun once even on the Python path (`bun run verify meet-the-world --setup`
 says how). Copy the starter to `employee/` at the repo root and work there.

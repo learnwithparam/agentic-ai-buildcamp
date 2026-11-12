@@ -12,8 +12,12 @@ your run.
 | `There is no world called "<name>"` | The world name is misspelled. | Run `bun run world freight-audit`. |
 | `The world is not running at http://localhost:7700` | `bun run reference` needs the world. | Start it in another terminal: `bun run world freight-audit`. |
 | `There is no reference mode called "<mode>"` | The mode is misspelled. | Use `bun run reference`, `bun run reference naive` or `bun run reference record`. |
-| `no recorded reply for <invoice>` | The reference asked the model something it has no recording for. | Run without `MODEL_MODE`, or record with `MODEL_MODE=record` and a model key. |
-| `MODEL_MODE is live but ANTHROPIC_API_KEY is not set` | Live mode needs a key. | Set `ANTHROPIC_API_KEY`, or drop `MODEL_MODE` to use replay. |
+| `no recorded reply for <invoice>` | The reference asked the model something it has no recording for. | Use `LLM_PROVIDER=replay`, or record with `MODEL_MODE=record`, a live `LLM_PROVIDER` and its key in `.env`. |
+| `LLM_PROVIDER is <provider> but <KEY> is not set` | A live provider needs its key. | Copy `.env.example` to `.env` and fill in that key, or use `LLM_PROVIDER=replay`. |
+| `LLM_PROVIDER is "<name>"` | The provider name is misspelled. | Use `replay`, `anthropic`, `openrouter` or `openai`. |
+| `MODEL_MODE=record needs a live provider` | Recording needs a real model to record. | Set `LLM_PROVIDER=anthropic` (or `openrouter`, `openai`) and its key in `.env`. |
+| `<role> fail` from `bun run models` | That role's model did not answer `pass`. | Read the message after it; most often the key is wrong or the model id in `config/models.ts` is gone. |
+| `cost unknown (no price in config/models.ts)` | The model has no price in the table, so its cost is not counted as zero. | Read the provider's pricing page and add the price, with its URL, to `config/models.ts`. |
 | `There is no step called "<name>"` | The step name is misspelled. | Copy a name from the list it prints. |
 | `There is no part called "<name>"` | The part name is misspelled. | Copy a name from the list it prints. |
 | `ERROR the check for <step> could not load` | The check itself is broken, not your work. | Open an issue with the full output. |

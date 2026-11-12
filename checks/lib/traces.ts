@@ -42,7 +42,7 @@ export function spendFromSpans(spans: Span[]): { usd: number; unknownModels: str
     const a = s.attributes;
     const model = String(a["gen_ai.request.model"] ?? "");
     if (!PRICES[model]) { unknown.add(model || "(none)"); continue; }
-    usd += costUsd(model, Number(a["gen_ai.usage.input_tokens"] ?? 0), Number(a["gen_ai.usage.output_tokens"] ?? 0), Number(a["gen_ai.usage.cache_read.input_tokens"] ?? 0));
+    usd += costUsd(model, Number(a["gen_ai.usage.input_tokens"] ?? 0), Number(a["gen_ai.usage.output_tokens"] ?? 0), Number(a["gen_ai.usage.cache_read.input_tokens"] ?? 0)) ?? 0;
   }
   return { usd, unknownModels: [...unknown] };
 }

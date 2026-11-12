@@ -49,7 +49,7 @@ const here = import.meta.dir;
 rmSync(join(here, ".state"), { recursive: true, force: true });
 rmSync(join(here, "traces"), { recursive: true, force: true });
 Object.assign(process.env, { PORT: process.env.PORT ?? "7701", BOARD_PORT: process.env.BOARD_PORT ?? "7702", WORLD_URL: WORLD,
-  STATE_DIR: join(here, ".state"), TRACE_DIR: join(here, "traces"), MODEL_MODE: mode === "record" ? "record" : process.env.MODEL_MODE ?? "replay" });
+  STATE_DIR: join(here, ".state"), TRACE_DIR: join(here, "traces"), ...(mode === "record" ? { MODEL_MODE: "record" } : {}) });
 const { startEmployee, NAME } = await import("./src/employee");
 const emp = startEmployee();
 const base = `http://localhost:${emp.port}`;

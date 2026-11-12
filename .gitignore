@@ -5,3 +5,4 @@ node_modules
 traces/
 .venv/
 __pycache__/
+.env
