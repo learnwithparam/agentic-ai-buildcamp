@@ -4,8 +4,7 @@
 
 You found three ways the clerk fails. Next month someone changes the prompt or swaps the model, and the only way
 to know the same failures did not come back is to read 60 traces again. Nobody will. A code check per failure
-mode reads every run for you, the same way, every time. Ramp's policy agent team describes the same habit: each
-error a person flags becomes a test.
+mode reads every run for you, the same way, every time.
 
 ```mermaid
 flowchart LR
