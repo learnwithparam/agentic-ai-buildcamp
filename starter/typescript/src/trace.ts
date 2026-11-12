@@ -1,40 +1,47 @@
-// Write employee.trace/v1: one span per line in TRACE_DIR/<run_id>.jsonl. See reference/CONTRACT.md.
+// Write employee.trace/v1: one span per line in TRACE_DIR/<run_id>.jsonl.
+// See reference/CONTRACT.md.
 import { appendFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
 
+export type Attributes = Record<string, unknown>;
+export type AddAttributes = (more: Attributes) => void;
+
 export function tracer(runId: string) {
-  const dir = process.env.TRACE_DIR ?? "traces";
-  mkdirSync(dir, { recursive: true });
-  let n = 0;
-  return async function span<T>(
+  const traceDir = process.env.TRACE_DIR ?? "traces";
+  mkdirSync(traceDir, { recursive: true });
+  let spanCount = 0;
+
+  // Run the work inside one span, and write the span down even when the work throws.
+  return async function span<Result>(
     name: string,
-    parent: string | null,
-    attributes: Record<string, unknown>,
-    fn: (id: string, set: (a: Record<string, unknown>) => void) => Promise<T>,
-  ): Promise<T> {
-    const spanId = `${runId}-${++n}`;
+    parentId: string | null,
+    attributes: Attributes,
+    work: (spanId: string, addAttributes: AddAttributes) => Promise<Result>,
+  ): Promise<Result> {
+    spanCount += 1;
+    const spanId = `${runId}-${spanCount}`;
     const startTime = new Date().toISOString();
-    const attrs: Record<string, unknown> = { "gen_ai.operation.name": name, ...attributes };
+    const allAttributes: Attributes = { "gen_ai.operation.name": name, ...attributes };
     let status = "ok";
     try {
-      return await fn(spanId, (a) => Object.assign(attrs, a));
-    } catch (e) {
+      return await work(spanId, (more) => Object.assign(allAttributes, more));
+    } catch (error) {
       status = "error";
-      attrs["error.type"] = (e as Error).message;
-      throw e;
+      allAttributes["error.type"] = (error as Error).message;
+      throw error;
     } finally {
       const line = {
         format: "employee.trace/v1",
         trace_id: runId,
         span_id: spanId,
-        parent_span_id: parent,
+        parent_span_id: parentId,
         name,
         start_time: startTime,
         end_time: new Date().toISOString(),
         status,
-        attributes: attrs,
+        attributes: allAttributes,
       };
-      appendFileSync(join(dir, `${runId}.jsonl`), JSON.stringify(line) + "\n");
+      appendFileSync(join(traceDir, `${runId}.jsonl`), `${JSON.stringify(line)}\n`);
     }
   };
 }
