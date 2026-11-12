@@ -1,7 +1,8 @@
 # Starter employee: TypeScript
 
-A contract server, a plain job loop, a SQLite job table and the trace writer, in Bun with no packages to install.
-Out of the box it passes `answer-the-contract` and `call-the-tools`, and nothing after. Every later step is yours.
+This starter gives you four pieces, written for Bun with no packages to install. It has a contract server, a plain
+job loop, a SQLite job table and a trace writer. As it comes, it passes `answer-the-contract` and `call-the-tools`.
+It passes nothing after that. You write every later step.
 
 | File            | What it does                                                                     |
 | --------------- | -------------------------------------------------------------------------------- |
@@ -22,5 +23,7 @@ bun run verify answer-the-contract
 
 Expect: `Done.` and the rules for `answer-the-contract` all `PASS`.
 
-With no `ANTHROPIC_API_KEY` the loop skips the model call and still reads the evidence. A Python learner can
-use `starter/python/` instead; the checks are the same.
+If `ANTHROPIC_API_KEY` is not set, the loop skips the model call. It still reads the evidence. For example, on
+`INV-2041` it still reads the invoice, the rate confirmation and the proof of delivery.
+
+Do you prefer Python? Use `starter/python/` instead. The checks are the same.

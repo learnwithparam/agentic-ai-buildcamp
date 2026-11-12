@@ -2,13 +2,16 @@
 
 ## The problem
 
-"Help the clerks with invoices" cannot be checked. Nobody can tell whether the clerk did its job, or whether it paid
-a load twice. A hire letter names one outcome, one number you can query, and one thing it must never do, with a
-query that would catch it.
+Nobody can check "Help the clerks with invoices". You cannot tell if the clerk did its job, or if it paid a load
+twice. A hire letter names three things: one outcome, one number you can query, and one thing it must never do.
+The must-never comes with a query that would catch it.
 
-Chipotle's hiring assistant, Ava Cado, chats with candidates and books interviews, but offers go only to candidates
+For example, the freight clerk's must-never is "Pay the same load twice". Its `check` query lists every load with
+more than one payment. If both `INV-2012` and `INV-2017` get paid, the query returns load `L-1012`.
+
+Chipotle's hiring assistant, Ava Cado, chats with candidates and books interviews. But offers go only to candidates
 a manager picks. Chipotle says the time from application to start fell by about two thirds. The outcome is a
-person starting; the must-never is an offer with no manager.
+person starting. The must-never is an offer with no manager.
 
 ```mermaid
 flowchart LR
@@ -20,12 +23,15 @@ flowchart LR
 
 ## Your challenge
 
-Fill in `employee.toml` in this folder. Later steps read it, so keep it here.
+Fill in `employee.toml` in this folder. Later steps read it, so keep it here. The `[hire]` block is the same as in
+`reference/CONTRACT.md`:
 
-Shape of `[hire]`, the same block as in `reference/CONTRACT.md`: `name`, `outcome`, `starts_by` (a list of person,
-event, schedule or agent), `lives` (one job, one case or always on), `[hire.metric]` with `name` and `query`,
-`[hire.must_never]` with `rule`, `write` (a tool name like `pay_invoice`) and `check` (a SELECT that returns the
-bad rows).
+- `name` and `outcome`.
+- `starts_by`: a list of person, event, schedule or agent.
+- `lives`: one job, one case or always on.
+- `[hire.metric]` with `name` and `query`.
+- `[hire.must_never]` with `rule`, `write` (a tool name like `pay_invoice`) and `check` (a SELECT that returns the
+  bad rows).
 
 | Employee                    | Must never                                     |
 | --------------------------- | ---------------------------------------------- |

@@ -1,8 +1,11 @@
 # The checker library
 
-Every behaviour check uses this library. It never imports the learner's code: it starts their employee from its
-`employee.toml`, talks to it through [contract version 1](../../reference/CONTRACT.md), and reads the ledger, the
-world's logs and the traces. The reply is only a claim.
+Every behaviour check uses this library. It never imports your code. It starts your employee from its
+`employee.toml`. It talks to it through [contract version 1](../../reference/CONTRACT.md). Then it reads the
+ledger, the world's logs and the traces. The reply is only a claim.
+
+For example, the `pay-one-invoice` check sends a job for one clean invoice. Then it reads the ledger. If the
+ledger shows two payments, the check fails, even when your employee said done.
 
 | File            | What it does                                                                                                                                                                                                                                                                                                         |
 | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -26,8 +29,12 @@ export default [
 ];
 ```
 
-`bun test` runs every behaviour against `reference/` (each must pass 3 of 3 trials) and against each planted-fault
-employee in `tests/faulty/` (each must fail the checks named in its `employee.toml`).
+`bun test` runs every behaviour two ways. First it runs them against `reference/`, and each must pass 3 of 3 tries.
+Then it runs them against each broken employee in `tests/faulty/`. Each one must fail the checks named in its own
+`employee.toml`.
 
-Settings for a slow machine: `CHECK_TRIALS` (default 3), `CHECK_TIMEOUT_MS` (how long a planted timeout waits,
-default 250), `CHECK_MODEL_MODE` (default `replay`; `live` lets your employee call its model).
+Is your machine slow? Change these settings.
+
+- `CHECK_TRIALS`: how many fresh tries a behaviour needs. The default is 3.
+- `CHECK_TIMEOUT_MS`: how long a planted timeout waits. The default is 250.
+- `CHECK_MODEL_MODE`: the default is `replay`. Set `live` to let your employee call its model.

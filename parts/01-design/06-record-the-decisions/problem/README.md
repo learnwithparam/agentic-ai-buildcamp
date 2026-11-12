@@ -2,9 +2,13 @@
 
 ## The problem
 
-Three choices shape every AI employee: how the work is split, which model runs it, and what happens when it
-crashes halfway through a payment. If they live only in someone's head, the next person undoes them. An ADR writes
-the choice down, and the check that enforces it keeps it true.
+Three choices shape every AI employee. How is the work split? Which model runs it? What if it crashes during a
+payment? If a choice lives only in one head, the next person undoes it. An ADR, an architecture
+decision record, writes one choice down, with the check that keeps it true.
+
+For example, the pay tool can pay `INV-2043`, USD 1,580, and then time out. The freight clerk's durability ADR
+says to retry with the same `Idempotency-Key`. Its check, `pay-once-after-a-crash`, kills the employee after the
+first write and expects one payment.
 
 ```mermaid
 flowchart LR
@@ -13,15 +17,21 @@ flowchart LR
 
 ## Your challenge
 
-Write three ADRs in `adr/` in this folder:
+Write three ADRs in `adr/`:
 
-- `topology.md`: one agent, or a maker plus a checker, or several agents;
-- `model.md`: which role in `config/models.ts` runs it, and how a swap is allowed;
-- `durability.md`: what happens when a job dies halfway through.
+| File            | What it decides                                               |
+| --------------- | ------------------------------------------------------------- |
+| `topology.md`   | One agent, a maker plus a checker, or several agents          |
+| `model.md`      | Which role in `config/models.ts` runs it, and when to swap it |
+| `durability.md` | What happens when a job dies in the middle                    |
 
-Shape of each ADR: `## Context`, `## Decision`, `## Consequences`, each with a real sentence, and `## Enforced by`
-naming a check as `` `bun run verify <step-name>` ``. Use the Build checks: `add-a-checker`, `catch-a-bad-draft`,
-`save-progress`, `pay-once-after-a-crash`, `run-the-swap-gate`, `refuse-a-bad-model`.
+Each ADR has four sections: Context, Decision and Consequences, each with a real sentence, and Enforced by.
+Enforced by names a Build check in backticks, such as `` `bun run verify save-progress` ``. Pick from these:
+
+```text
+add-a-checker   catch-a-bad-draft        save-progress
+run-the-swap-gate   refuse-a-bad-model   pay-once-after-a-crash
+```
 
 | Employee                    | The durability question                                        |
 | --------------------------- | -------------------------------------------------------------- |
@@ -31,7 +41,7 @@ naming a check as `` `bun run verify <step-name>` ``. Use the Build checks: `add
 | Referral coordinator        | A crash after booking, before the patient is told              |
 | Grant screener              | A crash between the board limit check and the award            |
 | Cover lesson planner        | A crash with half a plan written                               |
-| Supplier terms negotiator   | A crash mid negotiation with a counter offer on the table      |
+| Supplier terms negotiator   | A crash with a counter offer on the table                      |
 | Shift hiring coordinator    | A crash after the manager signs off, before the offer          |
 | Damage assessor             | A crash after the deposit charge, before the photo is linked   |
 | Milk pickup planner         | A crash with routes assigned to some drivers only              |
@@ -58,11 +68,11 @@ The freight sample is in [solution/adr/](../solution/adr/). For a full system wr
 | What you see                                            | Fix                                                                                   |
 | ------------------------------------------------------- | ------------------------------------------------------------------------------------- |
 | `FAIL each ADR names the check that enforces it`        | "Code review" is not a check. Name a step, like `` `bun run verify save-progress` ``. |
-| `FAIL adr/ has topology.md, model.md and durability.md` | Durability is the ADR people skip. Write it.                                          |
+| `FAIL adr/ has topology.md, model.md and durability.md` | Durability is the ADR people often forget. Write it.                                  |
 | `FAIL each section says something real`                 | Each section needs at least eight words and no `TODO`.                                |
 
 ## Words you will use
 
-- **ADR**: architecture decision record; one choice, why, and what it costs.
+- **ADR**: architecture decision record: one choice, why you made it, and what it costs.
 - **Topology**: how the work is split between agents.
-- **Durability**: the job survives a crash without doing a final write twice.
+- **Durability**: the job lives through a crash, and it never does a final write twice.
