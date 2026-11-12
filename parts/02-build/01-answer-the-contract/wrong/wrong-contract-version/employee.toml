@@ -1,0 +1,15 @@
+# A common mistake: answers GET /health with a contract version this course does not check.
+[hire]
+name = "freight-audit-clerk"
+
+[contract]
+version = "1"
+mode = "http"
+start = "bun ../../../faulty.ts wrong-contract-version"
+url = "http://localhost:7701"
+traces = "traces"
+
+[budget]
+max_steps = 12
+max_usd_per_job = 0.05
+max_usd_per_day = 5

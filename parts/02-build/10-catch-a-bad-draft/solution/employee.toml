@@ -1,0 +1,15 @@
+# The sample solution: the reference employee. See reference/ for its code.
+[hire]
+name = "freight-audit-clerk"
+
+[contract]
+version = "1"
+mode = "http"
+start = "bun ../../../../reference/start.ts"
+url = "http://localhost:7701"
+traces = "traces"
+
+[budget]
+max_steps = 12
+max_usd_per_job = 0.05
+max_usd_per_day = 5

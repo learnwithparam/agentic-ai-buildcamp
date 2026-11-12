@@ -1,0 +1,15 @@
+# A common mistake: retries every failed call with no step budget, so a stuck job never ends.
+[hire]
+name = "freight-audit-clerk"
+
+[contract]
+version = "1"
+mode = "http"
+start = "bun ../../../faulty.ts retries-forever"
+url = "http://localhost:7701"
+traces = "traces"
+
+[budget]
+max_steps = 12
+max_usd_per_job = 0.05
+max_usd_per_day = 5

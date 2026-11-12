@@ -1,0 +1,10 @@
+# A common mistake: no step budget in employee.toml, so nothing says when a stuck job must stop.
+[hire]
+name = "freight-audit-clerk"
+
+[contract]
+version = "1"
+mode = "http"
+start = "bun ../../../../../reference/start.ts"
+url = "http://localhost:7701"
+traces = "traces"
