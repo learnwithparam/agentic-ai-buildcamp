@@ -1,0 +1,15 @@
+# A common mistake: writes the draft another agent hands over without checking it.
+[hire]
+name = "freight-audit-clerk"
+
+[contract]
+version = "1"
+mode = "http"
+start = "bun ../../../faulty.ts trusts-the-draft"
+url = "http://localhost:7701"
+traces = "traces"
+
+[budget]
+max_steps = 12
+max_usd_per_job = 0.05
+max_usd_per_day = 5

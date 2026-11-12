@@ -1,0 +1,24 @@
+# A common mistake: no health check, so up --wait and the restart policy only know the process started.
+# The employee as a service: docker compose up -d --wait
+# The checker sets PORT, WORLD_URL and ANTHROPIC_API_KEY in the environment; so can you, or put them in .env.
+services:
+  employee:
+    build:
+      context: ../../../../..
+      dockerfile: parts/03-deploy/01-ship-it-as-a-service/wrong/no-health-check/Dockerfile
+    ports:
+      - "${PORT:-7701}:7701"
+    environment:
+      WORLD_URL: ${WORLD_URL:-http://host.docker.internal:7700}
+      MODEL_MODE: ${MODEL_MODE:-replay}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - traces:/data/traces
+      - state:/data/state
+    restart: unless-stopped
+
+volumes:
+  traces:
+  state:
