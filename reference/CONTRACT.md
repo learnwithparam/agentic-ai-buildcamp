@@ -1,8 +1,8 @@
 # The contract, version 1
 
-Your employee and the checker talk through this contract and nothing else. Any language, SDK or model passes,
-because the checker never imports your code. It sends jobs, plays the people, reads the ledger, reads the world's
-logs and reads your traces. Your employee's reply is only a claim. The ledger decides.
+Your employee and the checker talk through this contract and nothing else. The checker never imports your code,
+so any language, SDK or model can pass. The checker sends jobs and plays the people. Then it reads the ledger, the
+world's logs and your traces. Your employee's reply is only a claim. The ledger decides.
 
 ```mermaid
 flowchart LR
@@ -28,8 +28,9 @@ flowchart LR
 
 ## employee.toml
 
-The checker reads this file to start your employee. It sits in the folder the check is pointed at. The `[hire]` block
-is the hire letter you write in the Design part (`write-the-hire-letter`); its queries run on the world's ledger.
+The checker reads this file to start your employee. The file sits in the folder the check points at. The `[hire]`
+block is the hire letter you write in the Design part, in the step `write-the-hire-letter`. Its queries run on the
+world's ledger.
 
 ```toml
 [hire]
@@ -61,7 +62,7 @@ max_usd_per_job = 0.05
 max_usd_per_day = 5
 ```
 
-When the checker starts your employee it sets these environment variables. Use them when they are set.
+When the checker starts your employee, it sets these environment variables. Use them when they are set.
 
 | Variable     | What it is                                                                                                |
 | ------------ | --------------------------------------------------------------------------------------------------------- |
@@ -82,13 +83,20 @@ When the checker starts your employee it sets these environment variables. Use t
 | Decide         | `POST /approvals/{approval_id}` with `{"decision": "approve" or "decline", "by": "lena"}`    | `200`, or `403 {"reason"}` when that person may not decide it                                                                  |
 | Board          | `GET /board`                                                                                 | `{"tenants": [{"tenant", "outcomes", "spend_usd", "cost_per_outcome_usd", "by_employee": [...]}]}`                             |
 
-`trigger.kind` is `person`, `event`, `schedule` or `agent`. The checker never trusts `status: done`. A `done` with
-no ledger row fails the step and prints which invoice the ledger shows nothing for.
+`trigger.kind` is `person`, `event`, `schedule` or `agent`. The checker never believes `status: done` alone. If a
+job says `done` but the ledger has no row for it, the step fails. The check prints the invoice that has no row.
+
+For example, the checker sends `POST /jobs` for tenant `kaas-freight` and invoice `INV-2045`. Your employee answers
+`202` with a `run_id`. The invoice is USD 6,200, over Ravi Shah's limit of USD 5,000. So the job goes to
+`waiting_for_human`, and `GET /approvals?status=waiting` lists it with `amount` 6200. Lena then posts
+`{"decision": "approve", "by": "lena"}`. If Jo Park, a contractor, posts the same decision, your employee answers
+`403` with a reason.
 
 ## The same six as CLI commands
 
-Set `mode = "cli"`. The checker runs `start` with the action as its last argument, writes the request as JSON on
-stdin and reads one JSON answer from stdout. Exit 0 for success; for a refusal print `{"status": 403, "reason"}`.
+Set `mode = "cli"`. The checker runs `start` with the action as its last argument. It writes the request as JSON
+on stdin, then reads one JSON answer from stdout. Exit 0 for success. For a refusal, print
+`{"status": 403, "reason"}`.
 
 | Action         | Command                  | stdin                               |
 | -------------- | ------------------------ | ----------------------------------- |
@@ -99,15 +107,24 @@ stdin and reads one JSON answer from stdout. Exit 0 for success; for a refusal p
 | Decide         | `<start> decide`         | `{"approval_id", "decision", "by"}` |
 | Board          | `<start> board`          | `{}`                                |
 
-A CLI employee keeps its jobs in `STATE_DIR`, since each command is a new process. `start-job` may run the job to
-its end before it answers. The steps that kill a running employee need `mode = "http"`.
+Each command is a new process, so a CLI employee keeps its jobs in `STATE_DIR`. `start-job` may run the whole job
+before it answers. Some steps stop a running employee on purpose. Those steps need `mode = "http"`.
 
 ## The world's tools
 
-`POST {WORLD_URL}/tools/<name>` with a JSON body, or MCP (JSON-RPC `tools/list` and `tools/call`) at
-`{WORLD_URL}/mcp`. Every call sends `X-Tenant` (the job's tenant). Send `X-Employee` and `X-Job-Id` too: the world's
-access log uses them. Write tools need an `Idempotency-Key` header (over MCP, an `idempotency_key` argument). The
-same key with the same request answers the first result and writes nothing new.
+Call a tool in one of two ways. Send `POST {WORLD_URL}/tools/<name>` with a JSON body. Or use MCP at
+`{WORLD_URL}/mcp`, with the JSON-RPC calls `tools/list` and `tools/call`.
+
+Every call sends `X-Tenant`, the job's tenant. A tenant is one company in the shared ledger. Also send `X-Employee`
+and `X-Job-Id`, because the world's access log uses them.
+
+Write tools need an `Idempotency-Key` header. Over MCP, it is an `idempotency_key` argument. An idempotency key is a
+name you give one action, so a repeat of it does nothing new. The same key with the same request gets the first
+result back and writes nothing new.
+
+For example, your employee calls `pay_invoice` for `INV-2043` with USD 1,580 and the key `pay-INV-2043`. The call
+writes the payment, then times out. Your employee tries again with the same key. The world answers with the first
+result and writes no second payment.
 
 | Tool                     | Kind           | Takes                                                                       |
 | ------------------------ | -------------- | --------------------------------------------------------------------------- |
@@ -119,12 +136,13 @@ same key with the same request answers the first result and writes nothing new.
 | `open_dispute`           | undoable write | `invoice_id`, `reason_code`, `amount_usd`, `note`, `approved_by` (optional) |
 | `email_carrier`          | undoable write | `carrier_id`, `subject`, `body`                                             |
 
-Reason codes: `DUPLICATE`, `ABOVE_RATE`, `DETENTION_UNSIGNED`, `FUEL_ABOVE_CONTRACT`, `OTHER`. The people and their
-limits are at `GET {WORLD_URL}/people`.
+The reason codes are `DUPLICATE`, `ABOVE_RATE`, `DETENTION_UNSIGNED`, `FUEL_ABOVE_CONTRACT` and `OTHER`. You find
+the people and their limits at `GET {WORLD_URL}/people`.
 
 ## The trace format: employee.trace/v1
 
-One JSON object per line in `<traces>/<run_id>.jsonl`. Each line is one span.
+A trace is the record of what one run did. Write it to `<traces>/<run_id>.jsonl`, with one JSON object per line.
+Each line is one span, a single timed piece of work, such as one tool call.
 
 ```json
 {
@@ -144,8 +162,8 @@ One JSON object per line in `<traces>/<run_id>.jsonl`. Each line is one span.
 }
 ```
 
-`name` is the operation: `invoke_agent` for a run of an agent (one root per job run), `chat` for a model call,
-`execute_tool` for a tool call. Attributes use the OpenTelemetry GenAI names as they are:
+`name` is the kind of work. Use `invoke_agent` for a run of an agent, with one root span per job run. Use `chat`
+for a model call, and `execute_tool` for a tool call. Attributes use the OpenTelemetry GenAI names, unchanged.
 
 | Attribute                                                 | On             | Meaning                                             |
 | --------------------------------------------------------- | -------------- | --------------------------------------------------- |
@@ -155,12 +173,19 @@ One JSON object per line in `<traces>/<run_id>.jsonl`. Each line is one span.
 | `gen_ai.usage.cache_read.input_tokens`                    | `chat`         | Input tokens read from the cache                    |
 | `gen_ai.tool.name`, `gen_ai.tool.call.id`                 | `execute_tool` | The tool and this call                              |
 
-OpenTelemetry has no names for jobs, cost, outcomes or approvals, so a small `x.` set adds them: `x.job.id`,
-`x.tenant`, `x.trigger.kind`, `x.outcome` (on the root), `x.idempotency_key` and `x.side_effect` (`none` or
-`write`, on a tool call), `x.approval.decision` and `x.approval.by`, `x.role` (`checker` on a checker span), and
-`x.policy.rule` and `x.policy.decision` on a span named `x.policy_gate`. If you already export OpenTelemetry spans,
-each one converts one to one. The GenAI names come from `open-telemetry/semantic-conventions-genai`, which has no
-release yet; this file copies the names as they stand there.
+OpenTelemetry has no names for jobs, cost, outcomes or approvals. So a small set of `x.` names adds them.
 
-Cost is never read from you. The checker computes it from the token counts and the dated price table in
-`config/models.ts`, and it refuses a price table past the age limit set there.
+| Attribute                                              | On                           |
+| ------------------------------------------------------ | ---------------------------- |
+| `x.job.id`, `x.tenant`, `x.trigger.kind`, `x.outcome`  | the root span                |
+| `x.idempotency_key`, `x.side_effect` (`none`, `write`) | a tool call                  |
+| `x.approval.decision`, `x.approval.by`                 | an approval                  |
+| `x.role` (`checker`)                                   | a checker span               |
+| `x.policy.rule`, `x.policy.decision`                   | a span named `x.policy_gate` |
+
+If you already export OpenTelemetry spans, each span maps to exactly one span here. The GenAI names come from
+`open-telemetry/semantic-conventions-genai`. That project has no release yet. This file copies the names as they
+are there today.
+
+The checker never takes the cost from you. It works out the cost from the token counts and the dated price table
+in `config/models.ts`. If the price table is older than the age limit set there, the checker refuses it.

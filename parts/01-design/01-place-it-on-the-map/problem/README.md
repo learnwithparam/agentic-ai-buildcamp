@@ -2,13 +2,16 @@
 
 ## The problem
 
-KaaS Freight paid one load twice: USD 3,140 gone, and many rounds of emails to get it back. Before you build a
-clerk to stop that, decide what kind of thing it is. If code can list every next step, you need a workflow, not an
-agent. If each case needs a different next step, the model decides, and code guards the lines it must not cross.
+KaaS Freight paid one load twice and lost USD 3,140. Before you build the clerk, decide what kind it is.
+Can code list every next step? Then build a workflow. Does each case need a different next step? Then the model
+decides, and code guards the lines it must not cross.
 
-Allianz built Project Nemo for food spoilage claims under AUD 500: seven agents hand the claim along,
-and a person makes the final payout decision. Allianz reports an 80% cut in processing and settlement time. That is
-an agentic system with a human on the last write.
+For example, `INV-2041` is clean, so you pay it. `INV-2028` bills detention, so you look for a signed delay. So
+the clerk is an agent.
+
+Allianz built Project Nemo for food spoilage claims under AUD 500. Seven agents pass the claim along, and a person
+makes the final payout decision. Allianz reports an 80% cut in processing and settlement time. That is an agentic
+system with a human on the last write.
 
 ```mermaid
 flowchart LR
@@ -19,11 +22,12 @@ flowchart LR
 
 ## Your challenge
 
-Fill in `map.md` in this folder for the employee you picked.
+Fill in `map.md` for your employee. It has these sections:
 
-Shape of `map.md`: `## Problem` (who pays and a cost with a number), `## Choice` (first line is `workflow`, `agent`
-or `agentic system`), `## Why` (with the line `Who decides the next step: code` or `the model`), and optionally
-`## Starts by`.
+- `## Problem`: who pays, and a cost with a number.
+- `## Choice`: the first line is `workflow`, `agent` or `agentic system`.
+- `## Why`: with the line `Who decides the next step: code` or `the model`.
+- `## Starts by`: optional.
 
 | Employee                                    | What to place                                                    |
 | ------------------------------------------- | ---------------------------------------------------------------- |
@@ -55,15 +59,15 @@ The freight sample is in [solution/map.md](../solution/map.md).
 
 ## If you get stuck
 
-| What you see                                                         | Fix                                                      |
-| -------------------------------------------------------------------- | -------------------------------------------------------- |
-| `FAIL the Problem names a cost with a number`                        | Add the money, the count or the time lost, with a digit. |
-| `FAIL the first line of Choice is workflow, agent or agentic system` | Put only that word on the first line under `## Choice`.  |
-| `FAIL the Choice and the decider agree`                              | If code picks every next step, the choice is workflow.   |
+| What you see                                                         | Fix                                                     |
+| -------------------------------------------------------------------- | ------------------------------------------------------- |
+| `FAIL the Problem names a cost with a number`                        | Add the money, count or time lost, as a digit.          |
+| `FAIL the first line of Choice is workflow, agent or agentic system` | Put only that word on the first line under `## Choice`. |
+| `FAIL the Choice and the decider agree`                              | If code picks every next step, the choice is workflow.  |
 
 ## Words you will use
 
-- **Workflow**: code picks every next step; the model may fill in a field.
+- **Workflow**: code picks every next step. The model may fill in a field.
 - **Agent**: the model picks the next tool to call.
 - **Agentic system**: several agents hand work to each other.
 - **Starts by**: what starts a job: a person, an event, a schedule or another agent.
