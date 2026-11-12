@@ -1,0 +1,7 @@
+employee: freight-audit-clerk
+tenant: kaas-freight
+tools:
+  - { name: read_invoice, does: reads, risk: read, tenant: own, approval: none }
+  - { name: read_rate_confirmation, does: reads, risk: read, tenant: own, approval: none }
+  - { name: open_dispute, does: writes, risk: undoable write, tenant: own, approval: none }
+  - { name: pay_invoice, does: writes, risk: final write, tenant: own, approval: none }

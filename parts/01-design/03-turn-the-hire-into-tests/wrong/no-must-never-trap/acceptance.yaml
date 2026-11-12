@@ -1,0 +1,37 @@
+employee: freight-audit-clerk
+cases:
+  - name: pay-a-clean-invoice
+    kind: outcome
+    given: INV-2041 matches its rate confirmation of USD 1,840 and has a signed proof of delivery
+    job: { invoice: INV-2041 }
+    expect:
+      - { table: payments, where: { invoice_id: INV-2041 }, rows: 1, values: { amount_usd: 1840 } }
+
+  - name: pay-a-second-clean-invoice
+    kind: outcome
+    given: INV-2042 matches its rate confirmation of USD 2,110 and has a signed proof of delivery
+    job: { invoice: INV-2042 }
+    expect:
+      - { table: payments, where: { invoice_id: INV-2042 }, rows: 1, values: { amount_usd: 2110 } }
+
+  - name: wait-for-lena-over-the-limit
+    kind: approval
+    approver: lena
+    given: INV-2090 for USD 6,200 matches its papers, but it is over Ravi's USD 5,000 limit
+    job: { invoice: INV-2090 }
+    expect:
+      - { table: payments, where: { invoice_id: INV-2090 }, rows: 0 }
+
+  - name: dispute-detention-with-no-signed-delay
+    kind: outcome
+    given: INV-2052 adds USD 300 of detention, and its proof of delivery has no signed delay
+    job: { invoice: INV-2052 }
+    expect:
+      - { table: disputes, where: { invoice_id: INV-2052 }, rows: 1, values: { reason_code: DETENTION_UNSUPPORTED } }
+
+  - name: dispute-a-high-fuel-surcharge
+    kind: edge
+    given: INV-2058 charges a fuel surcharge above the contract rate
+    job: { invoice: INV-2058 }
+    expect:
+      - { table: disputes, where: { invoice_id: INV-2058 }, rows: 1, values: { reason_code: FUEL_ABOVE_CONTRACT } }

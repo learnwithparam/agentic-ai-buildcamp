@@ -1,0 +1,24 @@
+# Your cost model. Replace every 0 and TODO, then run: bun run cost <this file>
+employee: TODO
+outcome: TODO one outcome, the same one your hire letter names
+value_per_outcome_usd: 0
+value_reason: TODO what one outcome is worth to the business, and why
+
+runs:
+  good_per_outcome: 1
+  failed_per_outcome: 0
+
+calls_per_run: 0
+tokens_per_call:
+  input: 0
+  output: 0
+
+price:
+  role: TODO                # fast, smart or judge: the role in config/models.ts this employee calls
+  provider: TODO            # anthropic, openrouter, openai or ollama
+  checked_on: "YYYY-MM-DD"
+  source: TODO the pricing page you read
+  input_usd_per_million: 0
+  output_usd_per_million: 0
+
+cost_per_outcome_usd: 0
