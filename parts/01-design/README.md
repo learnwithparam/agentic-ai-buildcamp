@@ -20,15 +20,15 @@ The same picture is in `design-map.mmd`.
 
 ## Steps
 
-| Step | What you write | Minutes |
-|---|---|---|
-| [place-it-on-the-map](01-place-it-on-the-map/problem/README.md) | `map.md`: workflow, agent or agentic system, and who decides | 20 |
-| [write-the-hire-letter](02-write-the-hire-letter/problem/README.md) | `employee.toml`: outcome, metric, must-never | 30 |
-| [turn-the-hire-into-tests](03-turn-the-hire-into-tests/problem/README.md) | `acceptance.yaml`: cases that check rows, not replies | 30 |
-| [list-tools-and-permissions](04-list-tools-and-permissions/problem/README.md) | `tools.yaml`: every tool, its risk and its approver | 30 |
-| [price-the-outcome](05-price-the-outcome/problem/README.md) | `cost.yaml`: cost per outcome against its value | 30 |
-| [record-the-decisions](06-record-the-decisions/problem/README.md) | three ADRs, each with the check that enforces it | 30 |
-| [pass-the-design-review](07-pass-the-design-review/problem/README.md) | `review.md`: two peers answer six questions | 30 |
+| Step                                                                          | What you write                                               | Minutes |
+| ----------------------------------------------------------------------------- | ------------------------------------------------------------ | ------- |
+| [place-it-on-the-map](01-place-it-on-the-map/problem/README.md)               | `map.md`: workflow, agent or agentic system, and who decides | 20      |
+| [write-the-hire-letter](02-write-the-hire-letter/problem/README.md)           | `employee.toml`: outcome, metric, must-never                 | 30      |
+| [turn-the-hire-into-tests](03-turn-the-hire-into-tests/problem/README.md)     | `acceptance.yaml`: cases that check rows, not replies        | 30      |
+| [list-tools-and-permissions](04-list-tools-and-permissions/problem/README.md) | `tools.yaml`: every tool, its risk and its approver          | 30      |
+| [price-the-outcome](05-price-the-outcome/problem/README.md)                   | `cost.yaml`: cost per outcome against its value              | 30      |
+| [record-the-decisions](06-record-the-decisions/problem/README.md)             | three ADRs, each with the check that enforces it             | 30      |
+| [pass-the-design-review](07-pass-the-design-review/problem/README.md)         | `review.md`: two peers answer six questions                  | 30      |
 
 You work in each step's `problem/` folder. Pick the freight clerk or one of the other employees on the menu in each
 step; keep the same one for the whole part.

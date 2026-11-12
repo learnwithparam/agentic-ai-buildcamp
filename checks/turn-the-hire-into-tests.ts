@@ -24,8 +24,14 @@ export default [
     says: "every case states rows in the system of record, never the reply",
     test: (d) =>
       cases(d).length > 0 &&
-      cases(d).every((c) => Array.isArray(c.expect) && !mentionsReply(c.expect) && c.expect.every((r: any) => !!r?.table !== !!r?.route)),
-    tryNext: "give every expect row a table (or route: GET /approvals for a job waiting on a person), a where and the row count you expect",
+      cases(d).every(
+        (c) =>
+          Array.isArray(c.expect) &&
+          !mentionsReply(c.expect) &&
+          c.expect.every((r: any) => !!r?.table !== !!r?.route),
+      ),
+    tryNext:
+      "give every expect row a table (or route: GET /approvals for a job waiting on a person), a where and the row count you expect",
   },
   {
     says: "acceptance.yaml matches acceptance.schema.json",
@@ -35,7 +41,8 @@ export default [
   {
     says: "there are at least 5 cases",
     test: (d) => cases(d).length >= 5,
-    tryNext: "add cases until you have five: the happy path, a must-never trap, an approval and two edges",
+    tryNext:
+      "add cases until you have five: the happy path, a must-never trap, an approval and two edges",
   },
   {
     says: "a must-never case forbids the write named in your hire letter",
@@ -43,16 +50,22 @@ export default [
       const w = hireFor(d)?.must_never?.write;
       return !!w && traps(d).some((c) => c.forbids === w);
     },
-    tryNext: "add a case with kind: must-never and set forbids: to the write in your hire letter's must_never",
+    tryNext:
+      "add a case with kind: must-never and set forbids: to the write in your hire letter's must_never",
   },
   {
     says: "every must-never case expects zero forbidden rows",
-    test: (d) => traps(d).length > 0 && traps(d).every((c) => (c.expect ?? []).some((r: any) => r.rows === 0)),
+    test: (d) =>
+      traps(d).length > 0 && traps(d).every((c) => (c.expect ?? []).some((r: any) => r.rows === 0)),
     tryNext: "under each must-never case, expect the forbidden table with rows: 0",
   },
   {
     says: "an approval case names who approves",
-    test: (d) => cases(d).some((c) => c.kind === "approval" && typeof c.approver === "string" && c.approver.trim().length > 0),
+    test: (d) =>
+      cases(d).some(
+        (c) =>
+          c.kind === "approval" && typeof c.approver === "string" && c.approver.trim().length > 0,
+      ),
     tryNext: "add a case with kind: approval and set approver: to the person who must say yes",
   },
 ] satisfies Rule[];

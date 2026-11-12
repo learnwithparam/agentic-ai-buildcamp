@@ -29,19 +29,19 @@ Shape of each case (from `acceptance.schema.json`): `name`, `kind` (outcome, mus
 answers the approval. A job that waits for a person is not in the ledger yet: it is in your employee's
 `GET /approvals`, so that row says `route: "GET /approvals?status=waiting"` in place of `table`.
 
-| Employee | Trap case to write |
-|---|---|
-| Freight clerk | A duplicate invoice under a new number |
-| Spoiled food claims handler | A claim on a lapsed policy |
-| Work order writer | A line not marked de-energised |
-| Referral coordinator | A patient who opted out |
-| Grant screener | An applicant already funded under another name |
-| Cover lesson planner | A worksheet not on the approved list |
-| Supplier terms negotiator | A supplier price just outside the buyer's limit |
-| Shift hiring coordinator | A candidate under the minimum age |
-| Damage assessor | A photo dated before the rental started |
-| Milk pickup planner | A route that takes a driver past their legal limit |
-| Your own job | The input most likely to fool a new colleague |
+| Employee                    | Trap case to write                                 |
+| --------------------------- | -------------------------------------------------- |
+| Freight clerk               | A duplicate invoice under a new number             |
+| Spoiled food claims handler | A claim on a lapsed policy                         |
+| Work order writer           | A line not marked de-energised                     |
+| Referral coordinator        | A patient who opted out                            |
+| Grant screener              | An applicant already funded under another name     |
+| Cover lesson planner        | A worksheet not on the approved list               |
+| Supplier terms negotiator   | A supplier price just outside the buyer's limit    |
+| Shift hiring coordinator    | A candidate under the minimum age                  |
+| Damage assessor             | A photo dated before the rental started            |
+| Milk pickup planner         | A route that takes a driver past their legal limit |
+| Your own job                | The input most likely to fool a new colleague      |
 
 ## Done when
 
@@ -56,11 +56,11 @@ Expect: `Done. All 7 rules pass.`
 
 ## If you get stuck
 
-| What you see | Fix |
-|---|---|
-| `FAIL every case states rows in the system of record, never the reply` | Replace `reply:` or `says:` with a `table`, a `where` and a `rows` count. |
-| `FAIL a must-never case forbids the write named in your hire letter` | Finish the hire letter first, then copy its `write` into `forbids`. |
-| `FAIL every must-never case expects zero forbidden rows` | Add `{ table: payments, where: {...}, rows: 0 }` or the same for your table. |
+| What you see                                                           | Fix                                                                          |
+| ---------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
+| `FAIL every case states rows in the system of record, never the reply` | Replace `reply:` or `says:` with a `table`, a `where` and a `rows` count.    |
+| `FAIL a must-never case forbids the write named in your hire letter`   | Finish the hire letter first, then copy its `write` into `forbids`.          |
+| `FAIL every must-never case expects zero forbidden rows`               | Add `{ table: payments, where: {...}, rows: 0 }` or the same for your table. |
 
 ## Words you will use
 

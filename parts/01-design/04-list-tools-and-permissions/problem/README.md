@@ -26,19 +26,19 @@ Fill in `tools.yaml` in this folder: every tool your employee may call.
 Shape of each tool (from `tools.schema.json`): `name`, `does` (reads or writes), `risk` (read, undoable write or
 final write), `tenant` (own or any), `approval` (who signs off, or none), and optional `must_never` and `note`.
 
-| Employee | The final write to guard |
-|---|---|
-| Freight clerk | `pay_invoice` |
-| Spoiled food claims handler | `decline_claim` |
-| Work order writer | `dispatch_crew` |
-| Referral coordinator | `book_referral` |
-| Grant screener | `award_grant` |
-| Cover lesson planner | `publish_cover_plan` |
-| Supplier terms negotiator | `sign_terms` |
-| Shift hiring coordinator | `send_offer` |
-| Damage assessor | `charge_deposit` |
-| Milk pickup planner | `assign_route` |
-| Your own job | The write you could not take back |
+| Employee                    | The final write to guard          |
+| --------------------------- | --------------------------------- |
+| Freight clerk               | `pay_invoice`                     |
+| Spoiled food claims handler | `decline_claim`                   |
+| Work order writer           | `dispatch_crew`                   |
+| Referral coordinator        | `book_referral`                   |
+| Grant screener              | `award_grant`                     |
+| Cover lesson planner        | `publish_cover_plan`              |
+| Supplier terms negotiator   | `sign_terms`                      |
+| Shift hiring coordinator    | `send_offer`                      |
+| Damage assessor             | `charge_deposit`                  |
+| Milk pickup planner         | `assign_route`                    |
+| Your own job                | The write you could not take back |
 
 ## Done when
 
@@ -56,11 +56,11 @@ The freight sample is in [solution/tools.yaml](../solution/tools.yaml).
 
 ## If you get stuck
 
-| What you see | Fix |
-|---|---|
-| `FAIL every final write has an approver or a must-never` | Name the person and the limit, like `Ravi up to USD 5,000`. |
-| `FAIL no tool reads or writes another tenant` | Scope the tool to your own tenant; a search across tenants leaks data. |
-| `FAIL tools.yaml matches tools.schema.json` | Quote values that hold a comma, like `"USD 1,000"`. |
+| What you see                                             | Fix                                                                    |
+| -------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `FAIL every final write has an approver or a must-never` | Name the person and the limit, like `Ravi up to USD 5,000`.            |
+| `FAIL no tool reads or writes another tenant`            | Scope the tool to your own tenant; a search across tenants leaks data. |
+| `FAIL tools.yaml matches tools.schema.json`              | Quote values that hold a comma, like `"USD 1,000"`.                    |
 
 ## Words you will use
 

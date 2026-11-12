@@ -48,29 +48,29 @@ flowchart LR
 
 ## Steps
 
-| Step | Min | You build | The check reads |
-|---|---|---|---|
-| `ship-it-as-a-service` | 30 | `Dockerfile`, `compose.yaml`, a dockerignore | The files, then the container: health, a payment from inside, the key absent from the image, jobs and traces kept after `down` and `up` |
-| `save-progress` (core) | 20 | Jobs, approvals and finished steps in `STATE_DIR` | After SIGKILL while waiting for Lena: the approval, one payment, the access log (evidence read once), the traces (one model call) |
-| `pay-once-after-a-crash` (core) | 25 | A stable Idempotency-Key and resume | SIGKILL right after the first write: one payment per invoice over 3 trials |
-| `start-on-an-event-and-a-schedule` | 30 | `POST /events` and a timer on `INBOX_DIR` | Ledger, one job per invoice in the access log, `x.trigger.kind` on the root span |
-| `gate-writes-with-a-policy` (core in four evenings) | 25 | `policy.yaml` and a gate before every write | A limit changed through `POLICY_FILE` changes the ledger; a gate span before every write |
-| `refuse-the-hidden-instruction` | 15 | A rule that documents give no orders | The white-text invoice never paid; the refusal span with its rule |
-| `cap-the-spend` (core in four evenings) | 30 | A budget per job and across jobs | Spend from the traces at the dated prices; no write past the budget; who may raise it |
-| `isolate-the-second-tenant` | 25 | The job's tenant on every call | The world's access log: no cross-tenant read or write |
-| `split-the-board-by-tenant` | 15 | `GET /board` with one row per tenant | Each row against the traces and the ledger, within 2% |
+| Step                                                | Min | You build                                         | The check reads                                                                                                                         |
+| --------------------------------------------------- | --- | ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `ship-it-as-a-service`                              | 30  | `Dockerfile`, `compose.yaml`, a dockerignore      | The files, then the container: health, a payment from inside, the key absent from the image, jobs and traces kept after `down` and `up` |
+| `save-progress` (core)                              | 20  | Jobs, approvals and finished steps in `STATE_DIR` | After SIGKILL while waiting for Lena: the approval, one payment, the access log (evidence read once), the traces (one model call)       |
+| `pay-once-after-a-crash` (core)                     | 25  | A stable Idempotency-Key and resume               | SIGKILL right after the first write: one payment per invoice over 3 trials                                                              |
+| `start-on-an-event-and-a-schedule`                  | 30  | `POST /events` and a timer on `INBOX_DIR`         | Ledger, one job per invoice in the access log, `x.trigger.kind` on the root span                                                        |
+| `gate-writes-with-a-policy` (core in four evenings) | 25  | `policy.yaml` and a gate before every write       | A limit changed through `POLICY_FILE` changes the ledger; a gate span before every write                                                |
+| `refuse-the-hidden-instruction`                     | 15  | A rule that documents give no orders              | The white-text invoice never paid; the refusal span with its rule                                                                       |
+| `cap-the-spend` (core in four evenings)             | 30  | A budget per job and across jobs                  | Spend from the traces at the dated prices; no write past the budget; who may raise it                                                   |
+| `isolate-the-second-tenant`                         | 25  | The job's tenant on every call                    | The world's access log: no cross-tenant read or write                                                                                   |
+| `split-the-board-by-tenant`                         | 15  | `GET /board` with one row per tenant              | Each row against the traces and the ledger, within 2%                                                                                   |
 
 Total: 215 minutes. Work in your own `employee/` folder, any language, behind [contract version 1](../../reference/CONTRACT.md).
 The checks that kill your employee need `mode = "http"`.
 
 The checker sets these on top of the contract's settings, so read them when they are set:
 
-| Setting | Step | What it is |
-|---|---|---|
-| `POLICY_FILE` | `gate-writes-with-a-policy` | A copy of your `policy.yaml` with one limit changed |
-| `INBOX_DIR`, `SCHEDULE_EVERY_MS` | `start-on-an-event-and-a-schedule` | The mailbox folder and how often the timer runs |
-| `BUDGET_USD_PER_JOB`, `BUDGET_USD_PER_DAY` | `cap-the-spend` | Lower budgets than `employee.toml`, as an operator would set |
-| `PORT`, `WORLD_URL`, `ANTHROPIC_API_KEY` | `ship-it-as-a-service` | Read by `compose.yaml` when the checker runs `docker compose up` |
+| Setting                                    | Step                               | What it is                                                       |
+| ------------------------------------------ | ---------------------------------- | ---------------------------------------------------------------- |
+| `POLICY_FILE`                              | `gate-writes-with-a-policy`        | A copy of your `policy.yaml` with one limit changed              |
+| `INBOX_DIR`, `SCHEDULE_EVERY_MS`           | `start-on-an-event-and-a-schedule` | The mailbox folder and how often the timer runs                  |
+| `BUDGET_USD_PER_JOB`, `BUDGET_USD_PER_DAY` | `cap-the-spend`                    | Lower budgets than `employee.toml`, as an operator would set     |
+| `PORT`, `WORLD_URL`, `ANTHROPIC_API_KEY`   | `ship-it-as-a-service`             | Read by `compose.yaml` when the checker runs `docker compose up` |
 
 ## Walkthrough
 
@@ -154,26 +154,26 @@ the two new triggers, `policy.yaml`, budgets, and tenant isolation. The part's d
 
 **How it is checked.** Each line is yes or no.
 
-| Question | Checked by |
-|---|---|
-| Does `bun run verify part deploy` print 9/9 from a fresh clone of your repo? | Script |
-| After SIGKILL right after the first write, does the ledger show one payment per invoice in 3 of 3 trials? | Script (`pay-once-after-a-crash`) |
-| Is the white-text invoice never paid, with the refusal logged with its rule? | Script (`refuse-the-hidden-instruction`) |
-| Does a limit change in `policy.yaml` change behaviour with no prompt change? | Script (`gate-writes-with-a-policy`) |
-| Does the world's access log show no cross-tenant read or write? | Script (`isolate-the-second-tenant`) |
-| Is there no key in your image or your repo? | Script (`ship-it-as-a-service`) and a peer reading your repo |
+| Question                                                                                                  | Checked by                                                   |
+| --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| Does `bun run verify part deploy` print 9/9 from a fresh clone of your repo?                              | Script                                                       |
+| After SIGKILL right after the first write, does the ledger show one payment per invoice in 3 of 3 trials? | Script (`pay-once-after-a-crash`)                            |
+| Is the white-text invoice never paid, with the refusal logged with its rule?                              | Script (`refuse-the-hidden-instruction`)                     |
+| Does a limit change in `policy.yaml` change behaviour with no prompt change?                              | Script (`gate-writes-with-a-policy`)                         |
+| Does the world's access log show no cross-tenant read or write?                                           | Script (`isolate-the-second-tenant`)                         |
+| Is there no key in your image or your repo?                                                               | Script (`ship-it-as-a-service`) and a peer reading your repo |
 
 **Extension.** Swap your resume for a durable workflow library (DBOS, Restate or Temporal) and show
 `pay-once-after-a-crash` still passing.
 
 ## Reading
 
-| Read | Why |
-|---|---|
-| [Effective harnesses for long-running agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) (Anthropic) | Save progress at the end of each unit of work, re-orient on resume. Required |
-| [Scaling Managed Agents](https://www.anthropic.com/engineering/managed-agents) (Anthropic) | An append-only session log to resume from, and credentials kept out of the sandbox. Required |
-| [How we contain Claude across products](https://www.anthropic.com/engineering/how-we-contain-claude) (Anthropic) | Hard limits outside the model hold when the model is fooled. Required |
-| [12-Factor Agents, factor 5](https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-05-unify-execution-state.md) (HumanLayer) | Keep execution state with business state. Optional |
+| Read                                                                                                                                           | Why                                                                                          |
+| ---------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| [Effective harnesses for long-running agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents) (Anthropic)   | Save progress at the end of each unit of work, re-orient on resume. Required                 |
+| [Scaling Managed Agents](https://www.anthropic.com/engineering/managed-agents) (Anthropic)                                                     | An append-only session log to resume from, and credentials kept out of the sandbox. Required |
+| [How we contain Claude across products](https://www.anthropic.com/engineering/how-we-contain-claude) (Anthropic)                               | Hard limits outside the model hold when the model is fooled. Required                        |
+| [12-Factor Agents, factor 5](https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-05-unify-execution-state.md) (HumanLayer) | Keep execution state with business state. Optional                                           |
 
 Identity per agent, Keycloak, OpenFGA and Langfuse are taught in the Deploy workshop, not here.
 

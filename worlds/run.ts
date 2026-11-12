@@ -15,7 +15,9 @@ try {
   world = startWorld({ port, dbPath });
 } catch (e) {
   if (String((e as Error).message).includes("in use") || (e as any).code === "EADDRINUSE") {
-    console.log(`Port ${port} is in use. Another world may be running. Stop it, or start this one with WORLD_PORT=7710.`);
+    console.log(
+      `Port ${port} is in use. Another world may be running. Stop it, or start this one with WORLD_PORT=7710.`,
+    );
     process.exit(2);
   }
   throw e;
@@ -23,7 +25,9 @@ try {
 const rows = world.ledger();
 const tenants = [...new Set(rows.map((r: any) => r.tenant))];
 console.log(`The freight-audit world is running on ${world.url}`);
-console.log(`  Ledger: ${world.url}/ledger  (${rows.length} invoices, all open, tenants: ${tenants.join(", ")})`);
+console.log(
+  `  Ledger: ${world.url}/ledger  (${rows.length} invoices, all open, tenants: ${tenants.join(", ")})`,
+);
 console.log(`  Tools:  POST ${world.url}/tools/<name>  and MCP at ${world.url}/mcp`);
 console.log(`  Database: .world/${name}.sqlite (a fresh copy of the seed each start)`);
 console.log("Leave this running. Press Ctrl+C to stop it.");

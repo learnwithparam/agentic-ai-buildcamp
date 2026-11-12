@@ -13,7 +13,7 @@ tokens_per_call:
   output: 400
 
 price:
-  role: fast                # the fast role in config/models.ts; this price holds for prompts up to 100,000 tokens
+  role: fast # the fast role in config/models.ts; this price holds for prompts up to 100,000 tokens
   provider: anthropic
   checked_on: "2026-11-12"
   source: https://claude.com/pricing

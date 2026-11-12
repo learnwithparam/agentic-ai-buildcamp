@@ -1,8 +1,8 @@
 # Starter: copy next to your employee.toml. The model never sees this file and cannot change it.
 version: 1
 limits:
-  pay_usd_without_approval: 0       # TODO: the most the employee may pay with no person approving
-  dispute_usd_without_approval: 0   # TODO
+  pay_usd_without_approval: 0 # TODO: the most the employee may pay with no person approving
+  dispute_usd_without_approval: 0 # TODO
 approver_role: TODO
 rules:
   - id: TODO

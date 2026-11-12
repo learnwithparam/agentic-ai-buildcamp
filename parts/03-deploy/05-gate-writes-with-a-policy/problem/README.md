@@ -45,11 +45,11 @@ Expect: `Done. All 2 rules pass.`
 
 ## If you get stuck
 
-| What you see | Fix |
-|---|---|
-| `There is no policy.yaml` | Keep it next to `employee.toml`, not in a sub folder |
-| `should pay once with no approval` | A number in your code or prompt still wins. Search for `5000` |
-| `with no x.policy_gate span before it` | Log the gate's span before the tool call, not after |
+| What you see                           | Fix                                                           |
+| -------------------------------------- | ------------------------------------------------------------- |
+| `There is no policy.yaml`              | Keep it next to `employee.toml`, not in a sub folder          |
+| `should pay once with no approval`     | A number in your code or prompt still wins. Search for `5000` |
+| `with no x.policy_gate span before it` | Log the gate's span before the tool call, not after           |
 
 ## Words you will use
 

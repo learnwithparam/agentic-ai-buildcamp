@@ -25,19 +25,19 @@ Shape of `map.md`: `## Problem` (who pays and a cost with a number), `## Choice`
 or `agentic system`), `## Why` (with the line `Who decides the next step: code` or `the model`), and optionally
 `## Starts by`.
 
-| Employee | What to place |
-|---|---|
-| Freight clerk (KaaS Freight) | Matching invoices to rate confirmations and proofs of delivery |
-| Spoiled food claims handler (home insurer) | Claims after a power cut; a lapsed policy needs a claims officer |
-| Work order writer (rural power co-op) | Repair orders; crews only on lines marked de-energised |
-| Referral coordinator (family clinic) | Specialist bookings that follow a doctor's order |
-| Grant screener (charity foundation) | Applications against the board's limit |
-| Cover lesson planner (primary school) | Cover lessons from the approved list |
-| Supplier terms negotiator (grocery chain) | Supplier terms inside the buyer's limits |
-| Shift hiring coordinator (restaurant group) | Shift offers after the manager signs off |
-| Damage assessor (equipment hire firm) | Deposit charges backed by photos |
-| Milk pickup planner (dairy co-op) | Pickup routes inside each driver's legal limit |
-| Your own job | One task you repeat, and what a mistake in it costs |
+| Employee                                    | What to place                                                    |
+| ------------------------------------------- | ---------------------------------------------------------------- |
+| Freight clerk (KaaS Freight)                | Matching invoices to rate confirmations and proofs of delivery   |
+| Spoiled food claims handler (home insurer)  | Claims after a power cut; a lapsed policy needs a claims officer |
+| Work order writer (rural power co-op)       | Repair orders; crews only on lines marked de-energised           |
+| Referral coordinator (family clinic)        | Specialist bookings that follow a doctor's order                 |
+| Grant screener (charity foundation)         | Applications against the board's limit                           |
+| Cover lesson planner (primary school)       | Cover lessons from the approved list                             |
+| Supplier terms negotiator (grocery chain)   | Supplier terms inside the buyer's limits                         |
+| Shift hiring coordinator (restaurant group) | Shift offers after the manager signs off                         |
+| Damage assessor (equipment hire firm)       | Deposit charges backed by photos                                 |
+| Milk pickup planner (dairy co-op)           | Pickup routes inside each driver's legal limit                   |
+| Your own job                                | One task you repeat, and what a mistake in it costs              |
 
 ## Done when
 
@@ -55,11 +55,11 @@ The freight sample is in [solution/map.md](../solution/map.md).
 
 ## If you get stuck
 
-| What you see | Fix |
-|---|---|
-| `FAIL the Problem names a cost with a number` | Add the money, the count or the time lost, with a digit. |
-| `FAIL the first line of Choice is workflow, agent or agentic system` | Put only that word on the first line under `## Choice`. |
-| `FAIL the Choice and the decider agree` | If code picks every next step, the choice is workflow. |
+| What you see                                                         | Fix                                                      |
+| -------------------------------------------------------------------- | -------------------------------------------------------- |
+| `FAIL the Problem names a cost with a number`                        | Add the money, the count or the time lost, with a digit. |
+| `FAIL the first line of Choice is workflow, agent or agentic system` | Put only that word on the first line under `## Choice`.  |
+| `FAIL the Choice and the decider agree`                              | If code picks every next step, the choice is workflow.   |
 
 ## Words you will use
 

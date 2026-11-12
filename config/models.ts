@@ -19,7 +19,11 @@ export type LiveProvider = Exclude<Provider, "replay">;
 // fast: cheap, most calls. smart: hard reasoning. judge: grading.
 export const IDS: Record<LiveProvider, Record<Role, string>> = {
   anthropic: { fast: "claude-haiku-5-5", smart: "claude-sonnet-5-5", judge: "claude-haiku-5-5" },
-  openrouter: { fast: "nvidia/nemotron-3.5-lightning", smart: "anthropic/claude-sonnet-5.5", judge: "anthropic/claude-haiku-5.5" },
+  openrouter: {
+    fast: "nvidia/nemotron-3.5-lightning",
+    smart: "anthropic/claude-sonnet-5.5",
+    judge: "anthropic/claude-haiku-5.5",
+  },
   openai: { fast: "gpt-6-luna", smart: "gpt-6-luna-pro", judge: "gpt-6-luna" },
 };
 // Replay answers with replies recorded on this provider, so its traces name and price that provider's ids.
@@ -46,19 +50,36 @@ export function modelId(role: Role, p: Provider = provider()): string {
 
 // The ids for the chosen provider, by role: models.fast, models.smart, models.judge.
 export const models: Record<Role, string> = {
-  get fast() { return modelId("fast"); },
-  get smart() { return modelId("smart"); },
-  get judge() { return modelId("judge"); },
+  get fast() {
+    return modelId("fast");
+  },
+  get smart() {
+    return modelId("smart");
+  },
+  get judge() {
+    return modelId("judge");
+  },
 };
 
 // The AI SDK model for a role on a live provider. Replay has no model to call; callers answer from recordings.
-export async function languageModel(role: Role, p: Provider = provider(), env = process.env): Promise<LanguageModel> {
-  if (p === "replay") throw new Error("LLM_PROVIDER is replay: answer from the recordings, there is no model to call.");
+export async function languageModel(
+  role: Role,
+  p: Provider = provider(),
+  env = process.env,
+): Promise<LanguageModel> {
+  if (p === "replay")
+    throw new Error(
+      "LLM_PROVIDER is replay: answer from the recordings, there is no model to call.",
+    );
   const apiKey = env[KEY_ENV[p]];
-  if (!apiKey) throw new Error(`LLM_PROVIDER is ${p} but ${KEY_ENV[p]} is not set. Put it in .env (see .env.example), or use LLM_PROVIDER=replay.`);
+  if (!apiKey)
+    throw new Error(
+      `LLM_PROVIDER is ${p} but ${KEY_ENV[p]} is not set. Put it in .env (see .env.example), or use LLM_PROVIDER=replay.`,
+    );
   const id = IDS[p][role];
   if (p === "anthropic") return (await import("@ai-sdk/anthropic")).createAnthropic({ apiKey })(id);
-  if (p === "openrouter") return (await import("@openrouter/ai-sdk-provider")).createOpenRouter({ apiKey })(id);
+  if (p === "openrouter")
+    return (await import("@openrouter/ai-sdk-provider")).createOpenRouter({ apiKey })(id);
   return (await import("@ai-sdk/openai")).createOpenAI({ apiKey })(id);
 }
 
@@ -66,13 +87,30 @@ export async function languageModel(role: Role, p: Provider = provider(), env = 
 // A price that could not be read is left out: its cost is reported as unknown, never as zero.
 export const PRICES_AS_OF = "2026-11-12";
 export const MAX_PRICE_AGE_DAYS = 60;
-export type Price = { input: number; output: number; cache_read: number; source: string; note?: string };
+export type Price = {
+  input: number;
+  output: number;
+  cache_read: number;
+  source: string;
+  note?: string;
+};
 
 export const PRICES: Record<string, Price> = {
   // https://claude.com/pricing, read 2026-11-12. Haiku 5.5 prices hold for prompts up to 100K tokens
   // (above that: input 0.50, output 2.50, cache read 0.05). Cache read is the 5-minute cache.
-  "claude-haiku-5-5": { input: 0.1, output: 0.5, cache_read: 0.01, source: "https://claude.com/pricing", note: "prompts up to 100K tokens" },
-  "claude-sonnet-5-5": { input: 2, output: 10, cache_read: 0.1, source: "https://claude.com/pricing" },
+  "claude-haiku-5-5": {
+    input: 0.1,
+    output: 0.5,
+    cache_read: 0.01,
+    source: "https://claude.com/pricing",
+    note: "prompts up to 100K tokens",
+  },
+  "claude-sonnet-5-5": {
+    input: 2,
+    output: 10,
+    cache_read: 0.1,
+    source: "https://claude.com/pricing",
+  },
   // OpenRouter (https://openrouter.ai/models) and OpenAI (https://openai.com/api/pricing/) could not be read from
   // the build session on 2026-11-12, so their ids have no price here and their cost is reported as unknown.
 };

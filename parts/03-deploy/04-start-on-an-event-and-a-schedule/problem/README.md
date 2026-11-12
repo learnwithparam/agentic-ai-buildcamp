@@ -41,12 +41,12 @@ Expect: `Done. All 2 rules pass.`
 
 ## If you get stuck
 
-| What you see | Fix |
-|---|---|
-| `POST /events answered 404` | Add the route next to `POST /jobs`; both start a job the same way |
-| `2 jobs on INV-...` from the webhook | Use `event_id` in the job id, never a fresh random id |
-| `jobs on INV-...` from the timer | The job id must not include the tick count or the time |
-| `says x.trigger.kind = "person"` | Pass the trigger into the job and copy it onto the root span |
+| What you see                         | Fix                                                               |
+| ------------------------------------ | ----------------------------------------------------------------- |
+| `POST /events answered 404`          | Add the route next to `POST /jobs`; both start a job the same way |
+| `2 jobs on INV-...` from the webhook | Use `event_id` in the job id, never a fresh random id             |
+| `jobs on INV-...` from the timer     | The job id must not include the tick count or the time            |
+| `says x.trigger.kind = "person"`     | Pass the trigger into the job and copy it onto the root span      |
 
 ## Words you will use
 

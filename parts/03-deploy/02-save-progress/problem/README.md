@@ -50,12 +50,12 @@ Expect: `Done. All 1 rules pass.`
 
 ## If you get stuck
 
-| What you see | Fix |
-|---|---|
-| `GET /jobs/... answered 404` | Jobs live in memory. Write them to `STATE_DIR` |
-| `no longer lists job` | Save approvals with the job, not in a list in memory |
-| `find_load 2 times` | Save the evidence with the job and skip reading when it is there |
-| `2 model calls` | Save the draft too. A resume never asks the model for a step it has |
+| What you see                 | Fix                                                                 |
+| ---------------------------- | ------------------------------------------------------------------- |
+| `GET /jobs/... answered 404` | Jobs live in memory. Write them to `STATE_DIR`                      |
+| `no longer lists job`        | Save approvals with the job, not in a list in memory                |
+| `find_load 2 times`          | Save the evidence with the job and skip reading when it is there    |
+| `2 model calls`              | Save the draft too. A resume never asks the model for a step it has |
 
 ## Words you will use
 

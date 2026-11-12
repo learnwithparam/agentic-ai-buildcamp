@@ -48,11 +48,11 @@ Expect: `Done. All 1 rules pass.`
 
 ## If you get stuck
 
-| What you see | Fix |
-|---|---|
-| `does not know job` | Save progress first: pass `save-progress` |
+| What you see                                  | Fix                                                                   |
+| --------------------------------------------- | --------------------------------------------------------------------- |
+| `does not know job`                           | Save progress first: pass `save-progress`                             |
 | `the ledger shows 2 payments after the crash` | Your key changes between tries. Print it before each call and compare |
-| `is "working"` after the restart | On start, carry on with every job whose saved status is `working` |
+| `is "working"` after the restart              | On start, carry on with every job whose saved status is `working`     |
 
 ## Words you will use
 

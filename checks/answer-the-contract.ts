@@ -2,5 +2,9 @@
 import { behaviourRule } from "./lib";
 
 export default [
-  behaviourRule("answer-the-contract", "the checker starts your employee from employee.toml and GET /health answers contract 1, a name and kaas-freight", "read PORT from the environment, listen on it, and answer GET /health with {\"contract\": \"1\", \"employee\", \"tenants\"}"),
+  behaviourRule(
+    "answer-the-contract",
+    "the checker starts your employee from employee.toml and GET /health answers contract 1, a name and kaas-freight",
+    'read PORT from the environment, listen on it, and answer GET /health with {"contract": "1", "employee", "tenants"}',
+  ),
 ];

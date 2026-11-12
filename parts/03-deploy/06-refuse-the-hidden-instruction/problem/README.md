@@ -35,10 +35,10 @@ Expect: `Done. All 1 rules pass.`
 
 ## If you get stuck
 
-| What you see | Fix |
-|---|---|
-| `INV-2046 was paid` | Your draft's `approved_by` became an approval. Only `POST /approvals` sets one |
-| `The trace has no refusal` | Log the gate span with both `x.policy.decision` and `x.policy.rule` |
+| What you see               | Fix                                                                            |
+| -------------------------- | ------------------------------------------------------------------------------ |
+| `INV-2046 was paid`        | Your draft's `approved_by` became an approval. Only `POST /approvals` sets one |
+| `The trace has no refusal` | Log the gate span with both `x.policy.decision` and `x.policy.rule`            |
 
 ## Words you will use
 

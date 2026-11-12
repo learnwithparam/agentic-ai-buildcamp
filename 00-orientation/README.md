@@ -3,13 +3,13 @@
 KaaS Freight paid one invoice twice last month. That cost USD 3,140 and a lot of chasing. Your job in this course
 is to hire an AI employee who never lets that happen, and to prove it. This page takes about 20 minutes.
 
-| Minutes | You do | You see |
-|---|---|---|
-| 0 to 5 | Clone the repo, `bun install`, `bun run verify meet-the-world --setup` | A setup table: each line passed, or the fix to try |
-| 5 to 8 | `bun run world freight-audit` | The ledger on `localhost:7700/ledger`: 60 invoices, all open |
-| 8 to 12 | `bun run reference naive` | The naive employee says "All 6 invoices paid. Done." The ledger disagrees |
-| 12 to 17 | `bun run reference`, then open `localhost:7702/board` | Four cards Done, one Needs you, one Refused, and the cost per invoice settled |
-| 17 to 20 | `bun run verify meet-the-world` | Your next step |
+| Minutes  | You do                                                                 | You see                                                                       |
+| -------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| 0 to 5   | Clone the repo, `bun install`, `bun run verify meet-the-world --setup` | A setup table: each line passed, or the fix to try                            |
+| 5 to 8   | `bun run world freight-audit`                                          | The ledger on `localhost:7700/ledger`: 60 invoices, all open                  |
+| 8 to 12  | `bun run reference naive`                                              | The naive employee says "All 6 invoices paid. Done." The ledger disagrees     |
+| 12 to 17 | `bun run reference`, then open `localhost:7702/board`                  | Four cards Done, one Needs you, one Refused, and the cost per invoice settled |
+| 17 to 20 | `bun run verify meet-the-world`                                        | Your next step                                                                |
 
 ```mermaid
 flowchart LR

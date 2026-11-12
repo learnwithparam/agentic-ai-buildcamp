@@ -3,7 +3,17 @@
   "title": "cost.yaml",
   "description": "The cost model for one AI employee: what one outcome costs in model spend, and what it is worth.",
   "type": "object",
-  "required": ["employee", "outcome", "value_per_outcome_usd", "value_reason", "runs", "calls_per_run", "tokens_per_call", "price", "cost_per_outcome_usd"],
+  "required": [
+    "employee",
+    "outcome",
+    "value_per_outcome_usd",
+    "value_reason",
+    "runs",
+    "calls_per_run",
+    "tokens_per_call",
+    "price",
+    "cost_per_outcome_usd"
+  ],
   "additionalProperties": false,
   "properties": {
     "employee": { "type": "string", "minLength": 1 },
@@ -31,7 +41,14 @@
     },
     "price": {
       "type": "object",
-      "required": ["role", "provider", "checked_on", "source", "input_usd_per_million", "output_usd_per_million"],
+      "required": [
+        "role",
+        "provider",
+        "checked_on",
+        "source",
+        "input_usd_per_million",
+        "output_usd_per_million"
+      ],
       "additionalProperties": false,
       "properties": {
         "role": { "enum": ["fast", "smart", "judge"] },

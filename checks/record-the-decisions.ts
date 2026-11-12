@@ -13,18 +13,31 @@ export default [
   },
   {
     says: "each ADR has Context, Decision, Consequences and Enforced by",
-    test: (d) => ADRS.every((n) => ["context", "decision", "consequences", "enforced by"].every((s) => s in adr(d, n))),
-    tryNext: "give each ADR four headings: ## Context, ## Decision, ## Consequences, ## Enforced by",
+    test: (d) =>
+      ADRS.every((n) =>
+        ["context", "decision", "consequences", "enforced by"].every((s) => s in adr(d, n)),
+      ),
+    tryNext:
+      "give each ADR four headings: ## Context, ## Decision, ## Consequences, ## Enforced by",
   },
   {
     says: "each section says something real",
     test: (d) =>
-      ADRS.every((n) => ["context", "decision", "consequences"].every((s) => words(adr(d, n)[s]) >= 8 && !/\bTODO\b/.test(adr(d, n)[s]))),
-    tryNext: "write at least one full sentence under Context, Decision and Consequences, and remove every TODO",
+      ADRS.every((n) =>
+        ["context", "decision", "consequences"].every(
+          (s) => words(adr(d, n)[s]) >= 8 && !/\bTODO\b/.test(adr(d, n)[s]),
+        ),
+      ),
+    tryNext:
+      "write at least one full sentence under Context, Decision and Consequences, and remove every TODO",
   },
   {
     says: "each ADR names the check that enforces it",
-    test: (d) => ADRS.every((n) => /`bun run verify [a-z]+(-[a-z0-9]+)+`/.test(adr(d, n)["enforced by"] ?? "")),
-    tryNext: "under Enforced by, name the check in backticks, like `bun run verify pay-once-after-a-crash`",
+    test: (d) =>
+      ADRS.every((n) =>
+        /`bun run verify [a-z]+(-[a-z0-9]+)+`/.test(adr(d, n)["enforced by"] ?? ""),
+      ),
+    tryNext:
+      "under Enforced by, name the check in backticks, like `bun run verify pay-once-after-a-crash`",
   },
 ] satisfies Rule[];

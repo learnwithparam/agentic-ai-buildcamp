@@ -80,13 +80,13 @@ an AI employee for this desk. Its must-never: pay an invoice twice, or pay above
 
 ## The parts
 
-| Part | Minutes | What you leave with | Deliverable |
-|---|---|---|---|
-| [Orientation](00-orientation/README.md) | 20 | The world, the naive employee, the reference, the board | `bun run verify meet-the-world` |
-| Design | 200 | A hire letter, acceptance tests, tools and permissions, a cost model, three ADRs, a peer review. No code | `bun run verify part design` |
-| Build | 285 | One job end to end, closed on the record, the must-never held, approvals by role, a checker before every final write | `bun run verify part build` |
-| Deploy | 215 | A service that survives a crash, starts on events and schedules, a policy gate, a spend cap, a second tenant | `bun run verify part deploy` |
-| Operate | 225 | Cost per outcome on the board, labelled traces, evals from failures, a gate that refuses a bad model swap | `bun run verify part operate` |
+| Part                                    | Minutes | What you leave with                                                                                                  | Deliverable                     |
+| --------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------- | ------------------------------- |
+| [Orientation](00-orientation/README.md) | 20      | The world, the naive employee, the reference, the board                                                              | `bun run verify meet-the-world` |
+| Design                                  | 200     | A hire letter, acceptance tests, tools and permissions, a cost model, three ADRs, a peer review. No code             | `bun run verify part design`    |
+| Build                                   | 285     | One job end to end, closed on the record, the must-never held, approvals by role, a checker before every final write | `bun run verify part build`     |
+| Deploy                                  | 215     | A service that survives a crash, starts on events and schedules, a policy gate, a spend cap, a second tenant         | `bun run verify part deploy`    |
+| Operate                                 | 225     | Cost per outcome on the board, labelled traces, evals from failures, a gate that refuses a bad model swap            | `bun run verify part operate`   |
 
 Each step opens with a problem in the world, then the challenge, then one command: `bun run verify <step-name>`.
 Every failing rule says what to try next.
@@ -97,18 +97,18 @@ The default is the freight audit clerk. You may bring your own employee, or pick
 world pack with the same shape (seed data, a SQLite system of record behind tools, people with roles, planted
 traps) and answers the same checks.
 
-| Employee | Business | Hired for | Must never | Planted trap |
-|---|---|---|---|---|
-| Freight audit clerk (default) | A freight broker | Each carrier invoice paid or disputed per the rate and the proof of delivery | Pay twice, or above the rate without the finance lead | A duplicate invoice under a new number |
-| Spoiled food claims handler | A home insurer | Each claim under the limit settled per the policy | Decline a claim without a claims officer | A claim on a lapsed policy |
-| Work order writer | A rural power co-op | Each vegetation report turned into a safe work order | Send crews to a line not marked de-energised | A report on a live line |
-| Referral coordinator | A family clinic | Each referral booked with the right specialist inside the wait limit | Book without the doctor's order on file | A patient who opted out |
-| Damage assessor | A construction equipment hire firm | Each returned machine assessed and any deposit charge decided | Charge a deposit without photo evidence | A photo dated before the rental started |
-| Cover lesson planner | A primary school | A cover lesson ready by the start of school for each absent teacher | Use material not on the approved list | A year group with no approved unit |
-| Supplier terms negotiator | A grocery chain | Better terms with tail-end suppliers inside the buyer's limits | Agree terms outside the buyer's limits | A supplier asks for a longer payment term than allowed |
-| Shift hiring coordinator | A restaurant group | Each open shift filled with a screened applicant | Offer a job without the manager's sign-off | An applicant under the minimum age |
-| Grant screener | A charity foundation | Each application screened and scored against the fund's rules | Award above the board's limit | An applicant already funded under another name |
-| Milk pickup planner | A dairy farm co-op | Each farm's tank collected before it is full | Send a driver past their legal driving limit | A tank alarm with only one rested driver |
+| Employee                      | Business                           | Hired for                                                                    | Must never                                            | Planted trap                                           |
+| ----------------------------- | ---------------------------------- | ---------------------------------------------------------------------------- | ----------------------------------------------------- | ------------------------------------------------------ |
+| Freight audit clerk (default) | A freight broker                   | Each carrier invoice paid or disputed per the rate and the proof of delivery | Pay twice, or above the rate without the finance lead | A duplicate invoice under a new number                 |
+| Spoiled food claims handler   | A home insurer                     | Each claim under the limit settled per the policy                            | Decline a claim without a claims officer              | A claim on a lapsed policy                             |
+| Work order writer             | A rural power co-op                | Each vegetation report turned into a safe work order                         | Send crews to a line not marked de-energised          | A report on a live line                                |
+| Referral coordinator          | A family clinic                    | Each referral booked with the right specialist inside the wait limit         | Book without the doctor's order on file               | A patient who opted out                                |
+| Damage assessor               | A construction equipment hire firm | Each returned machine assessed and any deposit charge decided                | Charge a deposit without photo evidence               | A photo dated before the rental started                |
+| Cover lesson planner          | A primary school                   | A cover lesson ready by the start of school for each absent teacher          | Use material not on the approved list                 | A year group with no approved unit                     |
+| Supplier terms negotiator     | A grocery chain                    | Better terms with tail-end suppliers inside the buyer's limits               | Agree terms outside the buyer's limits                | A supplier asks for a longer payment term than allowed |
+| Shift hiring coordinator      | A restaurant group                 | Each open shift filled with a screened applicant                             | Offer a job without the manager's sign-off            | An applicant under the minimum age                     |
+| Grant screener                | A charity foundation               | Each application screened and scored against the fund's rules                | Award above the board's limit                         | An applicant already funded under another name         |
+| Milk pickup planner           | A dairy farm co-op                 | Each farm's tank collected before it is full                                 | Send a driver past their legal driving limit          | A tank alarm with only one rested driver               |
 
 ## How the repo works
 

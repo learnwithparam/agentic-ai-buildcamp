@@ -30,19 +30,19 @@ Shape of `review.md`: one `## Reviewer: First Last` heading per person, and unde
 
 Each answer starts with yes or no, then one line that says why.
 
-| Employee | A good question to push on |
-|---|---|
-| Freight clerk | Does the duplicate trap use a new invoice number? |
-| Spoiled food claims handler | Is a lapsed policy a trap case? |
-| Work order writer | Is the de-energised flag read from the grid record, not the request? |
-| Referral coordinator | Does the opt-out stop the booking? |
-| Grant screener | Is "funded under another name" a trap case? |
-| Cover lesson planner | Is the approved list the only source? |
-| Supplier terms negotiator | Are the buyer's limits in the tool, not the prompt? |
-| Shift hiring coordinator | Is the minimum age checked before the offer? |
-| Damage assessor | Is the photo date compared with the rental start? |
-| Milk pickup planner | Is the legal limit checked per driver? |
-| Your own job | What would your manager ask first? |
+| Employee                    | A good question to push on                                           |
+| --------------------------- | -------------------------------------------------------------------- |
+| Freight clerk               | Does the duplicate trap use a new invoice number?                    |
+| Spoiled food claims handler | Is a lapsed policy a trap case?                                      |
+| Work order writer           | Is the de-energised flag read from the grid record, not the request? |
+| Referral coordinator        | Does the opt-out stop the booking?                                   |
+| Grant screener              | Is "funded under another name" a trap case?                          |
+| Cover lesson planner        | Is the approved list the only source?                                |
+| Supplier terms negotiator   | Are the buyer's limits in the tool, not the prompt?                  |
+| Shift hiring coordinator    | Is the minimum age checked before the offer?                         |
+| Damage assessor             | Is the photo date compared with the rental start?                    |
+| Milk pickup planner         | Is the legal limit checked per driver?                               |
+| Your own job                | What would your manager ask first?                                   |
 
 ## Done when
 
@@ -57,11 +57,11 @@ Expect: `Done. All 5 rules pass.`
 
 ## If you get stuck
 
-| What you see | Fix |
-|---|---|
-| `FAIL two named peer reviewers` | Use each reviewer's real name, and two different people. |
+| What you see                                            | Fix                                                                |
+| ------------------------------------------------------- | ------------------------------------------------------------------ |
+| `FAIL two named peer reviewers`                         | Use each reviewer's real name, and two different people.           |
 | `FAIL each answer is yes or no with one line of reason` | Scores like `4/5` do not say what to fix. Write yes or no and why. |
-| `FAIL every answer is yes` | Fix the file behind each no, then ask that reviewer again. |
+| `FAIL every answer is yes`                              | Fix the file behind each no, then ask that reviewer again.         |
 
 ## Words you will use
 

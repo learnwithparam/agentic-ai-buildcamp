@@ -3,7 +3,9 @@ import { has, isQuery, toml } from "./design-lib";
 
 const hire = (d: string) => toml(d, "employee.toml").hire ?? {};
 const filled = (v: unknown) =>
-  typeof v === "string" ? v.trim().length > 0 && !/^(todo|tbd|write here)/i.test(v.trim()) : v !== undefined;
+  typeof v === "string"
+    ? v.trim().length > 0 && !/^(todo|tbd|write here)/i.test(v.trim())
+    : v !== undefined;
 
 export default [
   {
@@ -13,16 +15,22 @@ export default [
   },
   {
     says: "[hire] has outcome, metric, must_never, starts_by and lives",
-    test: (d) => ["outcome", "metric", "must_never", "starts_by", "lives"].every((k) => filled(hire(d)[k])),
+    test: (d) =>
+      ["outcome", "metric", "must_never", "starts_by", "lives"].every((k) => filled(hire(d)[k])),
     tryNext: "fill every key under [hire]; replace each TODO with your own words",
   },
   {
     says: "starts_by lists person, event, schedule or agent",
     test: (d) => {
       const s = hire(d).starts_by;
-      return Array.isArray(s) && s.length > 0 && s.every((x) => ["person", "event", "schedule", "agent"].includes(x));
+      return (
+        Array.isArray(s) &&
+        s.length > 0 &&
+        s.every((x) => ["person", "event", "schedule", "agent"].includes(x))
+      );
     },
-    tryNext: "set starts_by to a list of one or more of: person, event, schedule, agent, like starts_by = [\"person\"]",
+    tryNext:
+      'set starts_by to a list of one or more of: person, event, schedule, agent, like starts_by = ["person"]',
   },
   {
     says: "lives is one job, one case or always on",
@@ -32,7 +40,8 @@ export default [
   {
     says: "the metric has a name and a query on the system of record",
     test: (d) => filled(hire(d).metric?.name) && isQuery(hire(d).metric?.query),
-    tryNext: "under [hire.metric] give a name and a query that starts with SELECT and reads a table",
+    tryNext:
+      "under [hire.metric] give a name and a query that starts with SELECT and reads a table",
   },
   {
     says: "must_never names a write tool and a query that finds it",
@@ -40,6 +49,7 @@ export default [
       const m = hire(d).must_never ?? {};
       return filled(m.rule) && /^[a-z]+(_[a-z]+)+$/.test(m.write ?? "") && isQuery(m.check);
     },
-    tryNext: "under [hire.must_never] set rule, write (the tool name, like pay_invoice) and check (a SELECT that returns the forbidden rows)",
+    tryNext:
+      "under [hire.must_never] set rule, write (the tool name, like pay_invoice) and check (a SELECT that returns the forbidden rows)",
   },
 ] satisfies Rule[];

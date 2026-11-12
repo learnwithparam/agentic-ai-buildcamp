@@ -5,7 +5,8 @@ import { has, schemaIn, validate, yaml } from "./design-lib";
 const STEP = join(import.meta.dir, "..", "parts", "01-design", "04-list-tools-and-permissions");
 const file = (d: string) => yaml(d, "tools.yaml");
 const tools = (d: string): any[] => (Array.isArray(file(d)?.tools) ? file(d).tools : []);
-const none = (s: unknown) => typeof s !== "string" || /^(none|nobody|no one|todo|-)?$/i.test(s.trim());
+const none = (s: unknown) =>
+  typeof s !== "string" || /^(none|nobody|no one|todo|-)?$/i.test(s.trim());
 
 export default [
   {
@@ -20,8 +21,10 @@ export default [
   },
   {
     says: "every tool's risk fits what it does",
-    test: (d) => tools(d).length > 0 && tools(d).every((t) => (t.does === "reads") === (t.risk === "read")),
-    tryNext: "a tool that reads has risk read; a tool that writes is an undoable write or a final write",
+    test: (d) =>
+      tools(d).length > 0 && tools(d).every((t) => (t.does === "reads") === (t.risk === "read")),
+    tryNext:
+      "a tool that reads has risk read; a tool that writes is an undoable write or a final write",
   },
   {
     says: "every final write has an approver or a must-never",

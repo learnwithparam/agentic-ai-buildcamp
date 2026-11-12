@@ -34,19 +34,19 @@ clerk it looks like this:
 
 ![bun run cost on the freight clerk](../images/expected.png)
 
-| Employee | One outcome to price |
-|---|---|
-| Freight clerk | One invoice settled |
-| Spoiled food claims handler | One claim decided |
-| Work order writer | One work order sent |
-| Referral coordinator | One referral booked |
-| Grant screener | One application screened |
-| Cover lesson planner | One cover lesson ready |
-| Supplier terms negotiator | One set of terms agreed |
-| Shift hiring coordinator | One shift filled |
-| Damage assessor | One return assessed |
-| Milk pickup planner | One pickup route planned |
-| Your own job | One finished piece of your work |
+| Employee                    | One outcome to price            |
+| --------------------------- | ------------------------------- |
+| Freight clerk               | One invoice settled             |
+| Spoiled food claims handler | One claim decided               |
+| Work order writer           | One work order sent             |
+| Referral coordinator        | One referral booked             |
+| Grant screener              | One application screened        |
+| Cover lesson planner        | One cover lesson ready          |
+| Supplier terms negotiator   | One set of terms agreed         |
+| Shift hiring coordinator    | One shift filled                |
+| Damage assessor             | One return assessed             |
+| Milk pickup planner         | One pickup route planned        |
+| Your own job                | One finished piece of your work |
 
 ## Done when
 
@@ -62,11 +62,11 @@ Expect: `Done. All 6 rules pass.`
 
 ## If you get stuck
 
-| What you see | Fix |
-|---|---|
-| `FAIL failed runs are counted` | Some runs time out or get stopped. Start with 0.25 and fix it once traces exist. |
-| `FAIL your cost per outcome matches the recomputed one within 1%` | Copy the `cost per outcome` line from `bun run cost`. |
-| `FAIL the cost is below the value of one outcome` | Use fewer calls, fewer tokens or a cheaper role. |
+| What you see                                                      | Fix                                                                              |
+| ----------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `FAIL failed runs are counted`                                    | Some runs time out or get stopped. Start with 0.25 and fix it once traces exist. |
+| `FAIL your cost per outcome matches the recomputed one within 1%` | Copy the `cost per outcome` line from `bun run cost`.                            |
+| `FAIL the cost is below the value of one outcome`                 | Use fewer calls, fewer tokens or a cheaper role.                                 |
 
 ## Words you will use
 

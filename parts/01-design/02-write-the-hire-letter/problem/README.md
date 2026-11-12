@@ -27,19 +27,19 @@ event, schedule or agent), `lives` (one job, one case or always on), `[hire.metr
 `[hire.must_never]` with `rule`, `write` (a tool name like `pay_invoice`) and `check` (a SELECT that returns the
 bad rows).
 
-| Employee | Must never |
-|---|---|
-| Freight clerk | Pay the same load twice |
-| Spoiled food claims handler | Decline a claim without a claims officer |
-| Work order writer | Send a crew to a line not marked de-energised |
-| Referral coordinator | Book without the doctor's order |
-| Grant screener | Award above the board's limit |
-| Cover lesson planner | Use material not on the approved list |
-| Supplier terms negotiator | Agree terms outside the buyer's limits |
-| Shift hiring coordinator | Make an offer without the manager's sign-off |
-| Damage assessor | Charge a deposit without photo evidence |
-| Milk pickup planner | Send a driver over their legal driving limit |
-| Your own job | The one mistake that costs real money or trust |
+| Employee                    | Must never                                     |
+| --------------------------- | ---------------------------------------------- |
+| Freight clerk               | Pay the same load twice                        |
+| Spoiled food claims handler | Decline a claim without a claims officer       |
+| Work order writer           | Send a crew to a line not marked de-energised  |
+| Referral coordinator        | Book without the doctor's order                |
+| Grant screener              | Award above the board's limit                  |
+| Cover lesson planner        | Use material not on the approved list          |
+| Supplier terms negotiator   | Agree terms outside the buyer's limits         |
+| Shift hiring coordinator    | Make an offer without the manager's sign-off   |
+| Damage assessor             | Charge a deposit without photo evidence        |
+| Milk pickup planner         | Send a driver over their legal driving limit   |
+| Your own job                | The one mistake that costs real money or trust |
 
 ## Done when
 
@@ -56,10 +56,10 @@ The freight sample is in [solution/employee.toml](../solution/employee.toml).
 
 ## If you get stuck
 
-| What you see | Fix |
-|---|---|
-| `FAIL the metric has a name and a query on the system of record` | A feeling like "clerks are happier" is not a metric. Count rows. |
-| `FAIL must_never names a write tool and a query that finds it` | Name the tool in snake_case and write the SELECT that would list a breach. |
+| What you see                                                     | Fix                                                                        |
+| ---------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `FAIL the metric has a name and a query on the system of record` | A feeling like "clerks are happier" is not a metric. Count rows.           |
+| `FAIL must_never names a write tool and a query that finds it`   | Name the tool in snake_case and write the SELECT that would list a breach. |
 
 ## Words you will use
 

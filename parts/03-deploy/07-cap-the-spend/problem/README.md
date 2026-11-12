@@ -43,12 +43,12 @@ Expect: `Done. All 2 rules pass.`
 
 ## If you get stuck
 
-| What you see | Fix |
-|---|---|
-| `the ledger shows INV-... paid` | Check the budget after the model call too, before the write |
-| `no "raise_budget" approval` | Add the approval when you stop, with `action: "raise_budget"` |
-| `Ravi Shah (AP clerk) raised the budget` | Check the person's role, not their payment limit |
-| `more than one model call past the cap` | Add up `spend` across every job in `STATE_DIR`, not only this one |
+| What you see                             | Fix                                                               |
+| ---------------------------------------- | ----------------------------------------------------------------- |
+| `the ledger shows INV-... paid`          | Check the budget after the model call too, before the write       |
+| `no "raise_budget" approval`             | Add the approval when you stop, with `action: "raise_budget"`     |
+| `Ravi Shah (AP clerk) raised the budget` | Check the person's role, not their payment limit                  |
+| `more than one model call past the cap`  | Add up `spend` across every job in `STATE_DIR`, not only this one |
 
 ## Words you will use
 

@@ -6,7 +6,8 @@ import { dirname, join } from "node:path";
 
 async function config() {
   for (let d = import.meta.dir; d !== dirname(d); d = dirname(d))
-    if (existsSync(join(d, "config", "models.ts"))) return await import(join(d, "config", "models.ts"));
+    if (existsSync(join(d, "config", "models.ts")))
+      return await import(join(d, "config", "models.ts"));
   throw new Error("keep this employee inside the course repo so config/models.ts is found");
 }
 
@@ -16,6 +17,16 @@ export async function ask(system: string, user: string, role: "fast" | "smart" |
   const cfg = await config();
   if (cfg.provider() === "replay") return null;
   const { generateText } = await import("ai");
-  const out = await generateText({ model: await cfg.languageModel(role), system, prompt: user, maxOutputTokens: 400 });
-  return { model: cfg.modelId(role), text: out.text, input_tokens: out.usage.inputTokens ?? 0, output_tokens: out.usage.outputTokens ?? 0 };
+  const out = await generateText({
+    model: await cfg.languageModel(role),
+    system,
+    prompt: user,
+    maxOutputTokens: 400,
+  });
+  return {
+    model: cfg.modelId(role),
+    text: out.text,
+    input_tokens: out.usage.inputTokens ?? 0,
+    output_tokens: out.usage.outputTokens ?? 0,
+  };
 }

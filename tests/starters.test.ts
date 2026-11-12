@@ -4,7 +4,7 @@ import { describe, expect, test } from "bun:test";
 import { mkdtempSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { behaviours, type BehaviourName } from "../checks/lib/behaviours";
+import { type BehaviourName, behaviours } from "../checks/lib/behaviours";
 
 const ROOT = join(import.meta.dir, "..");
 const PASS: BehaviourName[] = ["answer-the-contract", "call-the-tools"];

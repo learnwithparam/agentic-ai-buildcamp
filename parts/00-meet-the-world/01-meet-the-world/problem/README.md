@@ -21,13 +21,13 @@ flowchart LR
 Run the world, the naive employee and the reference. Write what you saw in `notes.md` in this folder. Each line
 names an invoice id, such as `INV-2041`.
 
-| Line | What to write |
-|---|---|
-| `Naive said:` | The naive employee's last line, word for word |
-| `Paid twice:` | The invoice the ledger shows paid twice after the naive run |
-| `Not paid:` | The invoice the naive employee said it paid, but the ledger shows open |
-| `Needs you:` | The invoice in the board's Needs you column after `bun run reference` |
-| `Refused:` | The invoice in the board's Refused column |
+| Line          | What to write                                                          |
+| ------------- | ---------------------------------------------------------------------- |
+| `Naive said:` | The naive employee's last line, word for word                          |
+| `Paid twice:` | The invoice the ledger shows paid twice after the naive run            |
+| `Not paid:`   | The invoice the naive employee said it paid, but the ledger shows open |
+| `Needs you:`  | The invoice in the board's Needs you column after `bun run reference`  |
+| `Refused:`    | The invoice in the board's Refused column                              |
 
 ## Done when
 
@@ -44,12 +44,12 @@ Expect: five `PASS` lines, `Done. All 5 rules pass.`, then `You ran the referenc
 
 ## If you get stuck
 
-| What you see | Fix |
-|---|---|
-| `FAIL Paid twice: names the invoice ...` | Run `bun run reference naive` again and read its ledger table, or the red row on `localhost:7700/ledger`. |
-| `FAIL Not paid: names the invoice ...` | The naive employee tried once more on an error and gave up quietly. Find the row marked `NOT PAID`. |
-| `FAIL Needs you: ...` or `FAIL Refused: ...` | Run `bun run reference`, then open `localhost:7702/board`. |
-| `The world is not running` | Start it in another terminal: `bun run world freight-audit`. |
+| What you see                                 | Fix                                                                                                       |
+| -------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `FAIL Paid twice: names the invoice ...`     | Run `bun run reference naive` again and read its ledger table, or the red row on `localhost:7700/ledger`. |
+| `FAIL Not paid: names the invoice ...`       | The naive employee tried once more on an error and gave up quietly. Find the row marked `NOT PAID`.       |
+| `FAIL Needs you: ...` or `FAIL Refused: ...` | Run `bun run reference`, then open `localhost:7702/board`.                                                |
+| `The world is not running`                   | Start it in another terminal: `bun run world freight-audit`.                                              |
 
 More messages and their fixes are in [troubleshooting.md](../../../../00-orientation/troubleshooting.md).
 
