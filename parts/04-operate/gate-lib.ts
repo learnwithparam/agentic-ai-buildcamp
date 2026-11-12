@@ -1,7 +1,7 @@
 // Shared by run-the-swap-gate and refuse-a-bad-model: read gate.md and run the learner's gate.toml.
 import { existsSync, readFileSync } from "node:fs";
-import { find, readGate, runGate, type GateReport } from "../parts/04-operate/operate-lib";
-import { sections } from "./design-lib";
+import { find, readGate, runGate, type GateReport } from "./operate-lib";
+import { sections } from "../../checks/design-lib";
 
 export const say = (m: string) => { console.log(`        ${m}`); return false; };
 export const gate = (d: string) => readGate(d);

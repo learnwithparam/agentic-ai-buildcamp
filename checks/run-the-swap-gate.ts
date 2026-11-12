@@ -2,7 +2,7 @@
 // gate.md states the decision and cost per outcome before and after, and both match the gate's own run within 2%.
 import type { Rule } from "../scripts/verify";
 import { TRAPS } from "./lib";
-import { gate, gateMd, gateRun, near, say } from "./gate-lib";
+import { gate, gateMd, gateRun, near, say } from "../parts/04-operate/gate-lib";
 
 export default [
   {
