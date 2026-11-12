@@ -1,0 +1,10 @@
+# A planted-fault employee. Sends X-Tenant kaas-freight for every job, KaaS Dairy's too.
+# The behaviour checks it must fail: isolate-the-second-tenant.
+fails = ["isolate-the-second-tenant"]
+
+[contract]
+version = "1"
+mode = "http"
+start = "bun start.ts"
+url = "http://localhost:7701"
+traces = "traces"

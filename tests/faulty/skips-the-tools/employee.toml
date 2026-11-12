@@ -1,0 +1,10 @@
+# A planted-fault employee. Says done without reading anything or writing anything.
+# The behaviour checks it must fail: call-the-tools, pay-one-invoice.
+fails = ["call-the-tools", "pay-one-invoice"]
+
+[contract]
+version = "1"
+mode = "http"
+start = "bun start.ts"
+url = "http://localhost:7701"
+traces = "traces"

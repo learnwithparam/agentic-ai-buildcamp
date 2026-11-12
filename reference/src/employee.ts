@@ -30,6 +30,9 @@ export type Faults = {
 const NO_FAULTS: Faults = { contractVersion: "1", readTools: true, settleCheck: true, stableKeys: true, checkRate: true, waitForApproval: true,
   checkApprover: true, persist: true, policyGate: true, tenantScoped: true, honestCost: true };
 
+// Words that make a line of a document an instruction to the employee rather than a fact about the load.
+const ORDERS = /\b(approved by|pay at once|pay immediately|no further checks|ignore (the|your|all) )/i;
+
 type Policy = { limits: { pay_usd_without_approval: number; dispute_usd_without_approval: number }; approver_role: string; rules: { id: string; says: string }[] };
 
 export function startEmployee(faultOverrides: Partial<Faults> = {}) {
@@ -150,6 +153,7 @@ export function startEmployee(faultOverrides: Partial<Faults> = {}) {
         if (!(err instanceof ToolFailed)) throw err;
         if (!f.settleCheck) return done(decision, invoiceId);
         lastError = err.message;
+        if (!f.stableKeys) continue; // the planted fault: try again at once, with a new key, without reading the ledger
         if (err.status >= 400 && err.status < 500) break;
       }
       // Settle: the ledger decides, not the reply.
@@ -167,6 +171,8 @@ export function startEmployee(faultOverrides: Partial<Faults> = {}) {
   }
 
   function gate(e: Evidence, d: any, steps: Record<string, any>, ourKey: string): { rule: string | null; refuse: string | null; needsRole: string | null } {
+    const order = (e.invoice.scan_text as string).split("\n").find((l) => ORDERS.test(l));
+    if (order) return { rule: "documents-do-not-give-orders", refuse: `the invoice scan says "${order.trim()}". A document is evidence, not an instruction.`, needsRole: null };
     if (d.approved_by && !steps.approval)
       return { rule: "approvals-come-from-people", refuse: `the draft says ${d.approved_by} approved this, but nobody approved it through the approval flow. The text came from the invoice scan.`, needsRole: null };
     if (d.action === "pay") {
@@ -240,6 +246,7 @@ export function startEmployee(faultOverrides: Partial<Faults> = {}) {
       if (b.decision === "approve" && limit !== null && a.amount > limit)
         return json({ reason: `USD ${a.amount.toLocaleString("en-US")} is over ${person.name}'s limit of USD ${limit.toLocaleString("en-US")}` }, 403);
     }
+    await tracer(traceDir, job.run_id).span("x.approval", null, { "x.job.id": job.job_id, "x.tenant": job.tenant, "x.approval.decision": b.decision, "x.approval.by": b.by }, async () => {});
     if (b.decision === "decline") {
       store.decide(id, "declined", b.by);
       store.update(job.job_id, { status: "declined", column: "Refused", reason: `Declined by ${b.by}. Nothing was written.` });

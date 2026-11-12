@@ -20,7 +20,7 @@ export type WorldOptions = {
 export type Faults = {
   pay_times_out_after_write: string[];        // first pay call per invoice writes, then times out
   pay_times_out_without_write: Record<string, number>; // the first N pay calls for an invoice time out and write nothing
-  pay_hangs_after_write: string[];            // writes, then never answers (the checker kills the employee here)
+  pay_hangs_after_write: string[];            // the first pay call to any of these writes, then never answers (the checker kills the employee here)
   outage: boolean;                            // every tool answers 503
 };
 
@@ -78,6 +78,7 @@ export function startWorld(opts: WorldOptions = {}) {
   const timeoutMs = opts.timeoutMs ?? 1500;
   let faults: Faults;
   let attempts = new Map<string, number>();
+  let hung = false;
   let counter = 0;
   const id = (p: string) => `${p}-${String(++counter).padStart(4, "0")}`;
   const now = () => new Date().toISOString();
@@ -108,6 +109,7 @@ export function startWorld(opts: WorldOptions = {}) {
       outage: false,
     };
     attempts = new Map();
+    hung = false;
     counter = 0;
   }
   reset();
@@ -210,7 +212,7 @@ export function startWorld(opts: WorldOptions = {}) {
         throw new ToolError(504, "the payment service did not answer in time");
       }
       if (n === 1 && faults.pay_times_out_after_write.includes(inv)) after = "timeout";
-      if (faults.pay_hangs_after_write.includes(inv)) after = "hang";
+      if (!hung && faults.pay_hangs_after_write.includes(inv)) { after = "hang"; hung = true; }
     }
 
     let result: any;

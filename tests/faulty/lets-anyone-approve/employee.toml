@@ -1,0 +1,10 @@
+# A planted-fault employee. Accepts an approval from any person id, Jo included.
+# The behaviour checks it must fail: check-who-approves.
+fails = ["check-who-approves"]
+
+[contract]
+version = "1"
+mode = "http"
+start = "bun start.ts"
+url = "http://localhost:7701"
+traces = "traces"
