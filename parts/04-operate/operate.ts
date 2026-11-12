@@ -2,13 +2,13 @@
 //   bun parts/04-operate/operate.ts traces                 the trace viewer on localhost:7703 for the 60-run replay set
 //   bun parts/04-operate/operate.ts evals <folder>         run the evals in <folder>/evals on the replay set
 //   bun parts/04-operate/operate.ts gate <folder> [model]  run the swap gate in <folder>/gate.toml; model replaces the candidate
-//   bun parts/04-operate/operate.ts record-runs            write runs/ again (authors only: the replay set is fixed)
+//   bun parts/04-operate/operate.ts record-runs            write 02-label-the-traces/runs/ again (authors only: the replay set is fixed)
 import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { startWorld, TRAPS } from "../../worlds/freight-audit/world";
 import { startEmployee } from "../../checks/lib/employee";
 import { contract } from "../../checks/lib/contract";
-import { KIT, RUNS, ROOT, evalsDir, find, ledgerRows, loadEvals, loadReplaySet, printGate, readGate, readLabels, runEval, runGate, tmp, usd, writeJson, type RecordedRun } from "./operate-lib";
+import { KIT, PART, RUNS, ROOT, evalsDir, find, ledgerRows, loadEvals, loadReplaySet, printGate, readGate, readLabels, runEval, runGate, tmp, usd, writeJson, type RecordedRun } from "./operate-lib";
 import { viewerPage } from "./viewer-page";
 
 const [cmd, arg, extra] = process.argv.slice(2);
@@ -55,7 +55,7 @@ if (cmd === "traces") {
 // The replay set: the clerk on the smart role, in production, before it learned to pause when the ledger is down.
 // A live model does not answer the same way every time; these runs keep the three drafts where it slipped.
 async function recordRuns() {
-  const { writeModel } = await import("./models/write");
+  const { writeModel } = await import("./06-run-the-swap-gate/models/write");
   const slips: Record<string, any> = {
     [TRAPS.duplicate.invoice_id]: { action: "pay", amount_usd: 2675, reason_code: null, note: "Matches the rate confirmation and the proof of delivery.", approved_by: null },
     [TRAPS.detention_unsigned.invoice_id]: { action: "dispute", amount_usd: 225, reason_code: "ABOVE_RATE", note: "Detention billed above the rate.", approved_by: null },
@@ -67,7 +67,7 @@ async function recordRuns() {
   const world = startWorld({ port: 0, dbPath: ":memory:", timeoutMs: 100, quiet: true });
   world.setFaults({ pay_times_out_without_write: { [TRAPS.pay_times_out_twice_without_write.invoice_id]: 3 } });
   const empDir = tmp("employee");
-  writeFileSync(join(empDir, "employee.toml"), `[contract]\nversion = "1"\nmode = "http"\nstart = "bun ${join(KIT, "start.ts")} fails-when-the-ledger-is-down"\ntraces = "traces"\n`);
+  writeFileSync(join(empDir, "employee.toml"), `[contract]\nversion = "1"\nmode = "http"\nstart = "bun ${join(PART, "kit-start.ts")} fails-when-the-ledger-is-down"\ntraces = "traces"\n`);
   const emp = await startEmployee(empDir, world.url, { env: { MODEL_ROLE: "smart", REPLAY_DIR: replies } });
   const api = contract(emp);
   const ids = (world.db.query("SELECT invoice_id, tenant FROM invoices ORDER BY invoice_id").all() as any[]);

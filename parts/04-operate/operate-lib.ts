@@ -13,8 +13,9 @@ import { pdfText, SEED } from "../../worlds/freight-audit/world";
 
 export const PART = import.meta.dir;
 export const ROOT = resolve(PART, "..", "..");
-export const KIT = join(PART, "kit");
-export const RUNS = join(PART, "runs");
+export const KIT = join(PART, "01-show-cost-per-outcome", "solution"); // the sample clerk, started from its employee.toml
+export const RUNS = join(PART, "02-label-the-traces", "runs");
+export const MODELS = join(PART, "06-run-the-swap-gate", "models");
 export const usd = (n: number) => `USD ${n.toFixed(6)}`;
 
 // ---------- The world's evidence for one invoice, in the shape an eval reads ----------
@@ -157,13 +158,13 @@ export function evalsDir(dir: string): string | null {
 // ---------- Recorded models: models/<name>/model.toml names a role and the replies that stand in for it ----------
 export type Model = { name: string; role: string; replayDir: string };
 export function model(name: string): Model | null {
-  const f = join(PART, "models", name, "model.toml");
+  const f = join(MODELS, name, "model.toml");
   if (!existsSync(f)) return null;
   const t = Bun.TOML.parse(readFileSync(f, "utf8")) as any;
   if (!(ROLES as readonly string[]).includes(t.role)) return null;
   return { name, role: t.role, replayDir: resolve(dirname(f), t.replies) };
 }
-export const modelNames = () => readdirSync(join(PART, "models")).filter((d) => existsSync(join(PART, "models", d, "model.toml")));
+export const modelNames = () => readdirSync(MODELS).filter((d) => existsSync(join(MODELS, d, "model.toml")));
 
 // ---------- Fresh runs: a new world and a new employee on one model; the gate plays Lena ----------
 export type Fresh = { runs: Run[]; spend: number; unknownModels: string[]; outcomes: number; mustNever: string[] };

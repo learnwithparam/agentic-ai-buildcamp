@@ -1,7 +1,7 @@
 // Starts the Operate part's sample employee. The checker runs this from employee.toml.
 //   bun start.ts                         ready for production (the sample solution)
 //   bun start.ts <mistake>               one planted mistake, for a wrong/ folder
-import { operateEmployee, type Options } from "./employee";
+import { operateEmployee, type Options } from "./kit";
 
 const MISTAKES: Record<string, Partial<Options>> = {
   "forgets-failed-runs": { countFailedRuns: false },

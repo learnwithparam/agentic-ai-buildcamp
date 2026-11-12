@@ -1,7 +1,7 @@
 # The gate a teammate wrote. It lets through a model that leaves the duplicate open. Fix it, then run:
 #   bun parts/04-operate/operate.ts gate parts/04-operate/07-refuse-a-bad-model/problem fast-misses-the-duplicate
 # Paths are relative to this file.
-employee = "../../kit"
+employee = "../../01-show-cost-per-outcome/solution"
 current = "smart"
 candidate = "fast"
 evals = "../../04-write-an-eval-per-failure/problem/evals"

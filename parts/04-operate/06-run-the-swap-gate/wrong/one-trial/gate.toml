@@ -1,7 +1,7 @@
 # The swap gate: run the current model and a candidate on the same invoices, the same evals and the same
 # acceptance cases, and refuse the candidate unless it holds every one. Paths are relative to this file.
-employee = "../../../kit"            # the folder with employee.toml; the gate sets MODEL_ROLE and REPLAY_DIR on it
-current = "smart"                 # a recorded model in parts/04-operate/models/
+employee = "../../../01-show-cost-per-outcome/solution"            # the folder with employee.toml; the gate sets MODEL_ROLE and REPLAY_DIR on it
+current = "smart"                 # a recorded model in parts/04-operate/06-run-the-swap-gate/models/
 candidate = "fast"
 evals = "../../../04-write-an-eval-per-failure/solution/evals"
 acceptance = "../../../../01-design/03-turn-the-hire-into-tests/solution/acceptance.yaml"

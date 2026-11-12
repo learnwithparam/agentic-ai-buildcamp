@@ -10,6 +10,6 @@ lives = "one job"
 [contract]
 version = "1"
 mode = "http"
-start = "bun ../../../kit/start.ts fails-when-the-ledger-is-down"
+start = "bun ../../../kit-start.ts fails-when-the-ledger-is-down"
 url = "http://localhost:7701"
 traces = "traces"

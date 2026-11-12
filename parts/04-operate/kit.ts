@@ -10,16 +10,16 @@
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { costUsd, ROLES, type Role } from "../../../config/models";
-import { expected, allowedTotal, promptEvidence, SYSTEM_PROMPT, type Evidence } from "../../../reference/src/audit";
-import { openStore, type Job } from "../../../reference/src/store";
-import { tracer } from "../../../reference/src/trace";
-import { worldClient, ToolFailed } from "../../../reference/src/world";
-import { boardPage } from "../../../reference/src/board-page";
+import { costUsd, ROLES, type Role } from "../../config/models";
+import { expected, allowedTotal, promptEvidence, SYSTEM_PROMPT, type Evidence } from "../../reference/src/audit";
+import { openStore, type Job } from "../../reference/src/store";
+import { tracer } from "../../reference/src/trace";
+import { worldClient, ToolFailed } from "../../reference/src/world";
+import { boardPage } from "../../reference/src/board-page";
 
 export const NAME = "freight-audit-clerk";
 export const TENANTS = ["kaas-freight", "kaas-dairy"];
-const PART = join(import.meta.dir, "..");
+const PART = import.meta.dir;
 
 export type Options = {
   countFailedRuns: boolean;   // the board's spend counts every run, not only the ones that ended done
@@ -36,7 +36,7 @@ type Incident = { incident_id: string; opened_at: string; closed_at: string | nu
 export function modelSetting(env = process.env): { role: Role; replayDir: string } {
   const role = (env.MODEL_ROLE ?? "smart").trim() as Role;
   if (!(ROLES as readonly string[]).includes(role)) throw new Error(`MODEL_ROLE is "${role}". Set it to one of: ${ROLES.join(", ")}.`);
-  const replayDir = env.REPLAY_DIR ?? (role === "smart" ? join(PART, "models", "smart", "replies") : join(PART, "..", "..", "reference", "replay"));
+  const replayDir = env.REPLAY_DIR ?? (role === "smart" ? join(PART, "06-run-the-swap-gate", "models", "smart", "replies") : join(PART, "..", "..", "reference", "replay"));
   return { role, replayDir };
 }
 
@@ -44,7 +44,7 @@ export async function operateEmployee(overrides: Partial<Options> = {}) {
   const o = { ...READY, ...overrides };
   const setting = modelSetting();
   process.env.REPLAY_DIR = setting.replayDir; // read by reference/src/model.ts when it loads
-  const { chat } = await import("../../../reference/src/model");
+  const { chat } = await import("../../reference/src/model");
   const port = Number(process.env.PORT ?? 7701);
   const boardPort = process.env.BOARD_PORT ? Number(process.env.BOARD_PORT) : null;
   const traceDir = process.env.TRACE_DIR ?? join(process.cwd(), "traces");

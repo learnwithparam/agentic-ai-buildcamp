@@ -67,6 +67,6 @@ Expect: `Done. All 4 rules pass.`
 
 - **Swap gate**: a check that must pass before a model change ships, run on both models side by side.
 - **Recorded model**: in replay, a role (for its price) and one recorded reply per invoice, in
-  `parts/04-operate/models/`. With a live provider, the same gate calls the real models.
+  `parts/04-operate/06-run-the-swap-gate/models/`. With a live provider, the same gate calls the real models.
 
 Source: [Quantifying infrastructure noise in agentic coding evals, Anthropic](https://www.anthropic.com/engineering/infrastructure-noise), read 2026-11-12.

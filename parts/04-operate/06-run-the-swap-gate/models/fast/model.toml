@@ -1,4 +1,4 @@
 # The candidate finance asks about: the fast role, about twenty times cheaper per call.
 # Its recorded replies are the ones the reference uses.
 role = "fast"
-replies = "../../../../reference/replay"
+replies = "../../../../../reference/replay"

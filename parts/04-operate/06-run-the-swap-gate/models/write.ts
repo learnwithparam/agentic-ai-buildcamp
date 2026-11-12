@@ -4,14 +4,14 @@
 //   smart                       role smart: the clerk as it runs in production today
 //   fast                        role fast: the replies in reference/replay/ (this folder only names them)
 //   fast-misses-the-duplicate   role fast: the planted model. It drafts "pay" for the duplicate invoice
-// Run from the repo root: bun parts/04-operate/models/write.ts
+// Run from the repo root: bun parts/04-operate/06-run-the-swap-gate/models/write.ts
 import { mkdirSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { startWorld, TRAPS } from "../../../worlds/freight-audit/world";
-import { worldClient } from "../../../reference/src/world";
-import { expected, promptEvidence, SYSTEM_PROMPT } from "../../../reference/src/audit";
-import { replayKey } from "../../../reference/src/model";
-import type { Role } from "../../../config/models";
+import { startWorld, TRAPS } from "../../../../worlds/freight-audit/world";
+import { worldClient } from "../../../../reference/src/world";
+import { expected, promptEvidence, SYSTEM_PROMPT } from "../../../../reference/src/audit";
+import { replayKey } from "../../../../reference/src/model";
+import type { Role } from "../../../../config/models";
 
 type Slip = (e: any, want: any) => any | null;
 // Each recorded model: its role, and the drafts where it slips (null: the draft the evidence supports).
@@ -51,6 +51,6 @@ export async function writeModel(dir: string, role: Role, slip: Slip, source: st
 if (import.meta.main) {
   for (const [name, m] of Object.entries(MODELS)) {
     const n = await writeModel(join(import.meta.dir, name, "replies"), m.role, m.slip, "written from the evidence for cohort 1");
-    console.log(`Wrote ${n} replies to models/${name}/replies/ (role ${m.role}).`);
+    console.log(`Wrote ${n} replies to ${name}/replies/ (role ${m.role}).`);
   }
 }

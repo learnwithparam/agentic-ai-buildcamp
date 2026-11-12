@@ -10,7 +10,7 @@ lives = "one job"
 [contract]
 version = "1"
 mode = "http"
-start = "bun ../../../kit/start.ts forgets-failed-runs"
+start = "bun ../../../kit-start.ts forgets-failed-runs"
 url = "http://localhost:7701"
 traces = "traces"
 
