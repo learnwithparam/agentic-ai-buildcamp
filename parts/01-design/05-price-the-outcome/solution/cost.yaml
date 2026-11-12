@@ -14,9 +14,10 @@ tokens_per_call:
   output: 400
 
 price:
-  model: Claude Haiku 5.5   # prompts up to 100,000 tokens
+  role: fast                # the fast role in config/models.ts; this price holds for prompts up to 100,000 tokens
+  provider: anthropic
   checked_on: "2026-11-12"
-  source: https://platform.claude.com/docs/en/about-claude/pricing
+  source: https://claude.com/pricing
   input_usd_per_million: 0.10
   output_usd_per_million: 0.50
 

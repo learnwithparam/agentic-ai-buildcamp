@@ -123,7 +123,7 @@ if (import.meta.main) {
   }
   const { lines, perOutcome } = costOf(c);
   console.log(`Cost per outcome for ${c.employee} (${c.outcome})`);
-  console.log(`Prices: ${c.price.model}, checked on ${c.price.checked_on}`);
+  console.log(`Prices: the ${c.price.role} role on ${c.price.provider}, checked on ${c.price.checked_on}`);
   for (const l of lines) console.log(`  ${l.what.padEnd(18)} = ${l.how.padEnd(36)} = ${l.value}`);
   const said = c.cost_per_outcome_usd;
   const ok = within(said, perOutcome, 0.01);
