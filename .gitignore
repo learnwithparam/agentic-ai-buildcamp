@@ -3,4 +3,3 @@ node_modules
 .world/
 .state/
 traces/
-!reference/traces/

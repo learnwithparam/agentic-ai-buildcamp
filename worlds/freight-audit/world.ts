@@ -19,8 +19,7 @@ export type WorldOptions = {
 
 export type Faults = {
   pay_times_out_after_write: string[];        // first pay call per invoice writes, then times out
-  pay_times_out_once_without_write: string[]; // first pay call per invoice times out, writes nothing
-  pay_times_out_always_without_write: string[]; // every pay call times out, writes nothing
+  pay_times_out_without_write: Record<string, number>; // the first N pay calls for an invoice time out and write nothing
   pay_hangs_after_write: string[];            // writes, then never answers (the checker kills the employee here)
   outage: boolean;                            // every tool answers 503
 };
@@ -76,7 +75,7 @@ export function startWorld(opts: WorldOptions = {}) {
   if (dbPath !== ":memory:") mkdirSync(dirname(dbPath), { recursive: true });
   const db = new Database(dbPath, { create: true });
   db.exec("PRAGMA journal_mode = WAL;");
-  const timeoutMs = opts.timeoutMs ?? 2000;
+  const timeoutMs = opts.timeoutMs ?? 1500;
   let faults: Faults;
   let attempts = new Map<string, number>();
   let counter = 0;
@@ -104,8 +103,7 @@ export function startWorld(opts: WorldOptions = {}) {
     ins("invoices", invs.map(({ currency, ...r }) => r));
     faults = {
       pay_times_out_after_write: [TRAPS.pay_times_out_after_write.invoice_id],
-      pay_times_out_once_without_write: [TRAPS.pay_times_out_once_without_write.invoice_id],
-      pay_times_out_always_without_write: [],
+      pay_times_out_without_write: { [TRAPS.pay_times_out_twice_without_write.invoice_id]: 2 },
       pay_hangs_after_write: [],
       outage: false,
     };
@@ -119,7 +117,7 @@ export function startWorld(opts: WorldOptions = {}) {
 
   function invoiceView(inv: any) {
     const payments = all("SELECT payment_id, amount_usd, approved_by, idempotency_key, at FROM payments WHERE invoice_id = ? ORDER BY at", inv.invoice_id);
-    const disputes = all("SELECT dispute_id, reason_code, amount_usd, note, approved_by, at FROM disputes WHERE invoice_id = ? ORDER BY at", inv.invoice_id);
+    const disputes = all("SELECT dispute_id, reason_code, amount_usd, note, approved_by, idempotency_key, at FROM disputes WHERE invoice_id = ? ORDER BY at", inv.invoice_id);
     const status = payments.length ? "paid" : disputes.length ? "disputed" : "open";
     return { ...inv, lines: JSON.parse(inv.lines), status, payments, disputes };
   }
@@ -207,7 +205,7 @@ export function startWorld(opts: WorldOptions = {}) {
       const inv = target.invoice_id;
       const n = (attempts.get(inv) ?? 0) + 1;
       attempts.set(inv, n);
-      if (faults.pay_times_out_always_without_write.includes(inv) || (n === 1 && faults.pay_times_out_once_without_write.includes(inv))) {
+      if (n <= (faults.pay_times_out_without_write[inv] ?? 0)) {
         await sleep(timeoutMs);
         throw new ToolError(504, "the payment service did not answer in time");
       }

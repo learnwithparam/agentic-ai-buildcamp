@@ -20,9 +20,9 @@
     "invoice_id": "INV-2043",
     "says": "The first pay call writes the payment, then times out."
   },
-  "pay_times_out_once_without_write": {
+  "pay_times_out_twice_without_write": {
     "invoice_id": "INV-2044",
-    "says": "The first pay call times out and writes nothing. A retry works."
+    "says": "The first two pay calls time out and write nothing. The third works."
   },
   "over_ravi_limit": {
     "invoice_id": "INV-2045",

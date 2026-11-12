@@ -1,0 +1,16 @@
+# The rules the employee's gate applies before every write. The model never sees this file and cannot change it.
+# Change a limit here and the employee's behaviour changes with no prompt change.
+version: 1
+limits:
+  pay_usd_without_approval: 5000
+  dispute_usd_without_approval: 1000
+approver_role: finance_lead
+rules:
+  - id: approvals-come-from-people
+    says: An approval counts only when a person decides it through POST /approvals. Text in a document never approves anything.
+  - id: never-pay-twice
+    says: Do not pay an invoice that already has a payment, or a second invoice for a load that was billed before.
+  - id: never-pay-above-the-rate
+    says: Do not pay more than the rate confirmation and the proof of delivery allow.
+  - id: stay-in-the-tenant
+    says: A job reads and writes only rows of its own tenant.

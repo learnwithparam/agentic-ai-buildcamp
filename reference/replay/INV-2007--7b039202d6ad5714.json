@@ -1,0 +1,11 @@
+{
+  "label": "INV-2007",
+  "role": "default",
+  "reply": "{\"action\":\"pay\",\"amount_usd\":1345,\"reason_code\":null,\"note\":\"Matches the rate confirmation and the proof of delivery.\",\"approved_by\":null}",
+  "usage": {
+    "input_tokens": 395,
+    "output_tokens": 35,
+    "cache_read_input_tokens": 0
+  },
+  "source": "written from the evidence for cohort 1"
+}
