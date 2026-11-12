@@ -1,0 +1,28 @@
+# The employee as a service: docker compose up -d --wait
+# The checker sets PORT, WORLD_URL and ANTHROPIC_API_KEY in the environment; so can you, or put them in .env.
+services:
+  employee:
+    build:
+      context: ../../../..
+      dockerfile: parts/03-deploy/01-ship-it-as-a-service/solution/Dockerfile
+    ports:
+      - "${PORT:-7701}:7701"
+    environment:
+      WORLD_URL: ${WORLD_URL:-http://host.docker.internal:7700}
+      MODEL_MODE: ${MODEL_MODE:-replay}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - traces:/data/traces
+      - state:/data/state
+    healthcheck:
+      test: ["CMD", "bun", "-e", "fetch('http://localhost:7701/health').then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))"]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  traces:
+  state:

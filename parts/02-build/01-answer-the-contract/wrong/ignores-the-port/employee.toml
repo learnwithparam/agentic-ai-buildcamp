@@ -1,0 +1,15 @@
+# A common mistake: listens on a port of its own instead of the one in PORT.
+[hire]
+name = "freight-audit-clerk"
+
+[contract]
+version = "1"
+mode = "http"
+start = "bun ../../../faulty.ts ignores-the-port"
+url = "http://localhost:7701"
+traces = "traces"
+
+[budget]
+max_steps = 12
+max_usd_per_job = 0.05
+max_usd_per_day = 5

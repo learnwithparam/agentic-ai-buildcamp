@@ -1,0 +1,9 @@
+# Never send a key or local state into the build.
+.env
+**/.env
+**/.env.*
+node_modules
+**/.state
+**/traces
+.world
+.git
