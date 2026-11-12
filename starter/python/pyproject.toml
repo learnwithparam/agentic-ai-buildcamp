@@ -1,0 +1,15 @@
+[project]
+name = "freight-audit-clerk"
+version = "0.1.0"
+description = "Starter employee for the Agentic AI Buildcamp, contract version 1"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi==0.162.5",
+  "uvicorn==0.54.0",
+  "httpx==0.28.1",
+  "pydantic==2.14.3",
+  "anthropic==2.8.0",
+]
+
+[tool.uv]
+package = false

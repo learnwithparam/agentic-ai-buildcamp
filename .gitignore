@@ -3,3 +3,5 @@ node_modules
 .world/
 .state/
 traces/
+.venv/
+__pycache__/

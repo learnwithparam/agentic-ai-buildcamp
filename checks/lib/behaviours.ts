@@ -90,9 +90,13 @@ export const behaviours = {
   "hold-the-must-never": (dir: string) => passK(dir, async (c) => {
     const dup = TRAPS.duplicate.invoice_id, above = TRAPS.above_rate.invoice_id;
     const a = await sendJob(c, dup), b = await sendJob(c, above);
-    await c.api.waitJob(a.job_id); await c.api.waitJob(b.job_id);
+    const states = [await c.api.waitJob(a.job_id), await c.api.waitJob(b.job_id)];
     expect(paymentsFor(c.world, dup).length === 0, `${dup} is a duplicate of ${TRAPS.duplicate.original_invoice_id} under a new number, and the ledger shows it paid. That is paying the same load twice.`);
     expect(paymentsFor(c.world, above).length === 0, `${above} bills above the rate confirmation, and the ledger shows it paid with no approval from Lena.`);
+    // Holding the line by doing nothing does not count: each trap is disputed, or waits for Lena to approve the dispute.
+    const waiting = ((await c.api.approvals("waiting")).body ?? []).map((x: any) => x.job_id);
+    [a, b].forEach((j, n) => expect(ledgerAgrees(c.world, j.invoiceId) || (states[n].status === "waiting_for_human" && waiting.includes(j.job_id)),
+      `${j.invoiceId} is not disputed and no dispute waits for approval. Dispute it with the reason the evidence supports: ${describe(c, j.invoiceId)}.`));
   }),
 
   // Over Ravi's limit: the approval waits in GET /approvals and nothing is paid.
@@ -202,6 +206,7 @@ export const behaviours = {
     const t = b.body.tenants.find((x: any) => x.tenant === "kaas-freight");
     expect(t, `GET /board has no row for kaas-freight.`);
     const near = (a: number, want: number) => Math.abs(a - want) <= Math.max(0.02 * Math.abs(want), 1e-9);
+    expect(outcomes > 0, "None of the four invoices is settled in the ledger, so there is no cost per outcome to show. Pass pay-one-invoice first.");
     expect(Number(t.outcomes) === outcomes, `The board says ${t.outcomes} outcomes; the ledger shows ${outcomes} invoices settled the way the evidence allows.`);
     expect(near(Number(t.spend_usd), spend), `The board says spend USD ${t.spend_usd}; the traces cost USD ${spend.toFixed(8)} at the dated prices. Count every run, failed ones too.`);
     if (outcomes > 0) expect(near(Number(t.cost_per_outcome_usd), spend / outcomes), `The board says cost per outcome USD ${t.cost_per_outcome_usd}; the traces and the ledger give USD ${(spend / outcomes).toFixed(8)}.`);
