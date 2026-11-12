@@ -29,7 +29,7 @@ let runs = [];
 function show(i) {
   const r = runs[i];
   document.querySelectorAll(".run").forEach((el, n) => el.classList.toggle("sel", n === i));
-  const keep = ["gen_ai.tool.name", "gen_ai.request.model", "gen_ai.usage.input_tokens", "gen_ai.usage.output_tokens", "x.side_effect", "x.idempotency_key", "x.checker.verdict", "x.policy.rule", "x.policy.decision", "x.outcome", "x.model.role", "error.type"];
+  const keep = ["gen_ai.tool.name", "gen_ai.usage.input_tokens", "gen_ai.usage.output_tokens", "x.side_effect", "x.idempotency_key", "x.checker.verdict", "x.policy.rule", "x.policy.decision", "x.outcome", "x.model.role", "error.type"];
   const spans = r.spans.map((s) => '<div class="span' + (s.status === "error" ? " err" : "") + '"><b>' + esc(s.name) + '</b> ' + esc(s.status) + ' <span class="a">' +
     Object.entries(s.attributes).filter(([k]) => keep.includes(k)).map(([k, v]) => esc(k) + "=" + esc(v)).join("  ") + '</span></div>').join("");
   const l = r.ledger;
