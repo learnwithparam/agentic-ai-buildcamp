@@ -5,16 +5,14 @@
 The ledger goes down in the middle of the nightly batch. A **503** is the answer a server gives when it is down
 for a while: "Service Unavailable".
 
-In the replay set the clerk met exactly this. For example, four jobs got a 503 from the ledger, and each gave up as
-`failed`. In the morning four invoices sat open, and nobody was told. That is your largest failure mode,
-`failed-on-a-ledger-error`.
+For example, in the replay set four jobs got a 503 from the ledger, and each gave up as `failed`. By morning
+four invoices sat open, and nobody knew. That is your largest failure mode, `failed-on-a-ledger-error`.
 
-There are worse ways to fail. The clerk can retry in a tight loop and hit the ledger hard as it comes back. Or it
-can put four alarm cards on the board for one outage.
+Two other answers are worse. The clerk can retry in a tight loop and hit the ledger hard as it comes back.
+Or it can put four alarm cards on the board for one outage.
 
-Anthropic published a postmortem about a drop in quality in its own coding tools. Its evals missed the drop for a
-long time. The fixes were about process: more people using the build, evals on every prompt change, and a slow
-rollout. The lesson: write the plan for an incident before the incident.
+Anthropic's evals once missed a drop in quality in its own coding tools for a long time. The fixes were about
+process. The lesson: plan for an incident before it happens.
 
 ```mermaid
 sequenceDiagram
@@ -48,9 +46,8 @@ sequenceDiagram
    - Fix: how you bring it back, and how you check it;
    - Learn: the eval that catches it next time.
 
-The checker turns the outage on and sends four clean jobs. It reads the board while the ledger is down. Then it
-turns the outage off and reads the ledger. A proxy counts your calls to the ledger while it is down. It runs 3
-fresh trials.
+The checker turns the outage on, sends four clean jobs and reads the board. Then it turns the outage off and
+reads the ledger. A small program in the middle counts your ledger calls during the outage. It runs 3 fresh trials.
 
 ## Done when
 
@@ -76,7 +73,7 @@ Expect: `Done. All 5 rules pass.`
 
 ## Words you will use
 
-- **Incident**: something that stops the employee doing its job, handled by people with a plan.
+- **Incident**: something that stops the employee doing its job.
 - **Runbook**: the plan, written before: Detect, Stop, Tell, Fix, Learn.
 - **Probe**: one cheap read to ask "are you back?", instead of every job retrying on its own.
 

@@ -6,7 +6,7 @@ Finance looks at the model bill once a month and asks one question: what does on
 tokens does not answer it. Cost per outcome does.
 
 **Cost per outcome** is all model spend divided by the invoices the ledger shows settled the way the evidence
-allows. All spend means every run, also the runs that failed or stopped.
+allows. All spend includes the runs that failed or stopped.
 
 For example, the checker sends four jobs. Three end well in the ledger: two paid, one disputed. The fourth fails
 because its pay call never writes. All four runs together cost USD 0.0045. So cost per outcome is
@@ -50,19 +50,19 @@ Make your employee's `GET /board` answer, per tenant:
 }
 ```
 
-Work out spend from two things: the token counts of every model call, and the price table in `config/models.ts`.
-Never use a price you typed in yourself. Count every run.
+Work out spend from the token counts of every model call and the price table in `config/models.ts`. Never type
+in a price yourself. Count every run.
 
-Your employee is the one you built in Build and Deploy, in `employee/` at the repo root. You can also set
+Your employee is the one you built in Build and Deploy, in `employee/` at the repo root. Or set
 `EMPLOYEE_DIR` to another folder. The checker sends four jobs:
 
 1. two clean invoices;
 2. the above-rate invoice, which should end in a dispute;
 3. a clean invoice whose pay call never writes, which is a failed run.
 
-Then the checker works out the board again from your traces and the ledger, and compares.
+Then it works out the board again from your traces and the ledger, and compares.
 
-Open the board while the sample runs to see the header you are building:
+This is the board header you are building:
 
 ![The board header: cost per invoice settled, invoices settled, model spend](../images/expected.png)
 
