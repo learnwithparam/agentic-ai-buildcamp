@@ -8,6 +8,7 @@ sessions = [
   { name = "second block", parts = ["build"], minutes = 285, live_minutes = 150, home_minutes = 135 },
   { name = "third block", parts = ["deploy"], minutes = 215, live_minutes = 150, home_minutes = 65 },
   { name = "fourth block", parts = ["operate"], minutes = 225, live_minutes = 150, home_minutes = 75 },
+  { name = "closing block", parts = ["do-it-with-the-tools-teams-run"], minutes = 30, live_minutes = 0, home_minutes = 30 },
 ]
 
 [one-day]
@@ -20,6 +21,7 @@ sessions = [
   { name = "the build block", parts = ["build"], minutes = 285, core_minutes = 180, core = ["answer-the-contract", "call-the-tools", "pay-one-invoice", "close-on-the-record", "hold-the-must-never", "ask-for-approval", "check-who-approves"] },
   { name = "the deploy block", parts = ["deploy"], minutes = 215, core_minutes = 45, core = ["save-progress", "pay-once-after-a-crash"] },
   { name = "the operate block", parts = ["operate"], minutes = 225, core_minutes = 75, core = ["show-cost-per-outcome", "run-the-swap-gate", "refuse-a-bad-model"] },
+  { name = "the closing block", parts = ["do-it-with-the-tools-teams-run"], minutes = 30, core_minutes = 0, core = [] },
 ]
 
 [four-evenings]
@@ -28,6 +30,7 @@ sessions = [
   { name = "second evening", parts = ["build"], minutes = 285, live_step_minutes = 160, qa_minutes = 20, home_minutes = 125 },
   { name = "third evening", parts = ["deploy"], minutes = 215, live_step_minutes = 160, qa_minutes = 20, home_minutes = 55 },
   { name = "fourth evening", parts = ["operate"], minutes = 225, live_step_minutes = 160, qa_minutes = 20, home_minutes = 65 },
+  { name = "closing evening", parts = ["do-it-with-the-tools-teams-run"], minutes = 30, live_step_minutes = 0, qa_minutes = 0, home_minutes = 30 },
 ]
 
 [twelve-saturdays]
@@ -37,4 +40,5 @@ sessions = [
   { name = "build sessions", parts = ["build"], minutes = 285, split = [95, 95, 95] },
   { name = "deploy sessions", parts = ["deploy"], minutes = 215, split = [70, 75, 70] },
   { name = "operate sessions", parts = ["operate"], minutes = 225, split = [75, 75, 75] },
+  { name = "closing sessions", parts = ["do-it-with-the-tools-teams-run"], minutes = 30, split = [30] },
 ]

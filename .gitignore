@@ -6,3 +6,4 @@ traces/
 .venv/
 __pycache__/
 .env
+assignment/result.json

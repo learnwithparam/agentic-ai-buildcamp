@@ -1,0 +1,16 @@
+[project]
+name = "buildcamp-assignment"
+version = "0.1.0"
+description = "Closing part: pay once after a crash, with LangGraph"
+requires-python = ">=3.11"
+dependencies = [
+  "langgraph==1.2.21",
+  "langgraph-checkpoint-postgres==3.2.0",
+  "psycopg[binary]==3.3.9",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 100
