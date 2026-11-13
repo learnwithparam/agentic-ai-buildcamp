@@ -53,11 +53,11 @@ main {
 .ledger {
   margin:10px 0; padding:8px 10px; background:var(--bg); border-radius:6px; font-size:13px;
 }
-</style></head><body>
-<header><h1>Trace viewer</h1><p>The replay set: the clerk in production, one run per invoice.
-Pick a run, read its spans, then label it in labels.csv.</p></header>
+</style></head><body data-audience="staff">
+<header><h1>Trace viewer</h1><p>Recorded runs of the invoice clerk, one run per invoice.
+Pick a run, read its steps, then label it in labels.csv.</p></header>
 <main><div class="list" id="list"></div>
-<div class="detail" id="detail"><p>Pick a run on the left.</p></div></main>
+<div class="detail" id="detail"><p>Pick a run from the list to see its steps.</p></div></main>
 <script>
 const SAFE_CHARACTERS = { "&": "&amp;", "<": "&lt;", ">": "&gt;" };
 function escapeHtml(value) {
@@ -91,7 +91,7 @@ function ledgerSummary(ledger) {
       (dispute) => "dispute " + dispute.reason_code + " USD " + dispute.amount_usd);
     return disputes.join(", ");
   }
-  return "no row";
+  return "No ledger change";
 }
 
 function approvalSummary(run) {

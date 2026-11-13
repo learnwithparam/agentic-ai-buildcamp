@@ -47,8 +47,11 @@ td.num { text-align:right; font-variant-numeric:tabular-nums; }
 tr.twice td { background:var(--badbg); }
 tr.twice .s { color:var(--bad); }
 </style></head><body>
-<header><h1>KaaS Freight ledger</h1><p>The system of record.
-Rows change only through the world's tools. This page refreshes every two seconds.</p></header>
+<header><h1>KaaS Freight ledger</h1><p>Every invoice, payment and dispute,
+as the finance team sees it. This page updates every two seconds.</p></header>
+<p role="alert" id="problem" hidden style="margin:0 24px;color:var(--bad)">
+The ledger did not load. Start the world with <code>bun run world</code>,
+then reload this page.</p>
 <div class="stats" id="stats"></div>
 <div class="wrap"><table><thead><tr>
 <th>Invoice</th><th>Tenant</th><th>Carrier</th><th>Load</th><th style="text-align:right">Total</th>
@@ -57,6 +60,15 @@ Rows change only through the world's tools. This page refreshes every two second
 <script>
 const money = { minimumFractionDigits: 2, maximumFractionDigits: 2 };
 const usd = (amount) => "USD " + Number(amount).toLocaleString("en-US", money);
+
+const STATUS_LABEL = { open: "Open", paid: "Paid", disputed: "Disputed" };
+const REASON_LABEL = {
+  DUPLICATE: "Duplicate invoice",
+  ABOVE_RATE: "Rate above the contract",
+  DETENTION_UNSIGNED: "Detention not signed for",
+  FUEL_ABOVE_CONTRACT: "Fuel charge above the contract",
+  OTHER: "Other reason",
+};
 
 function cell(text, className) {
   const classAttribute = className ? ' class="' + className + '"' : "";
@@ -92,10 +104,10 @@ function invoiceRow(invoice) {
     cell(invoice.carrier_id),
     cell(invoice.load_id),
     cell(usd(invoice.total_usd), "num"),
-    cell(paidTwice ? "paid twice" : invoice.status, "s " + invoice.status),
+    cell(paidTwice ? "Paid twice" : STATUS_LABEL[invoice.status], "s " + invoice.status),
     cell(invoice.payments.length, "num"),
     cell(paid ? usd(paid) : ""),
-    cell(dispute ? dispute.reason_code : ""),
+    cell(dispute ? REASON_LABEL[dispute.reason_code] ?? "Other reason" : ""),
   ];
   return '<tr class="' + (paidTwice ? "twice" : "") + '">' + cells.join("") + "</tr>";
 }
@@ -103,9 +115,17 @@ function invoiceRow(invoice) {
 async function load() {
   const response = await fetch("/api/ledger").catch(() => null);
   const invoices = response ? await response.json().catch(() => null) : null;
-  if (!invoices) return;
+  const alertBox = document.getElementById("problem");
+  if (!Array.isArray(invoices)) {
+    alertBox.hidden = false;
+    return;
+  }
+  alertBox.hidden = true;
   document.getElementById("stats").innerHTML = statCards(invoices);
-  document.getElementById("rows").innerHTML = invoices.map(invoiceRow).join("");
+  document.getElementById("rows").innerHTML = invoices.length
+    ? invoices.map(invoiceRow).join("")
+    : '<tr data-empty-state><td colspan="9">No invoices yet. ' +
+      "Load them with <code>bun run world reset</code>.</td></tr>";
 }
 
 load();
