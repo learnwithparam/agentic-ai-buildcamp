@@ -64,10 +64,13 @@ async function namesThePersonAndTheEval(folder: string): Promise<boolean> {
 
 export default [
   {
-    says: "while the ledger is down, no job ends and the employee does not call the ledger again and again",
+    says:
+      "while the ledger is down, no job ends and the employee does not call the ledger " +
+      "again and again",
     test: drillShows("pauses"),
     tryNext:
-      "on a 503 from a tool, pause the job and probe the ledger from one loop every few hundred milliseconds; " +
+      "on a 503 from a tool, pause the job and probe the ledger from one loop " +
+      "every few hundred milliseconds; " +
       "do not fail the job and do not retry in a tight loop",
   },
   {

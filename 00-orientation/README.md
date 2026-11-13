@@ -101,7 +101,8 @@ bun run reference
 
 Expect: four `Done` lines, one `Needs you` (USD 6,200, over Ravi's limit, waits for Lena), one `Refused` (the scan with white text), and `Cost per invoice settled`.
 
-Open `localhost:7702/board` while it runs. A card shows Done only when the ledger agrees.
+Open `localhost:7702/board` while it runs. A card shows Done only when the ledger agrees. The reference keeps
+running so that you can look. Press Ctrl+C in its terminal before you go on to step 5.
 
 ![The board: four Done, one Needs you, one Refused](images/board-orientation.png)
 

@@ -22,6 +22,8 @@ bun parts/04-operate/operate.ts traces
 
 Expect: `The replay set: 60 runs` and `Trace viewer: http://localhost:7703`.
 
+The viewer keeps running. Open `localhost:7703` in your browser, and use a second terminal for `bun run verify`.
+
 ![The trace viewer: the run list on the left, the spans of one run on the right](../images/expected.png)
 
 For each run, read the reason, the ledger line and the spans. Ask three questions:

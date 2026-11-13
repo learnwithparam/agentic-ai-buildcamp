@@ -38,6 +38,8 @@ bun run reference
 
 Expect: four `Done` lines, one `Needs you`, one `Refused`, and `Cost per invoice settled`. Open `localhost:7702/board`.
 
+The reference keeps running so that you can look at the board. When you are done, press Ctrl+C in that terminal.
+
 ![The board after bun run reference: four Done, one Needs you, one Refused](images/board.png)
 
 Last, run the repo's own gate. It proves that every check passes on the reference. It also proves that every check

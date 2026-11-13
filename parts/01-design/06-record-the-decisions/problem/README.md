@@ -25,7 +25,8 @@ Write three ADRs in `adr/`:
 | `model.md`      | Which role in `config/models.ts` runs it, and when to swap it |
 | `durability.md` | What happens when a job dies in the middle                    |
 
-Each ADR has four sections: Context, Decision and Consequences, each with a real sentence, and Enforced by.
+Each ADR has four sections: Context, Decision, Consequences and Enforced by. Write at least one real sentence under
+Context, Decision and Consequences.
 Enforced by names a Build check in backticks, such as `` `bun run verify save-progress` ``. Pick from these:
 
 ```text

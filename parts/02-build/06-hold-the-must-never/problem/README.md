@@ -20,7 +20,8 @@ Put the rule in code, between the draft and the write. There, the model cannot t
    - linehaul is above the rate confirmation: dispute the difference with `ABOVE_RATE`;
    - detention with no signed delay: `DETENTION_UNSIGNED`; fuel above the cap: `FUEL_ABOVE_CONTRACT`.
 2. If the draft says pay and the rule says no, the rule wins.
-3. Open the dispute with `open_dispute`. If it is over the dispute limit, put it in `GET /approvals` instead.
+3. Open the dispute with `open_dispute`. Ravi may open a dispute up to USD 1,000 alone. This is the dispute limit.
+   A bigger dispute, like the USD 2,675 one for `INV-2017`, goes in `GET /approvals` for Lena instead.
 
 ```mermaid
 flowchart LR

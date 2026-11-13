@@ -163,7 +163,8 @@ async function ledgerAnswers(clerk: Clerk): Promise<boolean> {
   }
 }
 
-// Probes the ledger every few hundred milliseconds until it answers, then closes every open incident.
+// Probes the ledger every few hundred milliseconds
+// until it answers, then closes every open incident.
 async function waitForLedger(clerk: Clerk) {
   const giveUpAt = Date.now() + clerk.maxPauseMs;
   while (Date.now() < giveUpAt) {

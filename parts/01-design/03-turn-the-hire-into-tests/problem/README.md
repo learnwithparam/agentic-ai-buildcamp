@@ -58,6 +58,8 @@ bun run verify turn-the-hire-into-tests
 
 Expect: `Done. All 7 rules pass.`
 
+The freight sample is in [solution/acceptance.yaml](../solution/acceptance.yaml).
+
 ## If you get stuck
 
 | What you see                                                           | Fix                                                                          |

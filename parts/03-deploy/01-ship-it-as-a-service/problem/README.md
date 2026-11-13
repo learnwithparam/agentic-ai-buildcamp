@@ -28,7 +28,13 @@ flowchart LR
 
 ## Your challenge
 
-Copy the three starter files in this folder into your `employee/` folder. Fill in every `TODO`:
+Copy the three starter files in this folder into your `employee/` folder. Run this from the repo root:
+
+```bash
+cp parts/03-deploy/01-ship-it-as-a-service/problem/{Dockerfile,Dockerfile.dockerignore,compose.yaml} employee/
+```
+
+Then fill in every `TODO`:
 
 | File                      | What it holds                                                                                                                                                                                        |
 | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
