@@ -36,7 +36,8 @@ The same picture is in `design-map.mmd`.
 | [pass-the-design-review](07-pass-the-design-review/problem/README.md)         | `review.md`: two peers answer six questions                  | 30      |
 
 You work in each step's `problem/` folder. Pick the freight clerk, or one of the other employees on the menu. Keep
-the same employee for the whole part.
+the same employee for the whole part. From Build on, everyone builds the freight clerk, because it is the only
+employee with a world to run in.
 
 ## Walkthrough
 

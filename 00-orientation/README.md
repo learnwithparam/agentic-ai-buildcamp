@@ -9,7 +9,7 @@ minutes.
 | 0 to 5   | Clone the repo, `bun install`, `bun run verify meet-the-world --setup` | A setup table: each line passed, or the fix to try                            |
 | 5 to 8   | `bun run world freight-audit`                                          | The ledger on `localhost:7700/ledger`: 60 invoices, all open                  |
 | 8 to 12  | `bun run reference naive`                                              | The naive employee says "All 6 invoices paid. Done." The ledger disagrees     |
-| 12 to 17 | `bun run reference`, then open `localhost:7702/board`                  | Four cards Done, one Needs you, one Refused, and the cost per invoice settled |
+| 12 to 17 | `bun run reference`, open `localhost:7702/board`, then stop it         | Four cards Done, one Needs you, one Refused, and the cost per invoice settled |
 | 17 to 20 | `bun run verify meet-the-world`                                        | Your next step                                                                |
 
 ```mermaid
@@ -102,7 +102,9 @@ bun run reference
 Expect: four `Done` lines, one `Needs you` (USD 6,200, over Ravi's limit, waits for Lena), one `Refused` (the scan with white text), and `Cost per invoice settled`.
 
 Open `localhost:7702/board` while it runs. A card shows Done only when the ledger agrees. The reference keeps
-running so that you can look. Press Ctrl+C in its terminal before you go on to step 5.
+running so that you can look. While it runs, it keeps ports 7701 and 7702 busy. In Build, your own employee needs
+port 7701. So when you have seen the board, press Ctrl+C in the reference's terminal to stop it. Then go on to
+step 5. Leave the world running.
 
 ![The board: four Done, one Needs you, one Refused](images/board-orientation.png)
 
@@ -114,6 +116,6 @@ Write what you saw in `parts/00-meet-the-world/01-meet-the-world/problem/notes.m
 bun run verify meet-the-world
 ```
 
-Expect: `Done. All 5 rules pass.` and `You ran the reference. Your goal: your own employee passes the same checks. Next: bun run verify place-it-on-the-map.`
+Expect: `Done. All 5 rules pass.`, then `Progress: step 1 of 37, in part meet-the-world. Next: bun run verify place-it-on-the-map`, then `You ran the reference. Your goal: your own employee passes the same checks.`
 
 If a command prints something you do not expect, look it up in [troubleshooting.md](troubleshooting.md).

@@ -5,6 +5,7 @@
 import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import type { RuleAnswer } from "../scripts/verify";
 import {
   CheckProblem,
   checkerWorld,
@@ -185,7 +186,7 @@ export function cachedRule(
   return {
     says,
     tryNext,
-    async test(dir: string) {
+    async test(dir: string): Promise<RuleAnswer> {
       const cacheKey = `${key}:${dir}`;
       let outcome = cache.get(cacheKey);
       if (!outcome) {
@@ -194,6 +195,7 @@ export function cachedRule(
       }
       const result = await outcome;
       if (!result.ok) console.log(`        ${result.message}`);
+      if (result.skipped) return "skipped";
       return result.ok;
     },
   };

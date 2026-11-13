@@ -11,6 +11,7 @@
     "verify": "bun scripts/verify.ts",
     "world": "bun worlds/run.ts",
     "reference": "bun reference/run.ts",
+    "reference-employee": "bun reference/start.ts",
     "cost": "bun checks/design-lib.ts",
     "models": "bun scripts/models.ts"
   },

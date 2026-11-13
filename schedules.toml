@@ -1,5 +1,6 @@
 # How the parts map onto each format. Content lives in parts; this file only maps time.
 # A session's minutes must cover the full minutes of every part it lists (bun run check sums them).
+# Live plus home minutes, or the split, must add up to the session's minutes: no step is left out.
 
 [four-weeks]
 sessions = [
@@ -10,20 +11,23 @@ sessions = [
 ]
 
 [one-day]
-# The design steps marked core run live; the rest are finished after the session.
+# One day holds 480 minutes of steps. Only the core steps run live; the rest are finished after the day.
+# bun run check: each core list names real steps from its parts, each core_minutes is the sum of those
+# steps, and the core minutes of all blocks fit in the day's minutes.
+minutes = 480
 sessions = [
-  { name = "the design block", parts = ["meet-the-world", "design"], minutes = 220, core_minutes = 130, core = ["run-the-finished-system", "place-it-on-the-map", "write-the-hire-letter", "turn-the-hire-into-tests", "price-the-outcome"] },
-  { name = "the build block", parts = ["build"], minutes = 285 },
-  { name = "the deploy block", parts = ["deploy"], minutes = 215 },
-  { name = "the operate block", parts = ["operate"], minutes = 225 },
+  { name = "the design block", parts = ["meet-the-world", "design"], minutes = 220, core_minutes = 130, core = ["meet-the-world", "place-it-on-the-map", "write-the-hire-letter", "turn-the-hire-into-tests", "price-the-outcome"] },
+  { name = "the build block", parts = ["build"], minutes = 285, core_minutes = 180, core = ["answer-the-contract", "call-the-tools", "pay-one-invoice", "close-on-the-record", "hold-the-must-never", "ask-for-approval", "check-who-approves"] },
+  { name = "the deploy block", parts = ["deploy"], minutes = 215, core_minutes = 45, core = ["save-progress", "pay-once-after-a-crash"] },
+  { name = "the operate block", parts = ["operate"], minutes = 225, core_minutes = 75, core = ["show-cost-per-outcome", "run-the-swap-gate", "refuse-a-bad-model"] },
 ]
 
 [four-evenings]
 sessions = [
   { name = "first evening", parts = ["meet-the-world", "design"], minutes = 220, live_step_minutes = 160, qa_minutes = 20, home_minutes = 60 },
-  { name = "second evening", parts = ["build"], minutes = 285, live_step_minutes = 160, qa_minutes = 20, home_minutes = 105 },
-  { name = "third evening", parts = ["deploy"], minutes = 215, live_step_minutes = 160, qa_minutes = 20, home_minutes = 35 },
-  { name = "fourth evening", parts = ["operate"], minutes = 225, live_step_minutes = 160, qa_minutes = 20, home_minutes = 45 },
+  { name = "second evening", parts = ["build"], minutes = 285, live_step_minutes = 160, qa_minutes = 20, home_minutes = 125 },
+  { name = "third evening", parts = ["deploy"], minutes = 215, live_step_minutes = 160, qa_minutes = 20, home_minutes = 55 },
+  { name = "fourth evening", parts = ["operate"], minutes = 225, live_step_minutes = 160, qa_minutes = 20, home_minutes = 65 },
 ]
 
 [twelve-saturdays]

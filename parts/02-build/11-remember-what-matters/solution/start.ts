@@ -8,9 +8,24 @@
 // in the run's trace.
 import { randomUUID } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
-import { startEmployee } from "../../../../reference/src/employee";
-import { tracer } from "../../../../reference/src/trace";
+import { dirname, join } from "node:path";
+
+// The repo folder that holds reference/. This file looks for it by walking up from its own
+// folder, so it works here and also when you copy it into employee/.
+function findRepoRoot(): string {
+  let folder = import.meta.dir;
+  while (!existsSync(join(folder, "reference", "start.ts"))) {
+    const parent = dirname(folder);
+    if (parent === folder)
+      throw new Error("No reference/ folder above this file. Run it inside the repo.");
+    folder = parent;
+  }
+  return folder;
+}
+
+const referenceCode = join(findRepoRoot(), "reference", "src");
+const { startEmployee } = await import(join(referenceCode, "employee.ts"));
+const { tracer } = await import(join(referenceCode, "trace.ts"));
 
 type Fact = { tenant: string; invoice_id: string; fact: "declined"; by: string; job_id: string };
 type LocalJob = { job_id: string; run_id: string; tenant: string; status: string; reason: string };

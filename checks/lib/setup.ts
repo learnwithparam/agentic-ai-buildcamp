@@ -59,8 +59,28 @@ function bunIsNewEnough(): boolean {
   return patch >= 4;
 }
 
-function toolLines(): Line[] {
+// Docker counts only when its engine answers. The docker command alone, with the engine stopped,
+// cannot build or run a container.
+function dockerLine(): Line {
+  const line = { what: "Docker (optional)", optional: true };
   const dockerVersion = version("docker", ["--version"]);
+  if (!dockerVersion) {
+    const fix =
+      "Only needed for ship-it-as-a-service. " +
+      "Install Docker Desktop or Docker Engine before then";
+    return { ...line, ok: false, saw: "not found", fix };
+  }
+  const engine = spawnSync("docker", ["info"], { encoding: "utf8", timeout: 15_000 });
+  if (engine.status !== 0) {
+    const fix =
+      "Only needed for ship-it-as-a-service. " +
+      "Start Docker Desktop, or the Docker service, before then";
+    return { ...line, ok: false, saw: `${dockerVersion}, but the engine is not running`, fix };
+  }
+  return { ...line, ok: true, saw: `${dockerVersion}, engine running`, fix: "" };
+}
+
+function toolLines(): Line[] {
   const uvVersion = version("uv", ["--version"]);
   const hasModelKey = Boolean(process.env.ANTHROPIC_API_KEY);
   return [
@@ -80,15 +100,7 @@ function toolLines(): Line[] {
         "Fine for now: the reference runs on recorded replies. " +
         "Set ANTHROPIC_API_KEY before your employee calls a model",
     },
-    {
-      what: "Docker (optional)",
-      ok: Boolean(dockerVersion),
-      optional: true,
-      saw: dockerVersion ?? "not found",
-      fix:
-        "Only needed for ship-it-as-a-service. " +
-        "Install Docker Desktop or Docker Engine before then",
-    },
+    dockerLine(),
     {
       what: "uv (Python path only)",
       ok: Boolean(uvVersion),

@@ -257,13 +257,76 @@ function checkTroubleshooting() {
 }
 
 // 6. Every schedule covers every part, and the minutes add up.
-type Schedule = { sessions: { parts: string[]; minutes: number }[] };
+type Session = {
+  name: string;
+  parts: string[];
+  minutes: number;
+  live_minutes?: number;
+  live_step_minutes?: number;
+  home_minutes?: number;
+  split?: number[];
+  core?: string[];
+  core_minutes?: number;
+};
+type Schedule = { minutes?: number; sessions: Session[] };
 type ScheduleCheck = {
   path: string;
   format: string;
   allParts: Part[];
   minutesByPart: Record<string, number>;
 };
+
+// Live and home time, or the split, hold every step minute of the session: none is left out.
+function checkSessionSplit(session: Session, check: ScheduleCheck) {
+  const where = `${check.format}, ${session.name}`;
+  const live = session.live_minutes ?? session.live_step_minutes;
+  if (live !== undefined && session.home_minutes !== undefined) {
+    const total = live + session.home_minutes;
+    if (total !== session.minutes) {
+      fail(check.path, `${where}: live plus home is ${total} min, not ${session.minutes}`);
+    }
+  }
+  if (session.split) {
+    const total = session.split.reduce((sum, minutes) => sum + minutes, 0);
+    if (total !== session.minutes) {
+      fail(check.path, `${where}: the split adds up to ${total} min, not ${session.minutes}`);
+    }
+  }
+}
+
+// Every core entry is a real step from the session's own parts, and core_minutes is their sum.
+function checkSessionCore(session: Session, check: ScheduleCheck) {
+  if (!session.core) return;
+  const where = `${check.format}, ${session.name}`;
+  const sessionParts = check.allParts.filter((part) => session.parts.includes(part.name));
+  const sessionSteps = sessionParts.flatMap((part) => part.steps);
+  let coreTotal = 0;
+  for (const name of session.core) {
+    const step = sessionSteps.find((candidate) => candidate.name === name);
+    if (step) coreTotal += step.meta.minutes;
+    else fail(check.path, `${where}: core names "${name}", which is not a step in its parts`);
+  }
+  if (session.core_minutes !== coreTotal) {
+    fail(
+      check.path,
+      `${where}: core_minutes is ${session.core_minutes}, the core steps need ${coreTotal}`,
+    );
+  }
+}
+
+// A format with its own minutes must fit its sessions in them. A session with a core list runs
+// only its core steps live.
+function checkFormatMinutes(schedule: Schedule, check: ScheduleCheck) {
+  if (schedule.minutes === undefined) return;
+  let used = 0;
+  for (const session of schedule.sessions) used += session.core_minutes ?? session.minutes;
+  if (used > schedule.minutes) {
+    fail(
+      check.path,
+      `${check.format}: the sessions need ${used} min but the format has ${schedule.minutes}`,
+    );
+  }
+}
 
 function checkSchedule(schedule: Schedule, check: ScheduleCheck) {
   const { path, format, allParts, minutesByPart } = check;
@@ -276,7 +339,10 @@ function checkSchedule(schedule: Schedule, check: ScheduleCheck) {
     if (need > session.minutes) {
       fail(path, `${format}: a session needs ${need} min but has ${session.minutes}`);
     }
+    checkSessionSplit(session, check);
+    checkSessionCore(session, check);
   }
+  checkFormatMinutes(schedule, check);
 }
 
 function checkSchedules(allParts: Part[]) {

@@ -447,11 +447,10 @@ async function container(dir: string): Promise<Outcome> {
   if (problem) return { ok: false, message: problem };
   const whyNot = dockerMissing();
   if (whyNot) {
-    console.log(
-      `        SKIPPED: ${whyNot}, so the container was not built or started. ` +
-        "The file rules above still apply. Start Docker and run this again to check the container.",
-    );
-    return { ok: true, message: "skipped" };
+    const message =
+      `SKIPPED: ${whyNot}, so the container was not built or started. ` +
+      "This rule has not passed yet. Start Docker and run this again to check the container.";
+    return { ok: false, skipped: true, message };
   }
   const deployment = await newDeployment(service(findEmployeeDir(dir)) as Service);
   try {
