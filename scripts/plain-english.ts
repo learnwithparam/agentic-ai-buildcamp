@@ -62,16 +62,33 @@ function markdownFiles(folder: string, found: string[] = []): string[] {
   return found;
 }
 
+// The fence that a line opens or closes a code block with, or "" for any other line.
+function fenceOn(line: string): string {
+  return line.trim().match(/^`{3,}/)?.[0] ?? "";
+}
+
+// Which fence is open after this line: "" outside a code block.
+// A block closes only on a fence at least as long as the one that opened it,
+// so a ```yaml block quoted inside a ````text block stays inside.
+function openFenceAfter(line: string, openFence: string): string {
+  const fence = fenceOn(line);
+  if (openFence === "") return fence;
+  if (fence.length >= openFence.length) return "";
+  return openFence;
+}
+
 // Keep only the lines a person reads as sentences.
 export function proseOf(markdown: string): string {
   const proseLines: string[] = [];
-  let insideCodeBlock = false;
+  let openFence = "";
   for (const line of markdown.split("\n")) {
-    if (line.trim().startsWith("```")) insideCodeBlock = !insideCodeBlock;
+    const isFence = fenceOn(line) !== "";
+    openFence = openFenceAfter(line, openFence);
     const isStructure = /^\s*(#|\||<|!\[|Expect:)/.test(line);
-    if (!insideCodeBlock && !isStructure) proseLines.push(line);
+    if (!isFence && openFence === "" && !isStructure) proseLines.push(line);
   }
-  const withoutInlineCode = proseLines.join("\n").replace(/`[^`]*`/g, "it");
+  // Inline code stays on one line, so a stray backtick cannot hide the paragraphs after it.
+  const withoutInlineCode = proseLines.join("\n").replace(/`[^`\n]*`/g, "it");
   return withoutInlineCode.replace(/\[([^\]]*)\]\([^)]*\)/g, "$1");
 }
 
@@ -155,7 +172,17 @@ function configuredGrade(): number {
   return typeof grade === "number" ? grade : DEFAULT_READING_GRADE;
 }
 
+// The check tests itself first: code quoted inside a longer fence is never read as prose.
+function fencesAreSkipped(): boolean {
+  const sample = ["Intro.", "````text", "```yaml", "quoted: inside", "```", "````", "Outro."];
+  return !proseOf(sample.join("\n")).includes("quoted");
+}
+
 if (import.meta.main) {
+  if (!fencesAreSkipped()) {
+    console.error("plain-english.ts reads quoted code as prose. Fix proseOf first.");
+    process.exit(1);
+  }
   const gradeLimit = configuredGrade();
   const files = markdownFiles(ROOT);
   const problemsInFile = (file: string) => problemsIn(file, readFileSync(file, "utf8"), gradeLimit);
