@@ -136,7 +136,8 @@ function recordIncident(clerk: Clerk, jobId: string, why: string) {
   }
   const openIncident = clerk.incidents.find((incident) => !incident.closed_at);
   if (!openIncident) {
-    const summary = `The ledger answers ${why}. Jobs are paused, nothing is written until it answers again.`;
+    const summary =
+      `The ledger answers ${why}. ` + "Jobs are paused, nothing is written until it answers again.";
     clerk.incidents.push(newIncident(clerk, jobId, summary));
     return;
   }
