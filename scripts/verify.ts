@@ -174,9 +174,18 @@ async function verifyPart(partName: string | undefined): Promise<never> {
 }
 
 // Done is recomputed from the checks every time, never read from a saved flag.
+// The other steps' checks explain their own fails as they run. Those lines belong to
+// other steps, so they are kept quiet here: you only see the step you asked for.
 async function printProgress() {
+  console.log("Counting your progress on every step. This can take up to a minute.");
   const results: Result[] = [];
-  for (const step of allSteps()) results.push(await runStep(step, learnerWork(step)));
+  const printLine = console.log;
+  console.log = () => {};
+  try {
+    for (const step of allSteps()) results.push(await runStep(step, learnerWork(step)));
+  } finally {
+    console.log = printLine;
+  }
   const passing = results.filter((result) => result.status === "pass").length;
   console.log(`Progress: ${passing}/${results.length} steps pass.`);
 }

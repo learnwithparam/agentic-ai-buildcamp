@@ -23,7 +23,7 @@ sequenceDiagram
   C->>E: 4 jobs
   E->>W: read_invoice
   W-->>E: 503
-  E->>E: pause, one incident card, probe once a beat
+  E->>E: pause, one incident card, one probe loop
   C->>E: GET /board: one open incident
   C->>W: outage off
   E->>W: resume, pay with the same keys
@@ -34,7 +34,8 @@ sequenceDiagram
 
 1. **The employee** lives in `employee/` at the repo root, or in `EMPLOYEE_DIR`. When a tool answers 503:
    - pause the job instead of failing it;
-   - probe the ledger once a beat, not once per job per try;
+   - probe the ledger from one loop for the whole employee, every few hundred milliseconds. Do not let each job
+     retry on its own. The checker allows at most 60 ledger calls during the outage;
    - resume the job when the ledger answers.
 
    `GET /board` gets an `incidents` list. It holds one card for the outage with `"status": "open"`. The card
