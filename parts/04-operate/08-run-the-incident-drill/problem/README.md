@@ -53,12 +53,12 @@ Expect: `Done. All 5 rules pass.`
 
 ## If you get stuck
 
-| What you see | Fix |
-|---|---|
-| `the job for INV-2029 ended "failed"` | Catch a 503 apart from other errors. A 503 means wait, not give up. |
+| What you see                                    | Fix                                                                    |
+| ----------------------------------------------- | ---------------------------------------------------------------------- |
+| `the job for INV-2029 ended "failed"`           | Catch a 503 apart from other errors. A 503 means wait, not give up.    |
 | `called the ledger 400 times while it was down` | One probe loop for the whole employee, every few hundred milliseconds. |
-| `shows 4 open incident(s)` | One outage, one card. Add paused jobs to the open card. |
-| `Learn names none of your evals` | Name the eval file, such as `failed-on-a-ledger-error`. |
+| `shows 4 open incident(s)`                      | One outage, one card. Add paused jobs to the open card.                |
+| `Learn names none of your evals`                | Name the eval file, such as `failed-on-a-ledger-error`.                |
 
 ## Words you will use
 

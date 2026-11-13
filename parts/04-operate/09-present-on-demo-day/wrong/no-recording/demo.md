@@ -48,10 +48,10 @@ To follow (five minutes: the ledger, the refusal, Lena's approval, the gate)
 
 ## Demo rubric
 
-| Question | Peer: Ada | Peer: Tomas |
-|---|---|---|
-| A ledger row matches a job the employee reported done | yes | yes |
-| The must-never trap is refused and the refusal is logged with its rule | yes | yes |
-| A payment waited for the right approver | yes | yes |
-| Cost per outcome before and after a swap is stated and matches the board | yes | yes |
-| One failure mode, the eval that catches it and the fix are shown | yes | yes |
+| Question                                                                 | Peer: Ada | Peer: Tomas |
+| ------------------------------------------------------------------------ | --------- | ----------- |
+| A ledger row matches a job the employee reported done                    | yes       | yes         |
+| The must-never trap is refused and the refusal is logged with its rule   | yes       | yes         |
+| A payment waited for the right approver                                  | yes       | yes         |
+| Cost per outcome before and after a swap is stated and matches the board | yes       | yes         |
+| One failure mode, the eval that catches it and the fix are shown         | yes       | yes         |

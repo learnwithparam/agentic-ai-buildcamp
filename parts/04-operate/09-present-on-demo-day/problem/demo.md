@@ -18,4 +18,4 @@
 ## Demo rubric
 
 | Question | Peer: name | Peer: name |
-|---|---|---|
+| -------- | ---------- | ---------- |

@@ -7,6 +7,7 @@
 import type { Run } from "../../../operate-lib";
 
 export default function (run: Run): string | null {
-  if (run.ledger.payments.length > 1) return `${run.invoice_id} is paid ${run.ledger.payments.length} times`;
+  if (run.ledger.payments.length > 1)
+    return `${run.invoice_id} is paid ${run.ledger.payments.length} times`;
   return null;
 }

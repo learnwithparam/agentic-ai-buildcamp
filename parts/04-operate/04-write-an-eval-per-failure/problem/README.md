@@ -47,11 +47,11 @@ Expect: `Done. All 3 rules pass.`
 
 ## If you get stuck
 
-| What you see | Fix |
-|---|---|
-| `No eval for missed-the-duplicate` | The file name must match the mode in `failure-modes.md`, letter for letter. |
-| `threw on run-... : undefined is not an object` | A run may have no dispute or no payment. Check the array length before you read `[0]`. |
-| `returned something other than null or a sentence` | Return `null` for a pass and a string for a fail, nothing else. |
+| What you see                                       | Fix                                                                                    |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `No eval for missed-the-duplicate`                 | The file name must match the mode in `failure-modes.md`, letter for letter.            |
+| `threw on run-... : undefined is not an object`    | A run may have no dispute or no payment. Check the array length before you read `[0]`. |
+| `returned something other than null or a sentence` | Return `null` for a pass and a string for a fail, nothing else.                        |
 
 ## Words you will use
 

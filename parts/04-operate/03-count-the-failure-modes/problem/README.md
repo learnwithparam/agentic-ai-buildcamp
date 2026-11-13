@@ -43,12 +43,12 @@ Expect: `Done. All 5 rules pass.`
 
 ## If you get stuck
 
-| What you see | Fix |
-|---|---|
-| `The counts add up to 7; you labelled 8 runs fail` | A failed run is missing from the table, or a count is off by one. |
-| `mixes runs that ended stopped and failed` | Split the mode. Look at the end status in the viewer. |
-| `is in two modes` | Pick the first thing that went wrong for that run. |
-| `is not verb-thing` | Name it for the fix, in lower case with dashes: `wrong-reason-code`. |
+| What you see                                       | Fix                                                                  |
+| -------------------------------------------------- | -------------------------------------------------------------------- |
+| `The counts add up to 7; you labelled 8 runs fail` | A failed run is missing from the table, or a count is off by one.    |
+| `mixes runs that ended stopped and failed`         | Split the mode. Look at the end status in the viewer.                |
+| `is in two modes`                                  | Pick the first thing that went wrong for that run.                   |
+| `is not verb-thing`                                | Name it for the fix, in lower case with dashes: `wrong-reason-code`. |
 
 ## Words you will use
 

@@ -52,11 +52,11 @@ Expect: `Done. All 4 rules pass.`
 
 ## If you get stuck
 
-| What you see | Fix |
-|---|---|
-| `The gate allowed fast-misses-the-duplicate: 91.7% of its runs pass` | The threshold is an average. Set it to 1.0. |
-| `100.0% of its runs pass every eval` | Your evals or invoices miss the duplicate. Add `INV-2017` and your `missed-the-duplicate` eval. |
-| `The gate refused fast, a model that holds every case` | Refuse only on a failed eval or case, a must-never, or a cost rise. |
+| What you see                                                         | Fix                                                                                             |
+| -------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `The gate allowed fast-misses-the-duplicate: 91.7% of its runs pass` | The threshold is an average. Set it to 1.0.                                                     |
+| `100.0% of its runs pass every eval`                                 | Your evals or invoices miss the duplicate. Add `INV-2017` and your `missed-the-duplicate` eval. |
+| `The gate refused fast, a model that holds every case`               | Refuse only on a failed eval or case, a must-never, or a cost rise.                             |
 
 ## Words you will use
 

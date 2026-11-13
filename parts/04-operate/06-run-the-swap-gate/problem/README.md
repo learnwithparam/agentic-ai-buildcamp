@@ -56,12 +56,12 @@ Expect: `Done. All 4 rules pass.`
 
 ## If you get stuck
 
-| What you see | Fix |
-|---|---|
-| `evals = "" is not a folder` | Paths are relative to `gate.toml`. |
-| `trials = 1` | One run can be lucky. Three fresh trials, and every one must hold. |
+| What you see                                    | Fix                                                                  |
+| ----------------------------------------------- | -------------------------------------------------------------------- |
+| `evals = "" is not a folder`                    | Paths are relative to `gate.toml`.                                   |
+| `trials = 1`                                    | One run can be lucky. Three fresh trials, and every one must hold.   |
 | `gate.md says after USD ...; the gate measured` | Copy cost per outcome from the gate's table, not the price per call. |
-| `The gate cannot run` | Run the gate command and fix each line it prints. |
+| `The gate cannot run`                           | Run the gate command and fix each line it prints.                    |
 
 ## Words you will use
 

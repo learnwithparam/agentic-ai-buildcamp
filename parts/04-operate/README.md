@@ -29,17 +29,17 @@ The same picture is in `operate-loop.mmd`.
 
 ## Steps
 
-| Step | What you make | Minutes |
-|---|---|---|
-| [show-cost-per-outcome](01-show-cost-per-outcome/problem/README.md) | `GET /board` with spend and cost per outcome, failed runs included | 30 |
-| [label-the-traces](02-label-the-traces/problem/README.md) | `labels.csv`: at least 30 of 60 runs, pass or fail with a note | 25 |
-| [count-the-failure-modes](03-count-the-failure-modes/problem/README.md) | `failure-modes.md`: modes with counts that add up | 20 |
-| [write-an-eval-per-failure](04-write-an-eval-per-failure/problem/README.md) | `evals/`: one code check per mode | 25 |
-| [prove-each-eval-bites](05-prove-each-eval-bites/problem/README.md) | evals that fail their mode and pass good runs | 20 |
-| [run-the-swap-gate](06-run-the-swap-gate/problem/README.md) | `gate.toml` and `gate.md`: two models, cost per outcome before and after | 20 |
-| [refuse-a-bad-model](07-refuse-a-bad-model/problem/README.md) | a gate that refuses the planted model and allows the safe one | 25 |
-| [run-the-incident-drill](08-run-the-incident-drill/problem/README.md) | pause on a ledger outage, one incident card, `runbook.md` | 30 |
-| [present-on-demo-day](09-present-on-demo-day/problem/README.md) | `demo.md`, a five-minute recording, the scorecard | 30 |
+| Step                                                                        | What you make                                                            | Minutes |
+| --------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ------- |
+| [show-cost-per-outcome](01-show-cost-per-outcome/problem/README.md)         | `GET /board` with spend and cost per outcome, failed runs included       | 30      |
+| [label-the-traces](02-label-the-traces/problem/README.md)                   | `labels.csv`: at least 30 of 60 runs, pass or fail with a note           | 25      |
+| [count-the-failure-modes](03-count-the-failure-modes/problem/README.md)     | `failure-modes.md`: modes with counts that add up                        | 20      |
+| [write-an-eval-per-failure](04-write-an-eval-per-failure/problem/README.md) | `evals/`: one code check per mode                                        | 25      |
+| [prove-each-eval-bites](05-prove-each-eval-bites/problem/README.md)         | evals that fail their mode and pass good runs                            | 20      |
+| [run-the-swap-gate](06-run-the-swap-gate/problem/README.md)                 | `gate.toml` and `gate.md`: two models, cost per outcome before and after | 20      |
+| [refuse-a-bad-model](07-refuse-a-bad-model/problem/README.md)               | a gate that refuses the planted model and allows the safe one            | 25      |
+| [run-the-incident-drill](08-run-the-incident-drill/problem/README.md)       | pause on a ledger outage, one incident card, `runbook.md`                | 30      |
+| [present-on-demo-day](09-present-on-demo-day/problem/README.md)             | `demo.md`, a five-minute recording, the scorecard                        | 30      |
 
 `show-cost-per-outcome`, `run-the-swap-gate` and `refuse-a-bad-model` are core. A PM can do steps 2 to 7 and 9
 alone: they are files, and the gate runs the part's sample clerk.
@@ -164,16 +164,16 @@ Part operate is done: 9/9 steps pass.
 
 **How it is checked.** Every rule is yes or no:
 
-| Question | Checked by |
-|---|---|
-| Does `bun run verify part operate` pass every step from a fresh clone? | Script |
-| Does each eval fail on a labelled fail of its mode and pass every labelled pass? | Script |
-| Is the planted model that misses the duplicate refused, and the safe one allowed? | Script |
-| Does the recording show a ledger row that matches a job the employee reported done? | Peer, yes or no |
-| Does the recording show the must-never trap refused and the refusal logged with its rule? | Peer, yes or no |
-| Does the recording show a payment that waited for the right approver? | Peer, yes or no |
+| Question                                                                                       | Checked by       |
+| ---------------------------------------------------------------------------------------------- | ---------------- |
+| Does `bun run verify part operate` pass every step from a fresh clone?                         | Script           |
+| Does each eval fail on a labelled fail of its mode and pass every labelled pass?               | Script           |
+| Is the planted model that misses the duplicate refused, and the safe one allowed?              | Script           |
+| Does the recording show a ledger row that matches a job the employee reported done?            | Peer, yes or no  |
+| Does the recording show the must-never trap refused and the refusal logged with its rule?      | Peer, yes or no  |
+| Does the recording show a payment that waited for the right approver?                          | Peer, yes or no  |
 | Does the write-up state cost per outcome before and after a swap, matching the gate within 2%? | Script plus peer |
-| Does the write-up name one failure mode, the eval that catches it, and the fix? | Peer, yes or no |
+| Does the write-up name one failure mode, the eval that catches it, and the fix?                | Peer, yes or no  |
 
 **Extension.** Add a model judge for one failure mode that code cannot check, and report how often it agrees with
 your labels. Judge calibration in depth belongs to the Evals workshop.
