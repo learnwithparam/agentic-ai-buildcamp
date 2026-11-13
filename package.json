@@ -4,7 +4,7 @@
   "type": "module",
   "packageManager": "bun@1.4.4",
   "scripts": {
-    "check": "bun scripts/readable.ts && bun scripts/plain-english.ts && bun scripts/check.ts && bun scripts/verify.ts --all && bun test",
+    "check": "bun scripts/readable.ts && bun scripts/plain-english.ts && bun scripts/check.ts && bun scripts/verify.ts --all && bun test && bun scripts/text-audit.ts",
     "readable": "bun scripts/readable.ts",
     "plain-english": "bun scripts/plain-english.ts",
     "format": "biome check --write .",
@@ -13,7 +13,8 @@
     "reference": "bun reference/run.ts",
     "reference-employee": "bun reference/start.ts",
     "cost": "bun checks/design-lib.ts",
-    "models": "bun scripts/models.ts"
+    "models": "bun scripts/models.ts",
+    "text-audit": "bun scripts/text-audit.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "4.0.103",
@@ -27,6 +28,7 @@
     "zod": "4.6.7"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.6.5"
+    "@biomejs/biome": "2.6.5",
+    "@playwright/test": "1.63.0"
   }
 }

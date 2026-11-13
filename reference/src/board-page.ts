@@ -36,12 +36,12 @@ h1 { font-size:20px; margin:0; } header p { margin:2px 0 0; color:var(--muted); 
 .empty { color:var(--muted); font-size:13px; }
 </style></head><body>
 <header><div><h1>Freight audit board</h1>
-<p>Employee: ${employee}. A card is Done only when the ledger agrees.</p></div>
+<p>Signed in as ${employee}. A card is Done only when the ledger agrees.</p></div>
 <div class="kpis" id="kpis"></div></header>
 <div class="cols" id="cols"></div>
 <script>
 function usd(amount, digits = 6) {
-  return amount == null ? "n/a" : "USD " + Number(amount).toFixed(digits);
+  return amount == null ? "None settled yet" : "USD " + Number(amount).toFixed(digits);
 }
 const COLOUR_OF_COLUMN = { Done: "done", Refused: "ref", "Needs you": "need" };
 
@@ -55,8 +55,11 @@ function cardHtml(job) {
 }
 
 function columnHtml(name, jobs, working) {
-  let cards = '<div class="empty">Nothing here</div>';
-  if (working && name === "Done") cards = '<div class="empty">' + working + ' job(s) working</div>';
+  let cards = '<div class="empty" data-empty-state>No invoices in this column yet. ' +
+    'Run <code>bun run reference</code> to add some.</div>';
+  const noun = working === 1 ? " invoice" : " invoices";
+  const progress = working + noun + " in progress";
+  if (working && name === "Done") cards = '<div class="empty">' + progress + "</div>";
   if (jobs.length) cards = jobs.map(cardHtml).join("");
   const dot = '<i style="background:var(--' + COLOUR_OF_COLUMN[name] + ')"></i>';
   const heading = '<h2>' + dot + name + ' (' + jobs.length + ')</h2>';
