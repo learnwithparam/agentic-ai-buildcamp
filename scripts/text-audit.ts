@@ -1,5 +1,6 @@
 // bun run text-audit: starts the ledger, the board and the trace viewer, opens each page in a real
 // browser and runs the 10 text checks. It stops everything it started.
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { ROOT } from "./structure";
 
@@ -23,6 +24,11 @@ async function waitFor(port: number): Promise<boolean> {
     await Bun.sleep(500);
   }
   return false;
+}
+
+// The repo check does not run an install step, so get the audit's own package when it is missing.
+if (!existsSync(join(ROOT, "node_modules", "@playwright", "test"))) {
+  Bun.spawnSync(["bun", "install"], { cwd: ROOT, stdout: "inherit", stderr: "inherit" });
 }
 
 const servers = STARTS.map((command) =>
