@@ -25,8 +25,8 @@ Write three ADRs in `adr/`:
 | `model.md`      | Which role in `config/models.ts` runs it, and when to swap it |
 | `durability.md` | What happens when a job dies in the middle                    |
 
-Each ADR has four sections: Context, Decision, Consequences and Enforced by. Write at least one real sentence under
-Context, Decision and Consequences.
+Each ADR has four sections: Context, Decision, Consequences and Enforced by. The first three each need a real
+sentence.
 Enforced by names a Build check in backticks, such as `` `bun run verify save-progress` ``. Pick from these:
 
 ```text
@@ -69,7 +69,7 @@ The freight sample is in [solution/adr/](../solution/adr/). For a full system wr
 | What you see                                            | Fix                                                                                   |
 | ------------------------------------------------------- | ------------------------------------------------------------------------------------- |
 | `FAIL each ADR names the check that enforces it`        | "Code review" is not a check. Name a step, like `` `bun run verify save-progress` ``. |
-| `FAIL adr/ has topology.md, model.md and durability.md` | Durability is the ADR people often forget. Write it.                                  |
+| `FAIL adr/ has topology.md, model.md and durability.md` | People often forget durability.                                                       |
 | `FAIL each section says something real`                 | Each section needs at least eight words and no `TODO`.                                |
 
 ## Words you will use

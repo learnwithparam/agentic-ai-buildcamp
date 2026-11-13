@@ -34,8 +34,7 @@ sequenceDiagram
 
 1. **The employee** lives in `employee/` at the repo root, or in `EMPLOYEE_DIR`. When a tool answers 503:
    - pause the job instead of failing it;
-   - probe the ledger from one loop for the whole employee, every few hundred milliseconds. Do not let each job
-     retry on its own. The checker allows at most 60 ledger calls during the outage;
+   - probe the ledger from one loop every few hundred milliseconds, not once per job per try;
    - resume the job when the ledger answers.
 
    `GET /board` gets an `incidents` list. It holds one card for the outage with `"status": "open"`. The card
@@ -48,7 +47,7 @@ sequenceDiagram
    - Learn: the eval that catches it next time.
 
 The checker turns the outage on, sends four clean jobs and reads the board. Then it turns the outage off and
-reads the ledger. A small program in the middle counts your ledger calls during the outage. It runs 3 fresh trials.
+reads the ledger. It counts your ledger calls during the outage: at most 60. It runs 3 fresh trials.
 
 ## Done when
 
@@ -65,12 +64,12 @@ Expect: `Done. All 5 rules pass.`
 
 ## If you get stuck
 
-| What you see                                    | Fix                                                                    |
-| ----------------------------------------------- | ---------------------------------------------------------------------- |
-| `the job for INV-2029 ended "failed"`           | Catch a 503 apart from other errors. A 503 means wait, not give up.    |
-| `called the ledger 400 times while it was down` | One probe loop for the whole employee, every few hundred milliseconds. |
-| `shows 4 open incident(s)`                      | One outage, one card. Add paused jobs to the open card.                |
-| `Learn names none of your evals`                | Name the eval file, such as `failed-on-a-ledger-error`.                |
+| What you see                                    | Fix                                                                 |
+| ----------------------------------------------- | ------------------------------------------------------------------- |
+| `the job for INV-2029 ended "failed"`           | Catch a 503 apart from other errors. A 503 means wait, not give up. |
+| `called the ledger 400 times while it was down` | Use one probe loop for the whole employee.                          |
+| `shows 4 open incident(s)`                      | One outage, one card. Add paused jobs to the open card.             |
+| `Learn names none of your evals`                | Name the eval file, such as `failed-on-a-ledger-error`.             |
 
 ## Words you will use
 

@@ -49,7 +49,7 @@ a person answers the approval. A job that waits for a person is not in the ledge
 
 ## Done when
 
-- Five or more cases, and none of them checks a reply or a message.
+- Five or more cases. None checks a reply.
 - A must-never case forbids the write named in `02-write-the-hire-letter/problem/employee.toml`.
 
 ```bash

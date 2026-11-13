@@ -28,12 +28,8 @@ flowchart LR
 
 ## Your challenge
 
-Copy the three starter files in this folder into your `employee/` folder. Run this from the repo root:
-
-```bash
-cp parts/03-deploy/01-ship-it-as-a-service/problem/{Dockerfile,Dockerfile.dockerignore,compose.yaml} employee/
-```
-
+From the repo root, copy the three starter files in this folder into `employee/`:
+`cp parts/03-deploy/01-ship-it-as-a-service/problem/{Dockerfile,Dockerfile.dockerignore,compose.yaml} employee/`.
 Then fill in every `TODO`:
 
 | File                      | What it holds                                                                                                                                                                                        |
@@ -63,7 +59,7 @@ Expect: `Done. All 4 rules pass.`
 ![The container step passing](../images/expected.png)
 
 When Docker is not running, the last rule prints `SKIPPED: Docker is not running here`. The three file rules still
-decide. Start Docker to check the container itself.
+decide. Start Docker to check the container.
 
 ## If you get stuck
 
@@ -76,7 +72,7 @@ decide. Start Docker to check the container itself.
 
 ## Words you will use
 
-- **Image**: the frozen files a container starts from. Anyone who pulls it can read what is inside.
+- **Image**: the frozen files a container starts from. Anyone who pulls it can read it.
 - **Health check**: a command Docker runs to ask the service if it works, not only if it started.
 - **Named volume**: storage that Docker keeps when a container is removed.
 - **Secret**: a value, like an API key, that is given at start and never written into the image.
