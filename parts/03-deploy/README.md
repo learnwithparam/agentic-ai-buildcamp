@@ -56,7 +56,7 @@ flowchart LR
   subgraph box["container: healthy, key from the environment, volumes for traces and state"]
     J
   end
-  ID["identity per agent, Keycloak, OpenFGA, Langfuse"] -.the Deploy workshop.- box
+  ID["staff sign-in"] -.the Deploy workshop.- box
 ```
 
 ## Steps
@@ -191,7 +191,7 @@ still passes.
 | [How we contain Claude across products](https://www.anthropic.com/engineering/how-we-contain-claude) (Anthropic)                               | Hard limits outside the model hold when the model is fooled. Required                        |
 | [12-Factor Agents, factor 5](https://github.com/humanlayer/12-factor-agents/blob/main/content/factor-05-unify-execution-state.md) (HumanLayer) | Keep execution state with business state. Optional                                           |
 
-Identity per agent, Keycloak, OpenFGA and Langfuse are taught in the Deploy workshop, not here.
+Signing staff in is taught in the Deploy workshop, not here.
 
 ## FINISHED
 
