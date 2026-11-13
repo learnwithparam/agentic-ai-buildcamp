@@ -1,4 +1,4 @@
-# Part 5: Do it with the tools teams run
+# Part 5: Run the agent on LangGraph
 
 ## The problem
 
@@ -62,7 +62,7 @@ Expect: `Container assignment-db-1  Healthy`.
 Run the sample answer's graph above Lena's limit. It pauses and keeps running, like a clerk waiting for her.
 
 ```bash
-bun parts/05-do-it-with-the-tools-teams-run/01-resume-with-langgraph/solution/graph.ts start run-1 7850
+bun parts/05-run-the-agent-on-langgraph/01-resume-with-langgraph/solution/graph.ts start run-1 7850
 ```
 
 Expect: `node decide`, `node pay`, then `PAUSED waiting for Lena`. Press Ctrl+C to kill it. The process is gone. Postgres still has the pause.
@@ -70,7 +70,7 @@ Expect: `node decide`, `node pay`, then `PAUSED waiting for Lena`. Press Ctrl+C 
 Start a new process on the same run. It answers "approved".
 
 ```bash
-bun parts/05-do-it-with-the-tools-teams-run/01-resume-with-langgraph/solution/graph.ts resume run-1
+bun parts/05-run-the-agent-on-langgraph/01-resume-with-langgraph/solution/graph.ts resume run-1
 ```
 
 Expect: `node pay` and `DONE paid`, and no `node decide`. The second run starts at `pay`.
