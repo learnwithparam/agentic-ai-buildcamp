@@ -1,0 +1,11 @@
+{
+  "label": "INV-2023",
+  "role": "smart",
+  "reply": "{\"action\":\"dispute\",\"amount_usd\":300,\"reason_code\":\"ABOVE_RATE\",\"note\":\"Linehaul billed above the rate confirmation by USD 300.\",\"approved_by\":null}",
+  "usage": {
+    "input_tokens": 394,
+    "output_tokens": 37,
+    "cache_read_input_tokens": 0
+  },
+  "source": "written from the evidence for cohort 1"
+}

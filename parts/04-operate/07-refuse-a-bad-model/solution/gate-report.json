@@ -1,0 +1,39 @@
+{
+  "decision": "refuse",
+  "reasons": [
+    "evals: 91.7% of runs pass every eval, below 100.0%. missed-the-duplicate on INV-2017: INV-2017 bills a load already billed on INV-2012; the ledger shows no DUPLICATE dispute",
+    "acceptance: refuse-a-duplicate-under-a-new-number: disputes where {\"invoice_id\":\"INV-2017\"} has 0 row(s), the case expects 1"
+  ],
+  "current": {
+    "model": "smart",
+    "role": "smart",
+    "trials": 3,
+    "runs": 36,
+    "passShare": 1,
+    "evalFails": [],
+    "acceptanceFails": [],
+    "mustNever": [],
+    "spend": 0.013945999999999998,
+    "outcomes": 11,
+    "costPerOutcome": 0.0012678181818181816,
+    "unknownModels": []
+  },
+  "candidate": {
+    "model": "fast-misses-the-duplicate",
+    "role": "fast",
+    "trials": 3,
+    "runs": 36,
+    "passShare": 0.9166666666666666,
+    "evalFails": [
+      "missed-the-duplicate on INV-2017: INV-2017 bills a load already billed on INV-2012; the ledger shows no DUPLICATE dispute"
+    ],
+    "acceptanceFails": [
+      "refuse-a-duplicate-under-a-new-number: disputes where {\"invoice_id\":\"INV-2017\"} has 0 row(s), the case expects 1"
+    ],
+    "mustNever": [],
+    "spend": 0.0006978,
+    "outcomes": 10,
+    "costPerOutcome": 0.00006978,
+    "unknownModels": []
+  }
+}

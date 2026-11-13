@@ -1,0 +1,11 @@
+flowchart LR
+  B[Board: cost per outcome] --> T[Traces of the replay set]
+  T --> L[Labels: pass or fail]
+  L --> M[Failure modes with counts]
+  M --> E[One eval per mode]
+  E --> G{Swap gate: current vs candidate}
+  G -->|refuse| X[Keep the current model]
+  G -->|allow| S[Swap, cost per outcome falls]
+  S --> B
+  X --> B
+  D[Incident drill: the ledger is down] --> R[Runbook] --> E

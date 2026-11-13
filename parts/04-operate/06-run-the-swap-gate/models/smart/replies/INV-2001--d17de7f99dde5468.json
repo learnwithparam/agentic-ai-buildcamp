@@ -1,0 +1,11 @@
+{
+  "label": "INV-2001",
+  "role": "smart",
+  "reply": "{\"action\":\"pay\",\"amount_usd\":4305,\"reason_code\":null,\"note\":\"Matches the rate confirmation and the proof of delivery.\",\"approved_by\":null}",
+  "usage": {
+    "input_tokens": 397,
+    "output_tokens": 35,
+    "cache_read_input_tokens": 0
+  },
+  "source": "written from the evidence for cohort 1"
+}
