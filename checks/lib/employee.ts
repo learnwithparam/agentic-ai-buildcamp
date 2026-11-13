@@ -27,9 +27,9 @@ export function findEmployeeDir(dir: string): string {
     if (candidate && existsSync(join(candidate, "employee.toml"))) return resolve(candidate);
   }
   throw new CheckProblem(
-    `No employee.toml in ${dir}. ` +
-      "Copy a starter kit (starter/typescript or starter/python) " +
-      "and keep employee.toml next to it.",
+    `No employee.toml in ${dir}, in EMPLOYEE_DIR or in employee/ at the repo root. ` +
+      "Copy a starter kit there first: cp -r starter/typescript employee " +
+      "(or starter/python).",
   );
 }
 

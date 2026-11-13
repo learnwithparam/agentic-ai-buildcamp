@@ -5,7 +5,7 @@
 //      The swap gate sets both.
 //   2. GET /board counts every run's spend, failed and stopped runs too, and shows incidents.
 //   3. When the ledger answers 503 it pauses every job, opens one incident card, probes the
-//      ledger once a beat, and resumes the paused jobs when it answers again.
+//      ledger every few hundred milliseconds, and resumes the paused jobs when it answers again.
 // Each solution/ and wrong/ folder in this part starts it with one Options object; a wrong/ folder
 // plants one mistake a learner makes. Models are called only through reference/src/model.ts,
 // which asks config/models.ts.
@@ -163,7 +163,8 @@ async function ledgerAnswers(clerk: Clerk): Promise<boolean> {
   }
 }
 
-// Probes the ledger once a beat until it answers, then closes every open incident.
+// Probes the ledger every few hundred milliseconds
+// until it answers, then closes every open incident.
 async function waitForLedger(clerk: Clerk) {
   const giveUpAt = Date.now() + clerk.maxPauseMs;
   while (Date.now() < giveUpAt) {

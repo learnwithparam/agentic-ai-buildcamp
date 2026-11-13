@@ -87,6 +87,9 @@ bun parts/04-operate/operate.ts traces
 
 Expect: `The replay set: 60 runs of the clerk in production (49 done, 2 waiting, 4 stopped, 5 failed).`
 
+The trace viewer keeps running on `localhost:7703`. Open it in your browser. Run the next commands in a second
+terminal, and press Ctrl+C to stop the viewer when you are done.
+
 ```bash
 bun run verify label-the-traces
 ```

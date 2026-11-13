@@ -5,7 +5,8 @@
 KaaS Freight paid one invoice twice last month. The second payment came from a retry. The payment service could
 not tell the retry apart from a new payment. A payment is money out of the door, and you cannot undo it.
 
-So the world's `pay_invoice` tool takes an `Idempotency-Key` header, as real payment services do. An idempotency
+So the world's `pay_invoice` tool takes an `Idempotency-Key` header, as real payment services do (see
+[Stripe, idempotent requests](https://docs.stripe.com/api/idempotent_requests)). An idempotency
 key is a name for one write you mean to make. If the same key comes twice, the invoice is paid once.
 
 ## Your challenge

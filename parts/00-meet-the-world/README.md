@@ -46,6 +46,7 @@ bun run reference
 ```
 
 Expect: four `Done` lines, one `Needs you`, one `Refused`, and `Cost per invoice settled`. The board is on `localhost:7702/board`.
+The reference keeps running so that you can look at the board. Press Ctrl+C when you are done.
 
 Fill in `notes.md`. Then check it.
 

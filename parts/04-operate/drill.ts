@@ -174,7 +174,7 @@ async function runTrial(trial: Trial, counter: { down: boolean; calls: number })
   if (counter.calls > MAX_CALLS_WHILE_DOWN) {
     const message =
       `your employee called the ledger ${counter.calls} times while it was down. ` +
-      "Probe it once a beat, not once per job per try.";
+      "Probe it from one loop every few hundred milliseconds, not once per job per try.";
     note(trial.found, "pauses", trial.tag(message));
   }
   await checkJobsResume(trial);
