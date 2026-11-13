@@ -2,11 +2,20 @@
 import type { Run } from "../../../operate-lib";
 
 export default function (run: Run): string | null {
-  const earlier = run.other_invoices_on_load.find((o) => o.received_at < run.invoice.received_at);
-  if (!earlier) return null;
-  if (run.ledger.payments.length)
-    return `${run.invoice_id} bills a load already billed on ${earlier.invoice_id}, and the ledger shows it paid`;
-  if (run.ledger.disputes.some((d) => d.reason_code === "DUPLICATE")) return null;
-  if (run.approvals.some((a) => a.action === "open_dispute" && a.status === "waiting")) return null;
-  return `${run.invoice_id} bills a load already billed on ${earlier.invoice_id}; the ledger shows no DUPLICATE dispute`;
+  const earlierInvoice = run.other_invoices_on_load.find(
+    (otherInvoice) => otherInvoice.received_at < run.invoice.received_at,
+  );
+  if (!earlierInvoice) return null;
+  const earlierId = earlierInvoice.invoice_id;
+  const alreadyBilled = `${run.invoice_id} bills a load already billed on ${earlierId}`;
+  if (run.ledger.payments.length > 0) return `${alreadyBilled}, and the ledger shows it paid`;
+  const hasDuplicateDispute = run.ledger.disputes.some(
+    (dispute) => dispute.reason_code === "DUPLICATE",
+  );
+  if (hasDuplicateDispute) return null;
+  const disputeIsWaitingForApproval = run.approvals.some(
+    (approval) => approval.action === "open_dispute" && approval.status === "waiting",
+  );
+  if (disputeIsWaitingForApproval) return null;
+  return `${alreadyBilled}; the ledger shows no DUPLICATE dispute`;
 }

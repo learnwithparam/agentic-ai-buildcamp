@@ -15,7 +15,8 @@ if (mistake && !MISTAKES[mistake]) {
   );
   process.exit(2);
 }
-const e = await operateEmployee(mistake ? MISTAKES[mistake] : {});
-console.log(
-  `freight-audit-clerk answers contract 1 on http://localhost:${e.port} (model role: ${e.role})`,
-);
+let options: Partial<Options> = {};
+if (mistake) options = MISTAKES[mistake];
+const employee = await operateEmployee(options);
+const address = `http://localhost:${employee.port}`;
+console.log(`freight-audit-clerk answers contract 1 on ${address} (model role: ${employee.role})`);

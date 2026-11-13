@@ -2,13 +2,19 @@
 
 ## The problem
 
-Finance has the board: the clerk costs about USD 0.0013 per settled invoice on the `smart` role, and the `fast`
-role is about twenty times cheaper per call. They ask: can we swap? "It looked fine when I tried a few" is not an
-answer. A swap gate is: run the current model and the candidate on the same invoices, the same evals and the same
-acceptance cases, several times, and compare cost per outcome, not price per call.
+Finance has the board. The clerk costs about USD 0.0013 per settled invoice on the `smart` role. The `fast` role
+is about twenty times cheaper per call. They ask: can we swap? "It looked fine when I tried a few" is not an
+answer.
 
-Small gaps lie. Anthropic measured a 6 point swing on one agent benchmark from the machine setup alone, and advises
-doubt about gaps under 3 points until the setup is matched. The gate keeps everything but the model the same.
+A **swap gate** is a real answer. It runs the current model and the candidate model on the same invoices, the same
+evals and the same acceptance cases. It runs them several times. Then it compares cost per outcome, not price per
+call.
+
+Small gaps lie. Anthropic saw a 6 point swing on one agent benchmark from the machine setup alone. They say not to
+trust a gap under 3 points until the setup is the same. So the gate keeps everything the same except the model.
+
+For example, the sample answer ran both models 3 times on 12 invoices. `smart` cost USD 0.001268 per settled
+invoice, and `fast` cost USD 0.000063. Every eval and every acceptance case held, so the gate said `ALLOW  fast`.
 
 ```mermaid
 flowchart LR
@@ -29,8 +35,8 @@ Fill in `gate.toml` in this folder:
   invoices, the timeouts, the approvals) and a few clean ones.
 - `trials = 3`.
 
-Then run the gate. It starts a fresh world and a fresh clerk per trial, sets `MODEL_ROLE` and `REPLAY_DIR` for each
-model, plays Lena for what waits, and prices every run from its traces.
+Then run the gate. For each trial, it starts a fresh world and a fresh clerk. It sets `MODEL_ROLE` and `REPLAY_DIR`
+for each model. It plays Lena for what waits, and prices every run from its traces.
 
 ```bash
 bun parts/04-operate/operate.ts gate parts/04-operate/06-run-the-swap-gate/problem

@@ -2,13 +2,18 @@
 
 ## The problem
 
-A teammate wrote a gate before you. It refuses a candidate when fewer than 90% of runs pass the evals. Most runs
-passing sounds safe, until the model that slips is the one on the duplicate invoice: 11 of 12 invoices fine, and
-the one that is not is the must-never. Averages hide exactly the failure a gate exists to catch.
+A teammate wrote a gate before you. It refuses a candidate when fewer than 90% of runs pass the evals. "Most runs
+pass" sounds safe. But what if the one run that slips is the duplicate invoice? Then 11 of 12 invoices are fine,
+and the one that is not is the must-never. An average hides exactly the failure a gate is there to catch.
 
-The checker now plays the vendor: it swaps in a planted model, `fast-misses-the-duplicate`, that drafts "pay" for
-the duplicate invoice. The clerk's own checker stops the draft, so no money leaves, but the duplicate stays open
-for a person to find. Your gate must refuse it, say why, and still allow the safe `fast` model.
+For example, the gate runs 12 invoices. The planted model gets 11 right and misses `INV-2017`, the duplicate. That
+is 11 / 12 = 91.7% of runs passing. 91.7% is above 90%, so the teammate's gate says `ALLOW`. It should say
+`REFUSE`.
+
+The checker now plays the vendor. It swaps in a **planted model**, `fast-misses-the-duplicate`, that drafts "pay"
+for the duplicate invoice. The clerk's own checker stops the draft, so no money leaves. But the duplicate stays
+open for a person to find. Your gate must refuse this model and say why. It must still allow the safe `fast`
+model.
 
 ```mermaid
 flowchart LR

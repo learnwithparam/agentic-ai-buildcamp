@@ -3,11 +3,19 @@
 ## The problem
 
 Finance looks at the model bill once a month and asks one question: what does one settled invoice cost? A bill in
-tokens does not answer it. Cost per outcome does: all model spend, the runs that failed or stopped included,
-divided by the invoices the ledger shows settled the way the evidence allows.
+tokens does not answer it. Cost per outcome does.
 
-The easy board lies in two ways. It adds up spend only for jobs that ended `done`, so a run that stopped on a bad
-draft costs nothing. Or it counts the employee's own `done` as the outcome, so a claim counts as a result.
+**Cost per outcome** is all model spend divided by the invoices the ledger shows settled the way the evidence
+allows. All spend means every run, also the runs that failed or stopped.
+
+For example, the checker sends four jobs. Three end well in the ledger: two paid, one disputed. The fourth fails
+because its pay call never writes. All four runs together cost USD 0.0045. So cost per outcome is
+USD 0.0045 / 3 = USD 0.0015, not USD 0.0045 / 4.
+
+An easy board lies in two ways:
+
+- It adds up spend only for jobs that ended `done`. Then a run that stopped on a bad draft costs nothing.
+- It counts the employee's own `done` as the outcome. Then a claim counts as a result.
 
 ```mermaid
 flowchart LR
@@ -42,11 +50,17 @@ Make your employee's `GET /board` answer, per tenant:
 }
 ```
 
-Work out spend from the token counts of every model call and the price table in `config/models.ts`, never from a
-price you typed in. Count every run. Your employee is the one you built in Build and Deploy, in `employee/` at the
-repo root (or set `EMPLOYEE_DIR`). The checker sends four jobs: two clean invoices, the above-rate invoice
-(a dispute) and a clean invoice whose pay call never writes (a failed run). Then it recomputes the board from your
-traces and the ledger.
+Work out spend from two things: the token counts of every model call, and the price table in `config/models.ts`.
+Never use a price you typed in yourself. Count every run.
+
+Your employee is the one you built in Build and Deploy, in `employee/` at the repo root. You can also set
+`EMPLOYEE_DIR` to another folder. The checker sends four jobs:
+
+1. two clean invoices;
+2. the above-rate invoice, which should end in a dispute;
+3. a clean invoice whose pay call never writes, which is a failed run.
+
+Then the checker works out the board again from your traces and the ledger, and compares.
 
 Open the board while the sample runs to see the header you are building:
 

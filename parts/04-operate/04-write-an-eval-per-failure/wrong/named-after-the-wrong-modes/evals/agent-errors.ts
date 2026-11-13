@@ -2,7 +2,6 @@
 import type { Run } from "../../../../operate-lib";
 
 export default function (run: Run): string | null {
-  return run.status === "done" || run.status === "waiting_for_human"
-    ? null
-    : `${run.invoice_id} ended ${run.status}`;
+  if (run.status === "done" || run.status === "waiting_for_human") return null;
+  return `${run.invoice_id} ended ${run.status}`;
 }

@@ -17,5 +17,5 @@ ledger shows each invoice paid once. Any job that ended `failed` is started agai
 
 ## Learn
 
-Add the outage to the replay set and keep `failed-on-a-ledger-error` in the swap gate's evals, so a change that
+Add the outage to the replay set. Keep `failed-on-a-ledger-error` in the swap gate's evals. Then a change that
 makes the clerk give up on a 503 again is refused before it ships. Count the mode again after the next batch.

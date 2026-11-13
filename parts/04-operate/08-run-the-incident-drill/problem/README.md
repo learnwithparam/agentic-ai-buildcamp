@@ -2,14 +2,19 @@
 
 ## The problem
 
-The ledger goes down in the middle of the nightly batch. In the replay set the clerk met exactly this: four jobs
-hit a 503, each gave up as `failed`, and in the morning four invoices sat open with nobody told. That is your
-largest failure mode, `failed-on-a-ledger-error`. Worse ways exist: retry in a tight loop and hammer the ledger
-as it comes back, or put four alarm cards on the board for one outage.
+The ledger goes down in the middle of the nightly batch. A **503** is the answer a server gives when it is down
+for a while: "Service Unavailable".
 
-Anthropic published a postmortem of a quality regression in its own coding tools that evals missed for a long
-stretch; its fixes were process ones: more people using the build, evals on every prompt change, gradual rollout.
-An incident needs a plan written before the incident.
+In the replay set the clerk met exactly this. For example, four jobs got a 503 from the ledger, and each gave up as
+`failed`. In the morning four invoices sat open, and nobody was told. That is your largest failure mode,
+`failed-on-a-ledger-error`.
+
+There are worse ways to fail. The clerk can retry in a tight loop and hit the ledger hard as it comes back. Or it
+can put four alarm cards on the board for one outage.
+
+Anthropic published a postmortem about a drop in quality in its own coding tools. Its evals missed the drop for a
+long time. The fixes were about process: more people using the build, evals on every prompt change, and a slow
+rollout. The lesson: write the plan for an incident before the incident.
 
 ```mermaid
 sequenceDiagram
@@ -29,14 +34,23 @@ sequenceDiagram
 
 ## Your challenge
 
-1. **The employee** (`employee/` at the repo root, or `EMPLOYEE_DIR`): on a 503 from a tool, pause the job instead of
-   failing it, probe the ledger once a beat (not once per job per try), and resume when it answers. `GET /board`
-   gets an `incidents` list: one card for the outage with `"status": "open"`, closed when the jobs resume.
-2. **The runbook**: fill in `runbook.md` in this folder: Detect (the signal), Stop (how damage stops), Tell (who
-   hears, by name), Fix (how you bring it back and check it) and Learn (the eval that catches it next time).
+1. **The employee** lives in `employee/` at the repo root, or in `EMPLOYEE_DIR`. When a tool answers 503:
+   - pause the job instead of failing it;
+   - probe the ledger once a beat, not once per job per try;
+   - resume the job when the ledger answers.
 
-The checker turns the outage on, sends four clean jobs, reads the board while the ledger is down, turns it off,
-then reads the ledger. It counts your calls to the ledger while it is down through a proxy. 3 fresh trials.
+   `GET /board` gets an `incidents` list. It holds one card for the outage with `"status": "open"`. The card
+   closes when the jobs resume.
+2. **The runbook**: fill in `runbook.md` in this folder. It has five sections:
+   - Detect: the signal you see;
+   - Stop: how the damage stops;
+   - Tell: who hears about it, by name;
+   - Fix: how you bring it back, and how you check it;
+   - Learn: the eval that catches it next time.
+
+The checker turns the outage on and sends four clean jobs. It reads the board while the ledger is down. Then it
+turns the outage off and reads the ledger. A proxy counts your calls to the ledger while it is down. It runs 3
+fresh trials.
 
 ## Done when
 
