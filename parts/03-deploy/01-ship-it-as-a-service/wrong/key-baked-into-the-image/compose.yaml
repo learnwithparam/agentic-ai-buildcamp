@@ -8,7 +8,7 @@ services:
       dockerfile: parts/03-deploy/01-ship-it-as-a-service/wrong/key-baked-into-the-image/Dockerfile
       args:
       ports:
-      - "${PORT:-7701}:7701"
+        - "${PORT:-7701}:7701"
     environment:
       WORLD_URL: ${WORLD_URL:-http://host.docker.internal:7700}
       MODEL_MODE: ${MODEL_MODE:-replay}
@@ -18,7 +18,13 @@ services:
       - traces:/data/traces
       - state:/data/state
     healthcheck:
-      test: ["CMD", "bun", "-e", "fetch('http://localhost:7701/health').then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))"]
+      test:
+        [
+          "CMD",
+          "bun",
+          "-e",
+          "fetch('http://localhost:7701/health').then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))",
+        ]
       interval: 2s
       timeout: 2s
       retries: 10

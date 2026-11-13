@@ -1,9 +1,14 @@
 # Design
 
-KaaS Freight paid one carrier invoice twice: USD 3,140 for a single load, and many rounds of emails to get it
-back. Two clerks match about 40 carriers' invoices by hand, and when they fall behind, carriers charge late fees.
-Before anyone writes agent code, this part pins down what the AI employee is for, what it must never do, what it
-may touch, what it costs, and who signs off on the design. Every answer is a file a check can read.
+KaaS Freight paid one carrier invoice twice: USD 3,140 for a single load. It took many emails to get the money
+back. Two clerks match the invoices of about 40 carriers by hand. When they fall behind, carriers charge late fees.
+
+This part comes before any agent code. You decide five things. What is the AI employee for? What must it never do?
+What may it touch? What does it cost? And who approves the design? Every answer is a file that a check can read.
+
+For example, your hire letter names the must-never: "Pay the same load twice". It also names a SQL query that
+finds it in the ledger. Today `INV-2012` and `INV-2017` both bill load `L-1012`, for USD 2,675 each. If both are
+paid, that query returns load `L-1012`, and anyone can see the rule broke.
 
 ```mermaid
 flowchart LR
@@ -20,22 +25,22 @@ The same picture is in `design-map.mmd`.
 
 ## Steps
 
-| Step | What you write | Minutes |
-|---|---|---|
-| [place-it-on-the-map](01-place-it-on-the-map/problem/README.md) | `map.md`: workflow, agent or agentic system, and who decides | 20 |
-| [write-the-hire-letter](02-write-the-hire-letter/problem/README.md) | `employee.toml`: outcome, metric, must-never | 30 |
-| [turn-the-hire-into-tests](03-turn-the-hire-into-tests/problem/README.md) | `acceptance.yaml`: cases that check rows, not replies | 30 |
-| [list-tools-and-permissions](04-list-tools-and-permissions/problem/README.md) | `tools.yaml`: every tool, its risk and its approver | 30 |
-| [price-the-outcome](05-price-the-outcome/problem/README.md) | `cost.yaml`: cost per outcome against its value | 30 |
-| [record-the-decisions](06-record-the-decisions/problem/README.md) | three ADRs, each with the check that enforces it | 30 |
-| [pass-the-design-review](07-pass-the-design-review/problem/README.md) | `review.md`: two peers answer six questions | 30 |
+| Step                                                                          | What you write                                               | Minutes |
+| ----------------------------------------------------------------------------- | ------------------------------------------------------------ | ------- |
+| [place-it-on-the-map](01-place-it-on-the-map/problem/README.md)               | `map.md`: workflow, agent or agentic system, and who decides | 20      |
+| [write-the-hire-letter](02-write-the-hire-letter/problem/README.md)           | `employee.toml`: outcome, metric, must-never                 | 30      |
+| [turn-the-hire-into-tests](03-turn-the-hire-into-tests/problem/README.md)     | `acceptance.yaml`: cases that check rows, not replies        | 30      |
+| [list-tools-and-permissions](04-list-tools-and-permissions/problem/README.md) | `tools.yaml`: every tool, its risk and its approver          | 30      |
+| [price-the-outcome](05-price-the-outcome/problem/README.md)                   | `cost.yaml`: cost per outcome against its value              | 30      |
+| [record-the-decisions](06-record-the-decisions/problem/README.md)             | three ADRs, each with the check that enforces it             | 30      |
+| [pass-the-design-review](07-pass-the-design-review/problem/README.md)         | `review.md`: two peers answer six questions                  | 30      |
 
-You work in each step's `problem/` folder. Pick the freight clerk or one of the other employees on the menu in each
-step; keep the same one for the whole part.
+You work in each step's `problem/` folder. Pick the freight clerk, or one of the other employees on the menu. Keep
+the same employee for the whole part.
 
 ## Walkthrough
 
-Place the employee on the map. Fill in `01-place-it-on-the-map/problem/map.md`, then run:
+Place the employee on the map. Fill in `01-place-it-on-the-map/problem/map.md`. Then run the check.
 
 ```bash
 bun run verify place-it-on-the-map
@@ -52,7 +57,7 @@ bun run verify write-the-hire-letter
 Expect: `Done. All 6 rules pass.`
 
 Write the acceptance cases in `03-turn-the-hire-into-tests/problem/acceptance.yaml`. The check reads your hire
-letter to find the write your must-never case forbids.
+letter. There it finds the write that your must-never case forbids.
 
 ```bash
 bun run verify turn-the-hire-into-tests
@@ -68,7 +73,7 @@ bun run verify list-tools-and-permissions
 
 Expect: `Done. All 5 rules pass.`
 
-Price one outcome in `05-price-the-outcome/problem/cost.yaml`, then let the calculator show the sums.
+Price one outcome in `05-price-the-outcome/problem/cost.yaml`. Then let the calculator show the sums.
 
 ```bash
 bun run cost parts/01-design/05-price-the-outcome/problem/cost.yaml
@@ -77,7 +82,8 @@ bun run verify price-the-outcome
 
 Expect: the cost lines end with `(matches within 1%)`, then `Done. All 6 rules pass.`
 
-Write three ADRs in `06-record-the-decisions/problem/adr/`.
+Write three ADRs in `06-record-the-decisions/problem/adr/`. An ADR, an architecture decision record, is a short note
+about one design choice and why you made it.
 
 ```bash
 bun run verify record-the-decisions
@@ -85,7 +91,7 @@ bun run verify record-the-decisions
 
 Expect: `Done. All 4 rules pass.`
 
-Share your files with two peers and write their answers in `07-pass-the-design-review/problem/review.md`.
+Share your files with two peers. Write their answers in `07-pass-the-design-review/problem/review.md`.
 
 ```bash
 bun run verify pass-the-design-review
@@ -115,13 +121,19 @@ Part design is done: 7/7 steps pass.
 
 ## Finished
 
-You now have a design pack for one AI employee: where it sits on the map, a hire letter with a metric and a
-must-never a query can see, acceptance cases that check rows in the system of record, a tool list with risks and
-approvers, a dated cost per outcome below its value, three ADRs that each name their check, and a review signed by
-two peers.
+You now have a design pack for one AI employee. It holds seven things:
 
-Build turns each file into running code. The hire letter becomes the contract the agent is held to. The acceptance
-cases become the tests the agent must pass. The tool list becomes the policy that gates every write
-(`gate-writes-with-a-policy`). The must-never becomes `hold-the-must-never`. The ADRs become the checks they name:
-`add-a-checker`, `catch-a-bad-draft`, `save-progress`, `pay-once-after-a-crash`, `run-the-swap-gate` and
-`refuse-a-bad-model`.
+- where the employee sits on the map;
+- a hire letter with a metric, and a must-never that a query can see;
+- acceptance cases that check rows in the system of record, not replies;
+- a tool list with the risk and the approver of each tool;
+- a dated cost per outcome that is below the value of that outcome;
+- three ADRs, and each one names its check;
+- a review signed by two peers.
+
+In Build, each file turns into running code. The hire letter becomes the contract the agent must keep. The
+acceptance cases become the tests the agent must pass. The tool list becomes the policy that guards every write, in
+`gate-writes-with-a-policy`. The must-never becomes `hold-the-must-never`.
+
+The ADRs become the checks they name. Those are `add-a-checker`, `catch-a-bad-draft`, `save-progress`,
+`pay-once-after-a-crash`, `run-the-swap-gate` and `refuse-a-bad-model`.

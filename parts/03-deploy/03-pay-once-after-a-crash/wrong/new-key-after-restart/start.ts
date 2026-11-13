@@ -1,3 +1,5 @@
-// A common mistake: Makes a new Idempotency-Key on every try, so the retry after a restart pays again.
+// A common mistake: makes a new Idempotency-Key on every try.
+// So the retry after a restart pays the invoice again.
 import { deployEmployee } from "../../../deploy-kit";
+
 deployEmployee({ stableKeys: false });

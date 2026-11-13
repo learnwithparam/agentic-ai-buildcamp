@@ -2,9 +2,14 @@
 
 ## The problem
 
-An agent that says "done" is making a claim. At KaaS Freight a wrong claim is money out of the door: an invoice
-paid twice, or paid above the agreed rate, cannot be taken back. This part shows you the world you will work in,
-an employee that trusts its own reply, and the reference employee that trusts only the ledger.
+When an agent says "done", it makes a claim. At KaaS Freight, a wrong claim costs real money. You cannot take back
+an invoice paid twice, or paid above the agreed rate.
+
+This part shows you three things. First, the world you work in. Second, an employee that believes its own reply.
+Third, the reference employee, which believes only the ledger.
+
+For example, the naive employee says `All 6 invoices paid. Done.` The ledger says something else: `4 paid once, 1
+paid twice, 1 not paid.` Only the ledger tells the truth.
 
 ```mermaid
 flowchart LR
@@ -20,7 +25,7 @@ flowchart LR
 
 ## Walkthrough
 
-Start the world and leave it running in its own terminal.
+Start the world. Leave it running in its own terminal.
 
 ```bash
 bun run world freight-audit
@@ -28,7 +33,7 @@ bun run world freight-audit
 
 Expect: `The freight-audit world is running on http://localhost:7700` and `60 invoices, all open`.
 
-In a second terminal, run the naive employee, then the reference.
+In a second terminal, run the naive employee first. Then run the reference.
 
 ```bash
 bun run reference naive
@@ -42,7 +47,7 @@ bun run reference
 
 Expect: four `Done` lines, one `Needs you`, one `Refused`, and `Cost per invoice settled`. The board is on `localhost:7702/board`.
 
-Fill in `notes.md`, then check it.
+Fill in `notes.md`. Then check it.
 
 ```bash
 bun run verify meet-the-world

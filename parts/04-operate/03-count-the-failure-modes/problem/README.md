@@ -2,8 +2,8 @@
 
 ## The problem
 
-Eight runs failing out of 60 is a number, not a plan. Finance asks "which model should we use", the engineers ask
-"what do we fix first", and both need the same thing: the failures grouped by what went wrong, with a count. The
+Eight runs failing out of 60 is a number, not a plan. Finance asks "which model should we use?" The engineers ask
+"what do we fix first?" Both need the same thing: the failures grouped by what went wrong, with a count. The
 biggest group is often not the model at all.
 
 ```mermaid
@@ -17,8 +17,8 @@ flowchart LR
 
 ## Your challenge
 
-Fill the table in `failure-modes.md` in this folder from the runs you labelled `fail` in `label-the-traces` (the
-check reads `labels.csv` from that step's folder).
+Fill the table in `failure-modes.md` in this folder. Use the runs you labelled `fail` in `label-the-traces`. The
+check reads `labels.csv` from that step's folder.
 
 1. Read each failed run's reason and spans in the trace viewer again
    (`bun parts/04-operate/operate.ts traces`).
@@ -26,8 +26,14 @@ check reads `labels.csv` from that step's folder).
 3. Give each group a verb-thing name that says what to fix, such as `missed-the-duplicate`, never `agent-errors`.
 4. One row per mode: its count, its run ids and one line on what happened. Largest first.
 
-Keep runs that ended differently apart. A job that `failed` on a ledger error and a job the checker `stopped` on a
-wrong draft need different fixes, and in the next step, different evals.
+For example, one row for run `run-c2d6049d` from the last step looks like this:
+
+```text
+| missed-the-duplicate | 1 | run-c2d6049d | The draft said pay on a load already billed. The checker stopped it. |
+```
+
+Keep runs that ended in different ways apart. A job that `failed` on a ledger error needs a different fix from a
+job the checker `stopped` on a wrong draft. In the next step they also need different evals.
 
 ## Done when
 
@@ -43,12 +49,12 @@ Expect: `Done. All 5 rules pass.`
 
 ## If you get stuck
 
-| What you see | Fix |
-|---|---|
-| `The counts add up to 7; you labelled 8 runs fail` | A failed run is missing from the table, or a count is off by one. |
-| `mixes runs that ended stopped and failed` | Split the mode. Look at the end status in the viewer. |
-| `is in two modes` | Pick the first thing that went wrong for that run. |
-| `is not verb-thing` | Name it for the fix, in lower case with dashes: `wrong-reason-code`. |
+| What you see                                       | Fix                                                                  |
+| -------------------------------------------------- | -------------------------------------------------------------------- |
+| `The counts add up to 7; you labelled 8 runs fail` | A failed run is missing from the table, or a count is off by one.    |
+| `mixes runs that ended stopped and failed`         | Split the mode. Look at the end status in the viewer.                |
+| `is in two modes`                                  | Pick the first thing that went wrong for that run.                   |
+| `is not verb-thing`                                | Name it for the fix, in lower case with dashes: `wrong-reason-code`. |
 
 ## Words you will use
 

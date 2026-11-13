@@ -3,9 +3,19 @@
 ## The problem
 
 A hiring manager, a finance lead or your own team gives your work five minutes. In that time they must see that
-something other than the agent checked the work: a ledger row that matches a job, a must-never refused with its
-rule, a payment that waited for the right person, a cost per outcome before and after a swap, and one failure you
-found, caught with an eval and fixed. If the demo is the agent saying "done", it proves nothing.
+something other than the agent checked the work. They must see five things:
+
+1. a ledger row that matches a job;
+2. a must-never refused, with its rule;
+3. a payment that waited for the right person;
+4. a cost per outcome before and after a swap;
+5. one failure you found, caught with an eval, and fixed.
+
+If the demo is only the agent saying "done", it proves nothing.
+
+For example, the sample demo shows the naive agent first. It said "All 6 invoices paid. Done." But the ledger
+showed one invoice paid twice and one not paid at all. Then it shows the employee on the same six invoices: four
+settled, one waiting for Lena at USD 6,200, and the white-text invoice refused.
 
 ```mermaid
 flowchart LR
@@ -36,7 +46,8 @@ Expect: the table below, ending `Part operate is done: 9/9 steps pass.`, once ev
 
 - `demo.md` has all seven sections, with an https link under Recording.
 - Scorecard holds `Part operate is done: 9/9 steps pass.`
-- Cost per outcome matches your swap gate within 2%; One failure fixed names a mode and its eval.
+- Cost per outcome matches your swap gate within 2%.
+- One failure fixed names a mode and its eval.
 - Two peers answer the five rubric questions with yes or no.
 
 ```bash
@@ -47,11 +58,11 @@ Expect: `Done. All 6 rules pass.`
 
 ## If you get stuck
 
-| What you see | Fix |
-|---|---|
+| What you see                                         | Fix                                                        |
+| ---------------------------------------------------- | ---------------------------------------------------------- |
 | `demo.md says before USD 0.0036; your gate measured` | Copy the numbers from `gate.md`, not a price you remember. |
-| `Recording has no https link` | Upload it first; a link a peer cannot open does not count. |
-| `names none of your failure modes` | Use the mode name exactly as in `failure-modes.md`. |
+| `Recording has no https link`                        | Upload it first. A link a peer cannot open does not count. |
+| `names none of your failure modes`                   | Use the mode name exactly as in `failure-modes.md`.        |
 
 ## Words you will use
 

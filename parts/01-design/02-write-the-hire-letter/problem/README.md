@@ -2,13 +2,16 @@
 
 ## The problem
 
-"Help the clerks with invoices" cannot be checked. Nobody can tell whether the clerk did its job, or whether it paid
-a load twice. A hire letter names one outcome, one number you can query, and one thing it must never do, with a
-query that would catch it.
+Nobody can check "Help the clerks with invoices". You cannot tell if the clerk did its job, or if it paid a load
+twice. A hire letter names three things: one outcome, one number you can query, and one thing it must never do.
+The must-never comes with a query that would catch it.
 
-Chipotle's hiring assistant, Ava Cado, chats with candidates and books interviews, but offers go only to candidates
+For example, the freight clerk's must-never is "Pay the same load twice". Its `check` query lists every load with
+more than one payment. If both `INV-2012` and `INV-2017` get paid, the query returns load `L-1012`.
+
+Chipotle's hiring assistant, Ava Cado, chats with candidates and books interviews. But offers go only to candidates
 a manager picks. Chipotle says the time from application to start fell by about two thirds. The outcome is a
-person starting; the must-never is an offer with no manager.
+person starting. The must-never is an offer with no manager.
 
 ```mermaid
 flowchart LR
@@ -20,26 +23,29 @@ flowchart LR
 
 ## Your challenge
 
-Fill in `employee.toml` in this folder. Later steps read it, so keep it here.
+Fill in `employee.toml` in this folder. Later steps read it, so keep it here. The `[hire]` block is the same as in
+`reference/CONTRACT.md`:
 
-Shape of `[hire]`, the same block as in `reference/CONTRACT.md`: `name`, `outcome`, `starts_by` (a list of person,
-event, schedule or agent), `lives` (one job, one case or always on), `[hire.metric]` with `name` and `query`,
-`[hire.must_never]` with `rule`, `write` (a tool name like `pay_invoice`) and `check` (a SELECT that returns the
-bad rows).
+- `name` and `outcome`.
+- `starts_by`: a list of person, event, schedule or agent.
+- `lives`: one job, one case or always on.
+- `[hire.metric]` with `name` and `query`.
+- `[hire.must_never]` with `rule`, `write` (a tool name like `pay_invoice`) and `check` (a SELECT that returns the
+  bad rows).
 
-| Employee | Must never |
-|---|---|
-| Freight clerk | Pay the same load twice |
-| Spoiled food claims handler | Decline a claim without a claims officer |
-| Work order writer | Send a crew to a line not marked de-energised |
-| Referral coordinator | Book without the doctor's order |
-| Grant screener | Award above the board's limit |
-| Cover lesson planner | Use material not on the approved list |
-| Supplier terms negotiator | Agree terms outside the buyer's limits |
-| Shift hiring coordinator | Make an offer without the manager's sign-off |
-| Damage assessor | Charge a deposit without photo evidence |
-| Milk pickup planner | Send a driver over their legal driving limit |
-| Your own job | The one mistake that costs real money or trust |
+| Employee                    | Must never                                     |
+| --------------------------- | ---------------------------------------------- |
+| Freight clerk               | Pay the same load twice                        |
+| Spoiled food claims handler | Decline a claim without a claims officer       |
+| Work order writer           | Send a crew to a line not marked de-energised  |
+| Referral coordinator        | Book without the doctor's order                |
+| Grant screener              | Award above the board's limit                  |
+| Cover lesson planner        | Use material not on the approved list          |
+| Supplier terms negotiator   | Agree terms outside the buyer's limits         |
+| Shift hiring coordinator    | Make an offer without the manager's sign-off   |
+| Damage assessor             | Charge a deposit without photo evidence        |
+| Milk pickup planner         | Send a driver over their legal driving limit   |
+| Your own job                | The one mistake that costs real money or trust |
 
 ## Done when
 
@@ -56,10 +62,10 @@ The freight sample is in [solution/employee.toml](../solution/employee.toml).
 
 ## If you get stuck
 
-| What you see | Fix |
-|---|---|
-| `FAIL the metric has a name and a query on the system of record` | A feeling like "clerks are happier" is not a metric. Count rows. |
-| `FAIL must_never names a write tool and a query that finds it` | Name the tool in snake_case and write the SELECT that would list a breach. |
+| What you see                                                     | Fix                                                                        |
+| ---------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `FAIL the metric has a name and a query on the system of record` | A feeling like "clerks are happier" is not a metric. Count rows.           |
+| `FAIL must_never names a write tool and a query that finds it`   | Name the tool in snake_case and write the SELECT that would list a breach. |
 
 ## Words you will use
 

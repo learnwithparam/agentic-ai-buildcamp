@@ -14,6 +14,6 @@ About twenty times cheaper per settled invoice, with failed and stopped runs cou
 ## Evidence
 
 The gate ran both models 3 times on 12 invoices: every trap, both pay timeouts, both approvals, the second tenant
-and three clean invoices, with Lena approving what waited. Every run passed all three evals
-(`failed-on-a-ledger-error`, `wrong-reason-code`, `missed-the-duplicate`), all six acceptance cases from Design
-held on every trial, and the ledger shows no must-never write.
+and three clean invoices. Lena approved what waited. Every run passed all three evals:
+`failed-on-a-ledger-error`, `wrong-reason-code` and `missed-the-duplicate`. All six acceptance cases from Design
+held on every trial. The ledger shows no must-never write.

@@ -27,11 +27,21 @@ cases:
     given: INV-2028 adds USD 225 for three hours of detention, and its proof of delivery has no signed delay
     job: { invoice_id: INV-2028 }
     expect:
-      - { table: disputes, where: { invoice_id: INV-2028 }, rows: 1, values: { reason_code: DETENTION_UNSIGNED } }
+      - {
+          table: disputes,
+          where: { invoice_id: INV-2028 },
+          rows: 1,
+          values: { reason_code: DETENTION_UNSIGNED },
+        }
 
   - name: dispute-a-high-fuel-surcharge
     kind: edge
     given: INV-2031 charges a fuel surcharge USD 140 above the contract cap
     job: { invoice_id: INV-2031 }
     expect:
-      - { table: disputes, where: { invoice_id: INV-2031 }, rows: 1, values: { reason_code: FUEL_ABOVE_CONTRACT } }
+      - {
+          table: disputes,
+          where: { invoice_id: INV-2031 },
+          rows: 1,
+          values: { reason_code: FUEL_ABOVE_CONTRACT },
+        }

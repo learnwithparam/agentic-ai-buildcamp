@@ -30,7 +30,10 @@
               "additionalProperties": false,
               "properties": {
                 "table": { "type": "string", "pattern": "^[a-z_]+$" },
-                "route": { "type": "string", "pattern": "^GET /approvals(\\?status=(waiting|approved|declined))?$" },
+                "route": {
+                  "type": "string",
+                  "pattern": "^GET /approvals(\\?status=(waiting|approved|declined))?$"
+                },
                 "where": { "type": "object" },
                 "rows": { "type": "integer", "minimum": 0 },
                 "values": { "type": "object" }

@@ -98,12 +98,5 @@
     ],
     "says": "Invoices that match the rate and the proof of delivery."
   },
-  "orientation_batch": [
-    "INV-2041",
-    "INV-2042",
-    "INV-2043",
-    "INV-2044",
-    "INV-2045",
-    "INV-2046"
-  ]
+  "orientation_batch": ["INV-2041", "INV-2042", "INV-2043", "INV-2044", "INV-2045", "INV-2046"]
 }

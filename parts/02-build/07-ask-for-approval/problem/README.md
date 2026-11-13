@@ -2,18 +2,23 @@
 
 ## The problem
 
-INV-2045 is clean, but it is for USD 6,200. Ravi may approve up to USD 5,000; anything over goes to Lena, the
-finance lead. An agent that pays because the numbers match has done the arithmetic and skipped the company's
-rule. Asking a person is part of the job, and it must be visible where a person can find it.
+Some payments need a person to say yes first. An agent that pays because the numbers match has done the sums. But
+it has skipped the company's rule. Asking a person is part of the job. The question must also sit where that
+person can find it.
+
+For example, INV-2045 is clean, but it is for USD 6,200. Ravi Shah, the AP clerk, may approve up to USD 5,000.
+Anything over that goes to Lena Ortiz, the finance lead. So your employee must not pay INV-2045. It must ask Lena
+and wait.
 
 ## Your challenge
 
 Pause before a write that is over the limit.
 
 1. Before `pay_invoice`, compare the amount with the limit for paying without approval: USD 5,000.
-2. Over it: save an approval `{"approval_id", "job_id", "action", "amount", "summary", "approver_role"}` in your
-   state, end the run with status `waiting_for_human`, and write nothing.
-3. Answer `GET /approvals?status=waiting` with the list.
+2. If it is over, save an approval in your state:
+   `{"approval_id", "job_id", "action", "amount", "summary", "approver_role"}`. End the run with status
+   `waiting_for_human`, and write nothing.
+3. Answer `GET /approvals?status=waiting` with the list of waiting approvals.
 
 ```mermaid
 sequenceDiagram
@@ -30,7 +35,7 @@ sequenceDiagram
 ## Done when
 
 - `GET /approvals?status=waiting` lists the job for INV-2045 with amount 6200.
-- The job is `waiting_for_human` and the ledger shows no payment for INV-2045.
+- The job is `waiting_for_human`, and the ledger shows no payment for INV-2045.
 
 ```bash
 bun run verify ask-for-approval
@@ -41,11 +46,11 @@ Expect: `Done. All 1 rules pass.`
 ## If you get stuck
 
 - `was paid with no approval`: the limit check must run before the write, in code.
-- `does not list job`: the list must survive between requests; keep it in `STATE_DIR`, not in a local variable.
+- `does not list job`: the list must last between requests. Keep it in `STATE_DIR`, not in a local variable.
 - `amount` is a number in US dollars, the same as the payment would be.
 
 ## Words you will use
 
 - **Approval**: a saved request for a person's decision, with the action and the amount.
 - **Human in the loop**: a person decides before the final write.
-- **Approver role**: who may decide, here `finance_lead`.
+- **Approver role**: who may decide. Here it is `finance_lead`.

@@ -1,27 +1,53 @@
 // Shared by run-the-swap-gate and refuse-a-bad-model: read gate.md and run the learner's gate.toml.
 import { existsSync, readFileSync } from "node:fs";
-import { find, readGate, runGate, type GateReport } from "./operate-lib";
 import { sections } from "../../checks/design-lib";
+import { find, type GateReport, readGate, runGate } from "./operate-lib";
 
-export const say = (m: string) => { console.log(`        ${m}`); return false; };
-export const gate = (d: string) => readGate(d);
+// Print a note under the rule, then fail it.
+export const say = (message: string) => {
+  console.log(`        ${message}`);
+  return false;
+};
+export const gate = (folder: string) => readGate(folder);
 
-export function gateMd(d: string): { decision: string | null; before: number | null; after: number | null } {
-  const f = find(d, "gate.md", "run-the-swap-gate");
-  if (!f || !existsSync(f)) return { decision: null, before: null, after: null };
-  const s = sections(readFileSync(f, "utf8"));
-  const decision = (s["decision"] ?? "").match(/\b(allow|refuse)\b/i)?.[1]?.toLowerCase() ?? null;
-  const cost = s["cost per outcome"] ?? "";
-  const num = (w: string) => { const m = cost.match(new RegExp(`${w}[^\\n]*?USD\\s*([0-9]*\\.?[0-9]+)`, "i")); return m ? Number(m[1]) : null; };
-  return { decision, before: num("before"), after: num("after") };
+type GateNotes = { decision: string | null; before: number | null; after: number | null };
+
+// The USD amount on the first line of the cost section that starts with this word, like
+// "Before: USD 0.004120".
+function amountAfter(word: string, costSection: string): number | null {
+  const pattern = new RegExp(`${word}[^\\n]*?USD\\s*([0-9]*\\.?[0-9]+)`, "i");
+  const match = costSection.match(pattern);
+  return match ? Number(match[1]) : null;
 }
 
-const runs = new Map<string, Promise<GateReport>>();
-export function gateRun(d: string, candidate?: string): Promise<GateReport> | null {
-  const { config, problems } = readGate(d);
+export function gateMd(folder: string): GateNotes {
+  const file = find(folder, "gate.md", "run-the-swap-gate");
+  if (!file || !existsSync(file)) return { decision: null, before: null, after: null };
+  const sectionText = sections(readFileSync(file, "utf8"));
+  const decisionText = sectionText.decision ?? "";
+  const decisionWord = decisionText.match(/\b(allow|refuse)\b/i)?.[1];
+  const costSection = sectionText["cost per outcome"] ?? "";
+  return {
+    decision: decisionWord?.toLowerCase() ?? null,
+    before: amountAfter("before", costSection),
+    after: amountAfter("after", costSection),
+  };
+}
+
+// Each gate runs once per candidate, however many rules ask for its report.
+const gateRuns = new Map<string, Promise<GateReport>>();
+export function gateRun(folder: string, candidate?: string): Promise<GateReport> | null {
+  const { config, problems } = readGate(folder);
   if (!config || problems.length) return null;
   const key = `${config.dir}:${candidate ?? config.candidate}`;
-  if (!runs.has(key)) runs.set(key, runGate(config, candidate));
-  return runs.get(key)!;
+  let report = gateRuns.get(key);
+  if (!report) {
+    report = runGate(config, candidate);
+    gateRuns.set(key, report);
+  }
+  return report;
 }
-export const near = (a: number | null, b: number | null) => a !== null && b !== null && Math.abs(a - b) <= 0.02 * Math.abs(b) + 1e-9;
+
+// Two amounts agree when they are within 2% of each other.
+export const near = (first: number | null, second: number | null) =>
+  first !== null && second !== null && Math.abs(first - second) <= 0.02 * Math.abs(second) + 1e-9;
