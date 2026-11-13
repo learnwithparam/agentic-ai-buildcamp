@@ -132,7 +132,8 @@ async function checkProblems(step: Step): Promise<string[]> {
 
 async function checkEveryCheck(): Promise<never> {
   const problems: string[] = [];
-  for (const step of allSteps()) problems.push(...(await checkProblems(step)));
+  // The starters and wrong answers fail on purpose, so their fail messages stay quiet.
+  for (const step of allSteps()) problems.push(...(await quietly(() => checkProblems(step))));
   for (const problem of problems) console.log(`  ${problem}`);
   if (problems.length) console.log(`${problems.length} check problem(s).`);
   else console.log("Every check rejects its starter and wrong answers, and passes its solution.");
@@ -140,8 +141,7 @@ async function checkEveryCheck(): Promise<never> {
 }
 
 async function writeReport(): Promise<never> {
-  const results: Result[] = [];
-  for (const step of allSteps()) results.push(await runStep(step, learnerWork(step)));
+  const results = await quietly(resultsOnEveryStep);
   const report = { version: 1, at: new Date().toISOString(), results };
   writeFileSync(join(ROOT, "verify-report.json"), `${JSON.stringify(report, null, 2)}\n`);
   const passing = results.filter((result) => result.status === "pass").length;
@@ -173,19 +173,28 @@ async function verifyPart(partName: string | undefined): Promise<never> {
   process.exit(done === results.length ? 0 : 1);
 }
 
-// Done is recomputed from the checks every time, never read from a saved flag.
-// The other steps' checks explain their own fails as they run. Those lines belong to
-// other steps, so they are kept quiet here: you only see the step you asked for.
-async function printProgress() {
-  console.log("Counting your progress on every step. This can take up to a minute.");
-  const results: Result[] = [];
+// Checks explain their own fails as they run. When a run is not the one you asked about,
+// those lines would only confuse, so this keeps them quiet while the work runs.
+async function quietly<Answer>(work: () => Promise<Answer>): Promise<Answer> {
   const printLine = console.log;
   console.log = () => {};
   try {
-    for (const step of allSteps()) results.push(await runStep(step, learnerWork(step)));
+    return await work();
   } finally {
     console.log = printLine;
   }
+}
+
+async function resultsOnEveryStep(): Promise<Result[]> {
+  const results: Result[] = [];
+  for (const step of allSteps()) results.push(await runStep(step, learnerWork(step)));
+  return results;
+}
+
+// Done is recomputed from the checks every time, never read from a saved flag.
+async function printProgress() {
+  console.log("Counting your progress on every step. This can take up to a minute.");
+  const results = await quietly(resultsOnEveryStep);
   const passing = results.filter((result) => result.status === "pass").length;
   console.log(`Progress: ${passing}/${results.length} steps pass.`);
 }
