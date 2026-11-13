@@ -125,8 +125,8 @@ Run the whole part's checks against the finished sample. The deliverable runs th
 EMPLOYEE_DIR=parts/03-deploy/09-split-the-board-by-tenant/solution bun run verify part deploy
 ```
 
-Expect: the table below and `Part deploy is done: 9/9 steps pass.` With no Docker running, the container rule
-prints `SKIPPED: Docker is not running here` and the file rules still decide.
+Expect: the table below and `Part deploy is done: 9/9 steps pass.` With no Docker running, the first line says
+`SKIPPED  ship-it-as-a-service  (3/4 rules)`. A skipped rule is not a pass, so start Docker before you hand in.
 
 Now build each step in your own `employee/` folder, one at a time. Check each one by name:
 

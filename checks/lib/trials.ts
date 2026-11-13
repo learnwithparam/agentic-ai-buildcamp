@@ -12,7 +12,8 @@ export type TrialContext = {
   trial: number;
   jobId: (invoiceId: string) => string;
 };
-export type Outcome = { ok: boolean; message: string };
+// skipped: the check could not run here (for example, no Docker). It never counts as ok.
+export type Outcome = { ok: boolean; message: string; skipped?: boolean };
 export const TRIALS_PER_CHECK = Number(process.env.CHECK_TRIALS ?? 3);
 // The k in pass^k, under the short name the deploy checks import.
 export { TRIALS_PER_CHECK as K };

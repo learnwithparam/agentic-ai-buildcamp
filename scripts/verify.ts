@@ -1,5 +1,4 @@
-// bun run verify <step-name>            check your work on one step, then show progress on every
-//                                       step
+// bun run verify <step-name>            check your work on one step, then print one progress line
 // bun run verify <step-name> solution   check the sample solution instead
 // bun run verify part <part-name>      check every step in one part (a deliverable)
 // bun run verify --report               write verify-report.json for cohort grading
@@ -11,17 +10,21 @@ import { existsSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { allSteps, findStep, parts, ROOT, type Step } from "./structure";
 
+// A rule answers "skipped" when it could not run here, for example with no Docker.
+// A skipped rule is never a pass: the step is not done until the rule has run and passed.
+export type RuleAnswer = boolean | "skipped";
 export type Rule = {
   says: string;
-  test: (dir: string) => boolean | Promise<boolean>;
+  test: (dir: string) => RuleAnswer | Promise<RuleAnswer>;
   tryNext: string;
 };
 type Result = {
   step: string;
-  status: "pass" | "fail" | "error";
+  status: "pass" | "fail" | "skipped" | "error";
   passed: number;
   total: number;
   failed: string[];
+  skipped: string[];
 };
 
 async function rulesFor(step: Step): Promise<Rule[]> {
@@ -29,7 +32,7 @@ async function rulesFor(step: Step): Promise<Rule[]> {
 }
 
 // A rule that throws counts as a fail, so a half-written file never crashes the check.
-async function passes(rule: Rule, folder: string): Promise<boolean> {
+async function passes(rule: Rule, folder: string): Promise<RuleAnswer> {
   try {
     return await rule.test(folder);
   } catch {
@@ -50,26 +53,38 @@ async function loadRules(step: Step, print: boolean): Promise<Rule[] | null> {
   }
 }
 
-function printRule(rule: Rule, ok: boolean) {
-  if (ok) console.log(`  PASS  ${rule.says}`);
+function printRule(rule: Rule, answer: RuleAnswer) {
+  if (answer === true) console.log(`  PASS  ${rule.says}`);
+  else if (answer === "skipped") console.log(`  SKIP  ${rule.says}`);
   else console.log(`  FAIL  ${rule.says}\n        Try next: ${rule.tryNext}`);
+}
+
+function stepStatus(failed: string[], skipped: string[]): Result["status"] {
+  if (failed.length > 0) return "fail";
+  if (skipped.length > 0) return "skipped";
+  return "pass";
 }
 
 async function runStep(step: Step, folder: string, print = false): Promise<Result> {
   const rules = await loadRules(step, print);
-  if (rules === null) return { step: step.name, status: "error", passed: 0, total: 0, failed: [] };
+  if (rules === null) {
+    return { step: step.name, status: "error", passed: 0, total: 0, failed: [], skipped: [] };
+  }
   const failed: string[] = [];
+  const skipped: string[] = [];
   for (const rule of rules) {
-    const ok = await passes(rule, folder);
-    if (!ok) failed.push(rule.says);
-    if (print) printRule(rule, ok);
+    const answer = await passes(rule, folder);
+    if (answer === "skipped") skipped.push(rule.says);
+    else if (answer !== true) failed.push(rule.says);
+    if (print) printRule(rule, answer);
   }
   return {
     step: step.name,
-    status: failed.length ? "fail" : "pass",
-    passed: rules.length - failed.length,
+    status: stepStatus(failed, skipped),
+    passed: rules.length - failed.length - skipped.length,
     total: rules.length,
     failed,
+    skipped,
   };
 }
 
@@ -89,6 +104,12 @@ async function solutionProblems(step: Step): Promise<string[]> {
   }
   const solution = await runStep(step, join(step.dir, "solution"));
   if (solution.status === "pass") return [];
+  if (solution.status === "skipped") {
+    const rules = solution.skipped.join("; ");
+    return [
+      `${step.name}: the sample solution was not fully checked, a rule was skipped: ${rules}`,
+    ];
+  }
   return [`${step.name}: the sample solution fails: ${solution.failed.join("; ")}`];
 }
 
@@ -160,7 +181,8 @@ async function verifyPart(partName: string | undefined): Promise<never> {
   console.log(`Part ${part.name}:`);
   const results: Result[] = [];
   for (const step of part.steps) {
-    const result = await runStep(step, learnerWork(step));
+    // One line per step: the checks' own fail messages stay quiet here.
+    const result = await quietly(() => runStep(step, learnerWork(step)));
     results.push(result);
     const status = result.status.toUpperCase().padEnd(5);
     console.log(`  ${status}  ${step.name}  (${result.passed}/${result.total} rules)`);
@@ -191,12 +213,20 @@ async function resultsOnEveryStep(): Promise<Result[]> {
   return results;
 }
 
-// Done is recomputed from the checks every time, never read from a saved flag.
-async function printProgress() {
-  console.log("Counting your progress on every step. This can take up to a minute.");
-  const results = await quietly(resultsOnEveryStep);
-  const passing = results.filter((result) => result.status === "pass").length;
-  console.log(`Progress: ${passing}/${results.length} steps pass.`);
+// One line that says where this step sits and what comes next. It runs no other check: with an
+// employee/ folder, checking every step again takes minutes and prints their fails.
+function printProgress(step: Step, passed: boolean) {
+  const steps = allSteps();
+  const position = steps.findIndex((known) => known.name === step.name);
+  const where = `Progress: step ${position + 1} of ${steps.length}, in part ${step.part}.`;
+  const nextStep = steps[position + 1];
+  if (!passed) {
+    console.log(`${where} See every step in the part: bun run verify part ${step.part}`);
+  } else if (nextStep) {
+    console.log(`${where} Next: bun run verify ${nextStep.name}`);
+  } else {
+    console.log(`${where} That was the last step.`);
+  }
 }
 
 // The step with this name, or the list of steps and exit when there is none.
@@ -218,12 +248,18 @@ async function verifyStep(stepName: string | undefined, which: string | undefine
   const result = await runStep(step, folder, true);
   if (result.status === "error") process.exit(2);
   if (result.status === "pass") console.log(`Done. All ${result.total} rules pass.`);
-  else {
+  else if (result.status === "skipped") {
+    const skippedCount = result.skipped.length;
+    console.log(
+      `${result.passed} of ${result.total} rules pass, and ${skippedCount} could not run here. ` +
+        "The step is not done until every rule runs and passes.",
+    );
+  } else {
     console.log(
       `${result.passed} of ${result.total} rules pass. Fix the FAIL lines and run it again.`,
     );
   }
-  if (!asSolution) await printProgress();
+  if (!asSolution) printProgress(step, result.status === "pass");
   process.exit(result.status === "pass" ? 0 : 1);
 }
 

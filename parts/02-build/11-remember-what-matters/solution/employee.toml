@@ -1,4 +1,5 @@
 # The sample solution: the reference employee inside a memory layer (start.ts in this folder).
+# start.ts finds reference/ by itself, so this folder also works when you copy it into employee/.
 [hire]
 name = "freight-audit-clerk"
 

@@ -58,8 +58,7 @@ Expect: `Done. All 4 rules pass.`
 
 ![The container step passing](../images/expected.png)
 
-When Docker is not running, the last rule prints `SKIPPED: Docker is not running here`. The three file rules still
-decide. Start Docker to check the container.
+When Docker is not running, the last rule says `SKIP`. That is not a pass. Start Docker and check again.
 
 ## If you get stuck
 

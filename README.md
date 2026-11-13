@@ -108,13 +108,18 @@ too. It bills the same load as `INV-2012`, USD 2,675, under a new invoice number
 | Operate                                 | 225     | Cost per outcome on the board, labelled traces, evals from failures, a gate that refuses a bad model swap            | `bun run verify part operate`   |
 
 Each step starts with a problem in the world. Then it gives you the challenge. Then you run one command:
-`bun run verify <step-name>`. When a rule fails, it tells you what to try next.
+`bun run verify <step-name>`. When a rule fails, it tells you what to try next. [SUBMIT.md](SUBMIT.md) says what you
+hand in for each part and how it is graded.
 
 ## The employee menu
 
-The default employee is the freight audit clerk. You may bring your own employee, or pick one from this table.
-Each one comes as a world pack with the same shape. It has seed data, a SQLite ledger behind tools, people with
-roles, and planted traps. The same checks grade every world pack.
+The default employee is the freight audit clerk. It is the only one that comes with a world pack today:
+`worlds/freight-audit`. A world pack is the seed data, a SQLite ledger behind tools, people with roles, and planted
+traps. The Build, Deploy and Operate checks run only against that world, so in those parts you build the freight
+audit clerk.
+
+In Design you may pick any employee from this table, or bring your own. For example, you can write the hire letter
+for the grant screener. The Design checks read your files, not a world. The other nine have no world pack yet.
 
 | Employee                      | Business                           | Hired for                                                                    | Must never                                            | Planted trap                                           |
 | ----------------------------- | ---------------------------------- | ---------------------------------------------------------------------------- | ----------------------------------------------------- | ------------------------------------------------------ |

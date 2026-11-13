@@ -14,10 +14,7 @@ if (isThisStep && commandArguments.includes("--setup")) process.exit(await setup
 if (isThisStep && commandArguments.length === 1) {
   process.on("exit", (exitCode) => {
     if (exitCode !== 0) return;
-    console.log(
-      "You ran the reference. Your goal: your own employee passes the same checks. " +
-        "Next: bun run verify place-it-on-the-map.",
-    );
+    console.log("You ran the reference. Your goal: your own employee passes the same checks.");
   });
 }
 

@@ -1,11 +1,13 @@
 # The sample solution: the reference employee. See reference/ for its code.
+# bun run finds the repo's package.json from any folder inside the repo, so this file also works
+# when you copy it into employee/.
 [hire]
 name = "freight-audit-clerk"
 
 [contract]
 version = "1"
 mode = "http"
-start = "bun ../../../../reference/start.ts"
+start = "bun run reference-employee"
 url = "http://localhost:7701"
 traces = "traces"
 
