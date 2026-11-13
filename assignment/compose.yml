@@ -1,0 +1,17 @@
+# One Postgres for the closing part. The ledger table is created on first start from ledger.sql.
+# "trust" is fine here: the port is on your own machine and the data is thrown away by `down -v`.
+services:
+  db:
+    image: pgvector/pgvector:0.8.7-pg18-trixie
+    environment:
+      POSTGRES_DB: assignment
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "127.0.0.1:54329:5432"
+    volumes:
+      - ./ledger.sql:/docker-entrypoint-initdb.d/ledger.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d assignment"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
