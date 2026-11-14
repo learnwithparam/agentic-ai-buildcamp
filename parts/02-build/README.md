@@ -124,6 +124,17 @@ bun run verify part build
 
 Expect: with the untouched starter, `2/13 steps pass.`; when you finish, thirteen `PASS` lines and `Part build is done: 13/13 steps pass.`
 
+## Watch and read
+
+| Kind  | Title                                                  | Who made it                               | Why                                                                             | Link                                                                   |
+| ----- | ------------------------------------------------------ | ----------------------------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| video | Build Agents That Run for Hours                        | Ash Prabaker and Andrew Wilson, Anthropic | A hands-on workshop on handoffs and checking the work of an agent.              | https://www.youtube.com/watch?v=mR-WAvEPRwE                            |
+| video | How We Build Effective Agents                          | Barry Zhang, Anthropic                    | The maker of the method says when an agent is worth its cost.                   | https://www.youtube.com/watch?v=D7_ipDqhtwk                            |
+| read  | Demystifying evals for AI agents                       | Anthropic engineering                     | Judge an agent by the state it leaves behind, not by what it says.              | https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents |
+| read  | How AI agents shape experts' judgment calls            | Anthropic research                        | Shows why a click on approve is not proof that a person decided.                | https://www.anthropic.com/research/agents-judgment-calls               |
+| read  | Writing effective tools for AI agents                  | Anthropic engineering                     | How to write tools that a model can use without mistakes.                       | https://www.anthropic.com/engineering/writing-tools-for-agents         |
+| read  | Designing robust and predictable APIs with idempotency | Stripe engineering                        | The team that runs payments explains how to retry a write without paying twice. | https://stripe.com/blog/idempotency                                    |
+
 ## Assignment
 
 **The problem.** The naive agent reports "All 6 invoices paid. Done." The ledger does not agree.

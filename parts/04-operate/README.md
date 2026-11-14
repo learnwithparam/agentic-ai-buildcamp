@@ -178,6 +178,16 @@ Part operate:
 Part operate is done: 12/12 steps pass.
 ```
 
+## Watch and read
+
+| Kind  | Title                                                       | Who made it                               | Why                                                                         | Link                                                                   |
+| ----- | ----------------------------------------------------------- | ----------------------------------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| video | Why AI evals are the hottest new skill for product builders | Hamel Husain and Shreya Shankar           | Two people who teach the method explain how to read traces and write evals. | https://www.youtube.com/watch?v=BsWxPI9UM4c                            |
+| video | Build Agents That Run for Hours                             | Ash Prabaker and Andrew Wilson, Anthropic | A hands-on workshop on handoffs and checking the work of an agent.          | https://www.youtube.com/watch?v=mR-WAvEPRwE                            |
+| read  | Demystifying evals for AI agents                            | Anthropic engineering                     | Judge an agent by the state it leaves behind, not by what it says.          | https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents |
+| read  | Infrastructure noise in agentic coding evals                | Anthropic engineering                     | Why the same model scores differently on different machines.                | https://www.anthropic.com/engineering/infrastructure-noise             |
+| read  | How we built our multi-agent research system                | Anthropic engineering                     | The team that runs it shares real costs and failures.                       | https://www.anthropic.com/engineering/multi-agent-research-system      |
+
 ## Assignment
 
 **The problem.** Finance asks whether a cheaper model is safe. Nobody has read the traces.

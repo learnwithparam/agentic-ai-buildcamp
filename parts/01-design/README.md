@@ -23,6 +23,15 @@ flowchart LR
 
 The same picture is in `design-map.mmd`.
 
+## Watch and read
+
+| Kind  | Title                                       | Who made it                              | Why                                                                | Link                                                            |
+| ----- | ------------------------------------------- | ---------------------------------------- | ------------------------------------------------------------------ | --------------------------------------------------------------- |
+| video | How We Build Effective Agents               | Barry Zhang, Anthropic                   | The maker of the method says when an agent is worth its cost.      | https://www.youtube.com/watch?v=D7_ipDqhtwk                     |
+| read  | Building effective agents                   | Erik Schluntz and Barry Zhang, Anthropic | Start simple and add parts only when you must.                     | https://www.anthropic.com/engineering/building-effective-agents |
+| video | Building the future of agents with Claude   | Anthropic                                | Anthropic staff show how they think about agents and their limits. | https://www.youtube.com/watch?v=XuvKFsktX0Q                     |
+| read  | How AI agents shape experts' judgment calls | Anthropic research                       | Shows why a click on approve is not proof that a person decided.   | https://www.anthropic.com/research/agents-judgment-calls        |
+
 ## Steps
 
 | Step                                                                          | What you write                                               | Minutes |

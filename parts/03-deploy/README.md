@@ -182,6 +182,16 @@ saved progress, the two new triggers, `policy.yaml`, budgets, and tenants kept a
 durable workflow library saves each step for you and carries on after a crash. Show that `pay-once-after-a-crash`
 still passes.
 
+## Watch and read
+
+| Kind  | Title                                                  | Who made it                               | Why                                                                             | Link                                                                              |
+| ----- | ------------------------------------------------------ | ----------------------------------------- | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| video | Build Agents That Run for Hours                        | Ash Prabaker and Andrew Wilson, Anthropic | A hands-on workshop on handoffs and checking the work of an agent.              | https://www.youtube.com/watch?v=mR-WAvEPRwE                                       |
+| video | Building the future of agents with Claude              | Anthropic                                 | Anthropic staff show how they think about agents and their limits.              | https://www.youtube.com/watch?v=XuvKFsktX0Q                                       |
+| read  | Making Claude Code safer with sandboxing               | Anthropic engineering                     | Limits set outside the model hold even when the model is fooled.                | https://www.anthropic.com/engineering/claude-code-sandboxing                      |
+| read  | Designing robust and predictable APIs with idempotency | Stripe engineering                        | The team that runs payments explains how to retry a write without paying twice. | https://stripe.com/blog/idempotency                                               |
+| read  | Effective harnesses for long-running agents            | Anthropic engineering                     | Save progress after each unit of work so a restart can carry on.                | https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents |
+
 ## Reading
 
 | Read                                                                                                                                           | Why                                                                                          |

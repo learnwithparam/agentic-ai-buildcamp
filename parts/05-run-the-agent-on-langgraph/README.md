@@ -107,6 +107,16 @@ uv run assignment/check.py
 
 Expect: `Every line passes.` once your graph is built, and `assignment/result.json` with one `pass` or `fail` per line.
 
+## Watch and read
+
+| Kind  | Title                                                                   | Who made it    | Why                                                              | Link                                                                                         |
+| ----- | ----------------------------------------------------------------------- | -------------- | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| video | LangGraph interrupt: Making it easier to build human-in-the-loop agents | LangChain      | The team behind the library shows how a pause and a resume work. | https://www.youtube.com/watch?v=6t7YJcEFUIY                                                  |
+| video | LangGraph: Persistence                                                  | LangChain      | The team behind the library shows what a checkpoint saves.       | https://www.youtube.com/watch?v=YE6A5d8kNp4                                                  |
+| read  | Persistence                                                             | LangChain docs | What a checkpoint saves and how a thread resumes.                | https://docs.langchain.com/oss/python/langgraph/persistence                                  |
+| read  | Interrupts                                                              | LangChain docs | How a graph pauses for a person and then resumes.                | https://docs.langchain.com/oss/python/langgraph/interrupts                                   |
+| read  | Making it easier to build human-in-the-loop agents with interrupt       | LangChain blog | The team explains why a paused run is saved and how it resumes.  | https://blog.langchain.com/making-it-easier-to-build-human-in-the-loop-agents-with-interrupt |
+
 ## Assignment
 
 This part is optional in the live session and expected as homework. Work on it beside the class while the
