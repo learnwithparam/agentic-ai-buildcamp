@@ -1,4 +1,4 @@
-# Part 3: Deploy
+# Deploy
 
 ## The problem
 
@@ -206,5 +206,5 @@ You now have an employee that:
 
 Each of these is proved from the ledger, the world's logs, the traces and the container.
 
-Next, Part 4 (Operate) runs your employee many times and reads its traces. It turns each failure into an eval, a
+Next, Operate runs your employee many times and reads its traces. It turns each failure into an eval, a
 test case you can run again. Then it uses those evals to decide if a cheaper model is safe to swap in.
