@@ -12,7 +12,7 @@ lives = "one job"
 [contract]
 version = "1"
 mode = "http"
-start = "bun start.ts"
+start = "bun run deploy-employee"
 url = "http://localhost:7701"
 traces = "traces"
 

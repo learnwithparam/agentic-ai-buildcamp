@@ -1,5 +1,14 @@
 // bun run check: the repo standard. CI runs this; any failure stops the build.
-import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { spawnSync } from "node:child_process";
+import {
+  cpSync,
+  existsSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  statSync,
+} from "node:fs";
 import { dirname, join, relative } from "node:path";
 import { allSteps, type Part, parts, ROOT, type Step } from "./structure";
 
@@ -358,6 +367,32 @@ function checkSchedules(allParts: Part[]) {
   }
 }
 
+// 7. A solution that starts an employee still runs when a learner copies it into employee/.
+// The scratch folder sits directly under the repo root, like employee/, so a path that only works
+// from the solution's own folder fails here.
+function checkSolutionsRunInEmployee(steps: Step[]) {
+  const scratchRoot = mkdtempSync(join(ROOT, ".scratch-employee-"));
+  try {
+    for (const step of steps) {
+      const solution = join(step.dir, "solution");
+      if (!existsSync(join(solution, "employee.toml"))) continue;
+      const copy = join(scratchRoot, step.name);
+      cpSync(solution, copy, { recursive: true });
+      const run = spawnSync("bun", ["scripts/verify.ts", step.name, copy], {
+        cwd: ROOT,
+        encoding: "utf8",
+      });
+      const output = `${run.stdout}${run.stderr}`;
+      // A rule that cannot run here (no Docker) is not a pass, but it is not this rule's failure.
+      if (run.status === 0 || output.includes("could not run here")) continue;
+      const lastLines = output.trim().split("\n").slice(-3).join(" | ");
+      fail(solution, `copied into employee/, verify ${step.name} fails: ${lastLines}`);
+    }
+  } finally {
+    rmSync(scratchRoot, { recursive: true, force: true });
+  }
+}
+
 const files = walk(ROOT);
 const markdownFiles = files.filter((file) => file.endsWith(".md"));
 const allParts = parts();
@@ -378,6 +413,7 @@ checkModelIds(files);
 checkPins();
 checkTroubleshooting();
 checkSchedules(allParts);
+checkSolutionsRunInEmployee(allSteps());
 
 if (errors.length) {
   console.log(`The repo does not meet the standard. ${errors.length} problem(s):`);

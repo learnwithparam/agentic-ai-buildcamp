@@ -10,7 +10,7 @@ lives = "one job"
 [contract]
 version = "1"
 mode = "http"
-start = "bun ../../kit-start.ts"
+start = "bun run operate-employee"
 url = "http://localhost:7701"
 traces = "traces"
 

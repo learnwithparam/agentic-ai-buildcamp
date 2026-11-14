@@ -1,5 +1,6 @@
 // bun run verify <step-name>            check your work on one step, then print one progress line
 // bun run verify <step-name> solution   check the sample solution instead
+// bun run verify <step-name> <folder>   check the work in any folder, for example a scratch employee/
 // bun run verify part <part-name>      check every step in one part (a deliverable)
 // bun run verify --report               write verify-report.json for cohort grading
 // bun run verify --all                  CI: each check fails on its starter and wrong answers,
@@ -7,7 +8,7 @@
 // Exit codes: 0 pass, 1 fail, 2 the check could not run.
 
 import { existsSync, readdirSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { allSteps, findStep, parts, ROOT, type Step } from "./structure";
 
 // A rule answers "skipped" when it could not run here, for example with no Docker.
@@ -242,9 +243,11 @@ function stepOrList(stepName: string | undefined): Step {
 async function verifyStep(stepName: string | undefined, which: string | undefined) {
   const step = stepOrList(stepName);
   const asSolution = which === "solution";
+  const givenFolder = which && !asSolution && existsSync(which) ? resolve(which) : null;
   const whose = asSolution ? "sample solution" : "your work";
   console.log(`Checking ${step.name} (${whose}):`);
-  const folder = asSolution ? join(step.dir, "solution") : learnerWork(step);
+  let folder = asSolution ? join(step.dir, "solution") : learnerWork(step);
+  if (givenFolder) folder = givenFolder;
   const result = await runStep(step, folder, true);
   if (result.status === "error") process.exit(2);
   if (result.status === "pass") console.log(`Done. All ${result.total} rules pass.`);
@@ -259,7 +262,7 @@ async function verifyStep(stepName: string | undefined, which: string | undefine
       `${result.passed} of ${result.total} rules pass. Fix the FAIL lines and run it again.`,
     );
   }
-  if (!asSolution) printProgress(step, result.status === "pass");
+  if (!asSolution && !givenFolder) printProgress(step, result.status === "pass");
   process.exit(result.status === "pass" ? 0 : 1);
 }
 
