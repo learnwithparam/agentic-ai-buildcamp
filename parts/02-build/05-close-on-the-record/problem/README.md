@@ -43,7 +43,7 @@ Expect: `Done. All 1 rules pass.`
 
 ## If you get stuck
 
-- `The ledger shows 2 payments`: your retry used a new key. Build the key from the tenant and the invoice id.
+- "The ledger shows 2 payments": your retry used a new key. Build the key from the tenant and the invoice id.
 - `Your employee said done. The ledger shows nothing`: you returned `done` from the write call. Read the invoice
   first.
 - The timeout takes a moment on purpose. Give each call at least 2 s before you give up on it.

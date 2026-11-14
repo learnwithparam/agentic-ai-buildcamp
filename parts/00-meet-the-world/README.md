@@ -31,7 +31,7 @@ Start the world. Leave it running in its own terminal.
 bun run world freight-audit
 ```
 
-Expect: `The freight-audit world is running on http://localhost:7700` and `60 invoices, all open`.
+Expect: `The freight-audit world is running on http://localhost:7700` and "60 invoices, all open".
 
 In a second terminal, run the naive employee first. Then run the reference.
 
@@ -45,7 +45,7 @@ Expect: `Naive employee says: "All 6 invoices paid. Done."`, then `4 paid once, 
 bun run reference
 ```
 
-Expect: four `Done` lines, one `Needs you`, one `Refused`, and `Cost per invoice settled`. The board is on `localhost:7702/board`.
+Expect: four `Done` lines, one `Needs you`, one `Refused`, and "Cost per invoice settled". The board is on `localhost:7702/board`.
 The reference keeps running so that you can look at the board. Press Ctrl+C when you are done.
 
 Fill in `notes.md`. Then check it.

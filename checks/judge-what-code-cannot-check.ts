@@ -1,15 +1,17 @@
 // judge.yaml: a rubric for what code cannot check, and proof that the judge agrees with a person.
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Rule } from "../scripts/verify";
-import { hasFile, readYaml } from "./design-lib";
+import { hasFile, readText, readYaml } from "./design-lib";
 
 type Draft = { id: string; human: string; critical: boolean };
 type JudgeFile = {
   code_checks_instead?: unknown[];
   criteria?: { question?: unknown; pass_when?: unknown }[];
-  verdicts?: Record<string, unknown>;
 };
+// What judge.ts saves: the judge's yes or no for each question on each draft.
+type JudgeRun = { model?: unknown; rubric?: unknown; answers?: Record<string, unknown> };
 
 const STEP = join(import.meta.dir, "..", "parts", "04-operate", "11-judge-what-code-cannot-check");
 const drafts: Draft[] = JSON.parse(readFileSync(join(STEP, "drafts.json"), "utf8"));
@@ -19,7 +21,42 @@ function judgeIn(folder: string): JudgeFile {
   return readYaml<JudgeFile>(folder, "judge.yaml") ?? {};
 }
 
-const verdictFor = (folder: string, draft: Draft) => judgeIn(folder).verdicts?.[draft.id];
+function runIn(folder: string): JudgeRun {
+  if (!hasFile(folder, "judge-run.json")) return {};
+  try {
+    return JSON.parse(readText(folder, "judge-run.json")) as JudgeRun;
+  } catch {
+    return {};
+  }
+}
+
+const rubricHash = (folder: string) =>
+  createHash("sha256")
+    .update(JSON.stringify(judgeIn(folder).criteria ?? []))
+    .digest("hex");
+
+// A saved run only counts when it was made with this rubric and has a yes or no per question.
+function runMatchesRubric(folder: string): boolean {
+  const run = runIn(folder);
+  const criteria = judgeIn(folder).criteria ?? [];
+  if (criteria.length === 0 || String(run.model ?? "").trim() === "") return false;
+  if (run.rubric !== rubricHash(folder)) return false;
+  return drafts.every((draft) => {
+    const given = run.answers?.[draft.id];
+    return (
+      Array.isArray(given) &&
+      given.length === criteria.length &&
+      given.every((answer) => typeof answer === "boolean")
+    );
+  });
+}
+
+// The verdict is worked out here from the saved answers: pass only when every question is yes.
+function verdictFor(folder: string, draft: Draft): string | undefined {
+  if (!runMatchesRubric(folder)) return undefined;
+  const given = runIn(folder).answers?.[draft.id] as boolean[];
+  return given.every(Boolean) ? "pass" : "fail";
+}
 
 function keepsCodeChecksOut(folder: string): boolean {
   const listed = judgeIn(folder).code_checks_instead ?? [];
@@ -38,7 +75,7 @@ function hasRubric(folder: string): boolean {
 }
 
 function judgedEveryDraft(folder: string): boolean {
-  return drafts.every((draft) => ["pass", "fail"].includes(String(verdictFor(folder, draft))));
+  return runMatchesRubric(folder);
 }
 
 function agreement(folder: string): number {
@@ -66,9 +103,9 @@ export default [
     tryNext: "write each question so it ends with a question mark, and add a pass_when line",
   },
   {
-    says: "the judge gave a verdict on every draft",
+    says: "judge-run.json is a saved judge run for this rubric, with an answer for every draft",
     test: judgedEveryDraft,
-    tryNext: "add pass or fail for each of d1 to d10 under verdicts",
+    tryNext: "run judge.ts on your folder again after you change the rubric",
   },
   {
     says: "the judge agrees with the human label on at least eight of ten drafts",

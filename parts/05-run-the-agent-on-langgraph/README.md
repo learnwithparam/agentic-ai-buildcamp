@@ -57,7 +57,7 @@ Start Postgres. This needs Docker running. The first start pulls an image, so it
 docker compose -f assignment/compose.yml up -d --wait
 ```
 
-Expect: `Container assignment-db-1  Healthy`.
+Expect: "Container assignment-db-1 Healthy".
 
 Run the sample answer's graph above Lena's limit. It pauses and keeps running, like a clerk waiting for her.
 
@@ -65,7 +65,7 @@ Run the sample answer's graph above Lena's limit. It pauses and keeps running, l
 bun parts/05-run-the-agent-on-langgraph/01-resume-with-langgraph/solution/graph.ts start run-1 7850
 ```
 
-Expect: `node decide`, `node pay`, then `PAUSED waiting for Lena`. Press Ctrl+C to kill it. The process is gone. Postgres still has the pause.
+Expect: `node decide`, `node pay`, then "PAUSED waiting for Lena". Press Ctrl+C to kill it. The process is gone. Postgres still has the pause.
 
 Start a new process on the same run. It answers "approved".
 

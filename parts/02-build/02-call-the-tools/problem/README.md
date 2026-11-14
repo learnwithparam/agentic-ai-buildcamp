@@ -14,9 +14,9 @@ with all four papers can your employee say the invoice is clean.
 
 ## Your challenge
 
-When `POST /jobs` arrives with `{"job_id", "tenant", "trigger", "input": {"invoice_id"}}`:
+When `POST /jobs` arrives with {"job_id", "tenant", "trigger", "input": {"invoice_id"}}:
 
-1. Answer `202 {"job_id", "run_id"}` at once. Do the work in the background.
+1. Answer 202 {"job_id", "run_id"} at once. Do the work in the background.
 2. Call `read_invoice`, `find_load`, `read_rate_confirmation` and `read_proof_of_delivery` on `WORLD_URL`. Send
    the job's tenant in the `X-Tenant` header.
 3. Write spans to `TRACE_DIR/<run_id>.jsonl`, in the `employee.trace/v1` format from
@@ -53,7 +53,7 @@ Expect: `Done. All 1 rules pass.`
 
 - `No trace for run ...`: the file name must be the `run_id` you returned from `POST /jobs`. It must sit inside
   `TRACE_DIR`.
-- `The trace has no invoke_agent span`: wrap the whole job in one root span.
+- "The trace has no invoke_agent span": wrap the whole job in one root span.
 - Each line must be one JSON object with `"format": "employee.trace/v1"`. The checker skips other lines.
 
 ## Words you will use

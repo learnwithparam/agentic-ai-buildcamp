@@ -74,8 +74,6 @@ Core steps make the one-day path. Every check starts your employee from `employe
 | [engineer-the-context](12-engineer-the-context/problem/README.md)                     | 20      | no            | `context.yaml`: a budget, what is in, what is left out                               |
 | [design-the-tool-and-its-output](13-design-the-tool-and-its-output/problem/README.md) | 20      | no            | `tool.yaml`: a named tool, fixed output fields and an error with a fix               |
 
-Total: 325 minutes.
-
 ## Walkthrough
 
 Start the world and leave it running in its own terminal.

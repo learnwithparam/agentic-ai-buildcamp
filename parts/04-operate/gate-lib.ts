@@ -15,7 +15,7 @@ type GateNotes = { decision: string | null; before: number | null; after: number
 // The USD amount on the first line of the cost section that starts with this word, like
 // "Before: USD 0.004120".
 function amountAfter(word: string, costSection: string): number | null {
-  const pattern = new RegExp(`${word}[^\\n]*?USD\\s*([0-9]*\\.?[0-9]+)`, "i");
+  const pattern = new RegExp(`${word}[^\\n]*?(?:USD|\\$)\\s*([0-9]*\\.?[0-9]+)`, "i");
   const match = costSection.match(pattern);
   return match ? Number(match[1]) : null;
 }

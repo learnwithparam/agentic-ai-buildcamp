@@ -19,7 +19,7 @@ Keep a small memory for each tenant that lasts through a restart. A tenant is on
 Freight.
 
 1. When a person declines, save a fact in `STATE_DIR`:
-   `{"tenant", "invoice_id", "fact": "declined", "by", "job_id"}`.
+   {"tenant", "invoice_id", "fact": "declined", "by", "job_id"}.
 2. At the start of every job, read memory for the job's tenant only. Log a span named `x.memory` with
    `"x.memory.op": "read"`, and with `"x.tenant"` set to the job's tenant. Log writes with `"x.memory.op": "write"`.
 3. If the invoice was declined, end the job `declined`. Say who declined it, and do not ask again.
@@ -53,9 +53,9 @@ Expect: `Done. All 1 rules pass.`
 
 ## If you get stuck
 
-- `asked her again`: memory in a variable is lost when the process ends. Write it to a file or table in
+- "asked her again": memory in a variable is lost when the process ends. Write it to a file or table in
   `STATE_DIR`.
-- `shows no memory read`: log the read even when memory has nothing for the job.
+- "shows no memory read": log the read even when memory has nothing for the job.
 - `a memory read has x.tenant`: filter by the job's tenant before you look. Never read the whole store.
 
 ## Words you will use

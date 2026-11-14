@@ -1,8 +1,7 @@
 # Start here: meet the world
 
 KaaS Freight paid one invoice twice last month. That cost USD 3,140, and many emails to get the money back. In
-this course you hire an AI employee who never lets that happen. Then you prove it. This page takes about 20
-minutes.
+this course you hire an AI employee who never lets that happen. Then you prove it. This page is a short read.
 
 | Minutes  | You do                                                                 | You see                                                                       |
 | -------- | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
@@ -72,7 +71,7 @@ Open a second terminal and leave this running.
 bun run world freight-audit
 ```
 
-Expect: `The freight-audit world is running on http://localhost:7700` and `60 invoices, all open`.
+Expect: `The freight-audit world is running on http://localhost:7700` and "60 invoices, all open".
 
 Open `localhost:7700/ledger`. A row changes only when a tool from the world changes it. The world logs every
 write.
@@ -99,7 +98,7 @@ on the ledger: you need them in step 5.
 bun run reference
 ```
 
-Expect: four `Done` lines, one `Needs you` (USD 6,200, over Ravi's limit, waits for Lena), one `Refused` (the scan with white text), and `Cost per invoice settled`.
+Expect: four `Done` lines, one `Needs you` (USD 6,200, over Ravi's limit, waits for Lena), one `Refused` (the scan with white text), and "Cost per invoice settled".
 
 Open `localhost:7702/board` while it runs. A card shows Done only when the ledger agrees. The reference keeps
 running so that you can look. While it runs, it keeps ports 7701 and 7702 busy. In Build, your own employee needs

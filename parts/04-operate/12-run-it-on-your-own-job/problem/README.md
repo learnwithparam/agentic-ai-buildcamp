@@ -16,7 +16,7 @@ flowchart LR
 
 ## Your challenge
 
-Copy the three starter files into a folder for your own job, then fill them in:
+Copy the three starter files into a new folder for your own job, then fill them in. Run the check on that folder:
 
 1. `hire.yaml`: your job, the outcome, a metric with a `select` query, and one must-never rule with the write it forbids.
 2. `cases.yaml`: five or more cases. One is a must-never case that forbids that write and expects zero rows. None checks a reply.
@@ -32,7 +32,7 @@ Use words from your own job. A name from the freight world, such as an invoice n
 - Nothing comes from the course world.
 
 ```bash
-bun run verify run-it-on-your-own-job
+bun run verify run-it-on-your-own-job <your-folder>
 ```
 
 Expect: `Done. All 7 rules pass.`

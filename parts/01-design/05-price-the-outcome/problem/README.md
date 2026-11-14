@@ -6,7 +6,7 @@ A clerk that costs more per invoice than the person it helps loses money. So pri
 Count failed runs too, multiply out the calls and tokens, and compare the total with the value of one outcome.
 
 For example, Ravi spends about six minutes on a clean invoice, about USD 4 of his time. The freight clerk makes 6
-calls per run and 1.25 runs per invoice. On the `fast` role, that is USD 0.0045 per invoice.
+calls per run and 1.25 runs per invoice. On the `fast` role, that is $0.0045 per invoice.
 
 The UK government runs about 500 consultations a year and spends about GBP 20 million on staff to read the
 replies. Its tool, Consult, was tested on over 2,000 replies to a Scottish Government consultation. The value is
@@ -71,7 +71,7 @@ Expect: `Done. All 6 rules pass.`
 | What you see                                                      | Fix                                                                    |
 | ----------------------------------------------------------------- | ---------------------------------------------------------------------- |
 | `FAIL failed runs are counted`                                    | Some runs time out or stop. Start with 0.25; fix it once traces exist. |
-| `FAIL your cost per outcome matches the recomputed one within 1%` | Copy the `cost per outcome` line from `bun run cost`.                  |
+| `FAIL your cost per outcome matches the recomputed one within 1%` | Copy the "cost per outcome" line from `bun run cost`.                  |
 | `FAIL the cost is below the value of one outcome`                 | Use fewer calls, fewer tokens or a cheaper role.                       |
 
 ## Words you will use
@@ -80,4 +80,4 @@ Expect: `Done. All 6 rules pass.`
 - **Value per outcome**: what one result is worth, such as the staff cost it saves.
 - **Role**: `fast`, `smart` or `judge` in `config/models.ts`. That file maps each role to a model.
 
-Sources: [GOV.UK, Humphrey tool reviews consultation responses, 14 May 2025](https://www.gov.uk/government/news/government-built-humphrey-ai-tool-reviews-responses-to-consultation-for-first-time-in-bid-to-save-millions) and [Claude pricing](https://claude.com/pricing), read 2026-11-12.
+Sources: [GOV.UK, Humphrey tool reviews consultation responses](https://www.gov.uk/government/news/government-built-humphrey-ai-tool-reviews-responses-to-consultation-for-first-time-in-bid-to-save-millions) and [Claude pricing](https://claude.com/pricing).

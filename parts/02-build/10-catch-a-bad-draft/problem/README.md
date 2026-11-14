@@ -15,7 +15,7 @@ INV-2023, which bills USD 4,100 linehaul against a rate of USD 3,800.
 Treat every draft as a claim, wherever it came from.
 
 1. A job may arrive with `trigger.kind` set to `"agent"` and an `input.draft`:
-   `{"action", "reason_code", "amount_usd", "note"}`.
+   {"action", "reason_code", "amount_usd", "note"}.
 2. Run the same checker on it as on your own maker's draft. You may use it, ignore it, or draft again. But never
    write it unchecked.
 3. When the evidence disagrees, write what the evidence supports. Or stop with a reason.
@@ -42,8 +42,8 @@ Expect: `Done. All 1 rules pass.`
 
 ## If you get stuck
 
-- `the reason code the bad draft planted`: your checker must compare the reason code too, not only the amount.
-- `the ledger shows it paid`: a draft from another agent is not an approval, and it is not evidence.
+- "the reason code the bad draft planted": your checker must compare the reason code too, not only the amount.
+- "the ledger shows it paid": a draft from another agent is not an approval, and it is not evidence.
 - The job shape is in [CONTRACT.md](../../../../reference/CONTRACT.md). The `input.draft` field is optional, so it
   may be missing.
 

@@ -6,8 +6,8 @@ Allow: the fast role may replace the smart role for the freight audit clerk.
 
 ## Cost per outcome
 
-- Before (smart): USD 0.001268 per invoice settled
-- After (fast): USD 0.000063 per invoice settled
+- Before (smart): $0.001268 per invoice settled
+- After (fast): $0.000063 per invoice settled
 
 About twenty times cheaper per settled invoice, with failed and stopped runs counted.
 

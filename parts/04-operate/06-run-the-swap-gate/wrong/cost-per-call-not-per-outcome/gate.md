@@ -6,8 +6,8 @@ Allow: the fast role may replace the smart role for the freight audit clerk.
 
 ## Cost per outcome
 
-- Before (smart): USD 0.00125 per call
-- After (fast): USD 0.000058 per call
+- Before (smart): $0.00125 per call
+- After (fast): $0.000058 per call
 
 About twenty times cheaper per settled invoice, with failed and stopped runs counted.
 

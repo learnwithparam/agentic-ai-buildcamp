@@ -8,8 +8,8 @@
 
 ## Before and after
 
-Cost per outcome before: USD 0.042
-Cost per outcome after: USD 0.019
+Cost per outcome before: $0.042
+Cost per outcome after: $0.019
 
 ## One failure fixed
 

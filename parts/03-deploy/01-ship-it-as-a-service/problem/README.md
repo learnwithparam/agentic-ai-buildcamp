@@ -65,8 +65,8 @@ When Docker is not running, the last rule says `SKIP`. That is not a pass. Start
 | What you see                                                        | Fix                                                                                                                     |
 | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
 | `docker compose up --wait did not finish healthy`                   | Run `docker compose up --build` without `-d` and read the log                                                           |
-| `the ledger shows no payment`                                       | The container cannot reach the world. Use `WORLD_URL: ${WORLD_URL:-http://host.docker.internal:7700}` and `extra_hosts` |
-| `The Dockerfile says "ARG ANTHROPIC_API_KEY"`                       | Delete it. The key goes in `environment:` in compose                                                                    |
+| "the ledger shows no payment"                                       | The container cannot reach the world. Use `WORLD_URL: ${WORLD_URL:-http://host.docker.internal:7700}` and `extra_hosts` |
+| The Dockerfile says "ARG ANTHROPIC_API_KEY"                         | Delete it. The key goes in `environment:` in compose                                                                    |
 | `GET /jobs/... answered {"error": "no such job"}` after down and up | `STATE_DIR` is not on a named volume                                                                                    |
 
 ## Words you will use

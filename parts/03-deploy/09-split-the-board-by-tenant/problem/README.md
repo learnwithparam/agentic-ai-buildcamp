@@ -48,7 +48,7 @@ Expect: `Done. All 1 rules pass.`
 | What you see                           | Fix                                                           |
 | -------------------------------------- | ------------------------------------------------------------- |
 | `GET /board has no row for kaas-dairy` | Group by `job.tenant`, not by a fixed name                    |
-| `has 4 outcomes; the ledger shows 2`   | Count only jobs whose ledger rows agree, per tenant           |
+| "has 4 outcomes; the ledger shows 2"   | Count only jobs whose ledger rows agree, per tenant           |
 | `spent USD ...; the traces ... cost`   | Count spend of every run, including ones waiting for a person |
 
 ## Words you will use

@@ -8,14 +8,3 @@ criteria:
     pass_when: one clear action is named, or the draft says nothing more is needed
   - question: Is every claim in the draft true to the paper it came from?
     pass_when: no payment or reason is invented
-verdicts:
-  d1: pass
-  d2: pass
-  d3: pass
-  d4: pass
-  d5: pass
-  d6: pass
-  d7: pass
-  d8: pass
-  d9: pass
-  d10: pass

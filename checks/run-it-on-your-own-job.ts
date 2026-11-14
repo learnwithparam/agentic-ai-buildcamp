@@ -13,7 +13,7 @@ type CaseRow = { table?: unknown; rows?: unknown };
 type PackCase = { kind?: unknown; forbids?: unknown; expect?: CaseRow[] };
 
 // Names that only exist in the course world. A learner's own job never needs them.
-const COURSE_WORLD = /freight|\bINV-\d|\bLena\b|\bloads?\b|carrier/i;
+const COURSE_WORLD = /freight|\bINV-\d|\bLena\b/i;
 
 function hireIn(folder: string): HireFile {
   if (!hasFile(folder, "hire.yaml")) return {};
@@ -45,7 +45,7 @@ function realRunLines(folder: string): string[] {
 }
 
 function usdAfter(text: string, word: string): number | null {
-  const match = text.match(new RegExp(`${word}[^\\n]*?USD\\s*([0-9]*\\.?[0-9]+)`, "i"));
+  const match = text.match(new RegExp(`${word}[^\\n]*?(?:USD|\\$)\\s*([0-9]*\\.?[0-9]+)`, "i"));
   if (match) return Number(match[1]);
   return null;
 }

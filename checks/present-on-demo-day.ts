@@ -35,7 +35,7 @@ function say(message: string): false {
 
 // The USD amount on the first line that starts with this word, such as "before" or "after".
 function usdAfter(text: string, word: string): number | null {
-  const pattern = new RegExp(`${word}[^\\n]*?USD\\s*([0-9]*\\.?[0-9]+)`, "i");
+  const pattern = new RegExp(`${word}[^\\n]*?(?:USD|\\$)\\s*([0-9]*\\.?[0-9]+)`, "i");
   const match = text.match(pattern);
   if (match) return Number(match[1]);
   return null;

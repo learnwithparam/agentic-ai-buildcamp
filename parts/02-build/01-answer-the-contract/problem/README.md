@@ -18,10 +18,10 @@ requests.
 2. Open `employee/employee.toml`. Its `[contract]` table names the `start` command. The checker runs it from that
    folder. Keep `version = "1"`.
 3. Read `PORT` from the environment and listen on it. The checker picks a free port for every trial.
-4. Answer `GET /health` with `{"contract": "1", "employee": "<your name>", "tenants": ["kaas-freight"]}`.
+4. Answer `GET /health` with {"contract": "1", "employee": "<your name>", "tenants": ["kaas-freight"]}.
 
 For example, the reference employee is called `freight-audit-clerk`. When the checker sends `GET /health`, it
-answers `{"contract": "1", "employee": "freight-audit-clerk", "tenants": ["kaas-freight"]}`. KaaS Freight is the
+answers {"contract": "1", "employee": "freight-audit-clerk", "tenants": ["kaas-freight"]}. KaaS Freight is the
 one company it works for in this part.
 
 ```mermaid

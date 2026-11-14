@@ -58,11 +58,11 @@ Expect: `Done. All 6 rules pass.`
 
 ## If you get stuck
 
-| What you see                                         | Fix                                                        |
-| ---------------------------------------------------- | ---------------------------------------------------------- |
-| `demo.md says before USD 0.0036; your gate measured` | Copy the numbers from `gate.md`, not a price you remember. |
-| `Recording has no https link`                        | Upload it first. A link a peer cannot open does not count. |
-| `names none of your failure modes`                   | Use the mode name exactly as in `failure-modes.md`.        |
+| What you see                                      | Fix                                                        |
+| ------------------------------------------------- | ---------------------------------------------------------- |
+| `demo.md says before $0.0036; your gate measured` | Copy the numbers from `gate.md`, not a price you remember. |
+| "Recording has no https link"                     | Upload it first. A link a peer cannot open does not count. |
+| "names none of your failure modes"                | Use the mode name exactly as in `failure-modes.md`.        |
 
 ## Words you will use
 

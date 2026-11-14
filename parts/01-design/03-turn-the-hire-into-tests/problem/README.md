@@ -27,9 +27,9 @@ Write at least five cases for your employee in `acceptance.yaml`:
 - edge cases, such as a timeout or a hidden instruction inside a document.
 
 Each case follows `acceptance.schema.json`. It has `name`, `kind` (outcome, must-never, approval or edge), `given`
-and `job`. It may have `forbids` and `approver`. `expect` is a list of `{ table, where, rows, values }`.
+and `job`. It may have `forbids` and `approver`. `expect` is a list of "{ table, where, rows, values }".
 
-`job` is the contract's job input, such as `{ invoice_id: INV-2045 }`. Add `decide: { decision, by }` when
+`job` is the contract's job input, such as "{ invoice_id: INV-2045 }". Add "decide: { decision, by }" when
 a person answers the approval. A job that waits for a person is not in the ledger yet, but in your employee's
 `GET /approvals`. So that row says `route: "GET /approvals?status=waiting"` in place of `table`.
 

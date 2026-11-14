@@ -73,7 +73,7 @@ flowchart LR
 | `isolate-the-second-tenant`                         | 25  | The job's tenant on every call                    | The world's access log: no cross-tenant read or write                                                                                   |
 | `split-the-board-by-tenant`                         | 15  | `GET /board` with one row per tenant              | Each row against the traces and the ledger, within 2%                                                                                   |
 
-Total: 215 minutes. Work in your own `employee/` folder, in any language, behind
+Work in your own `employee/` folder, in any language, behind
 [contract version 1](../../reference/CONTRACT.md). Some checks kill your employee on purpose. Those checks need
 `mode = "http"`.
 
@@ -111,7 +111,7 @@ Run the finished Deploy employee as a container. This needs Docker running.
 cd parts/03-deploy/09-split-the-board-by-tenant/solution && docker compose up -d --build --wait && curl -s localhost:7701/health
 ```
 
-Expect: `Container solution-employee-1  Healthy` and `{"contract":"1","employee":"freight-audit-clerk","tenants":["kaas-freight","kaas-dairy"]}`
+Expect: "Container solution-employee-1 Healthy" and `{"contract":"1","employee":"freight-audit-clerk","tenants":["kaas-freight","kaas-dairy"]}`
 
 ```bash
 docker compose ps && docker compose down -v && cd ../../../..

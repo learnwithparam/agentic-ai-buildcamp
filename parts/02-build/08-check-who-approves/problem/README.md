@@ -11,7 +11,7 @@ is over his limit. Only Lena Ortiz, the finance lead, may approve it.
 
 ## Your challenge
 
-Handle `POST /approvals/{approval_id}` with `{"decision": "approve" or "decline", "by": "<person id>"}`.
+Handle `POST /approvals/{approval_id}` with {"decision": "approve" or "decline", "by": "<person id>"}.
 
 1. Look the person up in `GET {WORLD_URL}/people`. Read their role, `may_approve`, `pay_limit_usd` and tenant.
 2. Answer `403 {"reason"}` in three cases: they may not approve, the amount is over their limit, or they work for
@@ -43,8 +43,8 @@ Expect: `Done. All 1 rules pass.`
 ## If you get stuck
 
 - `answered 200` for Jo: read `may_approve` from the world. Do not trust the id alone.
-- `shows 2 payments` after Lena: approving must resume the saved job, not start a second one.
-- `the job must end "declined"`: a decline is an outcome, not a failure.
+- "shows 2 payments" after Lena: approving must resume the saved job, not start a second one.
+- the job must end "declined": a decline is an outcome, not a failure.
 
 ## Words you will use
 

@@ -9,19 +9,19 @@ For example, the draft "Pay it now or we will cancel your account!!" must fail, 
 
 ```mermaid
 flowchart LR
-  D[Ten labelled drafts] --> J[Your judge, one yes or no per draft]
-  J --> V[verdicts]
+  D[Ten labelled drafts] --> J[Your judge, a yes or no per question]
+  J --> V[judge-run.json]
   H[Human labels] --> C{Agree on 8 of 10, and catch every critical draft?}
   V --> C
 ```
 
 ## Your challenge
 
-Fill in `judge.yaml`. The ten drafts and the human labels are in `drafts.json`.
+Copy `judge.yaml` into your own folder and fill it in. The ten drafts and the human labels are in `drafts.json`.
 
 1. `code_checks_instead`: at least two things you keep out of the judge, because code can check them.
 2. `criteria`: three or more. Each has a `question` that ends with a question mark and a `pass_when` line.
-3. `verdicts`: run your judge on each draft and record `pass` or `fail` for `d1` to `d10`. Read the draft yourself too.
+3. Run the judge: `bun parts/04-operate/11-judge-what-code-cannot-check/judge.ts <your-folder>`. It asks your judge model each question on each draft and saves `judge-run.json`. The check works out pass or fail from those answers. You do not type verdicts.
 
 ## Done when
 
@@ -30,7 +30,7 @@ Fill in `judge.yaml`. The ten drafts and the human labels are in `drafts.json`.
 - It does not just say pass to everything.
 
 ```bash
-bun run verify judge-what-code-cannot-check
+bun run verify judge-what-code-cannot-check <your-folder>
 ```
 
 Expect: `Done. All 6 rules pass.`

@@ -9,8 +9,8 @@ tokens does not answer it. Cost per outcome does.
 allows. All spend includes the runs that failed or stopped.
 
 For example, the checker sends four jobs. Three end well in the ledger: two paid, one disputed. The fourth fails
-because its pay call never writes. All four runs together cost USD 0.0045. So cost per outcome is
-USD 0.0045 / 3 = USD 0.0015, not USD 0.0045 / 4.
+because its pay call never writes. All four runs together cost $0.0045. So cost per outcome is
+$0.0045 / 3 = $0.0015, not $0.0045 / 4.
 
 An easy board lies in two ways:
 
@@ -83,8 +83,8 @@ Expect: `Done. All 1 rules pass.`
 | What you see                                            | Fix                                                                                           |
 | ------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
 | `The board says spend USD ...; the traces cost USD ...` | Add the spend of failed and stopped runs too. Price each chat span from its own token counts. |
-| `The board says 4 outcomes; the ledger shows 3`         | A job that failed is not an outcome. Count only jobs the ledger agrees with.                  |
-| `not in the price table`                                | Your trace names a model with no price. Use a role from `config/models.ts`.                   |
+| "The board says 4 outcomes; the ledger shows 3"         | A job that failed is not an outcome. Count only jobs the ledger agrees with.                  |
+| "not in the price table"                                | Your trace names a model with no price. Use a role from `config/models.ts`.                   |
 | `No employee.toml`                                      | Put your employee in `employee/` at the repo root, or run with `EMPLOYEE_DIR=path/to/it`.     |
 
 ## Words you will use

@@ -129,7 +129,7 @@ bun parts/04-operate/operate.ts gate parts/04-operate/06-run-the-swap-gate/probl
 bun run verify run-the-swap-gate
 ```
 
-Expect: `ALLOW  fast` with cost per outcome about USD 0.001268 before and USD 0.000063 after, then `Done. All 4 rules pass.`
+Expect: `ALLOW  fast` with cost per outcome about $0.001268 before and $0.000063 after, then `Done. All 4 rules pass.`
 
 Fix the teammate's gate in `07-refuse-a-bad-model/problem/gate.toml` until it refuses the planted model.
 

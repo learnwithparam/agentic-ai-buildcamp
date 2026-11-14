@@ -57,7 +57,7 @@ Expect: `Done. All 3 rules pass.`
 | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
 | `passes all 5 run(s) in its mode`    | Read one of those runs in the viewer. What does the ledger hold that a good run does not? Check that.                         |
 | `fails ..., which you labelled pass` | The eval fires where the mode does not apply. Return `null` first when, for example, there is no earlier invoice on the load. |
-| `fails a healthy run of INV-2017`    | A duplicate disputed after Lena approved is right. Accept a `DUPLICATE` dispute, or a dispute waiting for approval.           |
+| "fails a healthy run of INV-2017"    | A duplicate disputed after Lena approved is right. Accept a `DUPLICATE` dispute, or a dispute waiting for approval.           |
 
 ## Words you will use
 

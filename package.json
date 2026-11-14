@@ -4,7 +4,7 @@
   "type": "module",
   "packageManager": "bun@1.4.4",
   "scripts": {
-    "check": "bun scripts/readable.ts && bun scripts/plain-english.ts && bun scripts/check.ts && bun scripts/verify.ts --all && bun test && bun scripts/text-audit.ts",
+    "check": "bun scripts/readable.ts && bun scripts/plain-english.ts && bun scripts/check.ts && bun scripts/verify.ts --all && bun test && bun scripts/text-audit.ts && bun test scripts/prose.test.ts && bun test scripts/dates.test.ts && bun scripts/capstone.ts && bun test scripts/shape.test.ts && bun scripts/picks.ts && bun test scripts/workfiles.test.ts scripts/picks.test.ts scripts/changed.test.ts",
     "readable": "bun scripts/readable.ts",
     "plain-english": "bun scripts/plain-english.ts",
     "format": "biome check --write .",
@@ -16,7 +16,10 @@
     "operate-employee": "bun parts/04-operate/kit-start.ts",
     "cost": "bun checks/design-lib.ts",
     "models": "bun scripts/models.ts",
-    "text-audit": "bun scripts/text-audit.ts"
+    "text-audit": "bun scripts/text-audit.ts",
+    "check:changed": "bun scripts/changed.ts",
+    "picks": "bun scripts/picks.ts",
+    "capstone": "bun scripts/capstone.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "4.0.103",
@@ -32,5 +35,10 @@
   "devDependencies": {
     "@biomejs/biome": "2.6.5",
     "@playwright/test": "1.63.0"
-  }
+  },
+  "plainEnglish": {
+    "grade": 6
+  },
+  "capstone": true,
+  "picks": true
 }

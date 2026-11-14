@@ -38,7 +38,7 @@ For example, the eval `missed-the-duplicate` asks three questions about one run:
 
 1. Is there an earlier invoice in `run.other_invoices_on_load`? If not, return `null`.
 2. Does `run.ledger` show a payment? Then return a sentence such as
-   `INV-2017 bills a load already billed on INV-2012, and the ledger shows it paid`.
+   "INV-2017 bills a load already billed on INV-2012, and the ledger shows it paid".
 3. Is there a `DUPLICATE` dispute, or one waiting for approval? Then return `null`. If not, return a sentence.
 
 Then run your evals over the replay set:
@@ -64,9 +64,9 @@ Expect: `Done. All 3 rules pass.`
 
 | What you see                                       | Fix                                                                                    |
 | -------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| `No eval for missed-the-duplicate`                 | The file name must match the mode in `failure-modes.md`, letter for letter.            |
+| "No eval for missed-the-duplicate"                 | The file name must match the mode in `failure-modes.md`, letter for letter.            |
 | `threw on run-... : undefined is not an object`    | A run may have no dispute or no payment. Check the array length before you read `[0]`. |
-| `returned something other than null or a sentence` | Return `null` for a pass and a string for a fail, nothing else.                        |
+| "returned something other than null or a sentence" | Return `null` for a pass and a string for a fail, nothing else.                        |
 
 ## Words you will use
 

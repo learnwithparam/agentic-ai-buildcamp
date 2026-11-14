@@ -26,7 +26,7 @@ flowchart LR
 
 Share your design files with two peers. Write their answers in `review.md` in this folder.
 
-In `review.md`, write one `## Reviewer: First Last` heading per person. Under each heading, write six lines:
+In `review.md`, write one "## Reviewer: First Last" heading per person. Under each heading, write six lines:
 
 - `- outcome checkable:` can a query tell whether the outcome happened?
 - `- must-never checkable:` does a query and a trap case catch the must-never?

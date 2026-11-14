@@ -2,14 +2,3 @@ code_checks_instead:
   - the amount paid, because the ledger row holds the true number
   - whether a payment was made twice, because a query counts the rows
 criteria: []
-verdicts:
-  d1: pass
-  d2: fail
-  d3: pass
-  d4: fail
-  d5: pass
-  d6: fail
-  d7: pass
-  d8: fail
-  d9: pass
-  d10: pass
