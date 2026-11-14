@@ -213,7 +213,7 @@ function noRawCodes() {
 
 function noOperatorDetail() {
   if (document.body.dataset.audience === "staff") return [];
-  const text = document.body.innerText;
+  const text = document.body.textContent;
   const patterns = [MODEL_NAMES, TOKEN_COUNT, RUN_COST, HOST_NAME];
   const hits = patterns.map((pattern) => text.match(pattern)).filter(Boolean);
   return hits.map((hit) => `Public page shows "${hit[0]}". Staff detail belongs on a staff page.`);

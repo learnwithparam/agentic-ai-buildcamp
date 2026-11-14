@@ -12,7 +12,7 @@ A cap is code that does three things:
 - it lets only the finance lead raise the budget.
 
 For example, the reference sets `max_usd_per_job = 0.05` and `max_usd_per_day = 5` in `employee.toml`. The checker
-lowers the job budget to USD 0.00001, less than one model call costs. Now a clean invoice is not paid. Its job
+lowers the job budget to $0.00001, less than one model call costs. Now a clean invoice is not paid. Its job
 waits in Needs you with a `raise_budget` approval. Ravi and Jo get `403`. When Lena approves, the invoice is paid
 once.
 
@@ -59,9 +59,9 @@ Expect: `Done. All 2 rules pass.`
 | What you see                             | Fix                                                               |
 | ---------------------------------------- | ----------------------------------------------------------------- |
 | `the ledger shows INV-... paid`          | Check the budget after the model call too, before the write       |
-| `no "raise_budget" approval`             | Add the approval when you stop, with `action: "raise_budget"`     |
+| no "raise_budget" approval               | Add the approval when you stop, with `action: "raise_budget"`     |
 | `Ravi Shah (AP clerk) raised the budget` | Check the person's role, not their payment limit                  |
-| `more than one model call past the cap`  | Add up `spend` across every job in `STATE_DIR`, not only this one |
+| "more than one model call past the cap"  | Add up `spend` across every job in `STATE_DIR`, not only this one |
 
 ## Words you will use
 

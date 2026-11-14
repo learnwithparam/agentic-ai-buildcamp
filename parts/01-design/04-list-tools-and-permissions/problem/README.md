@@ -65,7 +65,7 @@ The freight sample is in [solution/tools.yaml](../solution/tools.yaml).
 
 | What you see                                             | Fix                                                                    |
 | -------------------------------------------------------- | ---------------------------------------------------------------------- |
-| `FAIL every final write has an approver or a must-never` | Name the person and the limit, like `Ravi up to USD 5,000`.            |
+| `FAIL every final write has an approver or a must-never` | Name the person and the limit, like "Ravi up to USD 5,000".            |
 | `FAIL no tool reads or writes another tenant`            | Limit the tool to your own tenant. A search across tenants leaks data. |
 | `FAIL tools.yaml matches tools.schema.json`              | Quote values that hold a comma, like `"USD 1,000"`.                    |
 
@@ -76,4 +76,4 @@ The freight sample is in [solution/tools.yaml](../solution/tools.yaml).
 - **Tenant**: one customer's data, kept apart from every other customer.
 - **Approver**: the named person who must say yes before a final write.
 
-Sources: [Ramp engineering, how to build agents users can trust](https://engineering.ramp.com/post/how-to-build-agents-users-can-trust) and [Ramp, policy agent launch, 13 Jan 2026](https://ramp.com/blog/ramp-policy-agent-ga-launch), read 2026-11-12.
+Sources: [Ramp engineering, how to build agents users can trust](https://engineering.ramp.com/post/how-to-build-agents-users-can-trust) and [Ramp, policy agent launch](https://ramp.com/blog/ramp-policy-agent-ga-launch).

@@ -31,7 +31,7 @@ Start the world. Leave it running in its own terminal.
 bun run world freight-audit
 ```
 
-Expect: `The freight-audit world is running on http://localhost:7700` and `60 invoices, all open`.
+Expect: `The freight-audit world is running on http://localhost:7700` and "60 invoices, all open".
 
 In a second terminal, run the naive employee first. Then run the reference.
 
@@ -45,7 +45,7 @@ Expect: `Naive employee says: "All 6 invoices paid. Done."`, then `4 paid once, 
 bun run reference
 ```
 
-Expect: four `Done` lines, one `Needs you`, one `Refused`, and `Cost per invoice settled`. The board is on `localhost:7702/board`.
+Expect: four `Done` lines, one `Needs you`, one `Refused`, and "Cost per invoice settled". The board is on `localhost:7702/board`.
 The reference keeps running so that you can look at the board. Press Ctrl+C when you are done.
 
 Fill in `notes.md`. Then check it.
@@ -55,3 +55,12 @@ bun run verify meet-the-world
 ```
 
 Expect: `Done. All 5 rules pass.`
+
+## Watch and read
+
+| Kind  | Title                                     | Who made it                              | Why                                                                | Link                                                                   |
+| ----- | ----------------------------------------- | ---------------------------------------- | ------------------------------------------------------------------ | ---------------------------------------------------------------------- |
+| video | How We Build Effective Agents             | Barry Zhang, Anthropic                   | The maker of the method says when an agent is worth its cost.      | https://www.youtube.com/watch?v=D7_ipDqhtwk                            |
+| read  | Demystifying evals for AI agents          | Anthropic engineering                    | Judge an agent by the state it leaves behind, not by what it says. | https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents |
+| video | Building the future of agents with Claude | Anthropic                                | Anthropic staff show how they think about agents and their limits. | https://www.youtube.com/watch?v=XuvKFsktX0Q                            |
+| read  | Building effective agents                 | Erik Schluntz and Barry Zhang, Anthropic | Start simple and add parts only when you must.                     | https://www.anthropic.com/engineering/building-effective-agents        |

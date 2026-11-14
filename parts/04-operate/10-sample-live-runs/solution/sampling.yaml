@@ -1,0 +1,6 @@
+rate_percent: 5
+reviewer_budget: 30
+always_keep:
+  error: true
+  approval: true
+  cost_over_usd: 0.1

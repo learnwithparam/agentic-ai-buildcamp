@@ -1,0 +1,8 @@
+job: ""
+outcome: ""
+metric:
+  name: ""
+  query: ""
+must_never:
+  rule: ""
+  forbidden_write: ""

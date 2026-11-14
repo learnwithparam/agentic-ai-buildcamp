@@ -74,4 +74,4 @@ The freight sample is in [solution/employee.toml](../solution/employee.toml).
 - **Must-never**: the one write the employee may never make, plus the query that would catch it.
 - **System of record**: the database that holds the truth, such as the ledger.
 
-Sources: [Chipotle newsroom, 19 Feb 2025](https://newsroom.chipotle.com/2025-02-19-CHIPOTLE-AIMS-TO-HIRE-FUTURE-BILLION-DOLLAR-BUSINESS-LEADERS-IN-NEW-BURRITO-SEASON-HIRING-PUSH), read 2026-11-12.
+Sources: [Chipotle newsroom](https://newsroom.chipotle.com/2025-02-19-CHIPOTLE-AIMS-TO-HIRE-FUTURE-BILLION-DOLLAR-BUSINESS-LEADERS-IN-NEW-BURRITO-SEASON-HIRING-PUSH).

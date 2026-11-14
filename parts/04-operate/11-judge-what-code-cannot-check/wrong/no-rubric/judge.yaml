@@ -1,0 +1,4 @@
+code_checks_instead:
+  - the amount paid, because the ledger row holds the true number
+  - whether a payment was made twice, because a query counts the rows
+criteria: []

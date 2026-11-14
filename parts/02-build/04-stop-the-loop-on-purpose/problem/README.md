@@ -44,11 +44,11 @@ Expect: `Done. All 1 rules pass.`
 
 ## If you get stuck
 
-- `still "working" after 15 s`: your retry has no end. Put a limit on the tries for each call and the steps for
+- still "working" after 15 s: your retry has no end. Put a limit on the tries for each call and the steps for
   each job.
 - `over max_steps`: every `execute_tool` and `chat` span counts, retries too.
-- `needs [budget] max_steps`: add the table to `employee.toml`. The checker reads it.
-- `shows no pay_invoice call`: pass pay-one-invoice first. There is no loop to stop until you pay.
+- "needs [budget] max_steps": add the table to `employee.toml`. The checker reads it.
+- "shows no pay_invoice call": pass pay-one-invoice first. There is no loop to stop until you pay.
 
 ## Words you will use
 

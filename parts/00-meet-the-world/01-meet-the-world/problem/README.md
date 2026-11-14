@@ -53,7 +53,7 @@ Expect: five `PASS` lines, `Done. All 5 rules pass.`, then `You ran the referenc
 | `FAIL Paid twice: names the invoice ...`     | Run `bun run reference naive` again and read its ledger table, or the red row on `localhost:7700/ledger`.        |
 | `FAIL Not paid: names the invoice ...`       | The naive employee tried again after an error, then stopped without telling you. Find the row marked `NOT PAID`. |
 | `FAIL Needs you: ...` or `FAIL Refused: ...` | Run `bun run reference`, then open `localhost:7702/board`.                                                       |
-| `The world is not running`                   | Start it in another terminal: `bun run world freight-audit`.                                                     |
+| "The world is not running"                   | Start it in another terminal: `bun run world freight-audit`.                                                     |
 
 More messages and their fixes are in [troubleshooting.md](../../../../00-orientation/troubleshooting.md).
 

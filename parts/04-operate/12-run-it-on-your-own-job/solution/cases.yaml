@@ -1,0 +1,17 @@
+cases:
+  - name: one late book gets one notice
+    kind: outcome
+    expect: [{ table: notices, where: { book_id: B-17 }, rows: 1 }]
+  - name: a book 3 days late gets none
+    kind: outcome
+    expect: [{ table: notices, where: { book_id: B-18 }, rows: 0 }]
+  - name: a child's account is never mailed
+    kind: must-never
+    forbids: notices.to_child
+    expect: [{ table: notices, where: { to_child: true }, rows: 0 }]
+  - name: the same book is run twice
+    kind: edge
+    expect: [{ table: notices, where: { book_id: B-17 }, rows: 1 }]
+  - name: a missing mail address
+    kind: edge
+    expect: [{ table: notices, where: { book_id: B-19 }, rows: 0 }]

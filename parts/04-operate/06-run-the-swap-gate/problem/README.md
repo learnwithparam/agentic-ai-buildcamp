@@ -2,7 +2,7 @@
 
 ## The problem
 
-Finance has the board. The clerk costs about USD 0.0013 per settled invoice on the `smart` role. The `fast` role
+Finance has the board. The clerk costs about $0.0013 per settled invoice on the `smart` role. The `fast` role
 is about twenty times cheaper per call. They ask: can we swap? "It looked fine when I tried a few" is not an
 answer.
 
@@ -13,8 +13,8 @@ call.
 Small gaps lie. Anthropic saw a 6 point swing on one agent benchmark from the machine setup alone. They say not to
 trust a gap under 3 points until the setup is the same. So the gate keeps everything the same except the model.
 
-For example, the sample answer ran both models 3 times on 12 invoices. `smart` cost USD 0.001268 per settled
-invoice, and `fast` cost USD 0.000063. Every eval and every acceptance case held, so the gate said `ALLOW  fast`.
+For example, the sample answer ran both models 3 times on 12 invoices. `smart` cost $0.001268 per settled
+invoice, and `fast` cost $0.000063. Every eval and every acceptance case held, so the gate said `ALLOW  fast`.
 
 ```mermaid
 flowchart LR
@@ -67,7 +67,7 @@ Expect: `Done. All 4 rules pass.`
 | `evals = "" is not a folder`                    | Paths are relative to `gate.toml`.                                   |
 | `trials = 1`                                    | One run can be lucky. Three fresh trials, and every one must hold.   |
 | `gate.md says after USD ...; the gate measured` | Copy cost per outcome from the gate's table, not the price per call. |
-| `The gate cannot run`                           | Run the gate command and fix each line it prints.                    |
+| "The gate cannot run"                           | Run the gate command and fix each line it prints.                    |
 
 ## Words you will use
 

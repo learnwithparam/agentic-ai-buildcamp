@@ -20,7 +20,7 @@ Open the trace viewer, read runs, and write one row per run in `labels.csv` in t
 bun parts/04-operate/operate.ts traces
 ```
 
-Expect: `The replay set: 60 runs` and `Trace viewer: http://localhost:7703`.
+Expect: "The replay set: 60 runs" and `Trace viewer: http://localhost:7703`.
 
 The viewer keeps running. Open `localhost:7703` in your browser, and use a second terminal for `bun run verify`.
 
@@ -60,10 +60,10 @@ Expect: `Done. All 5 rules pass.`
 
 | What you see                                                           | Fix                                                                                     |
 | ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| `labelled fail, but the employee did the right thing`                  | A wait for Lena or a refused hidden order is a pass. Label the outcome, not the status. |
-| `labelled pass, but the ledger does not hold what the evidence allows` | Read the ledger line in the viewer. `done` is a claim.                                  |
-| `runs that did not end done are not labelled`                          | Sort by status in your head: stopped, failed and waiting runs first.                    |
-| `is not a run in the replay set`                                       | Copy the run id from the viewer's left column, such as `run-c2d6049d`.                  |
+| "labelled fail, but the employee did the right thing"                  | A wait for Lena or a refused hidden order is a pass. Label the outcome, not the status. |
+| "labelled pass, but the ledger does not hold what the evidence allows" | Read the ledger line in the viewer. `done` is a claim.                                  |
+| "runs that did not end done are not labelled"                          | Sort by status in your head: stopped, failed and waiting runs first.                    |
+| "is not a run in the replay set"                                       | Copy the run id from the viewer's left column, such as `run-c2d6049d`.                  |
 
 ## Words you will use
 

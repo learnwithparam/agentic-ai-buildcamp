@@ -45,8 +45,8 @@ Expect: `Done. All 1 rules pass.`
 
 - `is a duplicate ... and the ledger shows it paid`: `find_load` lists every invoice on the load, with its
   `received_at` time. The earlier one is the real one.
-- `bills above the rate confirmation`: compare each kind of line with `read_rate_confirmation`, not the total.
-- `is not disputed and no dispute waits`: doing nothing is not the same as holding the rule.
+- "bills above the rate confirmation": compare each kind of line with `read_rate_confirmation`, not the total.
+- "is not disputed and no dispute waits": doing nothing is not the same as holding the rule.
 
 ## Words you will use
 

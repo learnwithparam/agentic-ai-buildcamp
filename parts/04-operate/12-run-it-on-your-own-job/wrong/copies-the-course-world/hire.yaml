@@ -1,0 +1,8 @@
+job: Send overdue notices for the town freight
+outcome: every invoice more than 14 days late gets one notice, and no one gets two
+metric:
+  name: notices sent per overdue invoice
+  query: select count(*) from notices where invoice_id = :invoice_id
+must_never:
+  rule: never send a notice to a child's account without the parent
+  forbidden_write: notices.to_child

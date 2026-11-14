@@ -2,7 +2,7 @@
 
 ## Context
 
-`cost.yaml` puts one settled invoice at about USD 0.0045 on the fast role, against USD 4 of clerk time. The
+`cost.yaml` puts one settled invoice at about $0.0045 on the fast role, against USD 4 of clerk time. The
 smart role costs about 20 times more per token on the same provider. A cheaper model could miss the duplicate invoice, which is the
 must-never.
 

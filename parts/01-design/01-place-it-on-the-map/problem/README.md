@@ -26,8 +26,8 @@ Fill in `map.md` for your employee. It has these sections:
 
 - `## Problem`: who pays, and a cost with a number.
 - `## Choice`: the first line is `workflow`, `agent` or `agentic system`.
-- `## Why`: with the line `Who decides the next step: code` or `the model`.
-- `## Starts by`: optional.
+- `## Why`: with the line "Who decides the next step: code" or `the model`.
+- "## Starts by": optional.
 
 | Employee                                    | What to place                                                    |
 | ------------------------------------------- | ---------------------------------------------------------------- |
@@ -47,7 +47,7 @@ Fill in `map.md` for your employee. It has these sections:
 
 - `map.md` has Problem, Choice and Why.
 - The Problem names a cost with a number.
-- The Choice and `Who decides the next step` agree: workflow with code, agent or agentic system with the model.
+- The Choice and "Who decides the next step" agree: workflow with code, agent or agentic system with the model.
 
 ```bash
 bun run verify place-it-on-the-map

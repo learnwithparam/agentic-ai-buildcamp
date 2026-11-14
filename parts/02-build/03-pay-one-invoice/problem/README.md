@@ -51,10 +51,10 @@ Expect: two `PASS` lines and `Done. All 2 rules pass.`
 
 ## If you get stuck
 
-- `The ledger shows no payment`: check the header name, `Idempotency-Key`. Check that `X-Tenant` is the job's
+- "The ledger shows no payment": check the header name, `Idempotency-Key`. Check that `X-Tenant` is the job's
   tenant.
-- `started a new run`: look the `job_id` up in your job table before you create a run.
-- `no pay_invoice span names it`: the key in the trace must be exactly the header you sent.
+- "started a new run": look the `job_id` up in your job table before you create a run.
+- "no pay_invoice span names it": the key in the trace must be exactly the header you sent.
 
 ## Words you will use
 

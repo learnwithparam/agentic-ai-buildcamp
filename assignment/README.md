@@ -14,7 +14,7 @@ For example, an invoice for USD 7,850 is over the limit. Your graph pauses at `p
 docker compose -f assignment/compose.yml up -d --wait
 ```
 
-Expect: `Container assignment-db-1  Healthy`.
+Expect: "Container assignment-db-1 Healthy".
 
 Edit `graph.ts` or `graph.py`. Both nodes are stubs. The step page has the install commands.
 

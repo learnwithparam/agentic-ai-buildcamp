@@ -13,7 +13,7 @@ So a checker has to earn its cost. On a write that cannot be undone, it does.
 
 Split the maker from the checker. The maker drafts the decision. The checker accepts or rejects it.
 
-1. The maker drafts `{"action", "amount_usd", "reason_code", "note"}` from the evidence.
+1. The maker drafts {"action", "amount_usd", "reason_code", "note"} from the evidence.
 2. The checker gets the draft and the evidence, and answers accept or reject. Plain code is a fine checker. A
    second model call with another role is fine too.
 3. Give the checker its own span: `"name": "invoke_agent"` and `"x.role": "checker"`. Put its verdict in the span.
@@ -51,8 +51,8 @@ Expect: `Done. All 1 rules pass.`
 
 ## If you get stuck
 
-- `the trace has no checker span`: set `"x.role": "checker"` on the checker's span.
-- `has no checker span that ended before it`: finish the check, then write. Spans are compared by `end_time` and
+- "the trace has no checker span": set `"x.role": "checker"` on the checker's span.
+- "has no checker span that ended before it": finish the check, then write. Spans are compared by `end_time` and
   `start_time`.
 - `shows 1 write(s) but the trace has 0 write span(s)`: trace the write itself, not only the decision.
 

@@ -74,14 +74,14 @@ When the checker starts your employee, it sets these environment variables. Use 
 
 ## The six routes
 
-| Action         | HTTP                                                                                         | Answer                                                                                                                         |
-| -------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| Health         | `GET /health`                                                                                | `{"contract": "1", "employee": "freight-audit-clerk", "tenants": ["kaas-freight"]}`                                            |
-| Start a job    | `POST /jobs` with `{"job_id", "tenant", "trigger": {"kind", "by"}, "input": {"invoice_id"}}` | `202 {"job_id", "run_id"}`. The same `job_id` again starts nothing new and answers the first `run_id`                          |
-| Read a job     | `GET /jobs/{job_id}`                                                                         | `{"status", "reason", "cost_usd"}`. `status` is one of `working`, `waiting_for_human`, `done`, `declined`, `stopped`, `failed` |
-| List approvals | `GET /approvals?status=waiting`                                                              | `[{"approval_id", "job_id", "action", "amount", "summary", "approver_role"}]`                                                  |
-| Decide         | `POST /approvals/{approval_id}` with `{"decision": "approve" or "decline", "by": "lena"}`    | `200`, or `403 {"reason"}` when that person may not decide it                                                                  |
-| Board          | `GET /board`                                                                                 | `{"tenants": [{"tenant", "outcomes", "spend_usd", "cost_per_outcome_usd", "by_employee": [...]}]}`                             |
+| Action         | HTTP                                                                                       | Answer                                                                                                                       |
+| -------------- | ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| Health         | `GET /health`                                                                              | {"contract": "1", "employee": "freight-audit-clerk", "tenants": ["kaas-freight"]}                                            |
+| Start a job    | `POST /jobs` with {"job_id", "tenant", "trigger": {"kind", "by"}, "input": {"invoice_id"}} | 202 {"job_id", "run_id"}. The same `job_id` again starts nothing new and answers the first `run_id`                          |
+| Read a job     | `GET /jobs/{job_id}`                                                                       | {"status", "reason", "cost_usd"}. `status` is one of `working`, `waiting_for_human`, `done`, `declined`, `stopped`, `failed` |
+| List approvals | `GET /approvals?status=waiting`                                                            | [{"approval_id", "job_id", "action", "amount", "summary", "approver_role"}]                                                  |
+| Decide         | `POST /approvals/{approval_id}` with {"decision": "approve" or "decline", "by": "lena"}    | `200`, or `403 {"reason"}` when that person may not decide it                                                                |
+| Board          | `GET /board`                                                                               | `{"tenants": [{"tenant", "outcomes", "spend_usd", "cost_per_outcome_usd", "by_employee": [...]}]}`                           |
 
 `trigger.kind` is `person`, `event`, `schedule` or `agent`. The checker never believes `status: done` alone. If a
 job says `done` but the ledger has no row for it, the step fails. The check prints the invoice that has no row.
@@ -89,23 +89,23 @@ job says `done` but the ledger has no row for it, the step fails. The check prin
 For example, the checker sends `POST /jobs` for tenant `kaas-freight` and invoice `INV-2045`. Your employee answers
 `202` with a `run_id`. The invoice is USD 6,200, over Ravi Shah's limit of USD 5,000. So the job goes to
 `waiting_for_human`, and `GET /approvals?status=waiting` lists it with `amount` 6200. Lena then posts
-`{"decision": "approve", "by": "lena"}`. If Jo Park, a contractor, posts the same decision, your employee answers
+{"decision": "approve", "by": "lena"}. If Jo Park, a contractor, posts the same decision, your employee answers
 `403` with a reason.
 
 ## The same six as CLI commands
 
 Set `mode = "cli"`. The checker runs `start` with the action as its last argument. It writes the request as JSON
 on stdin, then reads one JSON answer from stdout. Exit 0 for success. For a refusal, print
-`{"status": 403, "reason"}`.
+{"status": 403, "reason"}.
 
-| Action         | Command                  | stdin                               |
-| -------------- | ------------------------ | ----------------------------------- |
-| Health         | `<start> health`         | `{}`                                |
-| Start a job    | `<start> start-job`      | the job, as for `POST /jobs`        |
-| Read a job     | `<start> read-job`       | `{"job_id"}`                        |
-| List approvals | `<start> list-approvals` | `{"status": "waiting"}`             |
-| Decide         | `<start> decide`         | `{"approval_id", "decision", "by"}` |
-| Board          | `<start> board`          | `{}`                                |
+| Action         | Command                  | stdin                             |
+| -------------- | ------------------------ | --------------------------------- |
+| Health         | `<start> health`         | `{}`                              |
+| Start a job    | `<start> start-job`      | the job, as for `POST /jobs`      |
+| Read a job     | `<start> read-job`       | `{"job_id"}`                      |
+| List approvals | `<start> list-approvals` | `{"status": "waiting"}`           |
+| Decide         | `<start> decide`         | {"approval_id", "decision", "by"} |
+| Board          | `<start> board`          | `{}`                              |
 
 Each command is a new process, so a CLI employee keeps its jobs in `STATE_DIR`. `start-job` may run the whole job
 before it answers. Some steps stop a running employee on purpose. Those steps need `mode = "http"`.
@@ -139,7 +139,7 @@ result and writes no second payment.
 The reason codes are `DUPLICATE`, `ABOVE_RATE`, `DETENTION_UNSIGNED`, `FUEL_ABOVE_CONTRACT` and `OTHER`. You find
 the people and their limits at `GET {WORLD_URL}/people`.
 
-## The trace format: employee.trace/v1
+## The trace format
 
 A trace is the record of what one run did. Write it to `<traces>/<run_id>.jsonl`, with one JSON object per line.
 Each line is one span, a single timed piece of work, such as one tool call.

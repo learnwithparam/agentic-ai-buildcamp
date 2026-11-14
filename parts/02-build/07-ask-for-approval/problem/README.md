@@ -16,7 +16,7 @@ Pause before a write that is over the limit.
 
 1. Before `pay_invoice`, compare the amount with the limit for paying without approval: USD 5,000.
 2. If it is over, save an approval in your state:
-   `{"approval_id", "job_id", "action", "amount", "summary", "approver_role"}`. End the run with status
+   {"approval_id", "job_id", "action", "amount", "summary", "approver_role"}. End the run with status
    `waiting_for_human`, and write nothing.
 3. Answer `GET /approvals?status=waiting` with the list of waiting approvals.
 
@@ -45,8 +45,8 @@ Expect: `Done. All 1 rules pass.`
 
 ## If you get stuck
 
-- `was paid with no approval`: the limit check must run before the write, in code.
-- `does not list job`: the list must last between requests. Keep it in `STATE_DIR`, not in a local variable.
+- "was paid with no approval": the limit check must run before the write, in code.
+- "does not list job": the list must last between requests. Keep it in `STATE_DIR`, not in a local variable.
 - `amount` is a number in US dollars, the same as the payment would be.
 
 ## Words you will use

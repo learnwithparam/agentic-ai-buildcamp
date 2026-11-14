@@ -1,0 +1,7 @@
+# Which live runs a person reads each day.
+rate_percent: 0
+reviewer_budget: 0
+always_keep:
+  error: false
+  approval: false
+  cost_over_usd: 0

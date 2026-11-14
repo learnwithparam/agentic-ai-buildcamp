@@ -12,7 +12,7 @@ PMs have a full path too. Every Design and Operate step asks for a file, not cod
 
 ## Run the finished system
 
-You need Bun 1.4.4. You do not need a model key, because the reference uses recorded model replies. The reference
+You need Bun. You do not need a model key, because the reference uses recorded model replies. The reference
 is the finished employee we built for you. Start the world in one terminal.
 
 ```bash
@@ -20,7 +20,7 @@ bun install
 bun run world freight-audit
 ```
 
-Expect: `The freight-audit world is running on http://localhost:7700` and `60 invoices, all open`.
+Expect: `The freight-audit world is running on http://localhost:7700` and "60 invoices, all open".
 
 In a second terminal, watch an agent that believes its own reply.
 
@@ -36,7 +36,7 @@ Then run the reference employee. It believes only the ledger, the record of ever
 bun run reference
 ```
 
-Expect: four `Done` lines, one `Needs you`, one `Refused`, and `Cost per invoice settled`. Open `localhost:7702/board`.
+Expect: four `Done` lines, one `Needs you`, one `Refused`, and "Cost per invoice settled". Open `localhost:7702/board`.
 
 The reference keeps running so that you can look at the board. When you are done, press Ctrl+C in that terminal.
 
@@ -49,7 +49,7 @@ fails on each mistake we planted.
 bun run check
 ```
 
-Expect: `The repo meets the standard`, `Every check rejects its starter and wrong answers, and passes its solution.` and `0 fail`.
+Expect: "The repo meets the standard", `Every check rejects its starter and wrong answers, and passes its solution.` and `0 fail`.
 
 ## The world, your employee, the contract, the checker
 

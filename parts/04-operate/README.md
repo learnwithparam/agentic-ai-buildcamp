@@ -40,17 +40,20 @@ The same picture is in `operate-loop.mmd`.
 
 ## Steps
 
-| Step                                                                        | What you make                                                            | Minutes |
-| --------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ------- |
-| [show-cost-per-outcome](01-show-cost-per-outcome/problem/README.md)         | `GET /board` with spend and cost per outcome, failed runs included       | 30      |
-| [label-the-traces](02-label-the-traces/problem/README.md)                   | `labels.csv`: at least 30 of 60 runs, pass or fail with a note           | 25      |
-| [count-the-failure-modes](03-count-the-failure-modes/problem/README.md)     | `failure-modes.md`: modes with counts that add up                        | 20      |
-| [write-an-eval-per-failure](04-write-an-eval-per-failure/problem/README.md) | `evals/`: one code check per mode                                        | 25      |
-| [prove-each-eval-bites](05-prove-each-eval-bites/problem/README.md)         | evals that fail their mode and pass good runs                            | 20      |
-| [run-the-swap-gate](06-run-the-swap-gate/problem/README.md)                 | `gate.toml` and `gate.md`: two models, cost per outcome before and after | 20      |
-| [refuse-a-bad-model](07-refuse-a-bad-model/problem/README.md)               | a gate that refuses the planted model and allows the safe one            | 25      |
-| [run-the-incident-drill](08-run-the-incident-drill/problem/README.md)       | pause on a ledger outage, one incident card, `runbook.md`                | 30      |
-| [present-on-demo-day](09-present-on-demo-day/problem/README.md)             | `demo.md`, a five-minute recording, the scorecard                        | 30      |
+| Step                                                                              | What you make                                                            | Minutes |
+| --------------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ------- |
+| [show-cost-per-outcome](01-show-cost-per-outcome/problem/README.md)               | `GET /board` with spend and cost per outcome, failed runs included       | 30      |
+| [label-the-traces](02-label-the-traces/problem/README.md)                         | `labels.csv`: at least 30 of 60 runs, pass or fail with a note           | 25      |
+| [count-the-failure-modes](03-count-the-failure-modes/problem/README.md)           | `failure-modes.md`: modes with counts that add up                        | 20      |
+| [write-an-eval-per-failure](04-write-an-eval-per-failure/problem/README.md)       | `evals/`: one code check per mode                                        | 25      |
+| [prove-each-eval-bites](05-prove-each-eval-bites/problem/README.md)               | evals that fail their mode and pass good runs                            | 20      |
+| [run-the-swap-gate](06-run-the-swap-gate/problem/README.md)                       | `gate.toml` and `gate.md`: two models, cost per outcome before and after | 20      |
+| [refuse-a-bad-model](07-refuse-a-bad-model/problem/README.md)                     | a gate that refuses the planted model and allows the safe one            | 25      |
+| [run-the-incident-drill](08-run-the-incident-drill/problem/README.md)             | pause on a ledger outage, one incident card, `runbook.md`                | 30      |
+| [present-on-demo-day](09-present-on-demo-day/problem/README.md)                   | `demo.md`, a five-minute recording, the scorecard                        | 30      |
+| [sample-live-runs](10-sample-live-runs/problem/README.md)                         | `sampling.yaml`: a rate, always-keep rules, a reviewer budget            | 20      |
+| [judge-what-code-cannot-check](11-judge-what-code-cannot-check/problem/README.md) | `judge.yaml`: a rubric checked against human labels                      | 20      |
+| [run-it-on-your-own-job](12-run-it-on-your-own-job/problem/README.md)             | a world pack and evidence for your own job                               | 30      |
 
 `show-cost-per-outcome`, `run-the-swap-gate` and `refuse-a-bad-model` are core. A PM can do steps 2 to 7 and 9
 alone: they are files, and the gate runs the part's sample clerk.
@@ -126,7 +129,7 @@ bun parts/04-operate/operate.ts gate parts/04-operate/06-run-the-swap-gate/probl
 bun run verify run-the-swap-gate
 ```
 
-Expect: `ALLOW  fast` with cost per outcome about USD 0.001268 before and USD 0.000063 after, then `Done. All 4 rules pass.`
+Expect: `ALLOW  fast` with cost per outcome about $0.001268 before and $0.000063 after, then `Done. All 4 rules pass.`
 
 Fix the teammate's gate in `07-refuse-a-bad-model/problem/gate.toml` until it refuses the planted model.
 
@@ -172,8 +175,18 @@ Part operate:
   PASS   refuse-a-bad-model  (4/4 rules)
   PASS   run-the-incident-drill  (5/5 rules)
   PASS   present-on-demo-day  (6/6 rules)
-Part operate is done: 9/9 steps pass.
+Part operate is done: 12/12 steps pass.
 ```
+
+## Watch and read
+
+| Kind  | Title                                                       | Who made it                               | Why                                                                         | Link                                                                   |
+| ----- | ----------------------------------------------------------- | ----------------------------------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| video | Why AI evals are the hottest new skill for product builders | Hamel Husain and Shreya Shankar           | Two people who teach the method explain how to read traces and write evals. | https://www.youtube.com/watch?v=BsWxPI9UM4c                            |
+| video | Build Agents That Run for Hours                             | Ash Prabaker and Andrew Wilson, Anthropic | A hands-on workshop on handoffs and checking the work of an agent.          | https://www.youtube.com/watch?v=mR-WAvEPRwE                            |
+| read  | Demystifying evals for AI agents                            | Anthropic engineering                     | Judge an agent by the state it leaves behind, not by what it says.          | https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents |
+| read  | Infrastructure noise in agentic coding evals                | Anthropic engineering                     | Why the same model scores differently on different machines.                | https://www.anthropic.com/engineering/infrastructure-noise             |
+| read  | How we built our multi-agent research system                | Anthropic engineering                     | The team that runs it shares real costs and failures.                       | https://www.anthropic.com/engineering/multi-agent-research-system      |
 
 ## Assignment
 

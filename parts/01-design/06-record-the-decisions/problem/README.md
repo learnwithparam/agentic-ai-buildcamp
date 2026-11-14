@@ -52,7 +52,7 @@ run-the-swap-gate   refuse-a-bad-model   pay-once-after-a-crash
 
 - `topology.md`, `model.md` and `durability.md` exist in `adr/`.
 - Each section says something real, with no `TODO`.
-- Each `## Enforced by` names a `bun run verify` check.
+- Each "## Enforced by" names a `bun run verify` check.
 
 ```bash
 bun run verify record-the-decisions

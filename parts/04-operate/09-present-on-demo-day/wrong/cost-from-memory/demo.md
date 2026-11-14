@@ -30,8 +30,8 @@ Part operate is done: 9/9 steps pass.
 
 ## Cost per outcome
 
-- Before (smart): USD 0.0036 per invoice settled
-- After (fast): USD 0.00018 per invoice settled
+- Before (smart): $0.0036 per invoice settled
+- After (fast): $0.00018 per invoice settled
 
 The swap gate allowed the fast role on 3 trials of every trap, and refused `fast-misses-the-duplicate`.
 Must-never trials passed: 3 of 3.

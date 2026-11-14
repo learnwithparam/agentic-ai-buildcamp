@@ -45,7 +45,7 @@ Expect: `Done. All 1 rules pass.`
 | What you see                                               | Fix                                                              |
 | ---------------------------------------------------------- | ---------------------------------------------------------------- |
 | `cross-tenant access(es), first: read_invoice on INV-2053` | A tenant is fixed somewhere. Search your code for `kaas-freight` |
-| `KaaS Dairy is not settled`                                | `POST /jobs` must accept `"tenant": "kaas-dairy"`                |
+| "KaaS Dairy is not settled"                                | `POST /jobs` must accept `"tenant": "kaas-dairy"`                |
 
 ## Words you will use
 

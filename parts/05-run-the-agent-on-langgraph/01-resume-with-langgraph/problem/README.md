@@ -61,7 +61,7 @@ Expect: `Done. All 5 rules pass.` once your graph is built. The check starts Pos
 | `SKIP` on every line                         | Docker is not running. Start it, then run the check again.                    |
 | The run never prints `PAUSED`                | `pay` must call `interrupt()` above the limit, and `invoke` returns after it. |
 | `node decide` prints again after the restart | The saver is in memory. Use the Postgres checkpointer so the thread survives. |
-| The ledger has 2 rows, or the insert fails   | Use `on conflict do nothing` on the insert, so a second run writes nothing.   |
+| The ledger has 2 rows, or the insert fails   | Use "on conflict do nothing" on the insert, so a second run writes nothing.   |
 
 ## Words you will use
 

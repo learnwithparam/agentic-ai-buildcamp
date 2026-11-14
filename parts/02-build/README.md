@@ -58,21 +58,21 @@ reads the ledger to see if it landed.
 Core steps make the one-day path. Every check starts your employee from `employee.toml`. It sends jobs over
 [contract version 1](../../reference/CONTRACT.md) and needs 3 of 3 fresh trials to pass.
 
-| Step                                                                      | Minutes | Core          | The check reads                                                                      |
-| ------------------------------------------------------------------------- | ------- | ------------- | ------------------------------------------------------------------------------------ |
-| [answer-the-contract](01-answer-the-contract/problem/README.md)           | 30      | yes           | `GET /health` after the checker starts your employee from `employee.toml`            |
-| [call-the-tools](02-call-the-tools/problem/README.md)                     | 20      | yes           | the trace's `invoke_agent` and `execute_tool` spans; the write log stays empty       |
-| [pay-one-invoice](03-pay-one-invoice/problem/README.md)                   | 25      | yes           | the ledger's payment row and its Idempotency-Key in the trace                        |
-| [stop-the-loop-on-purpose](04-stop-the-loop-on-purpose/problem/README.md) | 30      | four evenings | the job's end status, the step count in the trace against `max_steps`, the write log |
-| [close-on-the-record](05-close-on-the-record/problem/README.md)           | 30      | yes           | the ledger after a pay call that timed out after it wrote, and one that never wrote  |
-| [hold-the-must-never](06-hold-the-must-never/problem/README.md)           | 30      | yes           | the ledger: no payment for the duplicate or the above-rate invoice                   |
-| [ask-for-approval](07-ask-for-approval/problem/README.md)                 | 20      | yes           | `GET /approvals` and the ledger: no payment for the USD 6,200 invoice                |
-| [check-who-approves](08-check-who-approves/problem/README.md)             | 25      | yes           | the answers to Jo, Ravi and Lena, the ledger, and the write log after a decline      |
-| [add-a-checker](09-add-a-checker/problem/README.md)                       | 25      | no            | checker spans before every write span, matched with the world's write log            |
-| [catch-a-bad-draft](10-catch-a-bad-draft/problem/README.md)               | 20      | no            | the ledger: a planted wrong reason code and an above-rate payment never land         |
-| [remember-what-matters](11-remember-what-matters/problem/README.md)       | 30      | no            | `GET /approvals`, the write log and `x.memory` spans after a restart                 |
-
-Total: 285 minutes.
+| Step                                                                                  | Minutes | Core          | The check reads                                                                      |
+| ------------------------------------------------------------------------------------- | ------- | ------------- | ------------------------------------------------------------------------------------ |
+| [answer-the-contract](01-answer-the-contract/problem/README.md)                       | 30      | yes           | `GET /health` after the checker starts your employee from `employee.toml`            |
+| [call-the-tools](02-call-the-tools/problem/README.md)                                 | 20      | yes           | the trace's `invoke_agent` and `execute_tool` spans; the write log stays empty       |
+| [pay-one-invoice](03-pay-one-invoice/problem/README.md)                               | 25      | yes           | the ledger's payment row and its Idempotency-Key in the trace                        |
+| [stop-the-loop-on-purpose](04-stop-the-loop-on-purpose/problem/README.md)             | 30      | four evenings | the job's end status, the step count in the trace against `max_steps`, the write log |
+| [close-on-the-record](05-close-on-the-record/problem/README.md)                       | 30      | yes           | the ledger after a pay call that timed out after it wrote, and one that never wrote  |
+| [hold-the-must-never](06-hold-the-must-never/problem/README.md)                       | 30      | yes           | the ledger: no payment for the duplicate or the above-rate invoice                   |
+| [ask-for-approval](07-ask-for-approval/problem/README.md)                             | 20      | yes           | `GET /approvals` and the ledger: no payment for the USD 6,200 invoice                |
+| [check-who-approves](08-check-who-approves/problem/README.md)                         | 25      | yes           | the answers to Jo, Ravi and Lena, the ledger, and the write log after a decline      |
+| [add-a-checker](09-add-a-checker/problem/README.md)                                   | 25      | no            | checker spans before every write span, matched with the world's write log            |
+| [catch-a-bad-draft](10-catch-a-bad-draft/problem/README.md)                           | 20      | no            | the ledger: a planted wrong reason code and an above-rate payment never land         |
+| [remember-what-matters](11-remember-what-matters/problem/README.md)                   | 30      | no            | `GET /approvals`, the write log and `x.memory` spans after a restart                 |
+| [engineer-the-context](12-engineer-the-context/problem/README.md)                     | 20      | no            | `context.yaml`: a budget, what is in, what is left out                               |
+| [design-the-tool-and-its-output](13-design-the-tool-and-its-output/problem/README.md) | 20      | no            | `tool.yaml`: a named tool, fixed output fields and an error with a fix               |
 
 ## Walkthrough
 
@@ -90,7 +90,7 @@ See where this part ends. The sample finished employee is the reference with a m
 EMPLOYEE_DIR=parts/02-build/11-remember-what-matters/solution bun run verify part build
 ```
 
-Expect: eleven `PASS` lines and `Part build is done: 11/11 steps pass.`
+Expect: thirteen `PASS` lines and `Part build is done: 13/13 steps pass.`
 
 Copy a starter kit to `employee/` at the repo root. The checker looks there. Use `starter/python` if you like
 Python better. Any other stack works too, as long as it answers the contract.
@@ -122,7 +122,18 @@ When every step is done, run the deliverable.
 bun run verify part build
 ```
 
-Expect: with the untouched starter, `2/11 steps pass.`; when you finish, eleven `PASS` lines and `Part build is done: 11/11 steps pass.`
+Expect: with the untouched starter, `2/13 steps pass.`; when you finish, thirteen `PASS` lines and `Part build is done: 13/13 steps pass.`
+
+## Watch and read
+
+| Kind  | Title                                                  | Who made it                               | Why                                                                             | Link                                                                   |
+| ----- | ------------------------------------------------------ | ----------------------------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| video | Build Agents That Run for Hours                        | Ash Prabaker and Andrew Wilson, Anthropic | A hands-on workshop on handoffs and checking the work of an agent.              | https://www.youtube.com/watch?v=mR-WAvEPRwE                            |
+| video | How We Build Effective Agents                          | Barry Zhang, Anthropic                    | The maker of the method says when an agent is worth its cost.                   | https://www.youtube.com/watch?v=D7_ipDqhtwk                            |
+| read  | Demystifying evals for AI agents                       | Anthropic engineering                     | Judge an agent by the state it leaves behind, not by what it says.              | https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents |
+| read  | How AI agents shape experts' judgment calls            | Anthropic research                        | Shows why a click on approve is not proof that a person decided.                | https://www.anthropic.com/research/agents-judgment-calls               |
+| read  | Writing effective tools for AI agents                  | Anthropic engineering                     | How to write tools that a model can use without mistakes.                       | https://www.anthropic.com/engineering/writing-tools-for-agents         |
+| read  | Designing robust and predictable APIs with idempotency | Stripe engineering                        | The team that runs payments explains how to retry a write without paying twice. | https://stripe.com/blog/idempotency                                    |
 
 ## Assignment
 
@@ -139,7 +150,7 @@ behaviour passes only on 3 of 3 fresh trials. Each check is tested against emplo
 | Question                                                 | Yes when                                     |
 | -------------------------------------------------------- | -------------------------------------------- |
 | Does every core step pass?                               | The seven core lines in the table say `PASS` |
-| Does every step pass?                                    | `Part build is done: 11/11 steps pass.`      |
+| Does every step pass?                                    | `Part build is done: 13/13 steps pass.`      |
 | Does a job ever say done when the ledger disagrees?      | No `said done` message in any run            |
 | Is the must-never held on every trial?                   | `hold-the-must-never` passes 3 of 3          |
 | Does a payment over the limit wait for the right person? | `check-who-approves` passes 3 of 3           |
