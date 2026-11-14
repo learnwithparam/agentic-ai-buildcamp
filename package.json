@@ -12,6 +12,8 @@
     "world": "bun worlds/run.ts",
     "reference": "bun reference/run.ts",
     "reference-employee": "bun reference/start.ts",
+    "deploy-employee": "bun parts/03-deploy/start.ts",
+    "operate-employee": "bun parts/04-operate/kit-start.ts",
     "cost": "bun checks/design-lib.ts",
     "models": "bun scripts/models.ts",
     "text-audit": "bun scripts/text-audit.ts"
