@@ -385,7 +385,8 @@ function checkSolutionsRunInEmployee(steps: Step[]) {
       const output = `${run.stdout}${run.stderr}`;
       // A rule that cannot run here (no Docker) is not a pass, but it is not this rule's failure.
       if (run.status === 0 || output.includes("could not run here")) continue;
-      const lastLines = output.trim().split("\n").slice(-3).join(" | ");
+      const outputLines = output.trim().split("\n");
+      const lastLines = outputLines.slice(-3).join(" | ");
       fail(solution, `copied into employee/, verify ${step.name} fails: ${lastLines}`);
     }
   } finally {

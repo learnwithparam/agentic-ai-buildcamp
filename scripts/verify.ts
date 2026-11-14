@@ -1,6 +1,6 @@
 // bun run verify <step-name>            check your work on one step, then print one progress line
 // bun run verify <step-name> solution   check the sample solution instead
-// bun run verify <step-name> <folder>   check the work in any folder, for example a scratch employee/
+// bun run verify <step-name> <folder>   check the work in any folder, such as a copy in employee/
 // bun run verify part <part-name>      check every step in one part (a deliverable)
 // bun run verify --report               write verify-report.json for cohort grading
 // bun run verify --all                  CI: each check fails on its starter and wrong answers,
@@ -240,10 +240,16 @@ function stepOrList(stepName: string | undefined): Step {
   process.exit(1);
 }
 
+// The folder a learner named on the command line, when it exists.
+function folderToCheck(argument: string | undefined): string | null {
+  if (!argument || argument === "solution" || !existsSync(argument)) return null;
+  return resolve(argument);
+}
+
 async function verifyStep(stepName: string | undefined, which: string | undefined) {
   const step = stepOrList(stepName);
   const asSolution = which === "solution";
-  const givenFolder = which && !asSolution && existsSync(which) ? resolve(which) : null;
+  const givenFolder = folderToCheck(which);
   const whose = asSolution ? "sample solution" : "your work";
   console.log(`Checking ${step.name} (${whose}):`);
   let folder = asSolution ? join(step.dir, "solution") : learnerWork(step);

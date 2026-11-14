@@ -219,11 +219,11 @@ export function replayRun(runId: string): Run | undefined {
 // ---------- Files a learner writes, found across steps ----------
 // A step that builds on an earlier one reads the file in its own folder first, then the earlier
 // step's folder of the same kind (problem or solution). A wrong/<mistake>/ folder is judged
-// against the sample solution's files.
+// against the sample solution's files, and so is a copy in employee/, which is neither.
 export function find(folder: string, file: string, stepSuffix: string): string | null {
   if (existsSync(join(folder, file))) return join(folder, file);
   const isWrongAnswer = basename(dirname(folder)) === "wrong";
-  const kind = isWrongAnswer ? "solution" : basename(folder);
+  const kind = !isWrongAnswer && basename(folder) === "problem" ? "problem" : "solution";
   const step = readdirSync(PART).find((name) => name.endsWith(`-${stepSuffix}`));
   if (!step) return null;
   const path = join(PART, step, kind, file);
