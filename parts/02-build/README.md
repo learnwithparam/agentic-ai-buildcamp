@@ -1,4 +1,4 @@
-# Part 2: Build
+# Build
 
 The naive clerk says "All 6 invoices paid. Done." Then you open the ledger. Four invoices are paid once. One is paid
 twice. One is not paid at all. The clerk did not lie on purpose. It trusted its own calls and never looked at the

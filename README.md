@@ -99,13 +99,14 @@ too. It bills the same load as `INV-2012`, USD 2,675, under a new invoice number
 
 ## The parts
 
-| Part                                    | Minutes | What you leave with                                                                                                  | Deliverable                     |
-| --------------------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------- | ------------------------------- |
-| [Orientation](00-orientation/README.md) | 20      | The world, the naive employee, the reference, the board                                                              | `bun run verify meet-the-world` |
-| Design                                  | 200     | A hire letter, acceptance tests, tools and permissions, a cost model, three ADRs, a peer review. No code             | `bun run verify part design`    |
-| Build                                   | 285     | One job end to end, closed on the record, the must-never held, approvals by role, a checker before every final write | `bun run verify part build`     |
-| Deploy                                  | 215     | A service that survives a crash, starts on events and schedules, a policy gate, a spend cap, a second tenant         | `bun run verify part deploy`    |
-| Operate                                 | 225     | Cost per outcome on the board, labelled traces, evals from failures, a gate that refuses a bad model swap            | `bun run verify part operate`   |
+| Part                                    | Minutes | What you leave with                                                                                                      | Deliverable                                      |
+| --------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------ |
+| [Orientation](00-orientation/README.md) | 20      | The world, the naive employee, the reference, the board                                                                  | `bun run verify meet-the-world`                  |
+| Design                                  | 200     | A hire letter, acceptance tests, tools and permissions, a cost model, three ADRs, a peer review. No code                 | `bun run verify part design`                     |
+| Build                                   | 285     | One job end to end, closed on the record, the must-never held, approvals by role, a checker before every final write     | `bun run verify part build`                      |
+| Deploy                                  | 215     | A service that survives a crash, starts on events and schedules, a policy gate, a spend cap, a second tenant             | `bun run verify part deploy`                     |
+| Operate                                 | 225     | Cost per outcome on the board, labelled traces, evals from failures, a gate that refuses a bad model swap                | `bun run verify part operate`                    |
+| Run the agent on LangGraph              | 30      | One approval pause you built by hand, redone on a graph library with a Postgres checkpointer, resumed on the same thread | `bun run verify part run-the-agent-on-langgraph` |
 
 Each step starts with a problem in the world. Then it gives you the challenge. Then you run one command:
 `bun run verify <step-name>`. When a rule fails, it tells you what to try next. [SUBMIT.md](SUBMIT.md) says what you

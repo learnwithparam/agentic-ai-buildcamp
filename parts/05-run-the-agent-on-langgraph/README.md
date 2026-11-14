@@ -1,4 +1,4 @@
-# Part 5: Run the agent on LangGraph
+# Run the agent on LangGraph
 
 ## The problem
 
