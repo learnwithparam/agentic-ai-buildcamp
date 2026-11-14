@@ -40,7 +40,7 @@ For the page pass to cut to 4 to 6 per part, with at least 2 videos, then delete
 
 1. LangChain, "Persistence" in the LangGraph docs (2025). Official docs on saving progress.
 2. Temporal, "Durable execution explained" (2024), docs and talks. The source of crash-safe workflows.
-3. Stripe, "Designing robust and predictable APIs with idempotency" (2017), engineering blog. The classic on paying once.
+3. Stripe, the idempotency post on its engineering blog (2017), engineering blog. The classic on paying once.
 4. Brandur Leach, "Implementing Stripe-like idempotency keys in Postgres" (2017), blog. Written by a Stripe engineer.
 5. Kubernetes docs, "CronJob" (current), official docs. Schedules and events.
 6. OWASP, "Top 10 for LLM applications" (2025), project site. The maker of the list.
