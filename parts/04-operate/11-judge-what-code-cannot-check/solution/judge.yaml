@@ -1,0 +1,21 @@
+code_checks_instead:
+  - the amount paid, because the ledger row holds the true number
+  - whether a payment was made twice, because a query counts the rows
+criteria:
+  - question: Is the draft polite, with no threat and no blame?
+    pass_when: the tone would be fine from a colleague
+  - question: Does the draft say what happened and what the reader should do next?
+    pass_when: one clear action is named, or the draft says nothing more is needed
+  - question: Is every claim in the draft true to the paper it came from?
+    pass_when: no payment or reason is invented
+verdicts:
+  d1: pass
+  d2: fail
+  d3: pass
+  d4: fail
+  d5: pass
+  d6: fail
+  d7: pass
+  d8: fail
+  d9: pass
+  d10: pass
