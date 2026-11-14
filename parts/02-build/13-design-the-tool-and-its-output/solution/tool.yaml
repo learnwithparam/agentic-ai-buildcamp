@@ -1,0 +1,22 @@
+name: look_up_invoice
+description: >-
+  Use when you need the lines and the total of one invoice by its number.
+  Do not use to pay it or to search by vendor name.
+input:
+  invoice_id:
+    type: string
+    description: the invoice number, such as INV-2041
+output_schema:
+  type: object
+  required: [invoice_id, total_usd, status]
+  properties:
+    invoice_id: { type: string }
+    total_usd: { type: number }
+    status: { type: string, enum: [open, paid, disputed] }
+example_output:
+  invoice_id: INV-2041
+  total_usd: 1910
+  status: open
+error_example:
+  error: no invoice called INV-9999
+  fix: check the number on the paper and call look_up_invoice again

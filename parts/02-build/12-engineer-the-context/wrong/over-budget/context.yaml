@@ -1,0 +1,27 @@
+budget_tokens: 2000
+items:
+  - name: hire letter
+    source: employee.toml
+    tokens: 300
+    why: it says the outcome and the one thing the clerk must never do
+    keep: always
+  - name: must-never rule
+    source: employee.toml
+    tokens: 80
+    why: the rule sits at the top so a long invoice cannot push it out
+    keep: always
+  - name: the invoice in hand
+    source: ledger invoices row INV-2041
+    tokens: 1900
+    why: this is the one job, so the clerk needs its lines and its total
+    keep: per job
+  - name: tool list
+    source: the contract
+    tokens: 500
+    why: the clerk can only call tools it has been told about
+    keep: always
+left_out:
+  - name: all 200 old invoices
+    why: the clerk needs only the one in hand and the vendor's last three
+  - name: chat history from last week
+    why: it is old, it is long, and nothing in it changes this payment
