@@ -1,12 +1,57 @@
 [
-  { "id": "d1", "draft": "Hi Lena, INV-2041 is ready to pay. Total USD 1,910, due Friday.", "human": "pass", "critical": false },
-  { "id": "d2", "draft": "Pay it now or we will cancel your account!!", "human": "fail", "critical": true },
-  { "id": "d3", "draft": "Hello, I held INV-2043 because the total does not match the load. Can you check it?", "human": "pass", "critical": false },
-  { "id": "d4", "draft": "per my last email, obviously you did not read it.", "human": "fail", "critical": true },
-  { "id": "d5", "draft": "INV-2046 is paid. Reference PAY-77 for your records.", "human": "pass", "critical": false },
+  {
+    "id": "d1",
+    "draft": "Hi Lena, INV-2041 is ready to pay. Total USD 1,910, due Friday.",
+    "human": "pass",
+    "critical": false
+  },
+  {
+    "id": "d2",
+    "draft": "Pay it now or we will cancel your account!!",
+    "human": "fail",
+    "critical": true
+  },
+  {
+    "id": "d3",
+    "draft": "Hello, I held INV-2043 because the total does not match the load. Can you check it?",
+    "human": "pass",
+    "critical": false
+  },
+  {
+    "id": "d4",
+    "draft": "per my last email, obviously you did not read it.",
+    "human": "fail",
+    "critical": true
+  },
+  {
+    "id": "d5",
+    "draft": "INV-2046 is paid. Reference PAY-77 for your records.",
+    "human": "pass",
+    "critical": false
+  },
   { "id": "d6", "draft": "Your invoice is bad. Fix it.", "human": "fail", "critical": false },
-  { "id": "d7", "draft": "Hi, I need your OK to pay INV-2050 for USD 9,400. It is above the usual limit.", "human": "pass", "critical": false },
-  { "id": "d8", "draft": "Sure, I paid INV-2051 twice just to be safe.", "human": "fail", "critical": true },
-  { "id": "d9", "draft": "Thanks for the quick reply. I will pay INV-2052 today.", "human": "pass", "critical": false },
-  { "id": "d10", "draft": "We cannot say why. It just did not go through.", "human": "fail", "critical": false }
+  {
+    "id": "d7",
+    "draft": "Hi, I need your OK to pay INV-2050 for USD 9,400. It is above the usual limit.",
+    "human": "pass",
+    "critical": false
+  },
+  {
+    "id": "d8",
+    "draft": "Sure, I paid INV-2051 twice just to be safe.",
+    "human": "fail",
+    "critical": true
+  },
+  {
+    "id": "d9",
+    "draft": "Thanks for the quick reply. I will pay INV-2052 today.",
+    "human": "pass",
+    "critical": false
+  },
+  {
+    "id": "d10",
+    "draft": "We cannot say why. It just did not go through.",
+    "human": "fail",
+    "critical": false
+  }
 ]

@@ -5,6 +5,8 @@
 Code can count ledger rows. It cannot tell if a reply to a vendor is polite and true. A second model can judge that,
 but only if you check the judge too. A judge that says pass to everything looks fine and catches nothing.
 
+For example, the draft "Pay it now or we will cancel your account!!" must fail, even though its numbers are right.
+
 ```mermaid
 flowchart LR
   D[Ten labelled drafts] --> J[Your judge, one yes or no per draft]
@@ -37,10 +39,10 @@ The sample is in [solution/judge.yaml](../solution/judge.yaml).
 
 ## If you get stuck
 
-| What you see | Fix |
-| --- | --- |
-| `FAIL the judge fails every draft marked critical` | Add a question that the missed draft breaks, then run it again. |
-| `FAIL the judge agrees with the human label on at least eight of ten drafts` | Read each draft it got wrong and tighten the `pass_when` line. |
+| What you see                                                                 | Fix                                                             |
+| ---------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| `FAIL the judge fails every draft marked critical`                           | Add a question that the missed draft breaks, then run it again. |
+| `FAIL the judge agrees with the human label on at least eight of ten drafts` | Read each draft it got wrong and tighten the `pass_when` line.  |
 
 ## Words you will use
 

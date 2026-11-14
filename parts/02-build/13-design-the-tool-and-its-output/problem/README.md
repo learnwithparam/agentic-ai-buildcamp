@@ -6,6 +6,8 @@ A tool called `invoices` with the note "Gets invoices" makes the model guess whe
 a friendly sentence makes your code guess what it meant. Name the tool for its job, say when to use it and when not,
 and hand back fields your code can read.
 
+For example, `look_up_invoice` takes `INV-2041` and hands back `total_usd: 1910` and `status: open`.
+
 ```mermaid
 flowchart LR
   M[Model] -->|invoice_id| T[look_up_invoice]
@@ -40,9 +42,9 @@ The freight sample is in [solution/tool.yaml](../solution/tool.yaml).
 
 ## If you get stuck
 
-| What you see | Fix |
-| --- | --- |
-| `FAIL the example output fits the output schema` | Make every required field appear in the example, with the right type. |
+| What you see                                            | Fix                                                                     |
+| ------------------------------------------------------- | ----------------------------------------------------------------------- |
+| `FAIL the example output fits the output schema`        | Make every required field appear in the example, with the right type.   |
 | `FAIL the description says when to use it and when not` | Add a sentence that starts "Use when" and one that starts "Do not use". |
 
 ## Words you will use

@@ -2,7 +2,13 @@
 import type { Rule } from "../scripts/verify";
 import { hasFile, readYaml } from "./design-lib";
 
-type ContextItem = { name?: unknown; source?: unknown; tokens?: unknown; why?: unknown; keep?: unknown };
+type ContextItem = {
+  name?: unknown;
+  source?: unknown;
+  tokens?: unknown;
+  why?: unknown;
+  keep?: unknown;
+};
 type LeftOut = { name?: unknown; why?: unknown };
 type ContextFile = { budget_tokens?: unknown; items?: ContextItem[]; left_out?: LeftOut[] };
 
@@ -40,7 +46,9 @@ function isMustNever(item: ContextItem): boolean {
 function leftOutOnPurpose(folder: string): boolean {
   const leftOut = contextIn(folder).left_out;
   if (!Array.isArray(leftOut)) return false;
-  return leftOut.length >= 2 && leftOut.every((entry) => isText(entry.name, 1) && isText(entry.why, 4));
+  return (
+    leftOut.length >= 2 && leftOut.every((entry) => isText(entry.name, 1) && isText(entry.why, 4))
+  );
 }
 
 export default [

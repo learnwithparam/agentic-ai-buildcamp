@@ -24,7 +24,7 @@ function toolIn(folder: string): ToolFile {
 
 const GENERIC_NAMES = ["tool", "helper", "data", "invoices", "run", "do", "get"];
 
-function nameIsAJob(folder: string): boolean {
+function nameSaysTheJob(folder: string): boolean {
   const name = toolIn(folder).name;
   if (typeof name !== "string" || GENERIC_NAMES.includes(name)) return false;
   return /^[a-z]+(_[a-z]+)+$/.test(name);
@@ -63,7 +63,7 @@ function exampleFitsTheSchema(folder: string): boolean {
   return extra.length === 0 && validate(tool.output_schema as never, example).length === 0;
 }
 
-function errorHasAFix(folder: string): boolean {
+function errorHasFix(folder: string): boolean {
   const error = toolIn(folder).error_example;
   return String(error?.error ?? "").trim().length > 5 && String(error?.fix ?? "").trim().length > 5;
 }
@@ -71,8 +71,9 @@ function errorHasAFix(folder: string): boolean {
 export default [
   {
     says: "the tool is named for its job in snake case, such as look_up_invoice",
-    test: nameIsAJob,
-    tryNext: "use a verb and a thing joined by an underscore, and avoid words like tool or invoices",
+    test: nameSaysTheJob,
+    tryNext:
+      "use a verb and a thing joined by an underscore, and avoid words like tool or invoices",
   },
   {
     says: "the description says when to use it and when not",
@@ -96,7 +97,7 @@ export default [
   },
   {
     says: "the error example says what went wrong and what to try next",
-    test: errorHasAFix,
+    test: errorHasFix,
     tryNext: "fill in error with the cause and fix with the next call the model should make",
   },
 ] satisfies Rule[];

@@ -5,6 +5,8 @@
 The model only knows what you put in front of it. A clerk that gets all 200 old invoices pays more, slows down and
 can lose the one rule that matters. Pick what goes in. One job, one invoice, one rule, a small budget.
 
+For example, for invoice `INV-2041` the clerk needs the one invoice, about 400 tokens, and not the 200 old ones.
+
 ```mermaid
 flowchart LR
   A[Everything you have] --> B{Does this job need it?}
@@ -41,10 +43,10 @@ The freight sample is in [solution/context.yaml](../solution/context.yaml).
 
 ## If you get stuck
 
-| What you see | Fix |
-| --- | --- |
-| `FAIL the items fit inside the budget` | Cut the biggest item down, or drop one that this job does not need. |
-| `FAIL the must-never rule is its own item that is always kept` | Add an item named "must-never rule" with `keep: always`. |
+| What you see                                                   | Fix                                                                 |
+| -------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `FAIL the items fit inside the budget`                         | Cut the biggest item down, or drop one that this job does not need. |
+| `FAIL the must-never rule is its own item that is always kept` | Add an item named "must-never rule" with `keep: always`.            |
 
 ## Words you will use
 

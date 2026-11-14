@@ -26,13 +26,14 @@ function keepsCodeChecksOut(folder: string): boolean {
   return listed.filter((item) => String(item ?? "").trim().length > 8).length >= 2;
 }
 
-function hasARubric(folder: string): boolean {
+function hasRubric(folder: string): boolean {
   const criteria = judgeIn(folder).criteria ?? [];
   if (criteria.length < 3) return false;
   return criteria.every(
     (criterion) =>
-      String(criterion.question ?? "").trim().endsWith("?") &&
-      String(criterion.pass_when ?? "").trim().length > 8,
+      String(criterion.question ?? "")
+        .trim()
+        .endsWith("?") && String(criterion.pass_when ?? "").trim().length > 8,
   );
 }
 
@@ -61,7 +62,7 @@ export default [
   },
   {
     says: "the rubric has three yes or no questions, each with a pass line",
-    test: hasARubric,
+    test: hasRubric,
     tryNext: "write each question so it ends with a question mark, and add a pass_when line",
   },
   {

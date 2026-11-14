@@ -5,6 +5,8 @@
 A day brings 200 runs and a person can read about 30. Reading the first 30 hides the bad ones. Reading a random few
 misses the rare bad one. So keep every run that went wrong or cost a lot, then add a small random slice of the rest.
 
+For example, 6 of the 200 runs are errors. All 6 get read, plus about 10 more picked by the dice.
+
 ```mermaid
 flowchart LR
   R[200 live runs] --> A{Error, approval or high cost?}
@@ -40,10 +42,10 @@ The sample is in [solution/sampling.yaml](../solution/sampling.yaml).
 
 ## If you get stuck
 
-| What you see | Fix |
-| --- | --- |
+| What you see                                    | Fix                                                                             |
+| ----------------------------------------------- | ------------------------------------------------------------------------------- |
 | `FAIL the runs kept fit in the reviewer budget` | Lower the rate, or raise the budget only if a person can really read that many. |
-| `FAIL every error run is kept` | Set `error: true` under `always_keep`. |
+| `FAIL every error run is kept`                  | Set `error: true` under `always_keep`.                                          |
 
 ## Words you will use
 
