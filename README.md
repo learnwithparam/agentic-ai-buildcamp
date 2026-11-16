@@ -125,10 +125,10 @@ In Design, you may pick any employee below, or bring your own. For example, you 
 
 ## Case studies
 
-Two real business problems for you to design and build. Read the brief first. Then design your own answer.
+Read these first. Then design your own solution.
 
-- [Case study 1: Enterprise Agentic HCP System](case-studies/enterprise-agentic-hcp-system.md)
-- [Case study 2: Autonomous AI Teammates](case-studies/autonomous-ai-teammates.md)
+- [Case Study 1: Enterprise Agentic HCP System](case-studies/enterprise-agentic-hcp-system.md)
+- [Case Study 2: Autonomous AI Teammates](case-studies/autonomous-ai-teammates.md)
 
 ## How the repo works
 
