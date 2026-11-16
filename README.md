@@ -123,6 +123,13 @@ In Design, you may pick any employee below, or bring your own. For example, you 
 | Grant screener                | A charity foundation               | Each application screened and scored against the fund's rules                | Award above the board's limit                         | An applicant already funded under another name         |
 | Milk pickup planner           | A dairy farm co-op                 | Each farm's tank collected before it is full                                 | Send a driver past their legal driving limit          | A tank alarm with only one rested driver               |
 
+## Case studies
+
+Two real business problems for you to design and build. Read the brief first. Then design your own answer.
+
+- [Case study 1: Enterprise Agentic HCP System](case-studies/enterprise-agentic-hcp-system.md)
+- [Case study 2: Autonomous AI Teammates](case-studies/autonomous-ai-teammates.md)
+
 ## How the repo works
 
 [STANDARD.md](STANDARD.md) lists the rules for every course repo, and the check behind each rule. Model ids and the dated price table live in one file: [config/models.ts](config/models.ts). The checker library has its own page: [checks/lib/README.md](checks/lib/README.md).
