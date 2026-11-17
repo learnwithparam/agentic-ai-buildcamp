@@ -17,6 +17,8 @@ flowchart LR
   L --> Y[notes.md: what the ledger and the board show]
 ```
 
+Notice: The naive run only says it is done. The reference run checks the ledger after every write.
+
 ## Your challenge
 
 Run the world, the naive employee and the reference. Then write what you saw in `notes.md` in this folder. Each line names

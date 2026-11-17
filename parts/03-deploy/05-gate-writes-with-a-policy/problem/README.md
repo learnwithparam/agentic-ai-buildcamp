@@ -28,6 +28,8 @@ flowchart LR
   Policy[policy.yaml] --> Gate
 ```
 
+Notice: The model only drafts. The gate in code reads policy.yaml and decides.
+
 ## Your challenge
 
 1. Copy `policy.yaml` from this folder next to your `employee.toml`. Fill it in:

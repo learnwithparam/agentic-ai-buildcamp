@@ -24,6 +24,8 @@ flowchart LR
   Healthy -->|must pass every one| Calm[Quiet when healthy]
 ```
 
+Notice: A good eval fails on bad runs, passes on good runs, and stays quiet on healthy ones.
+
 ## Your challenge
 
 Run your evals against your labels. Fix any eval that does not bite, or that barks at good runs:
@@ -54,11 +56,11 @@ Expect: `Done. All 3 rules pass.`
 
 ## If you get stuck
 
-| What you see                         | Fix                                                                                                                           |
-| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
-| `passes all 5 run(s) in its mode`    | Read one of those runs in the viewer. What does the ledger hold that a good run does not? Check that.                         |
-| `fails ..., which you labelled pass` | The eval fires where the mode does not apply. Return `null` first. For example, when there is no earlier invoice on the load. |
-| "fails a healthy run of INV-2017"    | A duplicate disputed after Lena approved is right. Accept a `DUPLICATE` dispute, or a dispute that waits for approval.        |
+| What you see                         | Fix                                                                                                |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------- |
+| `passes all 5 run(s) in its mode`    | Read one of those runs. Look for what the ledger holds that a good run lacks.                      |
+| `fails ..., which you labelled pass` | The eval fires where the mode does not apply. Return `null` first for those runs.                  |
+| "fails a healthy run of INV-2017"    | A duplicate disputed after Lena approved is right. Accept a `DUPLICATE` dispute or one that waits. |
 
 ## Words you will use
 

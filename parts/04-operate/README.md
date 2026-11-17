@@ -1,5 +1,16 @@
 # Operate
 
+## After this part you can
+
+- Price each outcome from the traces.
+- Label runs, count failure modes and write one eval for each.
+- Refuse a bad model swap with a gate.
+- Survive a ledger outage, and show it in a demo.
+
+## You leave with
+
+A board, evals, a swap gate, a runbook and a demo. The part passes `bun run verify part operate`.
+
 ## The problem
 
 The clerk works. Now finance asks two questions:
@@ -44,6 +55,8 @@ flowchart LR
   Keep --> Board
   Drill[Incident drill: the ledger is down] --> Runbook[Runbook] --> Evals
 ```
+
+Notice: The loop goes around. Better evidence drives the model choice, and the board shows the effect.
 
 The same picture is in `operate-loop.mmd`.
 
@@ -196,7 +209,7 @@ Part operate is done: 12/12 steps pass.
 | read  | Infrastructure noise in agentic coding evals                | Anthropic engineering                     | Why the same model scores differently on different machines.                | https://www.anthropic.com/engineering/infrastructure-noise             |
 | read  | How we built our multi-agent research system                | Anthropic engineering                     | The team that runs it shares real costs and failures.                       | https://www.anthropic.com/engineering/multi-agent-research-system      |
 
-## Assignment
+## Project
 
 **The problem.** Finance asks whether a cheaper model is safe. Nobody has read the traces.
 
@@ -219,16 +232,7 @@ with the recording link. The part's deliverable is `bun run verify part operate`
 **Extension.** Add a model judge for one failure mode that code cannot check. Then report how often it agrees with your
 labels. Judge calibration in depth belongs to the Evals workshop.
 
-## Finished
-
-You now have an employee you can run as a service, not a demo. You have:
-
-- a board that prices each outcome from the traces, with failed runs counted;
-- 60 labelled runs and failure modes with counts;
-- an eval per mode, proven to catch its mode;
-- a swap gate that allowed a model about twenty times cheaper per outcome, and refused one that leaves a duplicate open;
-- a runbook, and an employee that survives a ledger outage;
-- a five-minute demo with a scorecard.
+## What comes next
 
 This is the last part. The deliverable for the whole course is every part's `bun run verify part` table in your demo. From
 here, the sibling courses go deeper where this one stops:

@@ -25,6 +25,8 @@ sequenceDiagram
   E-->>C: declined, nothing written, Lena not asked
 ```
 
+Notice: The declined answer is saved. After a restart, Lena is not asked again.
+
 ## Your challenge
 
 Keep a small memory for each tenant. The memory must last through a restart. A tenant is one customer company, such as

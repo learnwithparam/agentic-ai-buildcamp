@@ -29,6 +29,8 @@ flowchart LR
   Record --> Peers[Two peers answer yes or no]
 ```
 
+Notice: The demo goes from the hire letter to one fixed failure. Two peers judge it.
+
 ## Your challenge
 
 Fill in `demo.md` in this folder. Each section is one slide of a five-minute recording.

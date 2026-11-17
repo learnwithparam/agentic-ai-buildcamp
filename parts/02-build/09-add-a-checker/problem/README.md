@@ -20,6 +20,8 @@ sequenceDiagram
   M->>W: open_dispute, with an Idempotency-Key
 ```
 
+Notice: The maker drafts and the checker compares with the papers. The write happens only after accept.
+
 ## Your challenge
 
 Split the maker from the checker. The maker drafts the decision. The checker accepts or rejects it.

@@ -24,6 +24,8 @@ sequenceDiagram
   C->>E: SIGTERM
 ```
 
+Notice: The checker starts your employee, asks if it is healthy, then stops it.
+
 ## Your challenge
 
 Make your employee a service that the checker can start and stop. A service is a program that stays up and answers

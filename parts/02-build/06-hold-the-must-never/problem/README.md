@@ -19,6 +19,8 @@ flowchart LR
   Rule -->|matches the evidence| Pay[pay_invoice]
 ```
 
+Notice: The rule is in code. The model can draft a payment, but code decides.
+
 ## Your challenge
 
 Put the rule in code, between the draft and the write. There, the model cannot talk its way past it.

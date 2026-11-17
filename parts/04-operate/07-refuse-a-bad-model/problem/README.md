@@ -20,6 +20,8 @@ flowchart LR
   Gate -->|safe| Allow[ALLOW: cost per outcome falls]
 ```
 
+Notice: The gate must refuse the planted model and allow the safe one.
+
 The checker now plays the vendor. It swaps in a **planted model**, `fast-misses-the-duplicate`. This model drafts "pay" for the
 duplicate invoice. The clerk's own checker stops the draft, so no money leaves. But the duplicate stays open for a person to
 find.

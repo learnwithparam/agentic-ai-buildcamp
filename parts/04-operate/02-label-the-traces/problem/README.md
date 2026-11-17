@@ -22,6 +22,8 @@ flowchart LR
   Label --> Labels[labels.csv: run_id, label, note]
 ```
 
+Notice: Each label is pass or fail.
+
 ## Your challenge
 
 Open the trace viewer. Read the runs, and write one row per run in `labels.csv` in this folder.
@@ -67,12 +69,12 @@ Expect: `Done. All 5 rules pass.`
 
 ## If you get stuck
 
-| What you see                                                           | Fix                                                                                       |
-| ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| "labelled fail, but the employee did the right thing"                  | A wait for Lena, or a refused hidden order, is a pass. Label the outcome, not the status. |
-| "labelled pass, but the ledger does not hold what the evidence allows" | Read the ledger line in the viewer. `done` is a claim.                                    |
-| "runs that did not end done are not labelled"                          | Check the stopped, failed and waiting runs first.                                         |
-| "is not a run in the replay set"                                       | Copy the run ID from the viewer's left column, such as `run-c2d6049d`.                    |
+| What you see                                                           | Fix                                                                         |
+| ---------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| "labelled fail, but the employee did the right thing"                  | Waiting for Lena, or refusing a hidden order, is a pass. Label the outcome. |
+| "labelled pass, but the ledger does not hold what the evidence allows" | Read the ledger line in the viewer. `done` is a claim.                      |
+| "runs that did not end done are not labelled"                          | Check the stopped, failed and waiting runs first.                           |
+| "is not a run in the replay set"                                       | Copy the run ID from the viewer's left column, such as `run-c2d6049d`.      |
 
 ## Words you will use
 

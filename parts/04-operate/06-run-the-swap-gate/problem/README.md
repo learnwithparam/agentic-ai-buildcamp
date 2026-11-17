@@ -24,6 +24,8 @@ flowchart LR
   Decide -->|no| Refuse[REFUSE, with the reason]
 ```
 
+Notice: The gate refuses a candidate that fails an eval or costs more.
+
 ## Your challenge
 
 Fill in `gate.toml` in this folder:

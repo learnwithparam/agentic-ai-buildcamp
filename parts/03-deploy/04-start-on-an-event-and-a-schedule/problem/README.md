@@ -25,6 +25,8 @@ flowchart LR
   Job --> Root[Root span: x.trigger.kind is person, event or schedule]
 ```
 
+Notice: Three starters make the same kind of job. The trace says which one started it.
+
 ## Your challenge
 
 1. Add `"event"` and `"schedule"` to `starts_by` in the `[hire]` block of `employee.toml`.

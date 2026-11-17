@@ -22,6 +22,8 @@ flowchart LR
   Questions -->|all yes| Build[Ready for Build]
 ```
 
+Notice: Any no sends you back. Build waits for two yeses.
+
 ## Your challenge
 
 Share your design files with two peers. Write their answers in `review.md` in this folder.

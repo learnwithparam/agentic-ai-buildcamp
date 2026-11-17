@@ -18,6 +18,8 @@ flowchart LR
   Reject --> Dispute[open_dispute DETENTION_UNSIGNED, or stop]
 ```
 
+Notice: The checker rejects a draft that the proof of delivery does not support.
+
 ## Your challenge
 
 Treat every draft as a claim, wherever it came from.

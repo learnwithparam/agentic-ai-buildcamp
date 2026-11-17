@@ -24,6 +24,8 @@ flowchart LR
   Approve -->|no| Refused[Refused at review]
 ```
 
+Notice: A final write such as a payment needs a named approver. Without one, the review refuses it.
+
 ## Your challenge
 
 Fill in `tools.yaml` in this folder. List every tool your employee may call. Each tool follows `tools.schema.json`. Every

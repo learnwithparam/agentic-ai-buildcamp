@@ -18,6 +18,8 @@ flowchart LR
   Expect --> Never[Must-never: 0 forbidden rows]
 ```
 
+Notice: A good case names rows in the ledger, not words in the reply.
+
 ## Your challenge
 
 Write at least five cases for your employee in `acceptance.yaml`:

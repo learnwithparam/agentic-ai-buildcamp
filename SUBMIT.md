@@ -19,7 +19,7 @@ bun run verify part build
 
 Expect: one line per step, and at the end `Part build is done: 13/13 steps pass.` when every step passes.
 
-A part is done when its command says every step passes. Each part's README ends with an "Assignment" section. It
+A part is done when its command says every step passes. Each part's README ends with a "Project" section. It
 lists a few more yes-or-no questions. Some are answered by a script, and some by a peer who reads your files or
 watches your demo.
 

@@ -1,5 +1,16 @@
 # Build
 
+## After this part you can
+
+- Run an employee that answers the contract.
+- Read the evidence, pay once and close on the ledger.
+- Hold the must-never and wait for the right approver.
+- Check every draft before it writes.
+
+## You leave with
+
+A running employee that passes `bun run verify part build`.
+
 ## The problem
 
 The naive clerk says "All 6 invoices paid. Done." Then you open the ledger.
@@ -40,6 +51,9 @@ For example, INV-2045 is for USD 6,200. Ravi may approve up to USD 5,000. So onl
 
 ## The loop you build
 
+Read the picture from left to right. A job comes in. Your employee reads the evidence. A maker drafts a decision, and a
+checker tests it.
+
 ```mermaid
 flowchart LR
   Job[POST /jobs] --> Read[Read the evidence]
@@ -56,8 +70,7 @@ flowchart LR
   Verify -->|no row| Failed[Report failed, with the reason]
 ```
 
-Read the diagram from left to right. A job comes in. Your employee reads the evidence. A maker drafts a decision, and a
-checker tests it.
+Notice: Nothing is written until the checker says yes. If the amount is over a limit, Lena must approve too.
 
 A payment over a limit waits for a person. Every write happens once. Then the employee reads the ledger to see whether the
 write landed.
@@ -73,7 +86,7 @@ Core steps make the one-day path. Every check starts your employee from `employe
 | [call-the-tools](02-call-the-tools/problem/README.md)                                 | 20      | yes           | the trace's `invoke_agent` and `execute_tool` spans; the write log stays empty       |
 | [pay-one-invoice](03-pay-one-invoice/problem/README.md)                               | 25      | yes           | the ledger's payment row and its Idempotency-Key in the trace                        |
 | [stop-the-loop-on-purpose](04-stop-the-loop-on-purpose/problem/README.md)             | 30      | four evenings | the job's end status, the step count in the trace against `max_steps`, the write log |
-| [close-on-the-record](05-close-on-the-record/problem/README.md)                       | 30      | yes           | the ledger after a pay call that timed out after it wrote, and one that never wrote  |
+| [close-on-the-record](05-close-on-the-record/problem/README.md)                       | 30      | yes           | the ledger after two timeouts: one after the write, one before it                    |
 | [hold-the-must-never](06-hold-the-must-never/problem/README.md)                       | 30      | yes           | the ledger: no payment for the duplicate or the above-rate invoice                   |
 | [ask-for-approval](07-ask-for-approval/problem/README.md)                             | 20      | yes           | `GET /approvals` and the ledger: no payment for the USD 6,200 invoice                |
 | [check-who-approves](08-check-who-approves/problem/README.md)                         | 25      | yes           | the answers to Jo, Ravi and Lena, the ledger, and the write log after a decline      |
@@ -144,7 +157,7 @@ Expect: with the untouched starter, `2/13 steps pass.`; when you finish, thirtee
 | read  | Writing effective tools for AI agents                  | Anthropic engineering                     | How to write tools that a model can use without mistakes.                       | https://www.anthropic.com/engineering/writing-tools-for-agents         |
 | read  | Designing robust and predictable APIs with idempotency | Stripe engineering                        | The team that runs payments explains how to retry a write without paying twice. | https://stripe.com/blog/idempotency                                    |
 
-## Assignment
+## Project
 
 **The problem.** The naive agent reports "All 6 invoices paid. Done." The ledger does not agree.
 
@@ -167,19 +180,7 @@ folder). So when a check passes, it means something. Each line is yes or no:
 **Extension for advanced learners.** Run with `CHECK_TRIALS=5` and pass pass^5 instead of pass^3. Or run your checker on a
 different model role from your maker, and report the cost of each on the board.
 
-## FINISHED
-
-You now have an AI employee that:
-
-- answers a contract any checker can drive;
-- reads the evidence before it acts;
-- pays once, with an idempotency key;
-- stops a job that cannot finish;
-- reports done only when the ledger agrees;
-- never pays the duplicate or the above-rate invoice;
-- waits for the right person to approve;
-- checks every draft before it writes;
-- remembers a decision the ledger cannot give back.
+## What comes next
 
 Next, Deploy runs the same employee as a service. It survives a crash in the middle of a payment. It starts on an event and
 on a schedule. It moves the rules into `policy.yaml` and caps its spend. And it serves a second tenant without ever reading

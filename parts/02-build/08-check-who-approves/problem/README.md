@@ -20,6 +20,8 @@ flowchart LR
   Who -->|Lena, decline| Declined[Declined, no write]
 ```
 
+Notice: Only Lena can approve this one. Jo and Ravi are refused with 403.
+
 ## Your challenge
 
 Handle `POST /approvals/{approval_id}`. The body has two fields: `decision`, which is `approve` or `decline`, and `by`, which

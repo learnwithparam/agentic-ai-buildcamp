@@ -16,6 +16,8 @@ flowchart LR
   E1 & E2 & E3 --> Result["Every run: null for a pass, or one sentence on why it fails"]
 ```
 
+Notice: Each failure mode gets its own eval. An eval returns null for a pass.
+
 ## Your challenge
 
 In `evals/` in this folder, write one file for each mode in your `failure-modes.md`. The check reads those files from
@@ -64,11 +66,11 @@ Expect: `Done. All 3 rules pass.`
 
 ## If you get stuck
 
-| What you see                                       | Fix                                                                                    |
-| -------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| "No eval for missed-the-duplicate"                 | The file name must match the mode in `failure-modes.md`, letter for letter.            |
-| `threw on run-... : undefined is not an object`    | A run may have no dispute or no payment. Check the array length before you read `[0]`. |
-| "returned something other than null or a sentence" | Return `null` for a pass, and a string for a fail. Nothing else.                       |
+| What you see                                       | Fix                                                                           |
+| -------------------------------------------------- | ----------------------------------------------------------------------------- |
+| "No eval for missed-the-duplicate"                 | The file name must match the mode in `failure-modes.md`, letter for letter.   |
+| `threw on run-... : undefined is not an object`    | A run may have no dispute or payment. Check the length before you read `[0]`. |
+| "returned something other than null or a sentence" | Return `null` for a pass, and a string for a fail. Nothing else.              |
 
 ## Words you will use
 

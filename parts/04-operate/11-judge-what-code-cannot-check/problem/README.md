@@ -15,6 +15,8 @@ flowchart LR
   Result --> Agree
 ```
 
+Notice: The judge passes only if it agrees with people on 8 of 10 and catches every critical draft.
+
 ## Your challenge
 
 Copy `judge.yaml` into your own folder, and fill it in. The ten drafts and the human labels are in `drafts.json`.

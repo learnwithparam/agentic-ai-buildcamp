@@ -19,6 +19,8 @@ sequenceDiagram
   Note over W: Ledger: INV-2009 paid once
 ```
 
+Notice: The same key goes on every payment try. So a retry never pays twice.
+
 ## Your challenge
 
 Pay a clean invoice. A clean invoice has lines that match the rate confirmation and the proof of delivery.

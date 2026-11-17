@@ -28,6 +28,8 @@ flowchart LR
   Invoice & Load & Rate & Proof --> Trace[(traces/run_id.jsonl)]
 ```
 
+Notice: Each tool call is one span. All of them land in one trace file.
+
 ## Your challenge
 
 When `POST /jobs` arrives with this JSON:

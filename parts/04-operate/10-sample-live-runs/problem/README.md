@@ -16,6 +16,8 @@ flowchart LR
   Slice --> Budget
 ```
 
+Notice: Errors, approvals and high costs are always read. A random slice covers the rest.
+
 ## Your challenge
 
 Fill in `sampling.yaml`:

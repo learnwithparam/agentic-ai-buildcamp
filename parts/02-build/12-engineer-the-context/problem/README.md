@@ -15,6 +15,8 @@ flowchart LR
   In --> Budget{Under the budget?}
 ```
 
+Notice: Every item in the context needs a reason and a cost. What does not fit is left out.
+
 ## Your challenge
 
 Fill in `context.yaml` for one job of your employee:

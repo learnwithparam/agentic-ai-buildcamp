@@ -16,6 +16,8 @@ This page is a short read.
 
 ## The four pieces
 
+Four pieces work together. Here is who talks to whom.
+
 ```mermaid
 flowchart LR
   World[The world: the invoice desk] --> Ledger[(Ledger)]
@@ -25,6 +27,8 @@ flowchart LR
   Employee -->|writes a trace| Traces[Your traces]
   Checker -->|reads| Traces
 ```
+
+Notice: The checker never trusts your employee's words. It reads the ledger and your traces.
 
 - **The world** is a freight broker's invoice desk. The **ledger** is the record of every invoice and payment.
 - **Your employee** is yours. It can use any language, SDK and model.

@@ -1,5 +1,15 @@
 # Meet the world
 
+## After this part you can
+
+- Start the freight-audit world.
+- Tell a naive employee from the reference one.
+- Read the ledger to see what really happened.
+
+## You leave with
+
+A `notes.md` that says what the ledger and the board show.
+
 ## The problem
 
 When an agent says "done", it makes a claim. At KaaS Freight, a wrong claim costs real money. You cannot take back an
@@ -17,6 +27,14 @@ flowchart LR
   Reference[Reference employee] -->|reads the ledger| Ledger[(Ledger)]
   Ledger -->|4 paid once, 1 paid twice, 1 not paid| Truth[The truth]
 ```
+
+Notice: The reply says all six are paid. The ledger shows one paid twice and one not paid.
+
+## Steps
+
+| Step                                                  | What you do                                         | Minutes |
+| ----------------------------------------------------- | --------------------------------------------------- | ------- |
+| [meet-the-world](01-meet-the-world/problem/README.md) | Run the world, the naive employee and the reference | 20      |
 
 ## Walkthrough
 
@@ -59,3 +77,7 @@ Expect: `Done. All 5 rules pass.`
 | read  | Demystifying evals for AI agents          | Anthropic engineering                    | Judge an agent by the state it leaves behind, not by what it says. | https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents |
 | video | Building the future of agents with Claude | Anthropic                                | Anthropic staff show how they think about agents and their limits. | https://www.youtube.com/watch?v=XuvKFsktX0Q                            |
 | read  | Building effective agents                 | Erik Schluntz and Barry Zhang, Anthropic | Start simple and add parts only when you must.                     | https://www.anthropic.com/engineering/building-effective-agents        |
+
+## Project
+
+Fill in `notes.md` with what the ledger and the board show. Then run `bun run verify meet-the-world`.
