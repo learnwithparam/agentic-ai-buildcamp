@@ -10,7 +10,7 @@ import {
   statSync,
 } from "node:fs";
 import { dirname, join, relative } from "node:path";
-import { allSteps, type Part, partShapeProblems, parts, ROOT, type Step } from "./structure";
+import { allSteps, type Part, parts, ROOT, type Step } from "./structure";
 
 const errors: string[] = [];
 const fail = (where: string, what: string) => {
@@ -118,7 +118,6 @@ function checkPartReadme(part: Part) {
   if (!existsSync(readme)) return fail(part.dir, "part has no README.md");
   const text = read(readme);
   if (!MERMAID.test(text)) fail(readme, "part README needs a Mermaid diagram");
-  for (const problem of partShapeProblems(text)) fail(readme, problem);
   const walkthrough = text.split("## Walkthrough")[1]?.split("\n## ")[0];
   if (walkthrough === undefined) fail(readme, `part README needs a "## Walkthrough" section`);
   else if (!walkthrough.includes("```bash")) {

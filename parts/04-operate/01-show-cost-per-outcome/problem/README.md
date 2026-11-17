@@ -26,8 +26,6 @@ flowchart LR
   Outcomes --> Cost
 ```
 
-Notice: Outcomes come from the ledger, not from replies.
-
 ## Your challenge
 
 Make your employee's `GET /board` answer, per tenant:
@@ -81,12 +79,12 @@ Expect: `Done. All 1 rules pass.`
 
 ## If you get stuck
 
-| What you see                                            | Fix                                                                                       |
-| ------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| `The board says spend USD ...; the traces cost USD ...` | Count failed and stopped runs too. Price each chat span from its own tokens.              |
-| "The board says 4 outcomes; the ledger shows 3"         | A job that failed is not an outcome. Count only jobs that the ledger agrees with.         |
-| "not in the price table"                                | Your trace names a model with no price. Use a role from `config/models.ts`.               |
-| `No employee.toml`                                      | Put your employee in `employee/` at the repo root, or run with `EMPLOYEE_DIR=path/to/it`. |
+| What you see                                            | Fix                                                                                           |
+| ------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `The board says spend USD ...; the traces cost USD ...` | Add the spend of failed and stopped runs too. Price each chat span from its own token counts. |
+| "The board says 4 outcomes; the ledger shows 3"         | A job that failed is not an outcome. Count only jobs that the ledger agrees with.             |
+| "not in the price table"                                | Your trace names a model with no price. Use a role from `config/models.ts`.                   |
+| `No employee.toml`                                      | Put your employee in `employee/` at the repo root, or run with `EMPLOYEE_DIR=path/to/it`.     |
 
 ## Words you will use
 

@@ -22,8 +22,6 @@ flowchart LR
   Ledger --> Log["Access log: cross_tenant must stay false"]
 ```
 
-Notice: Each job names its tenant. One tenant's rows must never show up for another.
-
 ## Your challenge
 
 1. List `kaas-dairy` in `tenants` on `GET /health`.

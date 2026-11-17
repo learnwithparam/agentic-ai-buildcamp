@@ -14,8 +14,6 @@ flowchart LR
   Evidence --> Verify{Verify}
 ```
 
-Notice: The hire letter turns into cases. The cases turn into evidence from real runs.
-
 ## Your challenge
 
 Copy the three starter files into a new folder for your own job. Fill them in. Then run the check on that folder.

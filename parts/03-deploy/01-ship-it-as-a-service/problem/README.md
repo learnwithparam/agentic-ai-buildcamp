@@ -29,8 +29,6 @@ flowchart LR
   Employee -->|tools| World["The world on :7700, on the host"]
 ```
 
-Notice: The key is never inside the image.
-
 ## Your challenge
 
 From the repo root, copy the three starter files in this folder into `employee/`:

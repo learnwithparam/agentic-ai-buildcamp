@@ -1,17 +1,5 @@
 # Design
 
-## After this part you can
-
-- Place an employee on the map.
-- Write a hire letter with a must-never that a query can check.
-- Turn the hire into tests on ledger rows, not replies.
-- List every tool with its risk and its approver.
-- Price one outcome and record three decisions.
-
-## You leave with
-
-A design pack for one AI employee, signed off by two peers.
-
 ## The problem
 
 KaaS Freight paid one carrier invoice twice. That was USD 3,140 for one load. It took many emails to get the money back.
@@ -41,8 +29,6 @@ flowchart LR
   Clerk[Freight clerk] -.->|placed here| Agent
   Agent --> Guard[Code guards the must-never: no second payment for one load]
 ```
-
-Notice: The freight clerk is an agent. Code, not the model, guards the must-never.
 
 The same picture is in `design-map.mmd`.
 
@@ -153,11 +139,17 @@ Part design:
 Part design is done: 7/7 steps pass.
 ```
 
-## Project
+## Finished
 
-Your design pack is the project. Two peers read it and answer six yes-or-no questions. Fix every no, then ask again.
+You now have a design pack for one AI employee. It has seven parts:
 
-## What comes next
+- where the employee sits on the map;
+- a hire letter with a metric, and a must-never that a query can check;
+- acceptance cases that check rows in the system of record, not replies;
+- a tool list with the risk and the approver of each tool;
+- a dated cost per outcome, below the value of that outcome;
+- three ADRs, and each one names its check;
+- a review signed by two peers.
 
 In Build, each file becomes running code:
 

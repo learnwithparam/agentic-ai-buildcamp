@@ -16,8 +16,6 @@ flowchart LR
   Tool -.->|error plus a fix| Model
 ```
 
-Notice: The tool returns fields your code can read. A bad call returns an error that says how to fix it.
-
 ## Your challenge
 
 Fill in `tool.yaml` for one tool of your employee:

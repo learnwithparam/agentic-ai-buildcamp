@@ -18,8 +18,6 @@ sequenceDiagram
   Note over E: job waiting_for_human, ledger unchanged
 ```
 
-Notice: An amount over the limit pauses the job. The ledger stays unchanged until a person answers.
-
 ## Your challenge
 
 Pause before a write that is over the limit.

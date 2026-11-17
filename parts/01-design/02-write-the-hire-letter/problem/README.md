@@ -25,11 +25,9 @@ flowchart LR
   Check --> Letter
 ```
 
-Notice: The letter holds two queries you can run.
-
 ## Your challenge
 
-Fill in `employee.toml` here. Later steps read it, so keep it here. The `[hire]` block has the same fields as
+Fill in `employee.toml` in this folder. Later steps read it, so keep it here. The `[hire]` block has the same fields as
 `reference/CONTRACT.md`:
 
 - `name` and `outcome`.

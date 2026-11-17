@@ -21,8 +21,6 @@ flowchart LR
   Outcomes --> Board
 ```
 
-Notice: The board has one row per tenant. Spend comes from traces, and outcomes come from the ledger.
-
 ## Your challenge
 
 Group `GET /board` by each job's tenant. Put one entry in `tenants` for each tenant. Give each entry `outcomes`, `spend_usd`

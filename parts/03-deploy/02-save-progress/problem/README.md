@@ -27,8 +27,6 @@ sequenceDiagram
   E->>E: skip saved steps, write once
 ```
 
-Notice: After SIGKILL, the job and its approval load again. Finished steps are skipped.
-
 ## Your challenge
 
 Keep three things in `STATE_DIR`. A SQLite file is enough.

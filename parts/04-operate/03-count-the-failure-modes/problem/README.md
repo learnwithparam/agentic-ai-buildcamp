@@ -17,8 +17,6 @@ flowchart LR
   A --> Fix[Fix the largest first]
 ```
 
-Notice: Count the failures by their first cause. Fix the biggest group first.
-
 ## Your challenge
 
 Fill the table in `failure-modes.md` in this folder. Use the runs that you labelled `fail` in `label-the-traces`. The check

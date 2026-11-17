@@ -19,8 +19,6 @@ stateDiagram-v2
   stopped --> [*]
 ```
 
-Notice: A run ends as failed or stopped. It never loops forever.
-
 ## Your challenge
 
 Give every job a step budget and a stop reason. A step budget is the most tool and model calls one job may make.

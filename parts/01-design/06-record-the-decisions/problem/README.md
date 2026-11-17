@@ -21,8 +21,6 @@ flowchart LR
   Decision --> Check[Enforced by: a bun run verify check]
 ```
 
-Notice: Each decision names its check.
-
 ## Your challenge
 
 Write three ADRs in `adr/`:

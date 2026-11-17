@@ -27,8 +27,6 @@ flowchart LR
   Wait -->|Ravi or Jo| Refused[403]
 ```
 
-Notice: At the budget, the job waits for Lena. Ravi and Jo get 403.
-
 ## Your challenge
 
 1. Read `max_usd_per_job` and `max_usd_per_day` from `[budget]` in `employee.toml`. An operator can lower them with

@@ -32,8 +32,6 @@ sequenceDiagram
   E->>W: read_invoice: one payment, done
 ```
 
-Notice: The world returns the first result for the same key. So the crash does not cause a second payment.
-
 ## Your challenge
 
 1. Build the key from things that never change: the tenant, the invoice and the action. Never use a random ID or a

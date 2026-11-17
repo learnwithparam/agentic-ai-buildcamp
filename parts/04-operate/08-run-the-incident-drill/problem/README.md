@@ -29,8 +29,6 @@ sequenceDiagram
   C->>W: each invoice paid once, card closed
 ```
 
-Notice: Nothing is paid twice during the outage.
-
 ## Your challenge
 
 1. **The employee** lives in `employee/` at the repo root, or in `EMPLOYEE_DIR`. When a tool answers 503:

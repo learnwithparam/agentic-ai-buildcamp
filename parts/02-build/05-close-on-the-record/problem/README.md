@@ -19,8 +19,6 @@ flowchart LR
   Check -->|no, out of tries| Failed[failed: the ledger shows no payment]
 ```
 
-Notice: A payment counts as done only after you read it back from the ledger.
-
 ## Your challenge
 
 After every write, read the ledger back. The ledger decides what happened.

@@ -24,11 +24,9 @@ flowchart LR
   Price --> Check{Below the value?}
 ```
 
-Notice: Is the cost below the value?
-
 ## Your challenge
 
-Fill in `cost.yaml` in this folder. It follows `cost.schema.json`. Replace each 0 and TODO:
+Fill in `cost.yaml` in this folder. It follows `cost.schema.json`. Replace each 0 and each TODO with your own value:
 
 - The employee and the one outcome.
 - What one outcome is worth, and why.
@@ -38,7 +36,7 @@ Fill in `cost.yaml` in this folder. It follows `cost.schema.json`. Replace each 
 - Your cost per outcome.
 
 For the role, write `fast`, `smart` or `judge` from `config/models.ts`. Never write a model name. Copy the price from the
-provider's page. Then run the calculator.
+provider's page. Then run the calculator. It prints every sum.
 
 ```bash
 bun run cost parts/01-design/05-price-the-outcome/problem/cost.yaml

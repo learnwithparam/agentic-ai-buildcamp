@@ -1,14 +1,5 @@
 # Run the agent on LangGraph
 
-## After this part you can
-
-- See what a graph library does for you: the pause, the saved state and the resume.
-- See what it leaves to you: your approval rule, and a pay node that is safe to run twice.
-
-## You leave with
-
-An approval pause that survives a kill, built on a graph library with Postgres.
-
 ## The problem
 
 You built the clerk's pause and its saved progress by hand. That is the right way to learn them.
@@ -43,8 +34,6 @@ flowchart LR
   Answer --> Again[Node pay runs again] --> Row
   Check[assignment/check.ts] -.kills, restarts, counts rows.-> Pause
 ```
-
-Notice: The pay node runs again after the answer. The payments table still ends with one row.
 
 ## Steps
 
@@ -130,14 +119,14 @@ Expect: `Every line passes.` once your graph is built, and `assignment/result.js
 | read  | Interrupts                                                              | LangChain docs | How a graph pauses for a person and then resumes.                | https://docs.langchain.com/oss/python/langgraph/interrupts                                   |
 | read  | Making it easier to build human-in-the-loop agents with interrupt       | LangChain blog | The team explains why a paused run is saved and how it resumes.  | https://blog.langchain.com/making-it-easier-to-build-human-in-the-loop-agents-with-interrupt |
 
-## Project
+## Assignment
 
 This part is optional in the live session and expected as homework. Work on it beside the class while the concepts are
 taught with the hand-built versions. The full task is in [assignment/README.md](../../assignment/README.md).
 
 **What you hand in.** A branch named `assignment`, pushed, with your URL submitted. The grader reruns the same check.
 
-## What comes next
+## FINISHED
 
 You now know what a graph library takes off your hands: the pause, the saved state and the resume. You also know what it
 leaves with you: your approval rule, and a pay node that is safe to run twice.

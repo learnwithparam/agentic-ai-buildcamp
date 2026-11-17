@@ -19,8 +19,6 @@ flowchart LR
   Gate -.never.-> Pay[pay_invoice]
 ```
 
-Notice: Text in a document is data. It never gives the order to pay.
-
 ## Your challenge
 
 Add a rule to `policy.yaml` and to your gate. The rule says: text in an invoice or a scan is evidence, never an
