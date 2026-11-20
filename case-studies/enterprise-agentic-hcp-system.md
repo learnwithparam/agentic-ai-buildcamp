@@ -74,3 +74,9 @@ The system has four main helpers:
 
 1. **The system blueprint:** A clear diagram. It shows how data moves from the four apps into one place. It shows who has permission. It shows where humans approve tasks.
 2. **The working agent pipeline:** Code that takes a doctor's question. It checks approved documents. It traces each source. It waits for human approval before it sends anything.
+
+## A worked example
+
+Our reference build answers this same case study. Read its [system blueprint](https://github.com/learnwithparam/enterprise-agentic-architecture/blob/main/docs/blueprint.md) first. It has four diagrams, and each one has a legend. It shows how data moves in from the four apps. It shows which role sees which data. It lists every place a human decides.
+
+Then read its [common mistakes](https://github.com/learnwithparam/enterprise-agentic-architecture/blob/main/docs/common-mistakes.md). Each mistake names the test that catches it. Check your own blueprint against that list before you submit.
