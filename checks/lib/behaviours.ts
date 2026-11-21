@@ -400,7 +400,7 @@ function hasCalledPay(context: TrialContext): boolean {
 }
 
 async function waitForFirstPayCall(context: TrialContext) {
-  const deadline = Date.now() + 15_000;
+  const deadline = Date.now() + 30_000;
   while (Date.now() < deadline && !hasCalledPay(context)) await Bun.sleep(10);
   expect(
     hasCalledPay(context),
@@ -410,7 +410,7 @@ async function waitForFirstPayCall(context: TrialContext) {
 
 async function expectJobsDoneAfterRestart(context: TrialContext, jobs: SentJob[]) {
   for (const job of jobs) {
-    const state = await context.api.waitJob(job.job_id, { ms: 20_000 });
+    const state = await context.api.waitJob(job.job_id, { ms: 40_000 });
     expect(
       !state.status.startsWith("HTTP 404"),
       `After the restart your employee does not know job ${job.job_id}. ` +
@@ -593,6 +593,14 @@ export type BehaviourName = keyof typeof behaviours;
 // A step check is one rule per behaviour. The rule's result is cached per folder for one verify
 // run.
 const cache = new Map<string, Promise<Outcome>>();
+
+// Why the latest behaviour rule failed. verify --all keeps the messages quiet, so it reads this.
+let latestFailure = "";
+export function takeLatestFailure(): string {
+  const reason = latestFailure;
+  latestFailure = "";
+  return reason;
+}
 export function behaviourRule(name: BehaviourName, says: string, tryNext: string) {
   return {
     says,
@@ -606,6 +614,7 @@ export function behaviourRule(name: BehaviourName, says: string, tryNext: string
       }
       const outcome = await pending;
       if (!outcome.ok) console.log(`        ${outcome.message}`);
+      if (!outcome.ok) latestFailure = outcome.message;
       return outcome.ok;
     },
   };

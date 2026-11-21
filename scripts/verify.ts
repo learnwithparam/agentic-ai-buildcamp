@@ -9,6 +9,7 @@
 
 import { existsSync, readdirSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
+import { takeLatestFailure } from "../checks/lib/behaviours";
 import { allSteps, findStep, parts, ROOT, type Step } from "./structure";
 
 // A rule answers "skipped" when it could not run here, for example with no Docker.
@@ -103,6 +104,7 @@ async function solutionProblems(step: Step): Promise<string[]> {
   if (!existsSync(join(step.dir, "solution"))) {
     return [`${step.name}: needs solution/ so CI can prove the check can pass`];
   }
+  takeLatestFailure();
   const solution = await runStep(step, join(step.dir, "solution"));
   if (solution.status === "pass") return [];
   if (solution.status === "skipped") {
@@ -111,7 +113,9 @@ async function solutionProblems(step: Step): Promise<string[]> {
       `${step.name}: the sample solution was not fully checked, a rule was skipped: ${rules}`,
     ];
   }
-  return [`${step.name}: the sample solution fails: ${solution.failed.join("; ")}`];
+  const reason = takeLatestFailure();
+  const because = reason ? ` Reason: ${reason}` : "";
+  return [`${step.name}: the sample solution fails: ${solution.failed.join("; ")}.${because}`];
 }
 
 async function wrongAnswerProblems(step: Step): Promise<string[]> {
