@@ -61,6 +61,8 @@ bun run verify turn-the-hire-into-tests
 
 Expect: `Done. All 7 rules pass.`
 
+Run it first. The FAIL lines are your to-do list.
+
 The freight sample is in [solution/acceptance.yaml](../solution/acceptance.yaml).
 
 ## If you get stuck

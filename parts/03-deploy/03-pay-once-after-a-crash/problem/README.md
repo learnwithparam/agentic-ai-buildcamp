@@ -53,6 +53,8 @@ bun run verify pay-once-after-a-crash
 
 Expect: `Done. All 1 rules pass.`
 
+Run it first. The FAIL lines are your to-do list.
+
 ![Kill, restart, one payment](../images/expected.png)
 
 ## If you get stuck

@@ -2,7 +2,7 @@
 
 ## The problem
 
-KaaS Freight paid one load twice and lost USD 3,140. Before you build the clerk, decide what kind of thing it is.
+KaaS Freight paid one load twice and lost USD 3,140. First decide what the clerk is.
 
 Ask one question: can code list every next step? If yes, build a workflow. If no, the model must decide the next step. Then
 code guards the lines the model must not cross.
@@ -10,7 +10,7 @@ code guards the lines the model must not cross.
 For example, `INV-2041` is clean, so the clerk pays it. `INV-2028` bills detention, so the clerk must look for a signed
 delay. The clerk cannot list every next step in advance. So the clerk is an agent.
 
-Allianz's Project Nemo passes food spoilage claims between seven agents. A person makes the final payout decision.
+Allianz's Project Nemo passes food spoilage claims between seven agents. A person decides the final payout.
 
 ```mermaid
 flowchart TD
@@ -53,6 +53,8 @@ bun run verify place-it-on-the-map
 ```
 
 Expect: `Done. All 6 rules pass.`
+
+Run it first. The FAIL lines are your to-do list.
 
 The freight sample is in [solution/map.md](../solution/map.md).
 

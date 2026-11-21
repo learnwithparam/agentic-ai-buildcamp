@@ -44,6 +44,8 @@ bun run verify stop-the-loop-on-purpose
 
 Expect: `Done. All 1 rules pass.`
 
+Run it first. The FAIL lines are your to-do list.
+
 ## If you get stuck
 
 - Still "working" after 15 s: your retry has no end. Put a limit on the tries for each call, and on the steps for each job.

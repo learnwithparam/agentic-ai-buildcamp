@@ -61,6 +61,8 @@ bun run verify run-the-incident-drill
 
 Expect: `Done. All 5 rules pass.`
 
+Run it first. The FAIL lines are your to-do list.
+
 ## If you get stuck
 
 | What you see                                    | Fix                                                                 |

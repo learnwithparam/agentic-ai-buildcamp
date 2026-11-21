@@ -66,6 +66,8 @@ bun run verify record-the-decisions
 
 Expect: `Done. All 4 rules pass.`
 
+Run it first. The FAIL lines are your to-do list.
+
 The freight sample is in [solution/adr/](../solution/adr/).
 
 ## If you get stuck

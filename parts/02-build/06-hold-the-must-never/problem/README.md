@@ -42,6 +42,8 @@ bun run verify hold-the-must-never
 
 Expect: `Done. All 1 rules pass.`
 
+Run it first. The FAIL lines are your to-do list.
+
 ## If you get stuck
 
 - `is a duplicate ... and the ledger shows it paid`: `find_load` lists every invoice on the load, with its `received_at`

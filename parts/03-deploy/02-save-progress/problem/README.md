@@ -52,6 +52,8 @@ bun run verify save-progress
 
 Expect: `Done. All 1 rules pass.`
 
+Run it first. The FAIL lines are your to-do list.
+
 ## If you get stuck
 
 | What you see                 | Fix                                                                  |

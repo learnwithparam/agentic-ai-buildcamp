@@ -58,6 +58,8 @@ bun run verify call-the-tools
 
 Expect: `Done. All 1 rules pass.`
 
+Run it first. The FAIL lines are your to-do list.
+
 ## If you get stuck
 
 - `No trace for run ...`: the file name must be the `run_id` that you returned from `POST /jobs`. It must sit inside

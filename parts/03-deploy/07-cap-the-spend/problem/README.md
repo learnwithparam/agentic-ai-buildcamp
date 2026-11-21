@@ -52,6 +52,8 @@ bun run verify cap-the-spend
 
 Expect: `Done. All 2 rules pass.`
 
+Run it first. The FAIL lines are your to-do list.
+
 ![The runaway job in Needs you](../images/expected.png)
 
 ## If you get stuck

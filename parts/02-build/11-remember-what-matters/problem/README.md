@@ -49,6 +49,8 @@ bun run verify remember-what-matters
 
 Expect: `Done. All 1 rules pass.`
 
+Run it first. The FAIL lines are your to-do list.
+
 ## If you get stuck
 
 - "asked her again": memory in a variable is lost when the process ends. Write it to a file or table in `STATE_DIR`.

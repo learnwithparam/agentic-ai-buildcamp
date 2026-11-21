@@ -40,6 +40,8 @@ bun run verify ask-for-approval
 
 Expect: `Done. All 1 rules pass.`
 
+Run it first. The FAIL lines are your to-do list.
+
 ## If you get stuck
 
 - "was paid with no approval": the limit check must run before the write, in code.

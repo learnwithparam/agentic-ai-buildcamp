@@ -53,6 +53,8 @@ bun run verify answer-the-contract
 
 Expect: `PASS` and `Done. All 1 rules pass.`
 
+Run it first. The FAIL lines are your to-do list.
+
 ![The checker's table when the contract answers](../images/expected.png)
 
 ## If you get stuck

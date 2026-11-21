@@ -40,6 +40,8 @@ bun run verify engineer-the-context
 
 Expect: `Done. All 6 rules pass.`
 
+Run it first. The FAIL lines are your to-do list.
+
 The freight sample is in [solution/context.yaml](../solution/context.yaml).
 
 ## If you get stuck

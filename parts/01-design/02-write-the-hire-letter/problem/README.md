@@ -27,7 +27,7 @@ flowchart LR
 
 ## Your challenge
 
-Fill in `employee.toml` in this folder. Later steps read it, so keep it here. The `[hire]` block has the same fields as
+Fill in `employee.toml` in this folder. Later steps read it. The `[hire]` block has the same fields as
 `reference/CONTRACT.md`:
 
 - `name` and `outcome`.
@@ -61,6 +61,8 @@ bun run verify write-the-hire-letter
 ```
 
 Expect: `Done. All 6 rules pass.`
+
+Run it first. The FAIL lines are your to-do list.
 
 The freight sample is in [solution/employee.toml](../solution/employee.toml).
 

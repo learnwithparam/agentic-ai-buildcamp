@@ -40,6 +40,8 @@ bun run verify catch-a-bad-draft
 
 Expect: `Done. All 1 rules pass.`
 
+Run it first. The FAIL lines are your to-do list.
+
 ## If you get stuck
 
 - "the reason code the bad draft planted": your checker must compare the reason code too, not only the amount.

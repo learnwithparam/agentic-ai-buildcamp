@@ -5,7 +5,7 @@
 In Build, you made the clerk wait for Lena when an invoice is over her limit. In Deploy, you saved its progress in files, so a
 crash did not make it pay twice. You wrote that code by hand, and it works.
 
-Most teams do not write it by hand. They use a graph library, with a database behind it.
+Most teams use a graph library, with a database behind it.
 
 LangGraph is that library. A **graph** is a list of steps, called nodes, joined by arrows. Your graph has two nodes: `decide`
 and `pay`. When the amount is over Lena's limit, `pay` calls `interrupt()`. That pauses the graph and saves it in Postgres.
@@ -56,6 +56,8 @@ bun run verify resume-with-langgraph
 ```
 
 Expect: `Done. All 5 rules pass.` once your graph is built. The check starts Postgres for you, and removes it when it ends.
+
+Run it first. The FAIL lines are your to-do list.
 
 ## If you get stuck
 

@@ -38,6 +38,8 @@ bun run verify sample-live-runs
 
 Expect: `Done. All 5 rules pass.`
 
+Run it first. The FAIL lines are your to-do list.
+
 The sample is in [solution/sampling.yaml](../solution/sampling.yaml).
 
 ## If you get stuck

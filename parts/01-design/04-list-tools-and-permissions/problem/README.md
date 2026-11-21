@@ -62,6 +62,8 @@ bun run verify list-tools-and-permissions
 
 Expect: `Done. All 5 rules pass.`
 
+Run it first. The FAIL lines are your to-do list.
+
 The freight sample is in [solution/tools.yaml](../solution/tools.yaml).
 
 ## If you get stuck

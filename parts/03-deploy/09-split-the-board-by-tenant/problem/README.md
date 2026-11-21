@@ -40,6 +40,8 @@ bun run verify split-the-board-by-tenant
 
 Expect: `Done. All 1 rules pass.`
 
+Run it first. The FAIL lines are your to-do list.
+
 ![The board split by tenant](../images/expected.png)
 
 ## If you get stuck

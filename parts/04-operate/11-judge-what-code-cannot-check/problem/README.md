@@ -37,6 +37,8 @@ bun run verify judge-what-code-cannot-check <your-folder>
 
 Expect: `Done. All 6 rules pass.`
 
+Run it first. The FAIL lines are your to-do list.
+
 The sample is in [solution/judge.yaml](../solution/judge.yaml).
 
 ## If you get stuck

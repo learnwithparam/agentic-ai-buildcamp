@@ -63,6 +63,8 @@ bun run verify pass-the-design-review
 
 Expect: `Done. All 5 rules pass.`
 
+Run it first. The FAIL lines are your to-do list.
+
 ## If you get stuck
 
 | What you see                                            | Fix                                                                |

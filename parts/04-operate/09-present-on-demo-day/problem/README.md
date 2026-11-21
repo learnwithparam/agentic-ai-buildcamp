@@ -47,6 +47,8 @@ bun run verify part operate
 
 Expect: the table below, ending with `Part operate is done: 9/9 steps pass.` That line appears once every step passes.
 
+Run it first. The FAIL lines are your to-do list.
+
 ![The Operate scorecard: every step passes](../images/expected.png)
 
 ## Done when

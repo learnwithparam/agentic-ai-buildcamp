@@ -45,6 +45,8 @@ bun run verify meet-the-world
 
 Expect: five `PASS` lines, `Done. All 5 rules pass.`, then `You ran the reference. Your goal: your own employee passes the same checks.`
 
+Run it first. The FAIL lines are your to-do list.
+
 ![The check passing once notes.md is filled in](../images/expected.png)
 
 ## If you get stuck

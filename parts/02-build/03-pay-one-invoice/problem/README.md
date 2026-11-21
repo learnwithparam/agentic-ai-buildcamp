@@ -48,6 +48,8 @@ bun run verify pay-one-invoice
 
 Expect: two `PASS` lines and `Done. All 2 rules pass.`
 
+Run it first. The FAIL lines are your to-do list.
+
 ## If you get stuck
 
 - "The ledger shows no payment": check the header name, `Idempotency-Key`. Check that `X-Tenant` is the job's tenant.

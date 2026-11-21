@@ -43,6 +43,8 @@ bun run verify check-who-approves
 
 Expect: `Done. All 1 rules pass.`
 
+Run it first. The FAIL lines are your to-do list.
+
 ## If you get stuck
 
 - `answered 200` for Jo: read `may_approve` from the world. Do not trust the ID alone.

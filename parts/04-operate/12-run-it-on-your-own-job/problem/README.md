@@ -39,6 +39,8 @@ bun run verify run-it-on-your-own-job <your-folder>
 
 Expect: `Done. All 7 rules pass.`
 
+Run it first. The FAIL lines are your to-do list.
+
 A library sample is in [solution/](../solution/hire.yaml).
 
 ## If you get stuck

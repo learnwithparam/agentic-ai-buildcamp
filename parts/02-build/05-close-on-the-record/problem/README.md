@@ -44,6 +44,8 @@ bun run verify close-on-the-record
 
 Expect: `Done. All 1 rules pass.`
 
+Run it first. The FAIL lines are your to-do list.
+
 ## If you get stuck
 
 - "The ledger shows 2 payments": your retry used a new key. Build the key from the tenant and the invoice ID.

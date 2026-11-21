@@ -39,6 +39,8 @@ bun run verify design-the-tool-and-its-output
 
 Expect: `Done. All 6 rules pass.`
 
+Run it first. The FAIL lines are your to-do list.
+
 The freight sample is in [solution/tool.yaml](../solution/tool.yaml).
 
 ## If you get stuck

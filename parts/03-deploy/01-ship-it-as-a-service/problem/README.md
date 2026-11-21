@@ -61,6 +61,8 @@ bun run verify ship-it-as-a-service
 
 Expect: `Done. All 4 rules pass.`
 
+Run it first. The FAIL lines are your to-do list.
+
 ![The container step passing](../images/expected.png)
 
 When Docker is not running, the last rule says `SKIP`. A skip is not a pass. Start Docker and check again.

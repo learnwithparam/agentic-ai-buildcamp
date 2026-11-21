@@ -54,6 +54,8 @@ bun run verify gate-writes-with-a-policy
 
 Expect: `Done. All 2 rules pass.`
 
+Run it first. The FAIL lines are your to-do list.
+
 ## If you get stuck
 
 | What you see                           | Fix                                                            |

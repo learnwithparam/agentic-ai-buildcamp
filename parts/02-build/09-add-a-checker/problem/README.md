@@ -48,6 +48,8 @@ bun run verify add-a-checker
 
 Expect: `Done. All 1 rules pass.`
 
+Run it first. The FAIL lines are your to-do list.
+
 ## If you get stuck
 
 - "the trace has no checker span": set `"x.role": "checker"` on the checker's span.
