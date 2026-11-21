@@ -66,8 +66,7 @@ bun run verify record-the-decisions
 
 Expect: `Done. All 4 rules pass.`
 
-The freight sample is in [solution/adr/](../solution/adr/). For a full example, read the
-[Quillon ADRs](https://github.com/learnwithparam/enterprise-agentic-architecture/tree/main/docs/adr).
+The freight sample is in [solution/adr/](../solution/adr/).
 
 ## If you get stuck
 
