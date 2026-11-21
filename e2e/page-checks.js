@@ -89,6 +89,7 @@ function visibleElements(selector) {
 }
 
 function textOf(element) {
+  // biome-ignore lint/performance/useDomNodeTextContent: innerText skips hidden text
   return (element.innerText || "").replace(/\s+/g, " ").trim();
 }
 
@@ -102,7 +103,7 @@ function nameOf(element) {
 }
 
 function sentenceCount(text) {
-  return text.split(/[.!?]+(\s|$)/).filter((part) => part && part.trim()).length;
+  return text.split(/[.!?]+(\s|$)/).filter((part) => part?.trim()).length;
 }
 
 function buttonLabel(button) {
@@ -189,6 +190,7 @@ function emptyStatesGuide() {
 }
 
 function brokenValues() {
+  // biome-ignore lint/performance/useDomNodeTextContent: innerText skips hidden text
   const lines = document.body.innerText.split("\n");
   return lines
     .filter((line) => BROKEN_VALUES.test(line))
