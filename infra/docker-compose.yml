@@ -19,5 +19,7 @@ services:
 
   phoenix:
     image: arizephoenix/phoenix:version-21.0.0
+    environment:
+      PHOENIX_ENABLE_AUTH: "false"
     ports:
       - "6006:6006"

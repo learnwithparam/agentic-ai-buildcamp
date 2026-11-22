@@ -35,7 +35,7 @@ export const UNITS: Unit[] = [
     job: "Show the team why an answer came out and what it cost",
     needs: "foundation",
     after: null,
-    built: false,
+    built: true,
     cases: [],
   },
   {

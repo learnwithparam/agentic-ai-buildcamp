@@ -4,7 +4,10 @@ import { createHash } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-const STORE = join(import.meta.dir, "..", "..", "..", "config", "replay", "answers.json");
+const FOLDER = join(import.meta.dir, "..", "..", "..", "config", "replay");
+const STORE = join(FOLDER, "answers.json");
+// Plumbing holds a few written replies. Checks use them before any real recording exists.
+const PLUMBING = join(FOLDER, "plumbing.json");
 
 export type Recorded = { text: string; inputTokens: number; outputTokens: number };
 
@@ -15,9 +18,13 @@ export function recordingKey(role: string, prompt: string): string {
   return createHash("sha256").update(text).digest("hex").slice(0, 24);
 }
 
+function readFile(file: string): Record<string, Recorded> {
+  if (!existsSync(file)) return {};
+  return JSON.parse(readFileSync(file, "utf8")) as Record<string, Recorded>;
+}
+
 function readStore(): Record<string, Recorded> {
-  if (!existsSync(STORE)) return {};
-  return JSON.parse(readFileSync(STORE, "utf8")) as Record<string, Recorded>;
+  return { ...readFile(PLUMBING), ...readFile(STORE) };
 }
 
 export function replayReply(role: string, prompt: string): Recorded {
@@ -31,7 +38,7 @@ export function replayReply(role: string, prompt: string): Recorded {
 }
 
 export function saveRecording(role: string, prompt: string, reply: Recorded): void {
-  const store = readStore();
+  const store = readFile(STORE);
   store[recordingKey(role, prompt)] = reply;
   const entries = Object.entries(store).sort(([first], [second]) => first.localeCompare(second));
   writeFileSync(STORE, `${JSON.stringify(Object.fromEntries(entries), null, 2)}\n`);

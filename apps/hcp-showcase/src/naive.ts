@@ -25,6 +25,7 @@ export function naivePrompt(question: string): string {
 // #endregion
 
 export async function askNaively(question: string): Promise<AgentResult> {
-  const reply = await ask("fast", naivePrompt(question));
+  const tags = { tenantId: "pharma-a", agentName: "naive-agent" };
+  const reply = await ask("fast", naivePrompt(question), tags);
   return { route: "answer", text: reply.text, citations: [] };
 }
