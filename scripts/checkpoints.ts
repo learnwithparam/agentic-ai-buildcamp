@@ -1,11 +1,13 @@
 // bun run checkpoints --dry     build every checkpoint in .checkpoints/ and type-check each one
 // bun run checkpoints --tag     the same, then write one tag per unit (the release job does this)
+// bun run checkpoints --prove   also run verify inside each checkpoint (the release job does this)
+//                               the unit before it must pass and the unit itself must fail
 //
 // Main holds the finished course. A checkpoint is main with every region of the unit, and of every
 // later unit, replaced by its stub. See scripts/regions.ts for the marker format.
-import { cpSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, mkdirSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { tagFor, UNITS, type Unit } from "../src/workshop";
+import { tagFor, UNITS, type Unit, unitBySlug } from "../src/workshop";
 import { git, mustGit } from "./git";
 import { finishedBefore, regionsIn, render } from "./regions";
 import { ROOT } from "./root";
@@ -70,9 +72,38 @@ function writeTag(unit: Unit): void {
   mustGit(["tag", "-f", tagFor(unit.slug), commit]);
 }
 
-function checkOne(unit: Unit, files: string[], writing: boolean): boolean {
+function passes(folder: string, slug: string): boolean {
+  const run = Bun.spawnSync(["bun", "scripts/verify.ts", slug], {
+    cwd: folder,
+    stdout: "pipe",
+    stderr: "pipe",
+  });
+  return run.exitCode === 0;
+}
+
+// Inside the checkpoint, the unit before must pass and the unit itself must still fail.
+function proves(unit: Unit): boolean {
+  if (!unit.built) return true;
+  const folder = folderFor(unit);
+  symlinkSync(join(ROOT, "node_modules"), join(folder, "node_modules"));
+  Bun.spawnSync(["bun", "scripts/seed.ts"], { cwd: folder, stdout: "ignore", stderr: "ignore" });
+  let good = true;
+  if (passes(folder, unit.slug)) {
+    console.log(`FAIL  ${tagFor(unit.slug)}: its own verify passes before the learner builds it`);
+    good = false;
+  }
+  const before = unit.needs === null ? undefined : unitBySlug(unit.needs);
+  if (before?.built && !passes(folder, before.slug)) {
+    console.log(`FAIL  ${tagFor(unit.slug)}: the verify before it, ${before.slug}, does not pass`);
+    good = false;
+  }
+  return good;
+}
+
+function checkOne(unit: Unit, files: string[], writing: boolean, proving: boolean): boolean {
   const stubbed = build(unit, files);
-  const good = typecheck(folderFor(unit));
+  let good = typecheck(folderFor(unit));
+  if (good && proving) good = proves(unit);
   console.log(`${good ? "PASS" : "FAIL"}  ${tagFor(unit.slug)}  (${stubbed} stubs)`);
   if (good && writing) writeTag(unit);
   return good;
@@ -85,14 +116,15 @@ function refuse(message: string, code: number): never {
 
 function main(): void {
   const writing = process.argv.includes("--tag");
-  if (!(writing || process.argv.includes("--dry"))) {
+  const proving = process.argv.includes("--prove");
+  if (!(writing || proving || process.argv.includes("--dry"))) {
     refuse("Say --dry to check every checkpoint, or --tag to write the tags.", 2);
   }
   if (writing && git(["status", "--porcelain"]).output !== "") {
     refuse("The tree is not clean. Commit first, so each tag names a real commit.", 1);
   }
   const files = trackedFiles();
-  const results = UNITS.map((unit) => checkOne(unit, files, writing));
+  const results = UNITS.map((unit) => checkOne(unit, files, writing, proving));
   rmSync(OUT, { recursive: true, force: true });
   if (results.includes(false)) process.exit(1);
 }

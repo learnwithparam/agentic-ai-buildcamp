@@ -22,10 +22,12 @@ jobs:
         with:
           bun-version: 1.4.4
       - run: bun install --frozen-lockfile
+      - name: Start the stack
+        run: bun run up
       - name: Gate on main
         run: bun run check
-      - name: Build every checkpoint tag
-        run: bun scripts/checkpoints.ts --tag
+      - name: Prove and build every checkpoint tag
+        run: bun scripts/checkpoints.ts --prove --tag
       - name: Push all tags together
         run: |
           tags=$(git tag --list 'checkpoint/*' 'lab/*')
