@@ -57,8 +57,13 @@ export const UNITS: Unit[] = [
     job: "Send trivia and off-label requests down cheap, safe paths",
     needs: "documents-freshness",
     after: null,
-    built: false,
-    cases: ["trivia-template", "off-label-refused"],
+    built: true,
+    cases: [
+      "trivia-template",
+      "off-label-refused",
+      "adverse-event-pause",
+      "safety-approval-resumes",
+    ],
   },
   {
     slug: "grounded-agent",
@@ -113,7 +118,7 @@ export const UNITS: Unit[] = [
     needs: "access-control",
     after: null,
     built: false,
-    cases: ["adverse-event-pause", "resume-after-restart", "memory-stays-in-tenant"],
+    cases: ["safety-approval-resumes", "resume-after-restart", "memory-stays-in-tenant"],
   },
   {
     slug: "guardrails-workers",
