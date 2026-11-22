@@ -3,6 +3,7 @@ import { describe, expect, test } from "bun:test";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { HCP_GOLDEN } from "../data/catalog/golden-hcp";
+import { MISSION_CONTROL_GOLDEN } from "../data/catalog/golden-mission-control";
 import { ROOT } from "../scripts/root";
 import { pageFor, stemFor, tagFor, UNITS, unitBySlug } from "../src/workshop";
 
@@ -53,16 +54,21 @@ describe("a built unit is complete", () => {
 });
 
 describe("the golden sets", () => {
-  const hcpUnits = UNITS.filter((unit) => unit.track === "hcp");
-  const assigned = hcpUnits.flatMap((unit) => unit.cases);
-  test("every golden case is assigned to one unit", () => {
-    const named = HCP_GOLDEN.cases.filter((item) => !item.name.startsWith("NAIVE"));
-    for (const item of named) {
-      expect(assigned.filter((name) => name === item.name)).toHaveLength(1);
-    }
-  });
-  test("every case a unit names is in its golden set", () => {
-    const known = HCP_GOLDEN.cases.map((item) => item.name);
-    for (const name of assigned) expect(known).toContain(name);
-  });
+  const sets = [
+    { track: "hcp", golden: HCP_GOLDEN },
+    { track: "mission-control", golden: MISSION_CONTROL_GOLDEN },
+  ];
+  for (const { track, golden } of sets) {
+    const assigned = UNITS.filter((unit) => unit.track === track).flatMap((unit) => unit.cases);
+    test(`every ${track} golden case is assigned to one unit`, () => {
+      const named = golden.cases.filter((item) => !item.name.startsWith("NAIVE"));
+      for (const item of named) {
+        expect(assigned.filter((name) => name === item.name)).toHaveLength(1);
+      }
+    });
+    test(`every case a ${track} unit names is in its golden set`, () => {
+      const known = golden.cases.map((item) => item.name);
+      for (const name of assigned) expect(known).toContain(name);
+    });
+  }
 });
