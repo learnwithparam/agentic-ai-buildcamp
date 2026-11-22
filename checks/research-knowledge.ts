@@ -116,7 +116,7 @@ export const checks: Check[] = [
   },
   {
     name: "A question outside the job gets a plain reply with no page read",
-    tryNext: "In decideMission, send a question that names no rival and no topic to template.",
+    tryNext: "Answer a question that names no rival and no topic with the template reply.",
     run: async () => {
       await withSite(async () => {
         const found = caseOf("trivia-redirected");

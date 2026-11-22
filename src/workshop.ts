@@ -178,8 +178,14 @@ export const UNITS: Unit[] = [
     job: "Spot churn risk in the product funnel and hand it to the briefing agent",
     needs: "surfaces",
     after: "surfaces",
-    built: false,
-    cases: ["funnel-drop", "churn-skill", "no-email-in-trace"],
+    built: true,
+    cases: [
+      "funnel-drop",
+      "churn-skill",
+      "churn-rate-quiet-week",
+      "no-email-in-trace",
+      "chart-spec-valid",
+    ],
   },
   {
     slug: "tenancy-and-memory",

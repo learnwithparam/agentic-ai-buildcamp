@@ -3,8 +3,8 @@
 import { COMPETITORS } from "../../../data/catalog/mission-control";
 import { personNamed } from "../../../data/catalog/people";
 import { type Tags, traced } from "../../../packages/core/src/telemetry";
-import type { Intent } from "../../../src/golden";
 import type { AgentResult } from "../../../src/grade";
+import { answerAnalysis, loadSkills } from "./analyst";
 import { reportOn, watchRival } from "./research";
 import type { World } from "./rivals";
 
@@ -15,9 +15,8 @@ export function rivalIn(question: string): string | undefined {
   return COMPETITORS.find((rival) => text.includes(rival.name.toLowerCase()))?.name;
 }
 
-export function decideMission(question: string): Intent {
-  if (rivalIn(question) !== undefined) return "answer";
-  return "template";
+async function analyse(question: string, tags: Tags): Promise<AgentResult | undefined> {
+  return answerAnalysis(question, tags, await loadSkills());
 }
 
 async function research(rival: string, world: World): Promise<AgentResult> {
@@ -32,12 +31,11 @@ export async function askMission(
 ): Promise<AgentResult> {
   const person = personNamed(personName);
   const tags: Tags = { tenantId: person.tenant, agentName: "mission-control", person: person.name };
-  return traced("mission.route", tags, async (setAttributes) => {
-    const route = decideMission(question);
-    setAttributes({ route });
-    if (route === "template") return { route, text: OUTSIDE, citations: [] };
+  return traced("mission.route", tags, async () => {
     const rival = rivalIn(question);
     if (rival !== undefined) return research(rival, world);
-    return { route: "refuse", text: OUTSIDE, citations: [] };
+    const analysis = await analyse(question, tags);
+    if (analysis !== undefined) return analysis;
+    return { route: "template", text: OUTSIDE, citations: [] };
   });
 }

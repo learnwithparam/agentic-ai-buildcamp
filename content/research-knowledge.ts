@@ -82,8 +82,8 @@ export const content: UnitContent = {
     {
       file: "apps/product-teammates/src/mission.ts",
       rule: "a question outside the job must get a template reply",
-      find: 'if (rivalIn(question) !== undefined) return "answer";',
-      replace: 'if (question.length > 0) return "answer";',
+      find: 'return { route: "template", text: OUTSIDE, citations: [] };',
+      replace: 'return { route: "answer", text: OUTSIDE, citations: [] };',
     },
   ],
 };
