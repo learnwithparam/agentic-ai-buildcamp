@@ -195,8 +195,14 @@ export const UNITS: Unit[] = [
     job: "Stop Core Growth from reading the Titan memo",
     needs: "approvals-memory",
     after: "approvals-memory",
-    built: false,
-    cases: ["titan-hidden", "tone-memory-scoped", "approval-resumes"],
+    built: true,
+    cases: [
+      "titan-hidden",
+      "titan-visible-to-owner",
+      "tone-memory-scoped",
+      "approval-resumes",
+      "writer-cannot-approve",
+    ],
   },
   {
     slug: "always-on-teammates",

@@ -7,6 +7,7 @@ import type { AgentResult } from "../../../src/grade";
 import { answerAnalysis, loadSkills } from "./analyst";
 import { reportOn, watchRival } from "./research";
 import type { World } from "./rivals";
+import { answerWorkspace } from "./workspace";
 
 const OUTSIDE = "That is outside Mission Control. Ask me about a rival, the funnel or a briefing.";
 
@@ -36,6 +37,8 @@ export async function askMission(
     if (rival !== undefined) return research(rival, world);
     const analysis = await analyse(question, tags);
     if (analysis !== undefined) return analysis;
+    const workspace = await answerWorkspace(question, person.name);
+    if (workspace !== undefined) return workspace;
     return { route: "template", text: OUTSIDE, citations: [] };
   });
 }
