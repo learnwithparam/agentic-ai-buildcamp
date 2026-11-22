@@ -6,7 +6,12 @@ import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import { COMMERCIAL_DISPENSES, TERRITORY_RX_WEEKLY } from "../data/catalog/analytics";
 import { GLYPH_WIDTH, glyphRows } from "../data/catalog/block-font";
 import { DOCUMENTS, type HcpDocument } from "../data/catalog/documents";
-import { COMPETITORS, PRODUCT_FUNNEL, WORKSPACES } from "../data/catalog/mission-control";
+import {
+  COMPETITORS,
+  type Competitor,
+  PRODUCT_FUNNEL,
+  WORKSPACES,
+} from "../data/catalog/mission-control";
 import { GRANTS, PEOPLE } from "../data/catalog/people";
 import { PRESCRIBERS } from "../data/catalog/prescribers";
 import { ROOT } from "./root";
@@ -141,10 +146,19 @@ function writeSql(): void {
   writeFileSync(join(OUTPUT, "sql", "seed.sql"), `${schemaSql()}\n\n${inserts.join("\n")}`);
 }
 
+const BANNER = '<div id="cookie-banner">We use cookies. Accept all or choose.</div>';
+const NOISE = "<style>body { font-family: sans-serif; }</style><script>track('view');</script>";
+
+function rivalPage(rival: Competitor, when: "before" | "after"): string {
+  const hidden = rival.hidden === undefined ? "" : `<section hidden>${rival.hidden}</section>`;
+  const body = `<h1>${rival.name}</h1><p>${rival[when]}</p>${hidden}`;
+  return `<html><head>${NOISE}</head><body>${BANNER}${body}</body></html>\n`;
+}
+
 function writeCompetitors(): void {
   for (const rival of COMPETITORS) {
     for (const when of ["before", "after"] as const) {
-      const page = `<html><body><h1>${rival.name}</h1><p>${rival[when]}</p></body></html>\n`;
+      const page = rivalPage(rival, when);
       const name = `${rival.name.toLowerCase()}-${when}.html`;
       writeFileSync(join(OUTPUT, "competitors", name), page);
     }

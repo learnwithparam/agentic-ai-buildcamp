@@ -61,6 +61,7 @@ export type Competitor = {
   change: string; // what happened between the two snapshots
   before: string; // the page text last week
   after: string; // the page text today
+  hidden?: string; // text that sits in a tab the page keeps closed
 };
 
 export const COMPETITORS: Competitor[] = [
@@ -81,6 +82,7 @@ export const COMPETITORS: Competitor[] = [
     change: "feature-removed",
     before: "Pricing tabs: Monthly, Yearly. Pro includes guest access.",
     after: "Pricing tabs: Monthly, Yearly. Pro no longer includes guest access.",
+    hidden: "Yearly tab: Pro is 90 dollars a year.",
   },
   {
     name: "Lumenboard",
