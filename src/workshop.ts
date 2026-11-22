@@ -95,8 +95,8 @@ export const UNITS: Unit[] = [
     job: "Let the team reach the agent where they already work",
     needs: "analytics-mcp",
     after: null,
-    built: false,
-    cases: ["same-answer-three-surfaces"],
+    built: true,
+    cases: ["top-territory-launch"],
   },
   {
     slug: "access-control",
