@@ -77,8 +77,8 @@ export const content: UnitContent = {
     {
       file: "packages/core/src/bi.ts",
       rule: "another workspace must be refused",
-      find: "if (outside !== undefined)",
-      replace: "if (tables.length === 99)",
+      find: "if (stray !== undefined)",
+      replace: "if (schemas.length === 99)",
     },
     {
       file: "packages/core/src/bi.ts",

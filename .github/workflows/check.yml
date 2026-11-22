@@ -9,6 +9,7 @@ jobs:
         with:
           bun-version: 1.4.4
       - uses: astral-sh/setup-uv@v6
+      - run: bun install --frozen-lockfile
       - name: Install the Mermaid renderer
         run: npm install -g @mermaid-js/mermaid-cli@11.6.0
       - run: bun run up
