@@ -9,5 +9,5 @@
     "types": ["bun"],
     "allowImportingTsExtensions": true
   },
-  "include": ["src", "scripts", "tests", "packages", "apps", "config"]
+  "include": ["src", "scripts", "tests", "packages", "apps", "config", "data", "content", "checks"]
 }
