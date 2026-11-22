@@ -1,8 +1,10 @@
 // The grounded agent answers only from the active documents. The model's reply is a claim.
 // This code checks the claim: it must cite a document it was shown, and use only its numbers.
+
 import { BRANDS, COUNTRIES } from "../../../data/catalog/brands";
 import type { AgentResult } from "../../../src/grade";
 import { ask } from "./ask";
+import { scrubDocument } from "./guardrails";
 import { activeDocuments, type StoredDocument } from "./ingestion";
 import { type Tags, traced } from "./telemetry";
 
@@ -38,7 +40,7 @@ function refusal(text: string): AgentResult {
 
 // #region step:grounded-agent
 export function groundedPrompt(question: string, documents: StoredDocument[]): string {
-  const shown = documents.map((item) => `[${item.slug}]\n${item.body}`).join("\n\n");
+  const shown = documents.map((item) => `[${item.slug}]\n${scrubDocument(item.body)}`).join("\n\n");
   const rules = `Answer from the documents only. End with the id of each document you used.
 Write each id in square brackets. If the documents do not say, reply ${NOT_THERE}.`;
   return [rules, shown, `Question: ${question}`].join("\n\n");

@@ -9,6 +9,7 @@ import { recall, remember, requestApproval } from "./approvals";
 import { ask } from "./ask";
 import { answerData, type WriteQuery } from "./bi";
 import { answerGrounded, type Generate } from "./grounded";
+import { givesOrders, REFUSAL } from "./guardrails";
 import { handle } from "./router";
 import type { Tags } from "./telemetry";
 
@@ -69,6 +70,7 @@ export async function askTeam(
     await remember(person.name, question.slice(REMEMBER.length));
     return { route: "template", text: "Noted.", citations: [] };
   }
+  if (givesOrders(question)) return { route: "refuse", text: REFUSAL, citations: [] };
   const result = await handle(question, tags, async (text) => {
     const verdict = permit(person, text);
     if (!verdict.allowed) return { route: "refuse", text: verdict.reason, citations: [] };

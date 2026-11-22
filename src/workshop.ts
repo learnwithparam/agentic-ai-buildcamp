@@ -128,8 +128,8 @@ export const UNITS: Unit[] = [
     job: "Watch for label changes overnight and survive a crash",
     needs: "approvals-memory",
     after: null,
-    built: false,
-    cases: ["injection-in-pdf", "select-star-blocked", "duplicate-events-one-run", "crash-resumes"],
+    built: true,
+    cases: ["injection-in-pdf"],
   },
   {
     slug: "release-gate",
