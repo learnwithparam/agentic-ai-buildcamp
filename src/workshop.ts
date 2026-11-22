@@ -212,8 +212,8 @@ export const UNITS: Unit[] = [
     job: "Publish the Monday briefing after a person approves it",
     needs: "release-gate",
     after: "release-gate",
-    built: false,
-    cases: ["event-to-run", "monday-briefing", "debounce", "crash-resume", "publish-approval"],
+    built: true,
+    cases: ["event-to-run", "debounce", "monday-briefing", "crash-resume", "publish-approval"],
   },
 ];
 

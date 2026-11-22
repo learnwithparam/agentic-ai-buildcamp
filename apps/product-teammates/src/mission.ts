@@ -4,6 +4,7 @@ import { COMPETITORS } from "../../../data/catalog/mission-control";
 import { personNamed } from "../../../data/catalog/people";
 import { type Tags, traced } from "../../../packages/core/src/telemetry";
 import type { AgentResult } from "../../../src/grade";
+import { answerAlwaysOn } from "./always-on";
 import { answerAnalysis, loadSkills } from "./analyst";
 import { reportOn, watchRival } from "./research";
 import type { World } from "./rivals";
@@ -33,6 +34,8 @@ export async function askMission(
   const person = personNamed(personName);
   const tags: Tags = { tenantId: person.tenant, agentName: "mission-control", person: person.name };
   return traced("mission.route", tags, async () => {
+    const always = await answerAlwaysOn(question, person.name);
+    if (always !== undefined) return always;
     const rival = rivalIn(question);
     if (rival !== undefined) return research(rival, world);
     const analysis = await analyse(question, tags);
