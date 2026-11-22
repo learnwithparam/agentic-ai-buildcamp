@@ -84,7 +84,7 @@ export const UNITS: Unit[] = [
     job: "Answer territory sales questions without leaking prescriber data",
     needs: "grounded-agent",
     after: null,
-    built: false,
+    built: true,
     cases: ["territory-dip", "second-schema", "no-row-in-trace"],
   },
   {
