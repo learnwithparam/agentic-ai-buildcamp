@@ -73,7 +73,7 @@ export const UNITS: Unit[] = [
     job: "Give medical reviewers answers they can check line by line",
     needs: "intent-routing",
     after: null,
-    built: false,
+    built: true,
     cases: ["multi-hop-cited", "unanswerable-refused", "wrong-country-label"],
   },
   {
