@@ -7,20 +7,25 @@ The research behind each rule is in the curriculum repo under `workshop-standard
 ## Shape
 
 ```
-README.md                run the finished system first, then how the course works
-00-orientation/          setup, meet the world, see the goal; troubleshooting.md
-world/                   the business: its data, its system of record, its app
-parts/NN-<verb-thing>/   README.md: the problem, its cost, a Mermaid diagram
-  NN-<verb-thing>/       one step: one problem, one outcome, one check
-    step.toml            minutes, screen
-    problem/             README.md and the starter; the learner works here
-    solution/            the sample answer; CI proves the check passes on it
-    wrong/<mistake>/     at least one common mistake; CI proves the check rejects it
-    images/expected.png  the expected result, for any step with something on screen
-checks/<step-name>.ts    the rules for one step
-config/models.ts         the only file that names a model
-schedules.toml           parts mapped onto formats
+README.md                    run the finished system first, then how the course works
+src/workshop.ts              the one list of modules and labs, with tags and prerequisites
+src/{glossary,stuck,pictures}.ts   course data, one source each
+packages/core/src/           the shared agent code; taught code sits in region markers
+apps/hcp-showcase/           the instructor track, modules 00 to 10
+apps/product-teammates/      the participant track, labs 01 to 04
+checks/<slug>.ts             what one module or lab must do, with a Try next line each
+content/<slug>.ts            the picture, glossary words, stuck row and planted breaks
+tests/promises/<stem>.test.ts  one promise test for each module and lab
+docs/{modules,labs}/<stem>.md  the learner pages, from the manifest
+data/catalog/                the seeded synthetic data and the golden sets
+design-pack/                 templates for the no-code path
+config/models.ts             the only file that names a model
+case-studies/                the two case studies, never changed by the rework
 ```
+
+Main holds the finished course. `bun run checkpoints --tag` builds a tag for each unit by swapping the
+unit's regions, and every later unit's regions, for their stubs. The release job proves each tag: it
+type-checks, the verify before it passes, and its own verify fails.
 
 ## Rules and the check behind each
 
