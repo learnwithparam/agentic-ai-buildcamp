@@ -1,10 +1,16 @@
 // Each course check must bite: feed it a planted violation and it must report it.
 import { describe, expect, test } from "bun:test";
+import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import type { UnitContent } from "../src/content";
 import { UNITS } from "../src/workshop";
+import { commandProblems } from "./commands";
 import { opaqueIds, unitProblems } from "./distinct";
 import { glossaryProblems, lessonOf, meaningProblems } from "./glossary";
 import { mermaidBlocks } from "./mermaid";
+import { tryBreak } from "./mutate";
+import { blockProblems, commentText, styleProblems } from "./plain-code";
 import { stuckProblems } from "./stuck";
 import type { Loaded } from "./units";
 
@@ -94,5 +100,68 @@ describe("mermaid", () => {
     const second = block("flowchart TD\n  c --> d");
     const page = `text\n${first}more\n${second}`;
     expect(mermaidBlocks(page).length).toBe(2);
+  });
+});
+
+describe("commands", () => {
+  test("a number is caught", () => {
+    expect(commandProblems("x.md", "bun run goto 03").length).toBe(1);
+    expect(commandProblems("x.md", "make M=01").length).toBe(1);
+  });
+  test("a name passes", () => {
+    expect(commandProblems("x.md", "bun run goto intent-routing")).toEqual([]);
+  });
+  test("a short question is caught", () => {
+    expect(commandProblems("x.md", 'bun run ask --question "dose"').length).toBe(1);
+    expect(commandProblems("x.md", 'bun run ask --question "What is the current dose?"')).toEqual(
+      [],
+    );
+  });
+});
+
+describe("plain code", () => {
+  test("a shouting comment is caught", () => {
+    expect(styleProblems("// THIS COMMENT IS SHOUTING LOUDLY").length).toBe(1);
+  });
+  test("an empty phrase is caught", () => {
+    expect(styleProblems("// skim this part").length).toBe(1);
+  });
+  test("region markers are not prose", () => {
+    expect(styleProblems("// #region step:foundation")).toEqual([]);
+  });
+  test("a hard block is caught", () => {
+    const hard =
+      "// Idempotent reconciliation orchestrates heterogeneous asynchronous infrastructure.";
+    expect(blockProblems(commentText(hard)).length).toBeGreaterThan(0);
+  });
+});
+
+describe("mutate", () => {
+  const change = { file: "x", rule: "r", find: "return true", replace: "return false" };
+  function scratch(): string {
+    const file = join(mkdtempSync(join(tmpdir(), "mutate-")), "rule.ts");
+    writeFileSync(file, "export const ok = () => { return true };");
+    return file;
+  }
+  test("a test that fails on the break is caught, and the file is restored", () => {
+    const file = scratch();
+    expect(tryBreak(file, change, () => false)).toBe("caught");
+    expect(readFileSync(file, "utf8")).toContain("return true");
+  });
+  test("a test that still passes is missed", () => {
+    expect(tryBreak(scratch(), change, () => true)).toBe("missed");
+  });
+  test("a break that finds nothing is reported", () => {
+    const missing = { ...change, find: "nothing like this" };
+    expect(tryBreak(scratch(), missing, () => false)).toBe("not-found");
+  });
+  test("the file is restored when the test run throws", () => {
+    const file = scratch();
+    expect(() =>
+      tryBreak(file, change, () => {
+        throw new Error("boom");
+      }),
+    ).toThrow();
+    expect(readFileSync(file, "utf8")).toContain("return true");
   });
 });

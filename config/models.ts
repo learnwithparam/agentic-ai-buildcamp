@@ -1,16 +1,14 @@
-// The only file that names a model. Code asks for a role (fast, smart or judge), never for an id,
-// so a learner swaps Anthropic, OpenRouter or OpenAI by changing LLM_PROVIDER, never the code.
-// See briefs/MODELS.md.
+// This is the only file that names a model. Code asks for a role, never for an id.
+// A role is fast, smart or judge. To change provider, change LLM_PROVIDER, not the code.
 //
-//   LLM_PROVIDER=replay      the default: recorded replies, no key,
-//                            used by CI, the checks and the first run
-//   LLM_PROVIDER=anthropic   needs ANTHROPIC_API_KEY
-//   LLM_PROVIDER=openrouter  needs OPENROUTER_API_KEY
-//   LLM_PROVIDER=openai      needs OPENAI_API_KEY
+// Set LLM_PROVIDER to one of these:
+//   replay      the default. It plays back recorded replies and needs no key.
+//   anthropic   needs ANTHROPIC_API_KEY.
+//   openrouter  needs OPENROUTER_API_KEY.
+//   openai      needs OPENAI_API_KEY.
 //
-// MODEL_MODE=replay (what the checker sets, see reference/CONTRACT.md) forces replay whatever
-// LLM_PROVIDER says. The AI SDK packages load only when a live provider is used, so replay, the
-// checks and CI need no install.
+// MODEL_MODE=replay forces replay, whatever LLM_PROVIDER says. The checks set it.
+// The provider packages load only for a live provider. Replay needs no install.
 import type { LanguageModel } from "ai";
 
 export const ROLES = ["fast", "smart", "judge"] as const;
@@ -19,7 +17,7 @@ export const PROVIDERS = ["replay", "anthropic", "openrouter", "openai"] as cons
 export type Provider = (typeof PROVIDERS)[number];
 export type LiveProvider = Exclude<Provider, "replay">;
 
-// fast: cheap, most calls. smart: hard reasoning. judge: grading.
+// Fast is cheap and takes most calls. Smart does the hard thinking. Judge does the grading.
 export const IDS: Record<LiveProvider, Record<Role, string>> = {
   anthropic: { fast: "claude-haiku-5-5", smart: "claude-sonnet-5-5", judge: "claude-haiku-5-5" },
   openrouter: {
@@ -29,8 +27,7 @@ export const IDS: Record<LiveProvider, Record<Role, string>> = {
   },
   openai: { fast: "gpt-6-luna", smart: "gpt-6-luna-pro", judge: "gpt-6-luna" },
 };
-// Replay answers with replies recorded on this provider, so its traces name and price that
-// provider's ids.
+// Replay plays back replies recorded on this provider. Its traces use this provider's ids.
 export const REPLAY_RECORDED_ON: LiveProvider = "anthropic";
 
 export const KEY_ENV: Record<LiveProvider, string> = {
@@ -48,13 +45,13 @@ export function provider(env = process.env): Provider {
   return chosen as Provider;
 }
 
-// The id a role maps to on a provider. Replay maps to the ids its replies were recorded with.
+// The id a role maps to on a provider. Replay uses the ids its replies were recorded with.
 export function modelId(role: Role, chosen: Provider = provider()): string {
   const recordedOn = chosen === "replay" ? REPLAY_RECORDED_ON : chosen;
   return IDS[recordedOn][role];
 }
 
-// The ids for the chosen provider, by role: models.fast, models.smart, models.judge.
+// The ids for the chosen provider, one for each role.
 export const models: Record<Role, string> = {
   get fast() {
     return modelId("fast");
@@ -67,8 +64,7 @@ export const models: Record<Role, string> = {
   },
 };
 
-// The AI SDK model for a role on a live provider. Replay has no model to call; callers answer
-// from recordings.
+// The model for a role on a live provider. Replay has no model to call. Callers read recordings.
 export async function languageModel(
   role: Role,
   chosen: Provider = provider(),
@@ -100,8 +96,8 @@ export async function languageModel(
   return createOpenAI({ apiKey })(id);
 }
 
-// Prices in USD per million tokens, read on PRICES_AS_OF from each provider's own pricing page.
-// A price that could not be read is left out: its cost is reported as unknown, never as zero.
+// Prices in US dollars for each million tokens. Each came from the provider's own pricing page.
+// A price we could not read is left out. Its cost shows as unknown, never as zero.
 export const PRICES_AS_OF = "2026-11-12";
 export const MAX_PRICE_AGE_DAYS = 60;
 export type Price = {
@@ -113,9 +109,8 @@ export type Price = {
 };
 
 export const PRICES: Record<string, Price> = {
-  // https://claude.com/pricing, read 2026-11-12. Haiku 5.5 prices hold for prompts up to 100K
-  // tokens (above that: input 0.50, output 2.50, cache read 0.05).
-  // Cache read is the 5-minute cache.
+  // From the pricing page at claude.com. These prices hold for prompts up to 100K tokens.
+  // Longer prompts cost more. Cache read is the five minute cache.
   "claude-haiku-5-5": {
     input: 0.1,
     output: 0.5,
@@ -129,14 +124,13 @@ export const PRICES: Record<string, Price> = {
     cache_read: 0.1,
     source: "https://claude.com/pricing",
   },
-  // OpenRouter (https://openrouter.ai/models) and OpenAI (https://openai.com/api/pricing/) could
-  // not be read from the build session on 2026-11-12, so their ids have no price here and their
-  // cost is reported as unknown.
+  // We could not read the OpenRouter or OpenAI prices. Their ids have no price here.
+  // Their cost shows as unknown.
 };
 
 export const priceOf = (id: string): Price | undefined => PRICES[id];
 
-// Cost of one model call from its token counts, or null when the model has no price in the table.
+// The cost of one model call from its token counts. It is null when the model has no price.
 export function costUsd(id: string, input: number, output: number, cacheRead = 0): number | null {
   const price = PRICES[id];
   if (!price) return null;

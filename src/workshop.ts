@@ -187,17 +187,17 @@ export function unitBySlug(slug: string): Unit | undefined {
   return UNITS.find((unit) => unit.slug === slug);
 }
 
-// The file name stem of a unit, for example 03-intent-routing.
+// The short name of a unit, like 03-intent-routing.
 export function stemFor(unit: Unit): string {
   return tagFor(unit.slug).split("/")[1];
 }
 
-// Where the learner page for a unit lives, for example docs/modules/03-intent-routing.md.
+// The page a learner reads for a unit.
 export function pageFor(unit: Unit): string {
   return `docs/${unit.kind}s/${stemFor(unit)}.md`;
 }
 
-// The tag name for a unit, for example checkpoint/03-intent-routing.
+// The tag a unit is saved under.
 export function tagFor(slug: string): string {
   const unit = unitBySlug(slug);
   if (unit === undefined) throw new Error(`No module or lab named ${slug}`);
