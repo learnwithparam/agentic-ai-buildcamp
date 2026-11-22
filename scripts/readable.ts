@@ -5,7 +5,7 @@
 // This file owns what they miss: names that are words, one idea per line, short lines.
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { extname, join, relative } from "node:path";
-import { ROOT } from "./structure";
+import { ROOT } from "./root";
 
 const LONGEST_LINE = 100;
 const MOST_CALLS_IN_ONE_LINE = 3;

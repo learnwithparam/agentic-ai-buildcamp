@@ -5,7 +5,7 @@
 // Code blocks, tables and headings are skipped: they are not sentences.
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { basename, join, relative, resolve } from "node:path";
-import { ROOT } from "./structure";
+import { ROOT } from "./root";
 
 // A course for everyone (no code) can lower this in package.json: "plainEnglish": { "grade": 6 }.
 const DEFAULT_READING_GRADE = 6;

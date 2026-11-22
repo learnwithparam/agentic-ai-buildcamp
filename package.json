@@ -4,23 +4,13 @@
   "type": "module",
   "packageManager": "bun@1.4.4",
   "scripts": {
-    "check": "bun scripts/readable.ts && bun scripts/plain-english.ts && bun scripts/check.ts && bun scripts/verify.ts --all && bun test && bun scripts/text-audit.ts && bun test ./scripts/prose.test.ts && bun test ./scripts/dates.test.ts && bun scripts/capstone.ts && bun test ./scripts/shape.test.ts && bun scripts/picks.ts && bun test ./scripts/workfiles.test.ts ./scripts/picks.test.ts ./scripts/changed.test.ts && bun scripts/parts.ts --check && bun scripts/learner-clarity.mjs",
+    "check": "bun scripts/readable.ts && bun scripts/plain-english.ts && bunx tsc -p . && bun test && bun scripts/checkpoints.ts --dry && bun scripts/learner-clarity.mjs",
     "readable": "bun scripts/readable.ts",
     "plain-english": "bun scripts/plain-english.ts",
     "format": "biome check --write .",
-    "verify": "bun scripts/verify.ts",
-    "parts": "bun scripts/parts.ts",
-    "world": "bun worlds/run.ts",
-    "reference": "bun reference/run.ts",
-    "reference-employee": "bun reference/start.ts",
-    "deploy-employee": "bun parts/03-deploy/start.ts",
-    "operate-employee": "bun parts/04-operate/kit-start.ts",
-    "cost": "bun checks/design-lib.ts",
-    "models": "bun scripts/models.ts",
-    "text-audit": "bun scripts/text-audit.ts",
-    "check:changed": "bun scripts/changed.ts",
-    "picks": "bun scripts/picks.ts",
-    "capstone": "bun scripts/capstone.ts"
+    "goto": "bun scripts/goto.ts",
+    "checkpoints": "bun scripts/checkpoints.ts",
+    "models": "bun scripts/models.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "4.0.103",
@@ -35,11 +25,10 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.6.5",
-    "@playwright/test": "1.63.0"
+    "@types/bun": "1.4.4",
+    "typescript": "7.0.2"
   },
   "plainEnglish": {
     "grade": 6
-  },
-  "capstone": true,
-  "picks": true
+  }
 }

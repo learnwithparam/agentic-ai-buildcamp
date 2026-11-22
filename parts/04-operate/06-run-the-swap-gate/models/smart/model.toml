@@ -1,3 +1,0 @@
-# The clerk as it runs in production today. Priced as the smart role in config/models.ts.
-role = "smart"
-replies = "replies"
