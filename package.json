@@ -4,9 +4,13 @@
   "type": "module",
   "packageManager": "bun@1.4.4",
   "scripts": {
-    "check": "bun scripts/readable.ts && bun scripts/plain-english.ts && bunx tsc -p . && bun test && bun scripts/checkpoints.ts --dry && bun scripts/learner-clarity.mjs",
+    "check": "bun scripts/readable.ts && bun scripts/plain-english.ts && bun scripts/glossary.ts && bun scripts/stuck.ts && bun scripts/distinct.ts && bun scripts/mermaid.ts && bunx tsc -p . && bun test && bun scripts/checkpoints.ts --dry && bun scripts/learner-clarity.mjs",
     "readable": "bun scripts/readable.ts",
     "plain-english": "bun scripts/plain-english.ts",
+    "glossary": "bun scripts/glossary.ts",
+    "stuck": "bun scripts/stuck.ts",
+    "distinct": "bun scripts/distinct.ts",
+    "mermaid": "bun scripts/mermaid.ts",
     "format": "biome check --write .",
     "goto": "bun scripts/goto.ts",
     "checkpoints": "bun scripts/checkpoints.ts",
@@ -29,6 +33,8 @@
     "typescript": "7.0.2"
   },
   "plainEnglish": {
-    "grade": 6
+    "grade": 6,
+    "longest": 18,
+    "average": 12
   }
 }

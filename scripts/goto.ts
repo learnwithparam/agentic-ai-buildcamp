@@ -2,7 +2,7 @@
 // bun run goto <slug> --fresh    take the reference lab files too
 //
 // A dirty tree is saved on a backup branch first, so nothing you wrote is lost.
-import { tagFor, UNITS, unitBySlug } from "../src/workshop";
+import { tagFor, UNITS, type Unit, unitBySlug } from "../src/workshop";
 import { git, mustGit } from "./git";
 
 const KEPT_FOLDERS = ["apps/product-teammates", "design-pack"];
@@ -25,14 +25,16 @@ function stubsLeft(): string[] {
   return found.ok ? found.output.split("\n") : [];
 }
 
+function chooseUnit(): Unit {
+  const unit = unitBySlug(process.argv[2] ?? "");
+  if (unit !== undefined) return unit;
+  console.log("Say which module or lab. The names are:");
+  for (const other of UNITS) console.log(`  bun run goto ${other.slug}`);
+  process.exit(2);
+}
+
 function main(): void {
-  const slug = process.argv[2];
-  const unit = slug ? unitBySlug(slug) : undefined;
-  if (unit === undefined) {
-    console.log("Say which module or lab. The names are:");
-    for (const other of UNITS) console.log(`  bun run goto ${other.slug}`);
-    process.exit(2);
-  }
+  const unit = chooseUnit();
   const fresh = process.argv.includes("--fresh");
   const saved = saveDirtyTree();
   const mine = saved ?? "HEAD";

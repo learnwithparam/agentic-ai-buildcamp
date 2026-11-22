@@ -12,6 +12,7 @@ export type Unit = {
   needs: string | null; // the one unit that must pass first
   after: string | null; // labs only: the module whose tag a lab starts from
   cases: string[]; // golden case names this unit turns green
+  built: boolean; // false until the unit has code, checks, content and a page
 };
 
 export const UNITS: Unit[] = [
@@ -23,6 +24,7 @@ export const UNITS: Unit[] = [
     job: "See why a plain chatbot fails a medical affairs team",
     needs: null,
     after: null,
+    built: false,
     cases: [],
   },
   {
@@ -33,6 +35,7 @@ export const UNITS: Unit[] = [
     job: "Show the team why an answer came out and what it cost",
     needs: "foundation",
     after: null,
+    built: false,
     cases: [],
   },
   {
@@ -43,6 +46,7 @@ export const UNITS: Unit[] = [
     job: "Make sure the agent quotes the current label, never the old one",
     needs: "gateway-tracing",
     after: null,
+    built: false,
     cases: ["current-label-wins", "expired-draft-hidden"],
   },
   {
@@ -53,6 +57,7 @@ export const UNITS: Unit[] = [
     job: "Send trivia and off-label requests down cheap, safe paths",
     needs: "documents-freshness",
     after: null,
+    built: false,
     cases: ["trivia-template", "off-label-refused"],
   },
   {
@@ -63,6 +68,7 @@ export const UNITS: Unit[] = [
     job: "Give medical reviewers answers they can check line by line",
     needs: "intent-routing",
     after: null,
+    built: false,
     cases: ["multi-hop-cited", "unanswerable-refused", "wrong-country-label"],
   },
   {
@@ -73,6 +79,7 @@ export const UNITS: Unit[] = [
     job: "Answer territory sales questions without leaking prescriber data",
     needs: "grounded-agent",
     after: null,
+    built: false,
     cases: ["territory-dip", "second-schema", "no-row-in-trace"],
   },
   {
@@ -83,6 +90,7 @@ export const UNITS: Unit[] = [
     job: "Let the team reach the agent where they already work",
     needs: "analytics-mcp",
     after: null,
+    built: false,
     cases: ["same-answer-three-surfaces"],
   },
   {
@@ -93,6 +101,7 @@ export const UNITS: Unit[] = [
     job: "Keep each pharma tenant and each role inside its own lane",
     needs: "surfaces",
     after: null,
+    built: false,
     cases: ["tenant-wall", "role-hides-bi", "country-attribute", "policy-matches-rls"],
   },
   {
@@ -103,6 +112,7 @@ export const UNITS: Unit[] = [
     job: "Route an adverse event report to the safety officer for approval",
     needs: "access-control",
     after: null,
+    built: false,
     cases: ["adverse-event-pause", "resume-after-restart", "memory-stays-in-tenant"],
   },
   {
@@ -113,6 +123,7 @@ export const UNITS: Unit[] = [
     job: "Watch for label changes overnight and survive a crash",
     needs: "approvals-memory",
     after: null,
+    built: false,
     cases: ["injection-in-pdf", "select-star-blocked", "duplicate-events-one-run", "crash-resumes"],
   },
   {
@@ -123,6 +134,7 @@ export const UNITS: Unit[] = [
     job: "Stop a one line change from bringing back the old label",
     needs: "guardrails-workers",
     after: null,
+    built: false,
     cases: ["regression-caught"],
   },
   {
@@ -133,6 +145,7 @@ export const UNITS: Unit[] = [
     job: "Tell the product lead when a rival changes its price",
     needs: "grounded-agent",
     after: "grounded-agent",
+    built: false,
     cases: ["price-swap", "unchanged-page-skipped", "cookie-wall", "hidden-price-tabs"],
   },
   {
@@ -143,6 +156,7 @@ export const UNITS: Unit[] = [
     job: "Spot churn risk in the product funnel and hand it to the briefing agent",
     needs: "surfaces",
     after: "surfaces",
+    built: false,
     cases: ["funnel-drop", "churn-skill", "no-email-in-trace"],
   },
   {
@@ -153,6 +167,7 @@ export const UNITS: Unit[] = [
     job: "Stop Core Growth from reading the Titan memo",
     needs: "approvals-memory",
     after: "approvals-memory",
+    built: false,
     cases: ["titan-hidden", "tone-memory-scoped", "approval-resumes"],
   },
   {
@@ -163,12 +178,23 @@ export const UNITS: Unit[] = [
     job: "Publish the Monday briefing after a person approves it",
     needs: "release-gate",
     after: "release-gate",
+    built: false,
     cases: ["event-to-run", "monday-briefing", "debounce", "crash-resume", "publish-approval"],
   },
 ];
 
 export function unitBySlug(slug: string): Unit | undefined {
   return UNITS.find((unit) => unit.slug === slug);
+}
+
+// The file name stem of a unit, for example 03-intent-routing.
+export function stemFor(unit: Unit): string {
+  return tagFor(unit.slug).split("/")[1];
+}
+
+// Where the learner page for a unit lives, for example docs/modules/03-intent-routing.md.
+export function pageFor(unit: Unit): string {
+  return `docs/${unit.kind}s/${stemFor(unit)}.md`;
 }
 
 // The tag name for a unit, for example checkpoint/03-intent-routing.

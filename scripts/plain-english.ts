@@ -9,7 +9,20 @@ import { ROOT } from "./root";
 
 // A course for everyone (no code) can lower this in package.json: "plainEnglish": { "grade": 6 }.
 const DEFAULT_READING_GRADE = 6;
-const LONGEST_SENTENCE = 25;
+
+type Limits = { grade: number; longest: number; average: number };
+
+function readLimits(): Limits {
+  const packageJson = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8"));
+  const set = packageJson.plainEnglish ?? {};
+  return {
+    grade: typeof set.grade === "number" ? set.grade : DEFAULT_READING_GRADE,
+    longest: typeof set.longest === "number" ? set.longest : 25,
+    average: typeof set.average === "number" ? set.average : 99,
+  };
+}
+
+const LIMITS = readLimits();
 
 const SKIPPED_FOLDERS = new Set([
   "node_modules",
@@ -18,6 +31,7 @@ const SKIPPED_FOLDERS = new Set([
   "recordings",
   "research",
   "fixtures",
+  "case-studies",
 ]);
 
 // Pages for the people who build the course, not for learners.
@@ -270,11 +284,17 @@ function hardWordProblems(file: string, prose: string): Problem[] {
   return problems;
 }
 
+function averageWords(sentences: string[]): number {
+  if (sentences.length === 0) return 0;
+  const total = sentences.reduce((sum, sentence) => sum + wordsOf(sentence).length, 0);
+  return total / sentences.length;
+}
+
 function sentenceProblems(file: string, sentences: string[]): Problem[] {
   const problems: Problem[] = [];
   for (const sentence of sentences) {
     const count = wordsOf(sentence).length;
-    if (count > LONGEST_SENTENCE) {
+    if (count > LIMITS.longest) {
       const opening = sentence.split(" ").slice(0, 8).join(" ");
       problems.push({ file, message: `${count}-word sentence "${opening}..."; split it` });
     }
@@ -300,6 +320,11 @@ export function problemsIn(file: string, markdown: string, gradeLimit: number): 
     const message = `reading grade ${shown}, above ${gradeLimit}; use shorter words`;
     problems.push({ file, message });
   }
+  const average = averageWords(sentences);
+  if (sentences.length >= 5 && average > LIMITS.average) {
+    const message = `${average.toFixed(1)} words a sentence on average, above ${LIMITS.average}`;
+    problems.push({ file, message });
+  }
   if (isTeachingPage(file) && !/\bfor example\b/i.test(markdown)) {
     problems.push({ file, message: 'no "For example": show one real case, not only the rule' });
   }
@@ -307,9 +332,7 @@ export function problemsIn(file: string, markdown: string, gradeLimit: number): 
 }
 
 function configuredGrade(): number {
-  const packageJson = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8"));
-  const grade = packageJson.plainEnglish?.grade;
-  return typeof grade === "number" ? grade : DEFAULT_READING_GRADE;
+  return LIMITS.grade;
 }
 
 // The check tests itself first: code quoted inside a longer fence is never read as prose.
