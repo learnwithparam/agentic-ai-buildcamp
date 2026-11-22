@@ -19,7 +19,9 @@
     "goto": "bun scripts/goto.ts",
     "checkpoints": "bun scripts/checkpoints.ts",
     "models": "bun scripts/models.ts",
-    "seed": "bun scripts/seed.ts"
+    "seed": "bun scripts/seed.ts",
+    "up": "bun scripts/up.ts",
+    "down": "docker compose -f infra/docker-compose.yml down -v"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "4.0.103",
@@ -35,6 +37,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.6.5",
     "@types/bun": "1.4.4",
+    "@types/pg": "8.23.1",
     "pdf-lib": "1.17.1",
     "typescript": "7.0.2"
   },

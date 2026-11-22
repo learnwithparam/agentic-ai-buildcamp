@@ -24,7 +24,7 @@ export const UNITS: Unit[] = [
     job: "See why a plain chatbot fails a medical affairs team",
     needs: null,
     after: null,
-    built: false,
+    built: true,
     cases: [],
   },
   {
