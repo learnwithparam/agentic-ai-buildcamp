@@ -9,12 +9,12 @@ const NEW_PRESCRIPTIONS = `SELECT territory, SUM(new_prescriptions) AS total
   WHERE brand = 'OncoX' AND week_start BETWEEN '2026-07-01' AND '2026-09-30'
   GROUP BY territory ORDER BY total DESC LIMIT 1`;
 
-const AGENT: Agent = (question, tenantId) => {
+const AGENT: Agent = (question, personName) => {
   const models = {
     generate: async () => "NOT_IN_DOCUMENTS",
     writeQuery: async () => NEW_PRESCRIPTIONS,
   };
-  return askTeam(question, tenantId, models);
+  return askTeam(question, personName, models);
 };
 
 function theCase() {

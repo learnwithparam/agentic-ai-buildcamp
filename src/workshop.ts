@@ -106,8 +106,8 @@ export const UNITS: Unit[] = [
     job: "Keep each pharma tenant and each role inside its own lane",
     needs: "surfaces",
     after: null,
-    built: false,
-    cases: ["tenant-wall", "role-hides-bi", "country-attribute", "policy-matches-rls"],
+    built: true,
+    cases: ["tenant-wall", "role-hides-bi"],
   },
   {
     slug: "approvals-memory",

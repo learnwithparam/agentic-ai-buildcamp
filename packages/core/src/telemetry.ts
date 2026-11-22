@@ -9,7 +9,7 @@ import { BasicTracerProvider, SimpleSpanProcessor } from "@opentelemetry/sdk-tra
 export const PHOENIX_URL = process.env.PHOENIX_URL ?? "http://localhost:6006";
 export const PROJECT = "buildcamp";
 
-export type Tags = { tenantId: string; agentName: string };
+export type Tags = { tenantId: string; agentName: string; person?: string };
 export type Attributes = Record<string, string | number | boolean>;
 
 let provider: BasicTracerProvider | undefined;

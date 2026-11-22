@@ -92,7 +92,7 @@ export async function answerGrounded(
 async function findDocuments(subject: Subject | undefined, tags: Tags): Promise<StoredDocument[]> {
   if (subject === undefined) return [];
   return traced("retrieval", tags, async (setAttributes) => {
-    const found = await activeDocuments(subject.brand, subject.country);
+    const found = await activeDocuments(subject.brand, subject.country, tags.person);
     setAttributes({ documents: found.length, brand: subject.brand, country: subject.country });
     return found;
   });

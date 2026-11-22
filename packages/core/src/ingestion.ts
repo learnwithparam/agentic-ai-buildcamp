@@ -7,6 +7,7 @@ import { ExtractInputKind, extract } from "@xberg-io/xberg";
 import { AS_OF } from "../../../data/catalog/brands";
 import { DOCUMENTS, type HcpDocument } from "../../../data/catalog/documents";
 import { OUTPUT } from "../../../scripts/seed";
+import { applyWalls, readUnderWall } from "./access";
 import { inTransaction, rows } from "./db";
 
 export type Outcome = "added" | "replaced" | "unchanged_skipped";
@@ -19,6 +20,7 @@ const COLUMNS = `slug text PRIMARY KEY, brand text, country text, type text, ver
 export async function resetDocuments(): Promise<void> {
   await rows("DROP TABLE IF EXISTS documents");
   await rows(`CREATE TABLE documents (${COLUMNS})`);
+  await applyWalls();
 }
 
 function fileOf(document: HcpDocument): string {
@@ -74,7 +76,13 @@ export async function ingestAll(): Promise<void> {
   for (const document of DOCUMENTS) await ingestDocument(document);
 }
 
-export async function activeDocuments(brand: string, country: string): Promise<StoredDocument[]> {
+// With a person, the database wall picks the documents.
+export async function activeDocuments(
+  brand: string,
+  country: string,
+  person?: string,
+): Promise<StoredDocument[]> {
+  if (person !== undefined) return readUnderWall(person, brand, country);
   return rows<StoredDocument>(
     `SELECT slug, brand, country, body FROM documents
      WHERE is_active AND brand = $1 AND country = $2`,

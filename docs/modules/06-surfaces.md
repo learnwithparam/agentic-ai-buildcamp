@@ -38,7 +38,7 @@ For example, ask which territory led OncoX new prescriptions from July to Septem
 
 The browser sends a question. The server calls the agent and sends the result back as one **server-sent event**. That is a message the server pushes over an open request.
 
-Until a later module adds sign-in, everyone acts as one dev user. The chat reads the tenant from the request and falls back to pharma-a.
+Until a later module adds sign-in, everyone acts as one dev user. The chat reads the person from the request and falls back to alice.
 
 ### packages/core/src/surfaces.ts
 
@@ -47,7 +47,7 @@ export async function chatResponse(request: Request, agent: Agent): Promise<Resp
   const body = (await request.json()) as ChatBody;
   const question = textOf(body.question);
   if (question === "") return new Response("Send a question.", { status: 400 });
-  const result = await agent(question, tenantOf(body.tenant));
+  const result = await agent(question, personOf(body.person));
   const event = `event: answer\ndata: ${JSON.stringify(result)}\n\n`;
   return new Response(event, { headers: { "content-type": "text/event-stream" } });
 }
@@ -61,7 +61,7 @@ export async function chatResponse(request: Request, agent: Agent): Promise<Resp
 
 ```ts
 function toolList(): unknown[] {
-  const properties = { question: { type: "string" }, tenant: { type: "string" } };
+  const properties = { question: { type: "string" }, person: { type: "string" } };
   const inputSchema = { type: "object", properties, required: ["question"] };
   return [{ name: TOOL_NAME, description: "Ask the medical affairs team.", inputSchema }];
 }
@@ -73,7 +73,7 @@ async function callTool(call: ToolCall | undefined, agent: Agent): Promise<unkno
   const question = textOf(call.arguments.question);
   if (question === "")
     return { isError: true, content: [{ type: "text", text: "Send a question." }] };
-  const result = await agent(question, tenantOf(call.arguments.tenant));
+  const result = await agent(question, personOf(call.arguments.person));
   return { content: [{ type: "text", text: result.text }] };
 }
 
@@ -110,7 +110,7 @@ function flagValue(args: string[], flag: string): string {
 export async function cliText(args: string[], agent: Agent): Promise<string> {
   const question = flagValue(args, "--question");
   if (question === "") return "Add --question with your question.";
-  const result = await agent(question, tenantOf(flagValue(args, "--tenant")));
+  const result = await agent(question, personOf(flagValue(args, "--person")));
   return result.text;
 }
 ```
