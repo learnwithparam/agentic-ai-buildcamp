@@ -117,8 +117,8 @@ export const UNITS: Unit[] = [
     job: "Route an adverse event report to the safety officer for approval",
     needs: "access-control",
     after: null,
-    built: false,
-    cases: ["safety-approval-resumes", "resume-after-restart", "memory-stays-in-tenant"],
+    built: true,
+    cases: ["safety-approval-resumes"],
   },
   {
     slug: "guardrails-workers",

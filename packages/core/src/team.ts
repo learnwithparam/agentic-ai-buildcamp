@@ -5,6 +5,7 @@ import type { DocumentType } from "../../../data/catalog/documents";
 import { type Person, personNamed } from "../../../data/catalog/people";
 import type { AgentResult } from "../../../src/grade";
 import { can, canUse, type Verdict } from "./access";
+import { recall, remember, requestApproval } from "./approvals";
 import { ask } from "./ask";
 import { answerData, type WriteQuery } from "./bi";
 import { answerGrounded, type Generate } from "./grounded";
@@ -48,6 +49,15 @@ function permit(person: Person, question: string): Verdict {
   return can(person, { brand, type: typeIn(question) });
 }
 
+const REMEMBER = "remember ";
+
+// A reply that needs a human waits as an approval. Nothing is sent until someone decides.
+async function pauseForHuman(result: AgentResult, person: Person, question: string) {
+  if (result.route !== "escalate" && result.route !== "approve") return result;
+  const id = await requestApproval(person.name, question);
+  return { route: result.route, text: `${result.text} Approval ${id} is waiting.`, citations: [] };
+}
+
 export async function askTeam(
   question: string,
   personName: string,
@@ -55,20 +65,27 @@ export async function askTeam(
 ): Promise<AgentResult> {
   const person = personNamed(personName);
   const tags: Tags = { tenantId: person.tenant, agentName: "team", person: person.name };
-  return handle(question, tags, async (text) => {
+  if (question.toLowerCase().startsWith(REMEMBER)) {
+    await remember(person.name, question.slice(REMEMBER.length));
+    return { route: "template", text: "Noted.", citations: [] };
+  }
+  const result = await handle(question, tags, async (text) => {
     const verdict = permit(person, text);
     if (!verdict.allowed) return { route: "refuse", text: verdict.reason, citations: [] };
     if (isDataQuestion(text)) return answerData(text, person.tenant, tags, models.writeQuery);
     return answerGrounded(text, tags, models.generate);
   });
+  return pauseForHuman(result, person, question);
 }
 
 // The live agent. Each model call is one traced call through the single door.
 export function liveAgent(): Agent {
   return async (question, personName) => {
     const tags: Tags = { tenantId: personNamed(personName).tenant, agentName: "team" };
+    const notes = await recall(personName);
+    const memory = notes.length === 0 ? "" : `Notes about this person: ${notes.join(" ")}\n`;
     const models: Models = {
-      generate: async (prompt) => (await ask("smart", prompt, tags)).text,
+      generate: async (prompt) => (await ask("smart", memory + prompt, tags)).text,
       writeQuery: async (prompt) => (await ask("smart", prompt, tags)).text,
     };
     return askTeam(question, personName, models);
