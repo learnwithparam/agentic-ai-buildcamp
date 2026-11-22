@@ -46,7 +46,7 @@ export const UNITS: Unit[] = [
     job: "Make sure the agent quotes the current label, never the old one",
     needs: "gateway-tracing",
     after: null,
-    built: false,
+    built: true,
     cases: ["current-label-wins", "expired-draft-hidden"],
   },
   {

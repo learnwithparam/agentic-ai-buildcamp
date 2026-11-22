@@ -4,6 +4,7 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import { COMMERCIAL_DISPENSES, TERRITORY_RX_WEEKLY } from "../data/catalog/analytics";
+import { GLYPH_WIDTH, glyphRows } from "../data/catalog/block-font";
 import { DOCUMENTS, type HcpDocument } from "../data/catalog/documents";
 import { COMPETITORS, PRODUCT_FUNNEL, WORKSPACES } from "../data/catalog/mission-control";
 import { GRANTS, PEOPLE } from "../data/catalog/people";
@@ -29,14 +30,48 @@ function insertAll(table: string, rows: Row[]): string {
   return `INSERT INTO ${table} (${columns}) VALUES\n${lines.join(",\n")};\n`;
 }
 
-// A page whose words are grey bars, so no text layer exists for a parser to read.
+// A scan has no text layer. The words are drawn as blocks, so only a page reader can find them.
+const BLOCK = 5;
+const LETTER_ADVANCE = (GLYPH_WIDTH + 1) * BLOCK;
+const MOST_LETTERS_ACROSS = 17;
+const LINE_HEIGHT = 60;
+
+function inkBlock(page: Page, left: number, top: number): void {
+  page.drawRectangle({
+    x: left,
+    y: top,
+    width: BLOCK + 0.6,
+    height: BLOCK + 0.6,
+    color: rgb(0, 0, 0),
+  });
+}
+
+function drawLetter(page: Page, character: string, left: number, top: number): void {
+  glyphRows(character).forEach((row, down) => {
+    [...row].forEach((cell, across) => {
+      if (cell === "#") inkBlock(page, left + across * BLOCK, top - down * BLOCK);
+    });
+  });
+}
+
 function drawScan(page: Page, text: string): void {
-  let across = 50;
+  const lines = wrapWords(text, MOST_LETTERS_ACROSS);
+  lines.forEach((line, row) => {
+    [...line].forEach((character, column) => {
+      drawLetter(page, character, 50 + column * LETTER_ADVANCE, 700 - row * LINE_HEIGHT);
+    });
+  });
+}
+
+function wrapWords(text: string, width: number): string[] {
+  const lines: string[] = [];
+  let line = "";
   for (const word of text.split(" ")) {
-    const width = word.length * 6;
-    page.drawRectangle({ x: across, y: 700, width, height: 8, color: rgb(0.3, 0.3, 0.3) });
-    across += width + 6;
+    const next = line === "" ? word : `${line} ${word}`;
+    if (next.length > width) lines.push(line);
+    line = next.length > width ? word : next;
   }
+  return [...lines, line];
 }
 
 async function drawText(pdf: PDFDocument, page: Page, document: HcpDocument): Promise<void> {

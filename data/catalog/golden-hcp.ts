@@ -106,7 +106,7 @@ const LABEL_CASES: GoldenCase[] = [
     brand: "Breathe-EZ",
     country: "BR",
     documentType: "scanned-page",
-    truth: { dose: "2 puffs every 6 hours" },
+    truth: { dose: "two puffs" },
   },
   {
     name: "driving-faq",

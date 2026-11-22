@@ -16,6 +16,7 @@
         "@opentelemetry/exporter-trace-otlp-proto": "0.301.2",
         "@opentelemetry/resources": "3.1.1",
         "@opentelemetry/sdk-trace-base": "2.12.0",
+        "@xberg-io/xberg": "1.3.10",
         "ai": "7.0.171",
         "pg": "8.23.1",
         "zod": "4.6.7",
@@ -159,6 +160,20 @@
     "@vercel/oidc": ["@vercel/oidc@3.2.0", "", {}, "sha512-UycprH3T6n3jH0k44NHMa7pnFHGu/N05MjojYr+Mc6I7obkoLIJujSWwin1pCvdy/eOxrI/l3uDLQsmcrOb4ug=="],
 
     "@workflow/serde": ["@workflow/serde@4.1.0", "", {}, "sha512-pav4F2BoirECWR7Nf1TKt+2eETcBj7jj4cBefQ8VXQCA6NPkaKeLfj/zMgi+3zYV5ZIBT4GuUiphsj0/b9hPQQ=="],
+
+    "@xberg-io/xberg": ["@xberg-io/xberg@1.3.10", "", { "optionalDependencies": { "@xberg-io/xberg-darwin-arm64": "1.3.10", "@xberg-io/xberg-linux-arm64-gnu": "1.3.10", "@xberg-io/xberg-linux-arm64-musl": "1.3.10", "@xberg-io/xberg-linux-x64-gnu": "1.3.10", "@xberg-io/xberg-linux-x64-musl": "1.3.10", "@xberg-io/xberg-win32-x64-msvc": "1.3.10" } }, "sha512-OfzX0SD5/oFpIPapTBxPbxK3T64OLg+7SA5Vo4v8krNLum5PRWpTjLYHWHgB2ylXZcNR9nG7iz7N4+nzQFNWvg=="],
+
+    "@xberg-io/xberg-darwin-arm64": ["@xberg-io/xberg-darwin-arm64@1.3.10", "", { "os": "darwin", "cpu": "arm64" }, "sha512-hLtCWVglMEtCkGKFgqmtzcT06oWaZx6QNa0sRe0WuexR2dpdVRBw2daYWvAgUTE+r4KUYPMyJow+iMrBj4lMcw=="],
+
+    "@xberg-io/xberg-linux-arm64-gnu": ["@xberg-io/xberg-linux-arm64-gnu@1.3.10", "", { "os": "linux", "cpu": "arm64", "libc": "glibc" }, "sha512-T4TiHYTxcyVslF+VwLR+2Va9AsUqn0fBH6WD+XN67ZpRK4VjGvyDhLuc/737mc9x+bsfN8iPweSZF+PEdx2Tcw=="],
+
+    "@xberg-io/xberg-linux-arm64-musl": ["@xberg-io/xberg-linux-arm64-musl@1.3.10", "", { "os": "linux", "cpu": "arm64", "libc": "musl" }, "sha512-T2j4C5XI7Khz+Nn2M3bBDiHRrDBt4dzsSUO4MpA8aiSPpLX6yS+A4PeV2mxZHvA8CIwcWbEjGA1DaePXlZtmJg=="],
+
+    "@xberg-io/xberg-linux-x64-gnu": ["@xberg-io/xberg-linux-x64-gnu@1.3.10", "", { "os": "linux", "cpu": "x64", "libc": "glibc" }, "sha512-d+WifY8sTToRrsEeadFOiScfjro15UjCuEarPwzdumX80MJky21DOFflrJvpV4fCR1llMFVJyrzC14q3ZGIbEA=="],
+
+    "@xberg-io/xberg-linux-x64-musl": ["@xberg-io/xberg-linux-x64-musl@1.3.10", "", { "os": "linux", "cpu": "x64", "libc": "musl" }, "sha512-uFp1J0Jae8hPZ1u6QpejJ2DZEOCRODzj3P+nJmmEmylfOE4Y3QPD9ivNS920ffQ+EhdJV72YNZTeZs34tIwerw=="],
+
+    "@xberg-io/xberg-win32-x64-msvc": ["@xberg-io/xberg-win32-x64-msvc@1.3.10", "", { "os": "win32", "cpu": "x64" }, "sha512-JypK+tfBKWPGuHbz+3hcSKejcboINisr5Jmt7B25AymaN3rz+MiXbz3lVHgZvzYDKuH17fFigHi5P3SvHfmUmA=="],
 
     "ai": ["ai@7.0.171", "", { "dependencies": { "@ai-sdk/gateway": "4.0.144", "@ai-sdk/provider": "4.0.38", "@ai-sdk/provider-utils": "5.0.80" }, "peerDependencies": { "zod": "^3.25.76 || ^4.1.8" } }, "sha512-YGyMIMn7XZY1H1EwSGn0QItd8PeVXA6OOzq+bVugnsfCjgFmHjcBIGs8JgmTzblMAd0lFRAL2ng5r0ozq98l6g=="],
 

@@ -151,8 +151,8 @@ export const DOCUMENTS: HcpDocument[] = [
     version: 1,
     effective: "2025-05-01",
     title: "Breathe-EZ leaflet page, Brazil, a scan with no text layer",
-    facts: { dose: "2 puffs every 6 hours" },
-    body: "Breathe-EZ leaflet. Use 2 puffs every 6 hours. Shake the inhaler first.",
+    facts: { dose: "two puffs" },
+    body: "Leaflet. Use two puffs. Then rest six hours. Rinse the mouth after use.",
   },
   {
     slug: "dermaclear-us-label-v1",

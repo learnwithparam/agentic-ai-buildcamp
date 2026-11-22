@@ -19,6 +19,24 @@ export async function rows<Row extends pg.QueryResultRow>(
   return result.rows;
 }
 
+// Runs the work as one transaction. If it fails, every change is undone.
+export async function inTransaction<Result>(
+  work: (run: (sql: string, values?: unknown[]) => Promise<pg.QueryResult>) => Promise<Result>,
+): Promise<Result> {
+  const client = await openPool().connect();
+  try {
+    await client.query("BEGIN");
+    const result = await work((sql, values = []) => client.query(sql, values));
+    await client.query("COMMIT");
+    return result;
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
+}
+
 export async function closeDatabase(): Promise<void> {
   await pool?.end();
   pool = undefined;
