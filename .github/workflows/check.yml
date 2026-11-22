@@ -9,5 +9,7 @@ jobs:
         with:
           bun-version: 1.4.4
       - uses: astral-sh/setup-uv@v6
+      - name: Install the Mermaid renderer
+        run: npm install -g @mermaid-js/mermaid-cli
       - run: bun run up
       - run: bun run check
