@@ -28,6 +28,10 @@ jobs:
         run: bun run up
       - name: Gate on main
         run: bun run check
+      - name: Name the committer for the tag commits
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
       - name: Prove and build every checkpoint tag
         run: bun scripts/checkpoints.ts --prove --tag
       - name: Push all tags together
