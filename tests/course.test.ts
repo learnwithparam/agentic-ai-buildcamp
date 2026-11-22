@@ -2,6 +2,7 @@
 import { describe, expect, test } from "bun:test";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
+import { HCP_GOLDEN } from "../data/catalog/golden-hcp";
 import { ROOT } from "../scripts/root";
 import { pageFor, stemFor, tagFor, UNITS, unitBySlug } from "../src/workshop";
 
@@ -49,4 +50,19 @@ describe("a built unit is complete", () => {
       for (const part of parts) expect(existsSync(join(ROOT, part))).toBe(true);
     });
   }
+});
+
+describe("the golden sets", () => {
+  const hcpUnits = UNITS.filter((unit) => unit.track === "hcp");
+  const assigned = hcpUnits.flatMap((unit) => unit.cases);
+  test("every golden case is assigned to one unit", () => {
+    const named = HCP_GOLDEN.cases.filter((item) => !item.name.startsWith("NAIVE"));
+    for (const item of named) {
+      expect(assigned.filter((name) => name === item.name)).toHaveLength(1);
+    }
+  });
+  test("every case a unit names is in its golden set", () => {
+    const known = HCP_GOLDEN.cases.map((item) => item.name);
+    for (const name of assigned) expect(known).toContain(name);
+  });
 });

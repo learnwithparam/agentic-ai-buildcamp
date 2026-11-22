@@ -47,7 +47,12 @@ export const UNITS: Unit[] = [
     needs: "gateway-tracing",
     after: null,
     built: true,
-    cases: ["current-label-wins", "expired-draft-hidden"],
+    cases: [
+      "current-label-wins",
+      "expired-draft-hidden",
+      "future-label-not-yet",
+      "not-approved-in-country",
+    ],
   },
   {
     slug: "intent-routing",
@@ -58,12 +63,7 @@ export const UNITS: Unit[] = [
     needs: "documents-freshness",
     after: null,
     built: true,
-    cases: [
-      "trivia-template",
-      "off-label-refused",
-      "adverse-event-pause",
-      "safety-approval-resumes",
-    ],
+    cases: ["trivia-template", "off-label-refused", "adverse-event-pause"],
   },
   {
     slug: "grounded-agent",
@@ -74,7 +74,15 @@ export const UNITS: Unit[] = [
     needs: "intent-routing",
     after: null,
     built: true,
-    cases: ["multi-hop-cited", "unanswerable-refused", "wrong-country-label"],
+    cases: [
+      "multi-hop-cited",
+      "unanswerable-refused",
+      "wrong-country-label",
+      "safety-letter-quoted",
+      "scanned-page-read",
+      "driving-faq",
+      "inhaler-label-us",
+    ],
   },
   {
     slug: "analytics-mcp",
