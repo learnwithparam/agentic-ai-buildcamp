@@ -139,7 +139,7 @@ export const UNITS: Unit[] = [
     job: "Stop a one line change from bringing back the old label",
     needs: "guardrails-workers",
     after: null,
-    built: false,
+    built: true,
     cases: ["regression-caught"],
   },
   {

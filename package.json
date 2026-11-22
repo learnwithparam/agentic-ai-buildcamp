@@ -20,6 +20,7 @@
     "checkpoints": "bun scripts/checkpoints.ts",
     "models": "bun scripts/models.ts",
     "seed": "bun scripts/seed.ts",
+    "eval": "bun scripts/eval.ts",
     "up": "bun scripts/up.ts",
     "serve": "bun apps/hcp-showcase/src/main.ts serve",
     "ask": "bun apps/hcp-showcase/src/main.ts",

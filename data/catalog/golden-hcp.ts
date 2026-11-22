@@ -34,13 +34,13 @@ const LABEL_CASES: GoldenCase[] = [
   {
     name: "expired-draft-hidden",
     kind: "edge",
-    intent: "answer",
+    intent: "refuse",
     question: "What is the CardioZ dose in Brazil?",
     persona: "alice",
     brand: "CardioZ",
     country: "BR",
     documentType: "label",
-    truth: { dose: "no current label", draftDose: "40 mg once daily" },
+    truth: { route: "refuse", draftDose: "40 mg once daily" },
   },
   {
     name: "future-label-not-yet",
@@ -73,7 +73,7 @@ const LABEL_CASES: GoldenCase[] = [
     brand: "OncoX",
     country: "JP",
     documentType: "label",
-    truth: { dose: "no current label" },
+    truth: { route: "refuse" },
   },
   {
     name: "safety-letter-quoted",

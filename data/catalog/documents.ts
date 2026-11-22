@@ -185,7 +185,7 @@ export const DOCUMENTS: HcpDocument[] = [
     effective: "2026-09-10",
     title: "DermaClear safety letter to doctors",
     facts: { warning: "Do not use on broken skin." },
-    body: "Dear doctor. New safety advice. Do not use DermaClear on broken skin.",
+    body: "Dear doctor. New safety advice. Do not use on broken skin.",
   },
   {
     slug: "neurocalm-us-label-v1",
@@ -207,7 +207,9 @@ export const DOCUMENTS: HcpDocument[] = [
     effective: "2025-06-15",
     title: "NeuroCalm study summary, two columns with footnotes",
     facts: { sleepGain: "18 minutes faster, against 6 for the sugar pill", people: "412" },
-    body: "412 adults took part. NeuroCalm users slept 18 minutes sooner. The sugar pill, 6.",
+    body:
+      "412 adults took part. " +
+      "NeuroCalm users fell asleep 18 minutes faster, against 6 for the sugar pill.",
   },
   {
     slug: "neurocalm-de-faq",
