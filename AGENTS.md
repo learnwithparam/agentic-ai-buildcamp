@@ -90,7 +90,7 @@ Every `checkpoint/*` tag is `main`'s tree except for its milestone files: the fi
 
 Inside a milestone file, regions marked `// checkpoint-sync:begin <name>` / `// checkpoint-sync:end <name>` still come from `main`. The sync fails if `main` has a region that a tag's milestone file lacks. When a new lesson starts editing a file, add it to `milestone_files()` for the earlier tags.
 
-The `Sync checkpoint tags` GitHub Action (`.github/workflows/sync-checkpoints.yml`) runs on every push to `main` (and by hand). It runs `npm ci`, then `./scripts/sync-checkpoints.sh --verify --push`. Each changed tag gets one commit, must pass `npm run typecheck`, and is force-moved. All moved tags are pushed together, and only once every tag has passed. `.github/` stays on `main` only.
+The `Sync checkpoint tags` GitHub Action (`.github/workflows/sync-checkpoints.yml`) runs on every push to `main` (and by hand). It runs `npm ci`, then `./scripts/sync-checkpoints.sh --verify --push`. Each changed tag gets one commit, must pass `npm run check`, and is force-moved. All moved tags are pushed together, and only once every tag has passed. `.github/` and `scripts/sync-checkpoints.sh` stay on `main` only.
 
 To run it locally (clean working tree required):
 
