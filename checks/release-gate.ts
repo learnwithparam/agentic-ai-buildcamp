@@ -3,7 +3,7 @@ import { runGolden } from "../apps/hcp-showcase/src/scoreboard";
 import { HCP_GOLDEN } from "../data/catalog/golden-hcp";
 import { resetApprovals } from "../packages/core/src/approvals";
 import { rows } from "../packages/core/src/db";
-import { gate, gateText } from "../packages/core/src/gate";
+import { experimentPayload, gate, gateText } from "../packages/core/src/gate";
 import { ingestAll, resetDocuments } from "../packages/core/src/ingestion";
 import { askTeam } from "../packages/core/src/team";
 import type { Grade } from "../src/grade";
@@ -79,6 +79,30 @@ export const checks: Check[] = [
       const result = gate(OFFLINE, grades);
       expect(result.passed === grades.length - 1, "The gate counted the wrong number of passes.");
       expect(!result.open, "One failure out of many left the gate open.");
+    },
+  },
+  {
+    name: "A case that never ran closes the gate",
+    tryNext: "Walk the golden set, not the grades. A missing grade is a failure.",
+    run: async () => {
+      const grades: Grade[] = OFFLINE.cases.map(() => ({ ok: true, reasons: [] }));
+      const result = gate(OFFLINE, grades.slice(1));
+      expect(!result.open, "A case that never ran left the gate open.");
+      expect(result.total === OFFLINE.cases.length, "The gate did not count every case.");
+    },
+  },
+  {
+    name: "The Phoenix payload holds every case and the score",
+    tryNext: "Build one dataset row per golden case, and put the score in the metadata.",
+    run: async () => {
+      const grades: Grade[] = OFFLINE.cases.map(() => ({ ok: true, reasons: [] }));
+      grades[0] = { ok: false, reasons: ["wrong"] };
+      const note = { mode: "replay", costUsd: 0, label: "test" } as const;
+      const payload = experimentPayload(OFFLINE, grades, note);
+      expect(payload.examples.length === OFFLINE.cases.length, "The payload lacks some cases.");
+      expect(payload.metadata.passed === grades.length - 1, "The payload holds the wrong score.");
+      expect(payload.metadata.open === false, "The payload says the gate is open.");
+      expect(payload.grades[OFFLINE.cases[0].name].ok === false, "The payload lost the failure.");
     },
   },
 ];

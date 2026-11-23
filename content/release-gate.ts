@@ -57,8 +57,8 @@ export const content: UnitContent = {
     {
       file: "packages/core/src/gate.ts",
       rule: "a failed case must be listed",
-      find: "if (grade.ok) return;",
-      replace: "if (grade.ok || !grade.ok) return;",
+      find: "else if (!grade.ok)",
+      replace: "else if (!grade.ok && grade.ok)",
     },
     {
       file: "packages/core/src/gate.ts",
@@ -69,14 +69,26 @@ export const content: UnitContent = {
     {
       file: "packages/core/src/gate.ts",
       rule: "the report must name the case",
-      find: "set.cases[position].name",
-      replace: "String(position)",
+      find: "const label = golden.name;",
+      replace: "const label = String(position);",
     },
     {
       file: "packages/core/src/gate.ts",
       rule: "the report must give the reason",
       find: 'grade.reasons.join(", ")',
       replace: '""',
+    },
+    {
+      file: "packages/core/src/gate.ts",
+      rule: "a case that never ran must close the gate",
+      find: "if (grade === undefined) failures.push(",
+      replace: "if (grade === undefined) void (",
+    },
+    {
+      file: "packages/core/src/gate.ts",
+      rule: "the Phoenix payload must hold the real score",
+      find: "passed: result.passed,",
+      replace: "passed: result.total,",
     },
   ],
 };
