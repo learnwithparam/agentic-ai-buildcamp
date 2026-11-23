@@ -1,7 +1,18 @@
 // Workspaces keep teams apart. A person reads a workspace only when a member grant says so.
 // Tone notes stay inside one workspace. A briefing waits as a row until an approver decides.
 import { join } from "node:path";
-import { inTransaction, rows } from "../../../packages/core/src/db";
+import {
+  Annotation,
+  type BaseCheckpointSaver,
+  Command,
+  END,
+  interrupt,
+  START,
+  StateGraph,
+} from "@langchain/langgraph";
+import { PostgresSaver } from "@langchain/langgraph-checkpoint-postgres";
+import { WORKSPACES } from "../../../data/catalog/mission-control";
+import { DATABASE_URL, inTransaction, rows } from "../../../packages/core/src/db";
 import { ROOT } from "../../../scripts/root";
 import type { AgentResult } from "../../../src/grade";
 
@@ -94,6 +105,143 @@ export async function approveBriefing(id: number, approver: string): Promise<voi
     const update = "UPDATE briefings SET status = 'published', approved_by = $2 WHERE id = $1";
     await run(update, [id, approver]);
   });
+}
+
+const WORKSPACE_WALL = `CREATE OR REPLACE FUNCTION app_member(who text, space text)
+RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER AS $$
+  SELECT EXISTS (SELECT 1 FROM grants WHERE person = who AND relation = 'member' AND object = space)
+$$;
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = 'app_reader') THEN
+    CREATE ROLE app_reader;
+  END IF;
+END $$;
+ALTER TABLE tone_notes ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS tone_wall ON tone_notes;
+CREATE POLICY tone_wall ON tone_notes FOR SELECT TO app_reader
+  USING (person = current_setting('app.person', true)
+    AND app_member(current_setting('app.person', true), workspace));
+GRANT SELECT ON tone_notes TO app_reader;
+ALTER TABLE briefings ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS briefing_wall ON briefings;
+CREATE POLICY briefing_wall ON briefings FOR SELECT TO app_reader
+  USING (app_member(current_setting('app.person', true), workspace));
+GRANT SELECT ON briefings TO app_reader`;
+
+// The database is a second wall. It holds even when a query forgets to filter.
+export async function applyWorkspaceWalls(): Promise<void> {
+  await setupWorkspace();
+  await rows(WORKSPACE_WALL);
+}
+
+// Seeds the two workspaces. The Titan memo already lives in the catalog, so it is never copied.
+export async function seedWorkspaces(): Promise<void> {
+  await rows(`CREATE TABLE IF NOT EXISTS workspaces (name text PRIMARY KEY, about text)`);
+  for (const space of WORKSPACES) {
+    await rows("INSERT INTO workspaces VALUES ($1, $2) ON CONFLICT (name) DO NOTHING", [
+      space.name,
+      space.about,
+    ]);
+  }
+}
+
+// This query names no person and no workspace filter. The policy alone picks the rows.
+export async function toneUnderWall(person: string, workspace: string): Promise<string[]> {
+  await applyWorkspaceWalls();
+  return inTransaction(async (run) => {
+    await run("SET LOCAL ROLE app_reader");
+    await run("SELECT set_config('app.person', $1, true)", [person]);
+    const found = await run("SELECT note FROM tone_notes WHERE workspace = $1 ORDER BY id", [
+      workspace,
+    ]);
+    return found.rows.map((item) => (item as { note: string }).note);
+  });
+}
+
+export async function briefingsUnderWall(person: string): Promise<string[]> {
+  await applyWorkspaceWalls();
+  return inTransaction(async (run) => {
+    await run("SET LOCAL ROLE app_reader");
+    await run("SELECT set_config('app.person', $1, true)", [person]);
+    const found = await run("SELECT body FROM briefings ORDER BY id");
+    return found.rows.map((item) => (item as { body: string }).body);
+  });
+}
+
+const BriefingState = Annotation.Root({
+  writer: Annotation<string>(),
+  workspace: Annotation<string>(),
+  body: Annotation<string>(),
+  approver: Annotation<string>(),
+  status: Annotation<string>(),
+});
+
+type Decision = { approver: string; approved: boolean };
+
+// The graph stops at interrupt() and saves its state. A later session resumes the same thread.
+function briefingGraph(saver: BaseCheckpointSaver) {
+  async function wait(state: typeof BriefingState.State) {
+    const answer = interrupt({ ask: "Approve this briefing?", workspace: state.workspace });
+    const decision = answer as Decision;
+    return { approver: decision.approver, status: decision.approved ? "approved" : "rejected" };
+  }
+  async function publish(state: typeof BriefingState.State) {
+    if (state.status !== "approved") return {};
+    const id = await submitBriefing(state.writer, state.workspace, state.body);
+    await approveBriefing(id, state.approver);
+    return { status: "published" };
+  }
+  return new StateGraph(BriefingState)
+    .addNode("wait", wait)
+    .addNode("publish", publish)
+    .addEdge(START, "wait")
+    .addEdge("wait", "publish")
+    .addEdge("publish", END)
+    .compile({ checkpointer: saver });
+}
+
+export async function postgresSaver(): Promise<PostgresSaver> {
+  const saver = PostgresSaver.fromConnString(DATABASE_URL);
+  await saver.setup();
+  return saver;
+}
+
+export type Brief = { writer: string; workspace: string; body: string };
+
+// Starts the briefing and stops at the approval. Nothing is published yet.
+export async function startBriefing(saver: BaseCheckpointSaver, thread: string, brief: Brief) {
+  await setupWorkspace();
+  await briefingGraph(saver).invoke(brief, { configurable: { thread_id: thread } });
+}
+
+export async function isWaiting(saver: BaseCheckpointSaver, thread: string): Promise<boolean> {
+  const state = await briefingGraph(saver).getState({ configurable: { thread_id: thread } });
+  return state.next.includes("wait");
+}
+
+// Checked before the resume, so a refused person leaves the saved thread untouched.
+async function mustBeApprover(thread: string, approver: string, saver: BaseCheckpointSaver) {
+  const config = { configurable: { thread_id: thread } };
+  const state = await briefingGraph(saver).getState(config);
+  if (approver === state.values.writer) {
+    throw new Error("A writer cannot approve their own briefing.");
+  }
+  const grant = "SELECT 1 FROM grants WHERE person = $1 AND relation = 'approves' AND object = $2";
+  if ((await rows(grant, [approver, "briefings"])).length === 0) {
+    throw new Error(`${approver} may not approve briefings.`);
+  }
+}
+
+// A fresh graph and a fresh call. Only the saved thread links it to the first session.
+export async function resumeBriefing(
+  saver: BaseCheckpointSaver,
+  thread: string,
+  decision: Decision,
+): Promise<string> {
+  await mustBeApprover(thread, decision.approver, saver);
+  const config = { configurable: { thread_id: thread } };
+  const done = await briefingGraph(saver).invoke(new Command({ resume: decision }), config);
+  return done.status;
 }
 
 export async function publishedIn(workspace: string): Promise<string[]> {
@@ -193,5 +341,43 @@ export async function answerWorkspace(
 //~   _person: string,
 //~ ): Promise<AgentResult | undefined> {
 //~   return undefined;
+//~ }
+//~
+//~ export async function applyWorkspaceWalls(): Promise<void> {}
+//~
+//~ export async function seedWorkspaces(): Promise<void> {}
+//~
+//~ export async function toneUnderWall(_person: string, _space: string): Promise<string[]> {
+//~   return rows<{ note: string }>("SELECT note FROM tone_notes").then((all) =>
+//~     all.map((item) => item.note),
+//~   );
+//~ }
+//~
+//~ export async function briefingsUnderWall(_person: string): Promise<string[]> {
+//~   return [];
+//~ }
+//~
+//~ export async function postgresSaver(): Promise<PostgresSaver> {
+//~   return PostgresSaver.fromConnString(DATABASE_URL);
+//~ }
+//~
+//~ export type Brief = { writer: string; workspace: string; body: string };
+//~
+//~ export async function startBriefing(
+//~   _saver: BaseCheckpointSaver,
+//~   _thread: string,
+//~   _brief: Brief,
+//~ ): Promise<void> {}
+//~
+//~ export async function isWaiting(_saver: BaseCheckpointSaver, _id: string): Promise<boolean> {
+//~   return false;
+//~ }
+//~
+//~ export async function resumeBriefing(
+//~   _saver: BaseCheckpointSaver,
+//~   _thread: string,
+//~   _decision: { approver: string; approved: boolean },
+//~ ): Promise<string> {
+//~   return "pending";
 //~ }
 // #endregion

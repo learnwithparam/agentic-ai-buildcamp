@@ -87,5 +87,23 @@ export const content: UnitContent = {
       find: "WHERE id = $1 AND status = 'pending'\", [id]);",
       replace: 'WHERE id = $1", [id]);',
     },
+    {
+      file: "apps/product-teammates/src/workspace.ts",
+      rule: "the database wall must hide notes from outsiders",
+      find: "USING (person = current_setting('app.person', true)",
+      replace: "USING (true OR person = current_setting('app.person', true)",
+    },
+    {
+      file: "apps/product-teammates/src/workspace.ts",
+      rule: "a briefing must wait for a person to approve it",
+      find: 'if (state.status !== "approved") return {};',
+      replace: 'if (state.status === "nothing") return {};',
+    },
+    {
+      file: "apps/product-teammates/src/workspace.ts",
+      rule: "the graph must stop and resume on the same thread",
+      find: "const answer = interrupt(",
+      replace: "const answer = ((_: unknown) => ({ approver: 'lena', approved: true }))(",
+    },
   ],
 };

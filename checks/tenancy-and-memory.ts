@@ -1,16 +1,25 @@
 // Lab 03: each workspace keeps its secrets, its tone notes and its approvals to itself.
 
+import { MemorySaver } from "@langchain/langgraph";
 import { askMission } from "../apps/product-teammates/src/mission";
 import {
   approveBriefing,
+  briefingsUnderWall,
+  isWaiting,
+  postgresSaver,
   publishedIn,
   readMemo,
   recallTone,
   rememberTone,
   resetWorkspace,
+  resumeBriefing,
+  seedWorkspaces,
+  startBriefing,
   submitBriefing,
+  toneUnderWall,
 } from "../apps/product-teammates/src/workspace";
 import { MISSION_CONTROL_GOLDEN } from "../data/catalog/golden-mission-control";
+import { rows } from "../packages/core/src/db";
 import { grade } from "../src/grade";
 import { type Check, expect } from "../src/verify";
 
@@ -32,7 +41,7 @@ async function askAs(person: string, question: string) {
   return askMission(question, person, NO_PAGES);
 }
 
-async function failsWith(work: () => Promise<void>): Promise<boolean> {
+async function failsWith(work: () => Promise<unknown>): Promise<boolean> {
   try {
     await work();
   } catch {
@@ -119,6 +128,71 @@ export const checks: Check[] = [
       expect(await failsWith(() => approveBriefing(id, "priya")), "The writer approved it.");
       const own = await submitBriefing("lena", CORE, "Lena wrote this briefing.");
       expect(await failsWith(() => approveBriefing(own, "lena")), "An approver passed their own.");
+    },
+  },
+  {
+    name: "The two workspaces are seeded once",
+    tryNext: "Insert each workspace with ON CONFLICT DO NOTHING. Leave the memo in the catalog.",
+    run: async () => {
+      await rows("DROP TABLE IF EXISTS workspaces");
+      await seedWorkspaces();
+      await seedWorkspaces();
+      const names = await rows<{ name: string }>("SELECT name FROM workspaces ORDER BY name");
+      expect(names.length === 2, `Found ${names.length} workspaces, wanted 2.`);
+    },
+  },
+  {
+    name: "The database hides notes and briefings from a person outside the workspace",
+    tryNext: "Add a row policy that calls app_member, then read as the app_reader role.",
+    run: async () => {
+      await resetWorkspace();
+      await rememberTone("lena", STEALTH, "formal and long");
+      await rememberTone("lena", CORE, "warm and chatty");
+      await submitBriefing("lena", STEALTH, "Titan briefing");
+      expect((await toneUnderWall("priya", STEALTH)).length === 0, "Priya read a stealth note.");
+      expect((await toneUnderWall("marcus", CORE)).length === 0, "Marcus read a core note.");
+      const own = await toneUnderWall("lena", STEALTH);
+      expect(own.length === 1 && own[0] === "formal and long", "Lena lost her own note.");
+      expect((await briefingsUnderWall("priya")).length === 0, "Priya read a stealth briefing.");
+      expect((await briefingsUnderWall("marcus")).length === 1, "Marcus lost his briefing.");
+    },
+  },
+  {
+    name: "A waiting briefing resumes on the same thread from a fresh session",
+    tryNext: "Call interrupt() in one node, then resume the thread with a Command.",
+    run: async (trial) => {
+      await resetWorkspace();
+      const thread = `briefing-${trial}-${Date.now()}`;
+      const body = "Churn is up for the Team plan.";
+      const first = await postgresSaver();
+      await startBriefing(first, thread, { writer: "priya", workspace: CORE, body });
+      expect(await isWaiting(first, thread), "The graph did not stop at the approval.");
+      expect((await publishedIn(CORE)).length === 0, "A briefing published before approval.");
+      const fresh = await postgresSaver();
+      const asMarcus = { approver: "marcus", approved: true };
+      expect(await failsWith(() => resumeBriefing(fresh, thread, asMarcus)), "Marcus approved.");
+      const asPriya = { approver: "priya", approved: true };
+      expect(await failsWith(() => resumeBriefing(fresh, thread, asPriya)), "The writer approved.");
+      expect((await publishedIn(CORE)).length === 0, "A refused approval still published.");
+      const status = await resumeBriefing(fresh, thread, { approver: "lena", approved: true });
+      expect(status === "published", `The status was ${status}, wanted published.`);
+      expect((await publishedIn(CORE)).includes(body), "The briefing did not publish.");
+    },
+  },
+  {
+    name: "A rejected briefing never publishes",
+    tryNext: "Publish only when the saved status is approved.",
+    run: async () => {
+      await resetWorkspace();
+      const saver = new MemorySaver();
+      const brief = { writer: "priya", workspace: CORE, body: "Rejected body." };
+      await startBriefing(saver, "reject-thread", brief);
+      const status = await resumeBriefing(saver, "reject-thread", {
+        approver: "lena",
+        approved: false,
+      });
+      expect(status === "rejected", `The status was ${status}, wanted rejected.`);
+      expect((await publishedIn(CORE)).length === 0, "A rejected briefing was published.");
     },
   },
 ];
