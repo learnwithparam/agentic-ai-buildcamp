@@ -64,7 +64,7 @@ app.use((_request, response) => {
 });
 
 const server = app.listen(env.port, "127.0.0.1", () => {
-  console.log(`Dad IT Support Agent server listening on http://127.0.0.1:${env.port}`);
+  console.log(`HCP Medical Information Agent server listening on http://127.0.0.1:${env.port}`);
 });
 
 async function shutdown() {
