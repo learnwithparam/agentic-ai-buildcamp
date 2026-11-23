@@ -91,7 +91,7 @@ export const UNITS: Unit[] = [
     job: "Answer a question that needs three lookups, and stop a loop that never ends",
     needs: "grounded-answer",
     after: null,
-    built: false,
+    built: true,
     cases: ["multi-hop-cited"],
   },
   {
