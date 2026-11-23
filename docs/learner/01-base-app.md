@@ -1,5 +1,5 @@
 ---
-title: "Workshop: Dad IT Support Agent Base App"
+title: "Workshop: HCP Medical Information Agent Base App"
 description: "Tour the TypeScript support agent before instrumentation: chat UI, Express API, OpenAI tool loop, local tools, and support data."
 ---
 
@@ -9,11 +9,10 @@ description: "Tour the TypeScript support agent before instrumentation: chat UI,
 
 ## What the running app does
 
-- Dad himself is the user. Specs (the agent) talks directly to him about his iPhone.
+- A doctor or pharmacist is the user. The agent answers their questions about our medicines from the label library.
 - One OpenAI tool-calling loop. Two local tools (`get_support_context`, `search_help_library`).
 - The system prompt is rendered locally from `src/server/support-agent.ts`. No Langfuse yet.
 
-![How Specs handles a ticket: one agent, two tools, one model, each hop an observation in the trace.](../images/specs_illustration.png)
 
 ## Where to look in the code
 
@@ -21,13 +20,13 @@ description: "Tour the TypeScript support agent before instrumentation: chat UI,
 - `src/server/index.ts`: Express routes
 - `src/server/support-agent.ts`: the tool-calling loop you'll instrument in `02-tracing`
 - `src/server/tools.ts`: tool definitions and `executeTool(...)`
-- `src/server/support-data.ts`: Dad's fixed context + guide library
+- `src/server/support-data.ts`: the fixed desk context + label library
 - `src/server/support-agent.ts`: system-prompt template
 
 
 ## Bonus
 
-You can customize your experience by changing the phone specs in support-data.ts file. Adding your dad's phone information means, you will get replies for the right type of phone.
+You can add a label article to `GUIDE_LIBRARY` in `src/server/support-data.ts`, for example a new country for an existing medicine, and ask about it in the chat.
 
 ## End state
 

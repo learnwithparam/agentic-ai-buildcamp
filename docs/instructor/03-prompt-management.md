@@ -15,7 +15,7 @@ Learner guide: [03 Prompt Management](../learner/03-prompt-management.md)
 
 ## Demo rhythm
 
-1. Create `dad-it-support-agent` as a text prompt and label it `production`.
+1. Create `hcp-medinfo-agent` as a text prompt and label it `production`.
 2. Fetch it with `LangfuseClient`.
 3. Swap the hardcoded system message for the fetched text, keeping `SYSTEM_PROMPT` as the fallback.
 4. Pass `langfusePrompt` into `observeOpenAI`.

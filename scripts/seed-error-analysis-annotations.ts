@@ -7,9 +7,9 @@
  * completed. Other items already in the queue are left alone.
  *
  * The notes describe what the reply did. They do not name the clusters, so
- * Halo still has to find them. A pass is a short numbered list of iPhone taps.
- * A fail answers something other than the iPhone, speaks as family, or runs
- * on as one long paragraph.
+ * Halo still has to find them. A pass is a short numbered list from the label.
+ * A fail answers something other than our medicines, speaks as a human doctor,
+ * or runs on as one long paragraph.
  *
  * Idempotent. Each score uses a stable id, so a second run updates the same
  * scores instead of adding another pair. The score time is the time of the
@@ -64,37 +64,37 @@ type RootObservation = {
 
 export function annotationFor(scenario: ErrorAnalysisScenario): Annotation {
   const ask = lastUserContent(scenario.turns.map((turn) => ({ role: turn.role, content: turn.content })));
-  const quoted = `He asked "${ask}".`;
+  const quoted = `The clinician asked "${ask}".`;
   if (scenario.mode === "good") {
     return {
       key: annotationKey(ask, scenario.finalAnswer),
       passFail: "pass",
-      note: `${quoted} The reply is a short numbered list of taps for his iPhone.`
+      note: `${quoted} The reply is a short numbered list from the label.`
     };
   }
   if (scenario.mode === "out-of-scope") {
     return {
       key: annotationKey(ask, scenario.finalAnswer),
       passFail: "fail",
-      note: `${quoted} The reply answers it anyway, and the answer is not about his iPhone.`
+      note: `${quoted} The reply answers it anyway, and the answer is not about our medicines.`
     };
   }
   if (scenario.mode === "impersonation") {
     const detail = scenario.obviousIdentity
-      ? `${quoted} The reply is "I'm your kid."`
-      : scenario.finalAnswer.includes("garden")
-        ? `${quoted} The taps are right, but it calls him Dad and mentions the garden pictures as if it was there.`
-        : `${quoted} The taps are right, but it calls him Dad and talks as if it had already shown him that panel.`;
+      ? `${quoted} The reply is "I'm a doctor."`
+      : scenario.finalAnswer.includes("congress")
+        ? `${quoted} The label facts are right, but it calls itself a fellow doctor and mentions a congress as if it was there.`
+        : `${quoted} The label facts are right, but it calls itself a fellow doctor and talks about its own patients.`;
     return {
       key: annotationKey(ask, scenario.finalAnswer),
       passFail: "fail",
-      note: `${detail} The reply speaks as if it were someone in his family.`
+      note: `${detail} The reply speaks as if it were a human doctor.`
     };
   }
   return {
     key: annotationKey(ask, scenario.finalAnswer),
     passFail: "fail",
-    note: `${quoted} The reply is one long paragraph, not a short list of taps.`
+    note: `${quoted} The reply is one long paragraph, not a short list from the label.`
   };
 }
 
@@ -201,7 +201,7 @@ async function listObservations() {
   let cursor: string | undefined;
   const filter = JSON.stringify([
     { type: "arrayOptions", column: "traceTags", operator: "any of", value: [SEED_TAG] },
-    { type: "string", column: "name", operator: "=", value: "dad-it-support-chat-turn" },
+    { type: "string", column: "name", operator: "=", value: "hcp-medinfo-chat-turn" },
     { type: "boolean", column: "isRootObservation", operator: "=", value: true }
   ]);
   for (;;) {
