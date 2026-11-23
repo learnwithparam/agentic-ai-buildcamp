@@ -1,0 +1,11 @@
+{
+  "fast": ["tencent/hy4-flash", "nvidia/nemotron-3.5-lightning"],
+  "smart": [
+    "nvidia/nemotron-3.5-lightning",
+    "thinkingmachines/inkling-2-mini",
+    "openai/gpt-6-luna"
+  ],
+  "decide": ["~typesafe/jev-latest"],
+  "judge": ["anthropic/claude-haiku-5.5"],
+  "vision": ["tencent/hy4-flash", "thinkingmachines/inkling-2-mini"]
+}

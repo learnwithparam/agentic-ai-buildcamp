@@ -115,6 +115,21 @@ function isCommentOrText(line: string): boolean {
   return trimmed.startsWith("//") || trimmed.startsWith("#") || trimmed.startsWith("*");
 }
 
+// A web address or a large number is named once, in a capital-letter constant, so a reader sees
+// what it means. It is never typed again where it is used.
+const NAMED_CONSTANT = /^\s*(export )?const [A-Z][A-Z0-9_]* /;
+const WEB_ADDRESS = /["'`]https?:\/\/(?!localhost|127\.)/;
+const QUOTED_TEXT = /(["'`])(?:\\.|(?!\1).)*\1/g;
+const BIG_NUMBER = /(?<![\w."'/-])\d[\d_]{3,}(?![\w"'/-])/;
+
+function unnamedValueProblem(line: string): string | undefined {
+  if (NAMED_CONSTANT.test(line)) return undefined;
+  if (WEB_ADDRESS.test(line)) return "name this web address in a capital-letter constant";
+  const withoutText = line.replace(QUOTED_TEXT, "");
+  if (BIG_NUMBER.test(withoutText)) return "name this number in a capital-letter constant";
+  return undefined;
+}
+
 function problemsOnLine(line: string): string[] {
   const messages: string[] = [];
   if (line.length > LONGEST_LINE) {
@@ -126,6 +141,8 @@ function problemsOnLine(line: string): string[] {
     messages.push("too many steps on one line; give each step its own line and a named result");
   }
   if (hasTwoTernaries(line)) messages.push("two ternaries on one line; use if and else");
+  const unnamed = unnamedValueProblem(line);
+  if (unnamed) messages.push(unnamed);
 
   for (const name of namesDeclaredOn(line)) {
     const problem = nameProblem(name);

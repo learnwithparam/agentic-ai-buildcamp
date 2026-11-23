@@ -26,7 +26,7 @@ export function tryBreak(file: string, change: Break, testPasses: () => boolean)
 
 function promiseTestPasses(stem: string): boolean {
   const test = join("tests", "promises", `${stem}.test.ts`);
-  const run = Bun.spawnSync(["bun", "test", test], {
+  const run = Bun.spawnSync(["bun", "test", "--timeout", "60000", test], {
     cwd: ROOT,
     stdout: "ignore",
     stderr: "ignore",

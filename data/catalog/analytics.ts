@@ -11,6 +11,12 @@
 // different column names. The agent must discover each shape, never assume it.
 
 import { TERRITORIES } from "./prescribers";
+
+const HCP_SALES_SEED = 20261121;
+const HCP_WEEKS_SEED = 20261120;
+const WEST_BASE_UNITS = 1400;
+const OTHER_BASE_UNITS = 1000;
+
 import { addDays, noiseAround, seededRandom } from "./random";
 
 export type WeeklyRow = {
@@ -71,7 +77,7 @@ function patternFor(territory: string, brand: string, weekStart: string): number
 }
 
 function buildWeekly(): WeeklyRow[] {
-  const random = seededRandom(20261120);
+  const random = seededRandom(HCP_WEEKS_SEED);
   const rows: WeeklyRow[] = [];
   for (const brand of ["OncoX", "CardioZ", "Breathe-EZ"]) {
     for (const territory of TERRITORIES) {
@@ -123,12 +129,12 @@ function unitPrice(product: string, month: string): number {
 }
 
 function buildMonthly(): MonthlyRow[] {
-  const random = seededRandom(20261121);
+  const random = seededRandom(HCP_SALES_SEED);
   const rows: MonthlyRow[] = [];
   for (const product of ["DermaClear", "NeuroCalm"]) {
     for (const region of REGIONS) {
       MONTHS.forEach((month, step) => {
-        const base = region === "West" ? 1400 : 1000;
+        const base = region === "West" ? WEST_BASE_UNITS : OTHER_BASE_UNITS;
         const units = Math.round(
           base * monthlyShape(product, month, step) * noiseAround(random, 0.04),
         );

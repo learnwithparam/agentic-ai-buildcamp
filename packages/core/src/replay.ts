@@ -9,7 +9,8 @@ const STORE = join(FOLDER, "answers.json");
 // Plumbing holds a few written replies. Checks use them before any real recording exists.
 const PLUMBING = join(FOLDER, "plumbing.json");
 
-export type Recorded = { text: string; inputTokens: number; outputTokens: number };
+// costUsd is what the provider charged for the call. It is -1 when the provider did not say.
+export type Recorded = { text: string; inputTokens: number; outputTokens: number; costUsd: number };
 
 export class NoRecording extends Error {}
 

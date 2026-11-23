@@ -1,100 +1,135 @@
-// bun run models: one tiny call per role on the chosen provider. Prints the provider, the role,
-// pass or fail and the cost. It never prints a key. LLM_PROVIDER=replay (the default) answers from
-// config/replay/ with no key. MODEL_MODE=record with a live provider saves each reply there.
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+// bun run models reads the live OpenRouter price list for every model in config/model-pool.json,
+// writes config/model-catalog.json and prints the model each role would use.
+// bun run models --measure also gives every candidate a small job per role, with the real
+// provider cost, and writes the cheapest one that passes everything to config/model-choice.json.
+// It needs OPENROUTER_API_KEY only for --measure. It never prints a key.
+import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 import {
-  costUsd,
-  languageModel,
+  CALL_TIMEOUT_MS,
+  type Catalog,
+  type CatalogEntry,
+  type Choice,
+  cheapestFor,
+  choices,
   modelId,
-  type Provider,
-  provider,
+  NEEDS,
+  OPENROUTER_API,
+  pool,
   ROLES,
   type Role,
+  TOKENS_PER_PRICE_UNIT,
 } from "../config/models";
+import { decideAmong } from "../packages/core/src/decide";
+import { DECIDE_CASES, PROBES, type Probe } from "./model-probes";
 
-const REPLAY = join(import.meta.dir, "..", "config", "replay");
-const PROMPT = "Reply with the single word: pass";
-const record = process.env.MODEL_MODE === "record";
-// Recording needs a live call, so MODEL_MODE is left out: provider() would otherwise force replay.
-const { MODEL_MODE: _modelMode, ...environmentWithoutModelMode } = process.env;
-const environment = record ? environmentWithoutModelMode : process.env;
-let chosenProvider: Provider;
-try {
-  chosenProvider = provider(environment);
-} catch (error) {
-  console.log((error as Error).message);
-  process.exit(2);
-}
+const CONFIG = join(import.meta.dir, "..", "config");
+const MEASURE = process.argv.includes("--measure");
 
-type Usage = { input_tokens: number; output_tokens: number; cache_read_input_tokens: number };
-type Answer = { text: string; usage: Usage };
+type Listed = {
+  id: string;
+  context_length: number;
+  pricing: { prompt: string; completion: string };
+  supported_parameters?: string[];
+  architecture?: { input_modalities?: string[] };
+};
 
-function recordedAnswer(role: Role, file: string): Answer {
-  if (!existsSync(file))
-    throw new Error(`no recorded reply for the ${role} role in config/replay/`);
-  const recording = JSON.parse(readFileSync(file, "utf8"));
-  return { text: recording.reply, usage: recording.usage };
-}
-
-async function liveAnswer(role: Role, file: string): Promise<Answer> {
-  const { generateText } = await import("ai");
-  const reply = await generateText({
-    model: await languageModel(role, chosenProvider, environment),
-    prompt: PROMPT,
-    maxOutputTokens: 16,
-  });
-  const usage = {
-    input_tokens: reply.usage.inputTokens ?? 0,
-    output_tokens: reply.usage.outputTokens ?? 0,
-    cache_read_input_tokens: reply.usage.inputTokenDetails?.cacheReadTokens ?? 0,
+function entryOf(item: Listed): CatalogEntry {
+  const params = item.supported_parameters ?? [];
+  return {
+    input: Number(item.pricing.prompt) * TOKENS_PER_PRICE_UNIT,
+    output: Number(item.pricing.completion) * TOKENS_PER_PRICE_UNIT,
+    context: item.context_length,
+    tools: params.includes("tools"),
+    json: params.includes("response_format"),
+    image: (item.architecture?.input_modalities ?? []).includes("image"),
   };
-  if (record) {
-    const source = `recorded on ${chosenProvider}`;
-    const recording = { role, prompt: PROMPT, reply: reply.text, usage, source };
-    writeFileSync(file, `${JSON.stringify(recording, null, 2)}\n`);
+}
+
+async function refreshCatalog(): Promise<Catalog> {
+  const response = await fetch(`${OPENROUTER_API}/v1/models`, {
+    signal: AbortSignal.timeout(CALL_TIMEOUT_MS),
+  });
+  const listed = ((await response.json()) as { data: Listed[] }).data;
+  const wanted = new Set(Object.values(pool()).flat());
+  const models: Catalog["models"] = {};
+  for (const item of listed) if (wanted.has(item.id)) models[item.id] = entryOf(item);
+  const fresh = { fetchedAt: new Date().toISOString(), models };
+  writeFileSync(join(CONFIG, "model-catalog.json"), `${JSON.stringify(fresh, null, 2)}\n`);
+  return fresh;
+}
+
+async function decideProbes(): Promise<Probe[]> {
+  const found: Probe[] = [];
+  const options = {
+    answer: "A question about a drug label, a study or sales.",
+    template: "Small talk or a question outside medical affairs.",
+  };
+  for (const item of DECIDE_CASES) {
+    const tags = { tenantId: "pharma-a", agentName: "models" };
+    const pick = await decideAmong(
+      item.question,
+      "Which path answers this question?",
+      options,
+      tags,
+    );
+    found.push({ name: item.name, pass: pick.choice === item.intent, costUsd: pick.costUsd });
   }
-  return { text: reply.text, usage };
+  return found;
 }
 
-async function call(role: Role): Promise<Answer> {
-  const file = join(REPLAY, `models-${role}.json`);
-  if (chosenProvider === "replay") return recordedAnswer(role, file);
-  return liveAnswer(role, file);
+async function probesFor(role: Role, candidate: string): Promise<Probe[]> {
+  if (role === "decide") return decideProbes();
+  const probe = PROBES[role];
+  return probe === undefined ? [] : probe(candidate);
 }
 
-function costText(role: Role, usage: Usage): string {
-  const usd = costUsd(
-    modelId(role, chosenProvider),
-    usage.input_tokens,
-    usage.output_tokens,
-    usage.cache_read_input_tokens,
-  );
-  if (usd === null) return "cost unknown (no price in config/models.ts)";
-  return `cost USD ${usd.toFixed(8)}`;
-}
-
-// Calls one role and prints its line. Returns whether the role answered "pass".
-async function tryRole(role: Role): Promise<boolean> {
-  try {
-    const answer = await call(role);
-    const ok = /\bpass\b/i.test(answer.text);
-    const tokens = `${answer.usage.input_tokens} in, ${answer.usage.output_tokens} out`;
-    const verdict = ok ? "pass" : "fail";
-    console.log(`  ${role.padEnd(6)} ${verdict}  ${tokens}, ${costText(role, answer.usage)}`);
-    return ok;
-  } catch (error) {
-    console.log(`  ${role.padEnd(6)} fail  ${(error as Error).message}`);
-    return false;
+async function measure(role: Role): Promise<Choice | undefined> {
+  const results: Choice[] = [];
+  for (const candidate of pool()[role]) {
+    process.env[`MODEL_${role.toUpperCase()}`] = candidate;
+    const probes = await probesFor(role, candidate).catch((error: Error) => {
+      console.log(`  ${role.padEnd(6)} ${candidate}  failed: ${error.message}`);
+      return [] as Probe[];
+    });
+    if (probes.length === 0) continue;
+    const passRate = probes.filter((probe) => probe.pass).length / probes.length;
+    const cost = probes.reduce((sum, probe) => sum + probe.costUsd, 0) / probes.length;
+    const line = `${role.padEnd(6)} ${candidate}  pass ${passRate.toFixed(2)}`;
+    console.log(`  ${line}  USD ${cost.toFixed(8)} a case`);
+    results.push({ id: candidate, passRate, costPerCase: cost });
   }
+  results.sort((first, second) => {
+    return second.passRate - first.passRate || first.costPerCase - second.costPerCase;
+  });
+  return results[0];
 }
 
-let replayNote = "";
-if (chosenProvider === "replay") replayNote = " (recorded replies, no key)";
-console.log(`Provider: ${chosenProvider}${replayNote}`);
-let failed = 0;
+const fresh = await refreshCatalog();
+const priced = Object.entries(pool())
+  .filter(([role]) => role !== "decide")
+  .flatMap(([, ids]) => ids);
+const missing = priced.filter((id) => fresh.models[id] === undefined);
+if (missing.length > 0) console.log(`Not on the OpenRouter list: ${missing.join(", ")}`);
+
+if (MEASURE) {
+  const chosen: Partial<Record<Role, Choice>> = {};
+  for (const role of ROLES) {
+    const best = await measure(role);
+    if (best !== undefined) chosen[role] = best;
+    delete process.env[`MODEL_${role.toUpperCase()}`];
+  }
+  writeFileSync(join(CONFIG, "model-choice.json"), `${JSON.stringify(chosen, null, 2)}\n`);
+}
+
+console.log("Role   Model                              Needs       In/Out USD per million");
 for (const role of ROLES) {
-  if (!(await tryRole(role))) failed++;
+  const id = modelId(role);
+  const entry = fresh.models[id];
+  const price = entry ? `${entry.input.toFixed(3)} / ${entry.output.toFixed(3)}` : "per call";
+  const needs = NEEDS[role].join(",").padEnd(11);
+  const note = choices()[role]
+    ? `pass ${choices()[role]?.passRate}`
+    : `cheapest: ${cheapestFor(role)}`;
+  console.log(`${role.padEnd(6)} ${id.padEnd(34)} ${needs} ${price}  ${note}`);
 }
-console.log(failed ? `${failed} role(s) failed.` : "Every role answered.");
-process.exit(failed ? 1 : 0);

@@ -7,6 +7,6 @@ describe("intent-routing", () => {
   for (const check of checks) {
     test(check.name, async () => {
       await check.run(1);
-    }, 60000);
+    });
   }
 });

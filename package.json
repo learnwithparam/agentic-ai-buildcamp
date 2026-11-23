@@ -4,7 +4,7 @@
   "type": "module",
   "packageManager": "bun@1.4.4",
   "scripts": {
-    "check": "bun scripts/readable.ts && bun scripts/plain-english.ts && bun scripts/plain-code.ts && bun scripts/commands.ts && bun scripts/glossary.ts && bun scripts/stuck.ts && bun scripts/distinct.ts && bun scripts/mermaid.ts && bun scripts/mutate.ts && bunx tsc -p . && bun test && bun scripts/checkpoints.ts --dry && bun scripts/learner-clarity.mjs",
+    "check": "bun scripts/readable.ts && bun scripts/plain-english.ts && bun scripts/plain-code.ts && bun scripts/commands.ts && bun scripts/glossary.ts && bun scripts/stuck.ts && bun scripts/distinct.ts && bun scripts/mermaid.ts && bun scripts/mutate.ts && bunx tsc -p . && bun test --timeout 60000 && bun scripts/checkpoints.ts --dry && bun scripts/learner-clarity.mjs",
     "readable": "bun scripts/readable.ts",
     "plain-english": "bun scripts/plain-english.ts",
     "glossary": "bun scripts/glossary.ts",

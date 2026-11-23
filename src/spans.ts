@@ -1,5 +1,7 @@
 // Reads spans back from Phoenix, so a check can prove what really ran.
+
 import { PHOENIX_URL, PROJECT } from "../packages/core/src/telemetry";
+import { MS_PER_SECOND } from "./time";
 
 const SECONDS_TO_WAIT = 20;
 
@@ -22,7 +24,7 @@ export async function spansWithRunId(runId: string): Promise<Span[]> {
   for (let attempt = 0; attempt < SECONDS_TO_WAIT; attempt++) {
     const mine = (await recentSpans()).filter((span) => span.attributes.run_id === runId);
     if (mine.length >= 1) return mine;
-    await Bun.sleep(1000);
+    await Bun.sleep(MS_PER_SECOND);
   }
   return [];
 }
@@ -32,7 +34,7 @@ export async function allSpansOfTrace(traceId: string): Promise<Span[]> {
   for (let attempt = 0; attempt < SECONDS_TO_WAIT; attempt++) {
     const found = (await recentSpans()).filter((span) => span.context.trace_id === traceId);
     if (found.length >= 2) return found;
-    await Bun.sleep(1000);
+    await Bun.sleep(MS_PER_SECOND);
   }
   return [];
 }

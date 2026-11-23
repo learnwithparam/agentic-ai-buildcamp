@@ -1,13 +1,15 @@
 // A small seeded random number generator. The same seed always gives the same numbers,
 // so every learner gets the same data and the same golden answers.
 
+const UINT32_RANGE = 2 ** 32;
+
 export function seededRandom(seed: number): () => number {
   let state = seed >>> 0;
   return () => {
     state = (state + 0x6d2b79f5) >>> 0;
     let mixed = Math.imul(state ^ (state >>> 15), 1 | state);
     mixed = (mixed + Math.imul(mixed ^ (mixed >>> 7), 61 | mixed)) ^ mixed;
-    return ((mixed ^ (mixed >>> 14)) >>> 0) / 4294967296;
+    return ((mixed ^ (mixed >>> 14)) >>> 0) / UINT32_RANGE;
   };
 }
 

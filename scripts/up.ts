@@ -4,6 +4,7 @@ import { spawnSync } from "node:child_process";
 import { join } from "node:path";
 import { closeDatabase, rows } from "../packages/core/src/db";
 import { loadSeed } from "../packages/core/src/seed-load";
+import { MS_PER_SECOND } from "../src/time";
 import { ROOT } from "./root";
 import { seed } from "./seed";
 
@@ -21,7 +22,7 @@ export async function waitForPhoenix(seconds = 60): Promise<void> {
   for (let attempt = 0; attempt < seconds; attempt++) {
     const reply = await fetch(PHOENIX_HEALTH).catch(() => undefined);
     if (reply?.ok) return;
-    await Bun.sleep(1000);
+    await Bun.sleep(MS_PER_SECOND);
   }
   throw new Error(`Phoenix did not answer at ${PHOENIX_HEALTH}.`);
 }

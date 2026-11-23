@@ -1,0 +1,22 @@
+{
+  "fast": {
+    "id": "tencent/hy4-flash",
+    "passRate": 1,
+    "costPerCase": 0.0000119365
+  },
+  "smart": {
+    "id": "openai/gpt-6-luna",
+    "passRate": 1,
+    "costPerCase": 0.0000545
+  },
+  "decide": {
+    "id": "~typesafe/jev-latest",
+    "passRate": 1,
+    "costPerCase": 0.000014484749999999999
+  },
+  "judge": {
+    "id": "anthropic/claude-haiku-5.5",
+    "passRate": 1,
+    "costPerCase": 0.0000572
+  }
+}

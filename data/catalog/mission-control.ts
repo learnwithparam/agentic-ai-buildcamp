@@ -3,6 +3,8 @@
 // Four rival pages each change in a different way, so the research agent never sees one easy diff.
 import { addDays, noiseAround, seededRandom } from "./random";
 
+const MISSION_SEED = 20261122;
+
 export type Workspace = { name: string; about: string; memo?: string };
 
 export const WORKSPACES: Workspace[] = [
@@ -39,7 +41,7 @@ function funnelFor(plan: string, week: number, weekStart: string, random: () => 
 }
 
 function buildFunnel(): FunnelRow[] {
-  const random = seededRandom(20261122);
+  const random = seededRandom(MISSION_SEED);
   const rows: FunnelRow[] = [];
   for (let week = 0; week < 20; week++) {
     const weekStart = addDays(FUNNEL_FIRST_WEEK, week * 7);

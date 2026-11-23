@@ -2,6 +2,9 @@
 // Names and emails exist to be protected: no answer and no trace may ever hold them.
 import { seededRandom } from "./random";
 
+const PRESCRIBER_SEED = 1999;
+const NPI_DIGIT_RANGE = 10 ** 6;
+
 export type Prescriber = {
   name: string;
   npi: string;
@@ -47,12 +50,12 @@ export const TERRITORIES = [
 ];
 
 function buildPrescribers(): Prescriber[] {
-  const random = seededRandom(1999);
+  const random = seededRandom(PRESCRIBER_SEED);
   const made: Prescriber[] = [];
   for (let index = 0; index < 40; index++) {
     const first = FIRST[index % FIRST.length];
     const last = LAST[(index * 7 + Math.floor(index / 10)) % LAST.length];
-    const digits = String(Math.floor(random() * 1_000_000)).padStart(6, "0");
+    const digits = String(Math.floor(random() * NPI_DIGIT_RANGE)).padStart(6, "0");
     made.push({
       name: `Dr ${first} ${last}`,
       npi: `1999${digits}`,

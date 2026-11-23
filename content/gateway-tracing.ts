@@ -64,7 +64,7 @@ export const content: UnitContent = {
     {
       file: "packages/core/src/ask.ts",
       rule: "the model span must hold the cost",
-      find: "cost_usd: costUsd(id, reply.inputTokens, reply.outputTokens) ?? -1,",
+      find: "cost_usd: reply.costUsd,",
       replace: "",
     },
   ],

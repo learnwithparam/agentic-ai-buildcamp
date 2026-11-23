@@ -13,6 +13,7 @@ import { publishedIn } from "../apps/product-teammates/src/workspace";
 import { MISSION_CONTROL_GOLDEN } from "../data/catalog/golden-mission-control";
 import { rows } from "../packages/core/src/db";
 import { grade } from "../src/grade";
+import { MS_PER_DAY, MS_PER_MINUTE } from "../src/time";
 import { type Check, expect } from "../src/verify";
 
 const NO_PAGES = {
@@ -21,6 +22,7 @@ const NO_PAGES = {
   },
 };
 const CORE = "core-growth";
+const SETTLE_MS = 1300; // longer than the job lease, so the stopped job counts as lost
 const WINDOW_MINUTES = 10;
 
 function caseOf(name: string) {
@@ -74,7 +76,7 @@ export const checks: Check[] = [
       await onEvent(PRICE_EVENT, "Orbitnote", moment);
       await drain();
       expect((await rivalsSeen()).length === 3, "Each rival must get its own run.");
-      const later = new Date(moment.getTime() + WINDOW_MINUTES * 60 * 1000);
+      const later = new Date(moment.getTime() + WINDOW_MINUTES * MS_PER_MINUTE);
       expect(await onEvent(PRICE_EVENT, "Tallyfox", later), "A later window got no new run.");
     },
   },
@@ -93,7 +95,7 @@ export const checks: Check[] = [
       expect((await count(drafts)) === 1, "The same week was drafted twice.");
       const [draft] = await rows<{ body: string }>("SELECT body FROM briefings");
       expect(draft.body.includes("Pulsedesk"), "The briefing does not name the rival that moved.");
-      const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+      const nextWeek = new Date(Date.now() + 7 * MS_PER_DAY);
       expect(await scheduleMonday(nextWeek, CORE), "Next week got no briefing job.");
     },
   },
@@ -109,7 +111,7 @@ export const checks: Check[] = [
       await child.exited;
       const stopped = "SELECT count(*) FROM jobs WHERE status = 'running' AND step = 1";
       expect((await count(stopped)) === 1, "The crash left no saved step.");
-      await new Promise((done) => setTimeout(done, 1300));
+      await new Promise((done) => setTimeout(done, SETTLE_MS));
       const found = caseOf("crash-resume");
       const result = await askAs("lena", found.question);
       expect(grade(found, result).ok, `The resume case failed: ${grade(found, result).reasons}`);

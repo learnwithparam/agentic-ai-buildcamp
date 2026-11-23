@@ -2,6 +2,7 @@
   "9220eb9c0fd76fadd8d7f047": {
     "text": "ready",
     "inputTokens": 12,
-    "outputTokens": 2
+    "outputTokens": 2,
+    "costUsd": 0.0000119
   }
 }
