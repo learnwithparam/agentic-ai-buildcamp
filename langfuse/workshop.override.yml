@@ -14,8 +14,10 @@ services:
       # so Langfuse listens on this machine only and nobody else can sign up.
       LANGFUSE_CODE_EVAL_DISPATCHER: insecure-local
       AUTH_DISABLE_SIGNUP: "true"
+      # Port 3000 is often taken by another dev server, so Langfuse uses 5174 on the host.
+      NEXTAUTH_URL: http://localhost:5174
     ports: !override
-      - 127.0.0.1:3000:3000
+      - 127.0.0.1:5174:3000
   langfuse-worker:
     environment:
       LANGFUSE_CODE_EVAL_DISPATCHER: insecure-local
