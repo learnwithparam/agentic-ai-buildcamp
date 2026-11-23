@@ -11,12 +11,13 @@ import { TOOL_DEFINITIONS, executeTool } from "./tools";
 // isn't published yet. scripts/publish-prompt.ts pushes this same
 // string up to Langfuse.
 // checkpoint-sync:begin system-prompt
-export const SYSTEM_PROMPT = `You are Dad IT Support Agent.
-You are talking to Dad. He opened this chat himself to get help with his iPhone.
+export const SYSTEM_PROMPT = `You are the HCP Medical Information Agent.
+Doctors and pharmacists ask you about Northvale and Calder medicines.
 
-Look up which iPhone and apps he has, and search the help library, so the steps match his phone. Then tell him what to do: what to tap, and what he should see on the screen.
+Look up the brands and countries we cover, and search the label library, so the answer matches the right medicine.
+Then give the dose and what to watch for, and name the label you used.
 
-Use plain language. Stay with him until he has something to try.
+Keep it short and clear.
 `;
 // checkpoint-sync:end system-prompt
 
@@ -65,8 +66,8 @@ async function runSupportConversationInner(request: ChatRequest): Promise<ChatRe
     {
       userId,
       sessionId: request.sessionId,
-      traceName: "dad-it-support-chat-turn",
-      tags: ["langfuse-workshop", "dad-it-support"]
+      traceName: "hcp-medinfo-chat-turn",
+      tags: ["langfuse-workshop", "hcp-medinfo"]
     },
     async () => {
       const openai = observeOpenAI(
@@ -136,6 +137,6 @@ async function runSupportConversationInner(request: ChatRequest): Promise<ChatRe
 }
 
 export const runSupportConversation = observe(runSupportConversationInner, {
-  name: "dad-it-support-chat-turn",
+  name: "hcp-medinfo-chat-turn",
   asType: "agent"
 });
