@@ -10,8 +10,12 @@ services:
       LANGFUSE_INIT_USER_EMAIL: learner@workshop.local
       LANGFUSE_INIT_USER_NAME: Learner
       LANGFUSE_INIT_USER_PASSWORD: workshop-password
-      # Lesson 04 creates a code evaluator. Locally it runs inside the worker, which is fine for the workshop's own template code.
+      # Lesson 04 creates a code evaluator. Locally it runs unsandboxed inside the worker,
+      # so Langfuse listens on this machine only and nobody else can sign up.
       LANGFUSE_CODE_EVAL_DISPATCHER: insecure-local
+      AUTH_DISABLE_SIGNUP: "true"
+    ports: !override
+      - 127.0.0.1:3000:3000
   langfuse-worker:
     environment:
       LANGFUSE_CODE_EVAL_DISPATCHER: insecure-local
