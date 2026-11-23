@@ -38,7 +38,7 @@ function refusal(text: string): AgentResult {
   return { route: "refuse", text, citations: [] };
 }
 
-// #region step:grounded-agent
+// #region step:grounded-answer
 export function groundedPrompt(question: string, documents: StoredDocument[]): string {
   const shown = documents.map((item) => `[${item.slug}]\n${scrubDocument(item.body)}`).join("\n\n");
   const rules = `Answer from the documents only. End with the id of each document you used.
@@ -73,7 +73,7 @@ export async function answerGrounded(
   return { route: "answer", text: reply, citations };
 }
 // #stub
-//~ // TODO(grounded-agent): show only active documents, then check the model's claim
+//~ // TODO(grounded-answer): show only active documents, then check the model's claim
 //~ export function groundedPrompt(question: string, _documents: StoredDocument[]): string {
 //~   return question;
 //~ }
@@ -102,7 +102,7 @@ async function findDocuments(subject: Subject | undefined, tags: Tags): Promise<
 
 // The real agent: the same guard, with a live model call as the generator.
 export async function groundedAgent(question: string): Promise<AgentResult> {
-  const tags = { tenantId: "pharma-a", agentName: "grounded-agent" };
+  const tags = { tenantId: "pharma-a", agentName: "grounded-answer" };
   const generate: Generate = async (prompt) => (await ask("smart", prompt, tags)).text;
   return answerGrounded(question, tags, generate);
 }

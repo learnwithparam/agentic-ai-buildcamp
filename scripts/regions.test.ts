@@ -38,7 +38,7 @@ test("a module starts with every earlier module finished and none after", () => 
   const done = finishedBefore("intent-routing");
   expect(done.has("documents-freshness")).toBe(true);
   expect(done.has("intent-routing")).toBe(false);
-  expect(done.has("grounded-agent")).toBe(false);
+  expect(done.has("grounded-answer")).toBe(false);
 });
 
 test("a lab starts from its module end state plus the earlier labs", () => {

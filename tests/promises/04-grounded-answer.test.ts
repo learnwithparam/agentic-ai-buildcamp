@@ -1,7 +1,7 @@
 // PROMISE: the agent answers only from active documents, and a made-up claim is refused.
 // A model reply that cites nothing, or uses a number outside its source, never reaches a reader.
 import { afterAll, beforeAll, describe, test } from "bun:test";
-import { checks } from "../../checks/grounded-agent";
+import { checks } from "../../checks/grounded-answer";
 import { closeDatabase } from "../../packages/core/src/db";
 import { loadSeed } from "../../packages/core/src/seed-load";
 import { seed } from "../../scripts/seed";
@@ -12,7 +12,7 @@ beforeAll(async () => {
 });
 afterAll(closeDatabase);
 
-describe("grounded-agent", () => {
+describe("grounded-answer", () => {
   for (const check of checks) {
     test(check.name, async () => {
       await check.run(1);

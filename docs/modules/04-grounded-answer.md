@@ -94,7 +94,7 @@ export async function answerGrounded(
 ## Step 4: verify
 
 ```bash
-bun run verify grounded-agent
+bun run verify grounded-answer
 ```
 
 Expect: seven green badges and the line "Every check passed."
@@ -114,10 +114,10 @@ Add a rule that an answer may not be longer than three sentences. For example, r
 If you are still stuck, start from a clean copy of this step.
 
 ```bash
-bun run goto grounded-agent
+bun run goto grounded-answer
 ```
 
-Expect: a message that you are now on the grounded-agent checkpoint, with a list of things to do.
+Expect: a message that you are now on the grounded-answer checkpoint, with a list of things to do.
 
 ## New words
 

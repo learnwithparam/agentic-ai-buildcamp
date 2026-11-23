@@ -44,7 +44,7 @@ The course gets fixes. Run `bun run goto` with the same name again to pick up th
 | gateway-tracing               | Show the team why an answer came out and what it cost            |
 | documents-freshness           | Make sure the agent quotes the current label, never the old one  |
 | intent-routing                | Send trivia and off-label requests down cheap, safe paths        |
-| grounded-agent                | Give medical reviewers answers they can check line by line       |
+| grounded-answer               | Give medical reviewers answers they can check line by line       |
 | analytics-mcp                 | Answer territory sales questions without leaking prescriber data |
 | surfaces                      | Let the team reach the agent where they already work             |
 | access-control                | Keep each pharma tenant and each role inside its own lane        |
