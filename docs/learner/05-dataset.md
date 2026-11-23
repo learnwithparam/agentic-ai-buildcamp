@@ -16,7 +16,7 @@ Complementary materials:
 
 ## Goal
 
-Create a first eval dataset that captures the kinds of requests Specs has to handle.
+Create a first eval dataset that captures the kinds of requests the agent has to handle.
 
 1. **Decide on the goal** for your eval dataset.
 2. **Design the item shape**: every dataset item has the same three fields, and we want ours to match the agent's actual input.
@@ -33,57 +33,45 @@ You have a traced, attributed, monitored app. `data/seed-dataset.json` and `scri
 Make sure `.env` has:
 
 ```bash
-DATASET_NAME=dad-it-support-workshop
+DATASET_NAME=hcp-medinfo-workshop
 ```
 
 ## Step 1: Decide on the goal for your eval dataset
 
 Build your eval dataset from what you expect your system to hit in production, and from what is important to you: the things you want to evaluate to make sure the system works. A previous error analysis is a good place to start.
 
-For Specs, two things matter most:
+For the agent, two things matter most:
 
 - **The answers are correct.**
 - **The agent behaves appropriately**: it knows when to reply, when to defer a question, and when to ask a follow-up first. Error analysis showed that out-of-scope requests often get answered anyway.
 
-On top of that, the dataset should cover the shapes of input we expect Specs to handle in production, at least the ones we have seen so far. It mixes cases that already work well, for example traces that passed error analysis, with cases that caused problems in the past and cases that must be handled correctly.
+On top of that, the dataset should cover the shapes of input we expect the agent to handle in production, at least the ones we have seen so far. It mixes cases that already work well, for example traces that passed error analysis, with cases that caused problems in the past and cases that must be handled correctly.
 
-The starter dataset has 25 items. Nine come from the traces you reviewed in [4.1 Error analysis](./04-monitoring/error-analysis.md) (`"source": "error-analysis"`); the other 16 cover cases it didn't include (`"source": "starter"`), so the step 07 prompt is also measured on cases it wasn't written from. Together they cover:
+The starter dataset has 27 items. Each one names the label articles its ideal answer is copied from in `metadata.source`, and a `metadata.skill` tag says what it tests:
 
-- iPhone how-to questions, from Bluetooth and Wi-Fi to WhatsApp, Maps and photos
-- Out-of-scope requests, such as a cake recipe or filing taxes
-- Multi-turn conversations, such as a follow-up ("Where is the moon icon?") or an off-topic question after a fix
-- Limits the agent must state, such as passwords or live location
-- Vague requests that need a clarifying question first ("My phone is not working.")
-
-If you add items later, prefer ones that match a real signal you saw in monitoring rather than items invented from scratch. For more on choosing what goes into a dataset, see the Academy page on [building datasets](https://langfuse.com/academy/datasets).
-
-## Step 2: Design the item shape
-
-Dataset items in Langfuse follow a consistent shape: three fields, one required, two optional:
-
-| Field | Required | Purpose |
-| --- | --- | --- |
-| `input` | yes | What you'd feed the agent. For us, the same `{ messages: [...] }` shape `/api/chat` accepts. |
-| `expectedOutput` | optional | What a good answer would look like. Free-form: used by evaluators to compare actual vs expected. |
-| `metadata` | optional | Tags or other fields for filtering and grouping (`category`, `difficulty`, etc.). |
+- **simple-llm**: one label answers it ("What is CardioZ used for?")
+- **rag**: the right label must win over a superseded one, a future one or an expired draft ("What is the approved CardioZ dose in Brazil?")
+- **agent**: the answer needs both tools and more than one article ("Which of our medicines have an approved label in Germany?")
+- **classification**: the agent must defer (off-label use, another company's medicine, trivia, a sick note) or ask a follow-up ("What's the dose?")
+- **agentic**: harder turns, such as a side effect hidden in a friendly message, a follow-up that changes the country, a prompt injection, and a study summary with a planted instruction
 
 In our case, the conceptual shape of one item is:
 
 ```json
 {
-  "input": "How do I turn Bluetooth on on my iPhone?",
+  "input": { "messages": [{ "role": "user", "content": "What is the CardioZ dose in the US?" }] },
   "expectedOutput": {
-    "idealAnswer": "1. Open the Settings app.\n2. Tap Bluetooth.\n3. Turn the Bluetooth switch on. It turns green when Bluetooth is on.",
+    "idealAnswer": "Take 20 mg each morning. Do not use in pregnancy. Source: CardioZ US label, version 3.",
     "expectedBehavior": "reply"
   },
-  "metadata": { "category": "iphone-bluetooth", "difficulty": "easy", "source": "starter" }
+  "metadata": { "category": "dose-by-country", "difficulty": "medium", "skill": "rag", "source": ["cardioz-us-label-v3"] }
 }
 ```
 
 The two fields inside `expectedOutput` match the two evaluation questions from Step 1:
 
 - **`idealAnswer`**: is the answer correct? This is the reply we want, written the way the prompt asks for it, with only the steps that matter.
-- **`expectedBehavior`**: did Specs behave appropriately? One of `reply`, `defer_question`, or `ask_follow_up`.
+- **`expectedBehavior`**: did the agent behave appropriately? One of `reply`, `defer_question`, or `ask_follow_up`.
 
 In chapter 06 you will see how each of these is evaluated.
 
@@ -106,7 +94,7 @@ For this workshop we use the programmatic path because we already have a curated
 npm run dataset:seed
 ```
 
-Open Langfuse → **Datasets**. The list view should show the new `dad-it-support-workshop` dataset with 25 items and 0 experiment runs (so far).
+Open Langfuse → **Datasets**. The list view should show the new `hcp-medinfo-workshop` dataset with 27 items and 0 experiment runs (so far).
 
 Click into the dataset and switch to the **Items** tab. You should see every seeded item with input, expected output, and metadata columns:
 
