@@ -17,7 +17,7 @@ Complementary materials:
 
 ## Goal
 
-When Dad asks "How do I turn Bluetooth on?", the agent doesn't just hit OpenAI once. Behind the scenes it asks OpenAI what to do, calls `get_support_context` to fetch Dad's iPhone setup, asks OpenAI again, calls `search_help_library` for Bluetooth steps, then asks OpenAI one more time to produce the numbered answer. None of that is visible today.
+When a clinician asks "What is the CardioZ dose in the US?", the agent doesn't just hit the model once. Behind the scenes it asks the model what to do, calls `get_support_context` to fetch the brands and countries we cover, asks the model again, calls `search_help_library` for the CardioZ labels, then asks the model one more time to produce the answer. None of that is visible today.
 
 The goal of this chapter is to make every one of those steps visible in Langfuse: one chat turn becomes one nested trace with the agent run, the OpenAI generations, and the two tool calls all logged in order.
 
@@ -133,16 +133,16 @@ The body stays exactly as it is.
 
 ```ts
 export const runSupportConversation = observe(runSupportConversationInner, {
-  name: "dad-it-support-chat-turn",
+  name: "hcp-medinfo-chat-turn",
   asType: "agent"
 });
 ```
 
 `index.ts` still imports `runSupportConversation` the same way. `observe(...)` auto-captures the function argument as the trace input and the return value as the trace output.
 
-**Verify:** one chat turn should now show up as a single `dad-it-support-chat-turn` observation with the OpenAI generation nested underneath.
+**Verify:** one chat turn should now show up as a single `hcp-medinfo-chat-turn` observation with the OpenAI generation nested underneath.
 
-![Trace tree after Step 2: one dad-it-support-chat-turn agent root with the OpenAI generation as a child.](../images/tracing/02-tracing-step-2.png)
+![Trace tree after Step 2: one hcp-medinfo-chat-turn agent root with the OpenAI generation as a child.](../images/tracing/02-tracing-step-2.png)
 
 
 
@@ -211,13 +211,13 @@ export async function executeTool(name: string, input: Record<string, unknown>):
 
 If `npm run dev` stops with `Multiple exports with the same name "executeTool"`, the original `executeTool` is still further down the file. Delete it and keep only the version above.
 
-![Trace after Step 3. dad-it-support-chat-turn with OpenAI generations, get_support_context, and search_help_library.](../images/tracing/02-tracing-step-3.png)
+![Trace after Step 3. hcp-medinfo-chat-turn with OpenAI generations, get_support_context, and search_help_library.](../images/tracing/02-tracing-step-3.png)
 
 
 ## How to verify you are done
 
 - A single user turn creates one trace in Langfuse.
-- Root observation: `dad-it-support-chat-turn` (type `agent`).
+- Root observation: `hcp-medinfo-chat-turn` (type `agent`).
 - Child generation from `observeOpenAI(...)` with prompt, response, tokens, latency.
 - Child tool observations: `get_support_context`, `search_help_library`.
 - Root input is the chat request; root output is the chat response.
@@ -244,7 +244,7 @@ return propagateAttributes(
   {
     userId: request.userId ?? `workshop-${context.id}`,
     sessionId: request.sessionId,
-    tags: ["langfuse-workshop", "dad-it-support"]
+    tags: ["langfuse-workshop", "hcp-medinfo"]
   },
   async () => {
     // ...the same tool-calling loop...
