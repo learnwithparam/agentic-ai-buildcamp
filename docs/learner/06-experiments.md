@@ -38,7 +38,7 @@ Your dataset is seeded in Langfuse. `scripts/run-dataset.ts` is already in the r
 
 In 05 you decided what the dataset should evaluate: correct answers, and the right behavior (reply, defer, or ask a follow-up). Each goal gets one evaluator, and each reads its own field from `expectedOutput`:
 
-- **`behavior_match`** (decision model + deterministic match): *did the agent reply, defer, or ask a follow-up when we expected it to?* The OpenAI Decisions API picks one of three fixed labels, and the script compares that label with `expectedBehavior`.
+- **`behavior_match`** (decision model + deterministic match): *did the agent reply, defer, or ask a follow-up when we expected it to?* The Decisions API picks one of three fixed labels, and the script compares that label with `expectedBehavior`.
 - **`correctness`** (LLM-as-a-judge regression check): *is the answer still correct, or did a change make it worse?* A semantic-equivalence check against `idealAnswer`: paraphrases pass, missing required detail or a contradicted fact fails. A prompt fix that makes the agent refuse too much, or drop a step, shows up here.
 
 Treat this set as a **starting point**: the simplest check for each goal from 05. Impersonation and lengthy replies get no evaluator here, so read traces for those, and add one (for example a word-count check) if they become worth tracking.
@@ -98,7 +98,7 @@ Three things to understand:
 
 `behavior_match` has two parts:
 
-1. **A decision model.** `decideBehavior(...)` sends the conversation plus the agent's answer to the [OpenAI Decisions API](https://developers.openai.com/api/docs/guides/decisions) (`POST /v1/decisions`, model `gpt-6-luna`) as one `choice` question. The API can only answer with one of the supplied values, `reply`, `defer_question`, or `ask_follow_up`, and returns a confidence alongside it.
+1. **A decision model.** `decideBehavior(...)` sends the conversation plus the agent's answer to the [OpenRouter Decisions API](https://openrouter.ai/docs/guides/features/decisions) (`POST /api/alpha/decisions`, model `openai/gpt-6-luna-decisions`) as one `choice` question. The API can only answer with one of the supplied values, `reply`, `defer_question`, or `ask_follow_up`, and returns a confidence alongside it.
 2. **A deterministic match.** The callback compares that label with the item's `expectedBehavior`: `1` on a match, `0` otherwise. The comment records both labels and the confidence, for example `Expected defer_question, got reply (confidence 0.85).`
 
 Why split it this way?

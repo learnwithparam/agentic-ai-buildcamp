@@ -16,6 +16,10 @@
 #   ./scripts/sync-checkpoints.sh --verify --push    # then force-push moved tags
 set -euo pipefail
 
+# The run checks out each tag, which rewrites this file on disk. Bash reads a
+# script as it runs, so the whole body sits in one group that is parsed first.
+{
+
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
@@ -143,7 +147,7 @@ for tag in "${TAGS[@]}"; do
   git commit -q -m "$(cat <<MSG
 Sync checkpoint with ${SOURCE_REF} (${SOURCE_SHA})
 
-Takes ${SOURCE_REF}'s tree, except the milestone files this step still
+Takes the ${SOURCE_REF} tree, except the milestone files this step still
 starts from: ${keep_files:-none}. Shared checkpoint-sync regions inside
 those files come from ${SOURCE_REF} too.
 MSG
@@ -165,3 +169,5 @@ if [[ "$PUSH" -eq 1 ]]; then
 else
   echo "Updated ${#MOVED[@]} tag(s) locally. Re-run with --push to publish them."
 fi
+exit
+}

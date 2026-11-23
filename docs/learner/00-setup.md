@@ -41,7 +41,7 @@ This checkpoint intentionally contains the same untraced base app as `checkpoint
    docker compose -f langfuse/docker-compose.yml -f langfuse/workshop.override.yml up -d
    ```
 
-   The first start downloads the images and takes a few minutes. Then open [http://localhost:3000](http://localhost:3000) and sign in as `learner@workshop.local` with the password `workshop-password`. The override file creates that user, the `HCP MedInfo` project, and its keys `pk-lf-workshop` and `sk-lf-workshop`, so there is nothing to click.
+   The first start downloads the images and takes a few minutes. Then open [http://localhost:5174](http://localhost:5174) and sign in as `learner@workshop.local` with the password `workshop-password`. The override file creates that user, the `HCP MedInfo` project, and its keys `pk-lf-workshop` and `sk-lf-workshop`, so there is nothing to click.
 2. **OpenRouter**: [openrouter.ai](https://openrouter.ai) → Keys → create one. Copy the `sk-or-...` value. You paste it into `.env` in Step 3.
 
 ## Step 2: Install the Langfuse skill and CLI
@@ -81,7 +81,7 @@ OPENAI_BASE_URL=https://openrouter.ai/api/v1
 OPENAI_MODEL=openai/gpt-6-luna
 LANGFUSE_PUBLIC_KEY=pk-lf-workshop
 LANGFUSE_SECRET_KEY=sk-lf-workshop
-LANGFUSE_BASE_URL=http://localhost:3000
+LANGFUSE_BASE_URL=http://localhost:5174
 ```
 
 Leave the rest of the defaults as they are.
