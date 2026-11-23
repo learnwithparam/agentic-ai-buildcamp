@@ -223,7 +223,7 @@ export function unitBySlug(slug: string): Unit | undefined {
 
 // The short name of a unit, like 03-intent-routing.
 export function stemFor(unit: Unit): string {
-  return tagFor(unit.slug).split("/")[1];
+  return branchFor(unit.slug).split("/")[1];
 }
 
 // The page a learner reads for a unit.
@@ -231,8 +231,8 @@ export function pageFor(unit: Unit): string {
   return `docs/${unit.kind}s/${stemFor(unit)}.md`;
 }
 
-// The tag a unit is saved under.
-export function tagFor(slug: string): string {
+// The branch a unit is saved on. The release tag never moves. These branches do.
+export function branchFor(slug: string): string {
   const unit = unitBySlug(slug);
   if (unit === undefined) throw new Error(`No module or lab named ${slug}`);
   const same = UNITS.filter((other) => other.kind === unit.kind);

@@ -23,9 +23,19 @@ config/models.ts             the only file that names a model
 case-studies/                the two case studies, never changed by the rework
 ```
 
-Main holds the finished course. `bun run checkpoints --tag` builds a tag for each unit by swapping the
-unit's regions, and every later unit's regions, for their stubs. The release job proves each tag: it
-type-checks, the verify before it passes, and its own verify fails.
+Main holds the finished course. `bun run checkpoints --branches` builds a branch for each unit by
+swapping the unit's regions, and every later unit's regions, for their stubs. The release job proves
+each branch: it type-checks, the verify before it passes, and its own verify fails.
+
+## Maintain the checkpoints
+
+A checkpoint is a branch, because git says a published tag must never move. A release tag such as
+`buildcamp-2026-11c` is frozen. Every checkpoint is a pure function of one main commit.
+
+1. Edit main, run `bun run check`, then push. CI proves every unit and moves the branches.
+2. Learners run `bun run goto <name>` again. It fetches and switches to the new branch.
+3. Rebuild the checkpoints of an old release with `bun run checkpoints --at <release-tag>`.
+4. Tag a new release and move the teach pins to it. No workflow creates, moves or deletes a tag.
 
 ## Rules and the check behind each
 

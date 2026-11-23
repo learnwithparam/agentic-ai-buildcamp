@@ -28,13 +28,13 @@ jobs:
         run: bun run up
       - name: Gate on main
         run: bun run check
-      - name: Name the committer for the tag commits
+      - name: Name the committer for the checkpoint commits
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
-      - name: Prove and build every checkpoint tag
-        run: bun scripts/checkpoints.ts --prove --tag
-      - name: Push all tags together
+      - name: Prove and build every checkpoint branch
+        run: bun scripts/checkpoints.ts --prove --branches
+      - name: Move the checkpoint branches together
         run: |
-          tags=$(git tag --list 'checkpoint/*' 'lab/*')
-          git push --atomic --force origin $tags
+          refs=$(git for-each-ref --format='%(refname):%(refname)' 'refs/heads/checkpoint/' 'refs/heads/lab/')
+          git push --atomic --force-with-lease origin $refs

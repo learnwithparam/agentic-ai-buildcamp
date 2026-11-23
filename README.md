@@ -24,7 +24,7 @@ flowchart LR
 
 ## Move through the course
 
-Every module and lab has a checkpoint. A checkpoint is a saved copy of the repo at that point. Pick one and jump to it.
+Every module and lab has a checkpoint. A checkpoint is a branch with the repo as it stands at that point. Pick one and jump to it.
 
 ```bash
 bun run goto foundation
@@ -32,7 +32,9 @@ bun run goto foundation
 
 Expect: a list of the TODO items for that checkpoint, and your own lab files kept as they were.
 
-If your tree has changes, they are saved on a backup branch first. Nothing you wrote is lost.
+If your tree has changes, goto stops and tells you to commit them first. Nothing you wrote is lost.
+
+The course gets fixes. Run `bun run goto` with the same name again to pick up the newest checkpoint.
 
 ## The modules and labs
 

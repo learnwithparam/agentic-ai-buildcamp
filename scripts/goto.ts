@@ -1,24 +1,11 @@
 // bun run goto <slug>            move to a checkpoint, keeping your lab work
 // bun run goto <slug> --fresh    take the reference lab files too
 //
-// A dirty tree is saved on a backup branch first, so nothing you wrote is lost.
-import { tagFor, UNITS, type Unit, unitBySlug } from "../src/workshop";
+// It refuses a tree with changes, so nothing you wrote can be lost. Commit first, then go.
+import { branchFor, UNITS, type Unit, unitBySlug } from "../src/workshop";
 import { git, mustGit } from "./git";
 
 const KEPT_FOLDERS = ["apps/product-teammates", "design-pack"];
-
-function stamp(): string {
-  return new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
-}
-
-function saveDirtyTree(): string | null {
-  if (git(["status", "--porcelain"]).output === "") return null;
-  const branch = `backup/${stamp()}`;
-  mustGit(["checkout", "-b", branch]);
-  mustGit(["add", "-A"]);
-  mustGit(["commit", "-m", `Save work before goto at ${branch}`]);
-  return branch;
-}
 
 function stubsLeft(): string[] {
   const found = git(["grep", "-n", "TODO(", "--", "*.ts"]);
@@ -33,18 +20,28 @@ function chooseUnit(): Unit {
   process.exit(2);
 }
 
+function refuseDirtyTree(): void {
+  if (git(["status", "--porcelain"]).output === "") return;
+  console.log("You have changes that are not saved. Save them first, then run goto again:");
+  console.log("  git add -A && git commit -m 'My work'");
+  process.exit(1);
+}
+
 function main(): void {
   const unit = chooseUnit();
-  const fresh = process.argv.includes("--fresh");
-  const saved = saveDirtyTree();
-  const mine = saved ?? "HEAD";
-  const branch = `work/${unit.slug}`;
-  mustGit(["checkout", "-B", branch, tagFor(unit.slug)]);
-  if (!fresh && saved !== null) {
+  refuseDirtyTree();
+  const fetched = git(["fetch", "origin"]);
+  if (!fetched.ok) {
+    console.log(`Could not fetch the checkpoints from GitHub:\n${fetched.output}`);
+    process.exit(1);
+  }
+  const mine = mustGit(["rev-parse", "HEAD"]);
+  const work = `work/${unit.slug}`;
+  mustGit(["switch", "-C", work, `origin/${branchFor(unit.slug)}`]);
+  if (!process.argv.includes("--fresh")) {
     for (const folder of KEPT_FOLDERS) git(["checkout", mine, "--", folder]);
   }
-  if (saved !== null) console.log(`Your earlier work is saved on ${saved}.`);
-  console.log(`You are on ${branch}. Open each TODO and write the answer:`);
+  console.log(`You are on ${work}. Open each TODO and write the answer:`);
   for (const line of stubsLeft().filter((text) => text.includes(`TODO(${unit.slug})`))) {
     console.log(`  ${line}`);
   }

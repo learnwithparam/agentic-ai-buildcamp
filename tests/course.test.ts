@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { HCP_GOLDEN } from "../data/catalog/golden-hcp";
 import { MISSION_CONTROL_GOLDEN } from "../data/catalog/golden-mission-control";
 import { ROOT } from "../scripts/root";
-import { pageFor, stemFor, tagFor, UNITS, unitBySlug } from "../src/workshop";
+import { branchFor, pageFor, stemFor, UNITS, unitBySlug } from "../src/workshop";
 
 describe("the manifest", () => {
   test("every slug is unique", () => {
@@ -31,8 +31,8 @@ describe("the manifest", () => {
   test("no number appears in a title or a job", () => {
     for (const unit of UNITS) expect(/\d/.test(`${unit.title} ${unit.job}`)).toBe(false);
   });
-  test("tags are numbered in order and never collide", () => {
-    const tags = UNITS.map((unit) => tagFor(unit.slug));
+  test("branches are numbered in order and never collide", () => {
+    const tags = UNITS.map((unit) => branchFor(unit.slug));
     expect(new Set(tags).size).toBe(tags.length);
     expect(tags[0]).toBe("checkpoint/00-foundation");
   });
