@@ -367,7 +367,8 @@ export async function answerAlwaysOn(
 //~ }
 //~
 //~ export function approvalCard(_briefingId: number, _body: string): ApprovalCard {
-//~   return { type: "ApprovalCard", props: { briefingId: 0, title: "", digest: "", post: "", channel: "" }, actions: [] };
+//~   const props = { briefingId: 0, title: "", digest: "", post: "", channel: "" };
+//~   return { type: "ApprovalCard", props, actions: [] };
 //~ }
 //~
 //~ export function cardText(_card: ApprovalCard): string {
@@ -388,7 +389,7 @@ export async function answerAlwaysOn(
 //~
 //~ export async function stopBoss(_boss: PgBoss): Promise<void> {}
 //~
-//~ export async function sendEvent(_boss: PgBoss, _rival: string, _moment: Date): Promise<boolean> {
+//~ export async function sendEvent(_boss: PgBoss, _rival: string, _at: Date): Promise<boolean> {
 //~   return false;
 //~ }
 //~
