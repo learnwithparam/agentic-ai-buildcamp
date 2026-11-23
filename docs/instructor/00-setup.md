@@ -14,7 +14,7 @@ Learner guide: [00 Setup](../learner/00-setup.md)
 - `main` contains the complete reference implementation, but learners should use the checkpoint so setup and base-app orientation share the same starting state.
 - Make learners confirm the UI loads at `127.0.0.1:3333` and that a suggestion-chip chat turn returns a real answer.
 - Tell learners to leave `npm run dev` running: Vite hot-reloads the client, and the API watcher restarts on server or `.env` changes. Stopping and starting between edits is unnecessary.
-- Langfuse runs locally from `langfuse/docker-compose.yml`. Have learners start it first, because the first image pull takes a few minutes. The host is `LANGFUSE_BASE_URL=http://localhost:3000`, and the login is `learner@workshop.local` / `workshop-password`.
+- Langfuse runs locally from `langfuse/docker-compose.yml`. Have learners start it first, because the first image pull takes a few minutes. The host is `LANGFUSE_BASE_URL=http://localhost:5174`, and the login is `learner@workshop.local` / `workshop-password`.
 - The Node server and helper scripts load the repository `.env` with override enabled, so stale exported `LANGFUSE_*`, `OPENAI_*`, or `DATASET_NAME` values from another local project should not win. Have learners edit `.env` when they need to switch keys or projects.
 - Do not frontload **Project Settings → LLM Connections** here. Learners add the OpenRouter connection in [section 4.2 Capturing signals](../learner/04-monitoring/capturing-signals.md) and pick `openai/gpt-6-luna` when creating the disagreement judge.
 - Keep key handling explicit: real API keys go only into `.env` or Langfuse secret fields, never into shared transcripts, notes, or chat.
