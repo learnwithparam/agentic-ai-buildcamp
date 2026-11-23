@@ -19,7 +19,7 @@ npm ci
 npm run dev
 ```
 
-Open the app at [http://localhost:3333](http://localhost:3333) and Langfuse at [http://localhost:3000](http://localhost:3000) (`learner@workshop.local` / `workshop-password`). Then:
+Open the app at [http://localhost:3333](http://localhost:3333) and Langfuse at [http://localhost:5174](http://localhost:5174) (`learner@workshop.local` / `workshop-password`). Then:
 
 ```bash
 npm run prompt:publish                  # the agent prompt

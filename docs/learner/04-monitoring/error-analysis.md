@@ -48,7 +48,7 @@ npm run langfuse:seed:error-analysis
 
 The seed is **not idempotent**: running it again adds another 20 traces. Run it once. The new traces are tagged `error-analysis-seed`, and they are the newest traces in the project.
 
-In [Tracing](http://localhost:3000/project/hcp-medinfo/traces), select the last 20 traces and add them to an annotation queue named `error analysis`. The queue has two score configs: `open coding` (Text) and `pass or fail` (Categorical, with the categories pass and fail). Create the queue with those configs, then add the traces. A queue keeps the score configs it was created with.
+In [Tracing](http://localhost:5174/project/hcp-medinfo/traces), select the last 20 traces and add them to an annotation queue named `error analysis`. The queue has two score configs: `open coding` (Text) and `pass or fail` (Categorical, with the categories pass and fail). Create the queue with those configs, then add the traces. A queue keeps the score configs it was created with.
 
 ![Select the traces, then add them to an annotation queue.](../../images/monitoring/add-to-annotation-queue.png)
 
