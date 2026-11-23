@@ -18,142 +18,200 @@ flowchart LR
 
 A customer may write a side effect report inside a friendly email. The law says a safety person must read it. A fast reply from the agent can break that rule.
 
-So the agent saves the report as an **approval** and stops. A named reviewer says yes or no later. The wait lives in the database, so a restart loses nothing.
+So the agent saves the report as an **approval** and stops. A named reviewer says yes or no later. The wait lives in Postgres, so a restart loses nothing.
 
 The agent also keeps **memory**. It saves a short note about one person, for that person only.
 
 ## What you will have at the end
 
-- An approval table with a waiting inbox for each reviewer.
-- A `decide` function that works once and only for the approver.
+- A `pending_approvals` inbox table with a waiting inbox for each reviewer.
+- A LangGraph run that stops at `interrupt()` and resumes after a restart.
+- An **ApprovalCard** that the web and the CLI both draw from one spec.
 - An **outbox** that holds each reply that was approved.
-- Notes that stay with one person inside one company.
+- Notes in a `PostgresStore` that stay with one person inside one company.
 
 ## See it fail first
 
-What happens when a customer reports a side effect and the agent just replies? Right now it answers at once. No safety person ever sees the report.
+What happens when a customer reports a side effect and the agent just replies? Right now it answers at once. No safety person ever sees the report. If the reviewer closes the tab, a pending decision is lost.
 
 For example, carol sends a note about a rash after CardioZ. The agent answers her and the safety team never hears of it.
 
-## Step 1: save the approval
+## Step 1: pause the run
 
-Each approval is one row with a status. It starts as pending.
+The graph has two nodes. The first node calls `interrupt()`. LangGraph saves the whole run in Postgres and stops. The second node runs only after a person resumes the run.
 
 ### packages/core/src/approvals.ts
 
 ```ts
+const ReviewState = Annotation.Root({
+  approvalId: Annotation<number>(),
+  question: Annotation<string>(),
+  decision: Annotation<Decision | null>(),
+});
+
+// The node that waits. interrupt() saves the run in Postgres and stops until a person resumes it.
+async function waitForPerson(state: typeof ReviewState.State) {
+  const payload = { approvalId: state.approvalId, question: state.question };
+  const decision = interrupt(payload) as Decision;
+  return { decision };
+}
+
+// One decision, once. The row changes only if it is still pending, and a reply goes out only on yes.
+async function sendReply(state: typeof ReviewState.State) {
+  const decision = state.decision as Decision;
+  await inTransaction(async (run) => {
+    const status = decision.approved ? "approved" : "rejected";
+    const changed = await run(
+      "UPDATE pending_approvals SET status = $2, decided_by = $3 WHERE id = $1 AND status = 'pending'",
+      [state.approvalId, status, decision.approver],
+    );
+    if (changed.rowCount === 0 || !decision.approved) return;
+    const body = `Reply sent for: ${state.question}`;
+    await run("INSERT INTO outbox VALUES ($1, $2, $3)", [
+      state.approvalId,
+      body,
+      decision.approver,
+    ]);
+  });
+  return {};
+}
+```
+
+## Step 2: save the approval
+
+Each approval is one row in the inbox. It starts as pending. Starting the run is what makes it stop at the interrupt.
+
+### packages/core/src/approvals.ts
+
+```ts
+// Saves the report in the inbox, then starts a run that stops at interrupt().
 export async function requestApproval(requester: string, question: string): Promise<number> {
-  await setupTables();
+  const { graph } = await running();
+  const thread = randomUUID();
   const [row] = await rows<{ id: number }>(
-    "INSERT INTO approvals (requester, topic, question) VALUES ($1, $2, $3) RETURNING id",
-    [requester, TOPIC, question],
+    "INSERT INTO pending_approvals (requester, topic, question, thread_id) VALUES ($1, $2, $3, $4) RETURNING id",
+    [requester, TOPIC, question, thread],
+  );
+  await graph.invoke(
+    { approvalId: row.id, question, decision: null },
+    { configurable: { thread_id: thread } },
   );
   return row.id;
 }
 ```
 
-## Step 2: show the inbox
+## Step 3: show the inbox
 
-A reviewer sees only the topics they hold a grant for. The grant comes from the same table that module 07 used.
+A reviewer sees only the topics they hold a grant for. The grant comes from the same table that module 09 used.
 
 ### packages/core/src/approvals.ts
 
 ```ts
 export async function pendingFor(approver: string): Promise<Approval[]> {
-  await setupTables();
+  await running();
   return rows<Approval>(
-    `SELECT * FROM approvals a WHERE a.status = 'pending' AND EXISTS (
+    `SELECT * FROM pending_approvals a WHERE a.status = 'pending' AND EXISTS (
        SELECT 1 FROM grants g
        WHERE g.person = $1 AND g.relation = 'approves' AND g.object = a.topic)
      ORDER BY a.id`,
     [approver],
   );
 }
-```
 
-## Step 3: decide once
-
-The whole decision runs in one transaction. It reads a pending row, checks the grant, then writes the status and the reply together. A second try finds no pending row and stops.
-
-### packages/core/src/approvals.ts
-
-```ts
-// One decision, once. Only a person who holds the approves grant may make it.
-export async function decide(id: number, approver: string, approved: boolean): Promise<Status> {
-  return inTransaction(async (run) => {
-    const found = await run("SELECT * FROM approvals WHERE id = $1 AND status = 'pending'", [id]);
-    if (found.rows.length === 0) throw new Error(`Approval ${id} is not waiting.`);
-    const approval = found.rows[0] as Approval;
-    const grant =
-      "SELECT 1 FROM grants WHERE person = $1 AND relation = 'approves' AND object = $2";
-    const allowed = await run(grant, [approver, approval.topic]);
-    if (allowed.rows.length === 0) throw new Error(`${approver} may not decide ${approval.topic}.`);
-    const status = approved ? "approved" : "rejected";
-    await run("UPDATE approvals SET status = $2, decided_by = $3 WHERE id = $1", [
-      id,
-      status,
-      approver,
-    ]);
-    if (approved) {
-      const body = `Reply sent for: ${approval.question}`;
-      await run("INSERT INTO outbox VALUES ($1, $2, $3)", [id, body, approver]);
-    }
-    return status;
-  });
+// The same inbox as cards. The web draws each card. The CLI prints it with cardText.
+export async function cardsFor(approver: string): Promise<Spec[]> {
+  return (await pendingFor(approver)).map(approvalCard);
 }
 ```
 
-## Step 4: keep notes per person
+## Step 4: decide once
 
-Each note is saved with the company and the person. A teammate and another company both get nothing back.
+Only a person with the approves grant may decide. Only a pending row can be decided. The decision resumes the saved run, so the reply goes out after a restart too.
 
 ### packages/core/src/approvals.ts
 
 ```ts
-// Notes stay with one person.
+// Only a person who holds the approves grant may decide, and only a pending row can be decided.
+export async function decide(id: number, approver: string, approved: boolean): Promise<Status> {
+  const { graph } = await running();
+  const found = await rows<Approval>(
+    "SELECT * FROM pending_approvals WHERE id = $1 AND status = 'pending'",
+    [id],
+  );
+  if (found.length === 0) throw new Error(`Approval ${id} is not waiting.`);
+  const grant = await rows(
+    "SELECT 1 FROM grants WHERE person = $1 AND relation = 'approves' AND object = $2",
+    [approver, found[0].topic],
+  );
+  if (grant.length === 0) throw new Error(`${approver} may not decide ${found[0].topic}.`);
+  const resume = new Command<Decision, Record<string, unknown>, "wait" | "send">({
+    resume: { approved, approver },
+  });
+  await graph.invoke(resume, { configurable: { thread_id: found[0].thread_id } });
+  return approved ? "approved" : "rejected";
+}
+```
+
+## Step 5: press the card or use the CLI
+
+The ApprovalCard is a json-render spec with an Approve and a Reject button. The web draws it with shadcn parts. The CLI prints the same spec as text. Both end in the same `decide` call.
+
+### packages/core/src/approvals.ts
+
+```ts
+// A button press on the card. The web calls this when a reviewer clicks Approve or Reject.
+export async function pressCard(spec: Spec, button: string, approver: string): Promise<Status> {
+  const binding = spec.elements[button]?.on?.press;
+  const params = (Array.isArray(binding) ? binding[0] : binding)?.params;
+  if (params === undefined) throw new Error(`The card has no button named ${button}.`);
+  return decide(Number(params.id), approver, params.approved === true);
+}
+
+// The CLI: "list <person>", "approve <id> <person>" or "reject <id> <person>". It returns text.
+export async function approvalsCli(argv: string[]): Promise<string> {
+  const [command, first, second] = argv;
+  if (command === "list")
+    return (await cardsFor(first)).map(cardText).join("\n\n") || "Inbox is empty.";
+  if (command !== "approve" && command !== "reject") throw new Error(`Unknown command: ${command}`);
+  const status = await decide(Number(first), second, command === "approve");
+  return `Approval ${first} is ${status}.`;
+}
+```
+
+## Step 6: keep notes per person
+
+Each note is saved in the store under the company, then the person. A teammate and another company both get nothing back.
+
+### packages/core/src/approvals.ts
+
+```ts
+// Notes stay with one person. The namespace is the company, then the person.
 export async function remember(person: string, note: string): Promise<void> {
   const owner = personNamed(person);
-  await setupTables();
-  await rows("INSERT INTO memories (tenant, person, note) VALUES ($1, $2, $3)", [
-    owner.tenant,
-    owner.name,
-    note,
-  ]);
+  const { store } = await running();
+  await store.put([owner.tenant, owner.name], randomUUID(), { note, at: Date.now() });
+}
+
+export async function recallFor(tenant: string, person: string): Promise<string[]> {
+  const { store } = await running();
+  const found = await store.search([tenant, person], { limit: 100 });
+  const sorted = found.sort((a, b) => Number(a.value.at) - Number(b.value.at));
+  return sorted.map((item) => String(item.value.note));
 }
 
 export async function recall(person: string): Promise<string[]> {
   const owner = personNamed(person);
-  await setupTables();
-  const found = await rows<{ note: string }>(
-    "SELECT note FROM memories WHERE tenant = $1 AND person = $2 ORDER BY created",
-    [owner.tenant, owner.name],
-  );
-  return found.map((item) => item.note);
+  return recallFor(owner.tenant, owner.name);
 }
 ```
 
-## Step 5: stop the agent and wait
-
-The router picks a route first. If the route needs a human, the agent saves an approval. It tells the person the approval is waiting.
-
-### packages/core/src/team.ts
-
-```ts
-// A reply that needs a human waits as an approval. Nothing is sent until someone decides.
-async function pauseForHuman(result: AgentResult, person: Person, question: string) {
-  if (result.route !== "escalate" && result.route !== "approve") return result;
-  const id = await requestApproval(person.name, question);
-  return { route: result.route, text: `${result.text} Approval ${id} is waiting.`, citations: [] };
-}
-```
-
-## Step 6: verify
+## Step 7: verify
 
 ```bash
 bun run verify approvals-memory
 ```
 
-Expect: six green badges and the line "Every check passed."
+Expect: every badge is green and the line "Every check passed."
 
 ## Try it yourself
 
@@ -167,12 +225,12 @@ Expect: the badge "Memory stays with its owner and company" is green.
 
 ## Stuck?
 
-| You see                                      | Why                                                            | Fix                                                                                  |
-| -------------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| A model ran before a human saw the report.   | The agent answers a safety report before it saves an approval. | In pauseForHuman, save the approval and return the waiting message.                  |
-| A person without the approves grant decided. | decide does not look for the approves grant.                   | In decide, look up the grant for this person and topic and throw when it is missing. |
-| The reply was sent twice.                    | decide acts on a row that was already decided.                 | In decide, select only rows whose status is pending.                                 |
-| A teammate read Alice's note.                | recall reads every note in the company.                        | In recall, filter by the company and by the person.                                  |
+| You see                                      | Why                                                                  | Fix                                                                                  |
+| -------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| A model ran before a human saw the report.   | The graph never stops, so the agent answers a safety report at once. | In waitForPerson, call interrupt so the run stops until a person decides.            |
+| A person without the approves grant decided. | decide does not look for the approves grant.                         | In decide, look up the grant for this person and topic and throw when it is missing. |
+| The reply was sent twice.                    | decide acts on a row that was already decided.                       | In decide, select only rows whose status is pending.                                 |
+| A teammate read Alice's note.                | recall reads every note in the company.                              | In recallFor, search the store under the company and then the person.                |
 
 If you are still stuck, start from a clean copy of this step.
 

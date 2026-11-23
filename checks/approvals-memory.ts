@@ -1,8 +1,21 @@
-// Module 08: a person must say yes before a reply is sent, and a restart loses nothing.
+// Module 10: a person must say yes before a reply is sent, and a restart loses nothing.
 import { HCP_GOLDEN } from "../data/catalog/golden-hcp";
-import { decide, pendingFor, recall, resetApprovals } from "../packages/core/src/approvals";
+import {
+  approvalCard,
+  approvalsCli,
+  cardsFor,
+  cardText,
+  decide,
+  pendingFor,
+  pressCard,
+  recall,
+  recallFor,
+  resetApprovals,
+  stopApprovals,
+} from "../packages/core/src/approvals";
 import { closeDatabase, rows } from "../packages/core/src/db";
 import { askTeam, type Models } from "../packages/core/src/team";
+import { grade } from "../src/grade";
 import { type Check, expect } from "../src/verify";
 
 let modelCalls = 0;
@@ -18,6 +31,12 @@ const MODELS: Models = {
 };
 
 const REPORT = "Thanks for the leaflet. By the way my patient got a rash after CardioZ.";
+
+// A restart: close the graph, the memory and the pool. The next call opens them again.
+async function restart(): Promise<void> {
+  await stopApprovals();
+  await closeDatabase();
+}
 
 async function freshStart(): Promise<void> {
   modelCalls = 0;
@@ -103,10 +122,58 @@ export const checks: Check[] = [
     run: async () => {
       await freshStart();
       await askTeam(REPORT, "carol", MODELS);
-      await closeDatabase();
+      await restart();
       const id = await waitingId();
       await decide(id, "dr-reviewer", true);
       expect((await sentCount()) === 1, "The approval did not resume after the restart.");
+    },
+  },
+  {
+    name: "A reviewer approves on the web card after a restart",
+    tryNext: "Pause with interrupt() so the run waits in Postgres, then resume it with a Command.",
+    run: async () => {
+      await freshStart();
+      await askTeam(REPORT, "carol", MODELS);
+      await restart();
+      const [card] = await cardsFor("dr-reviewer");
+      expect(card !== undefined, "The reviewer's inbox has no card after the restart.");
+      expect(cardText(card).includes("[Approve]"), "The card has no Approve button.");
+      expect((await pressCard(card, "approve", "dr-reviewer")) === "approved", "The press failed.");
+      expect((await sentCount()) === 1, "The thread did not resume after the restart.");
+      expect((await pendingFor("dr-reviewer")).length === 0, "The card is still in the inbox.");
+    },
+  },
+  {
+    name: "A second report is approved from the CLI",
+    tryNext: "Call decide from the CLI command, so the CLI and the card share one path.",
+    run: async () => {
+      await freshStart();
+      await askTeam(REPORT, "carol", MODELS);
+      const listed = await approvalsCli(["list", "dr-reviewer"]);
+      expect(listed.includes("[Approve]"), "The CLI did not print the card.");
+      const id = await waitingId();
+      const refused = await approvalsCli(["approve", String(id), "carol"]).catch(() => "refused");
+      expect(refused === "refused", "A person without the grant approved from the CLI.");
+      const said = await approvalsCli(["approve", String(id), "dr-reviewer"]);
+      expect(said.includes("approved"), "The CLI did not report the approval.");
+      expect((await sentCount()) === 1, "The CLI approval did not send one reply.");
+    },
+  },
+  {
+    name: "The approval card is a valid spec with two buttons",
+    tryNext: "Return a json-render spec with a Card, a Text and an Approve and a Reject Button.",
+    run: async () => {
+      const card = approvalCard({
+        id: 7,
+        requester: "carol",
+        topic: "adverse-events",
+        question: REPORT,
+        status: "pending",
+        decided_by: null,
+        thread_id: "t",
+      });
+      expect(card.elements.approve?.type === "Button", "The card has no Approve button.");
+      expect(card.elements.reject?.type === "Button", "The card has no Reject button.");
     },
   },
   {
@@ -120,6 +187,36 @@ export const checks: Check[] = [
       expect(mine.length === 1, "Alice's note was not kept.");
       expect((await recall("carol")).length === 0, "A teammate read Alice's note.");
       expect((await recall("bob")).length === 0, "Another company read Alice's note.");
+    },
+  },
+  {
+    name: "No memory is recalled across companies",
+    tryNext: "Put the company first in the memory namespace, then the person.",
+    run: async () => {
+      await freshStart();
+      await askTeam("Remember that I like short answers.", "alice", MODELS);
+      await restart();
+      expect((await recallFor("pharma-a", "alice")).length === 1, "Alice lost her note.");
+      expect((await recallFor("pharma-b", "alice")).length === 0, "Another company got a note.");
+      await askTeam("Remember that I like long answers.", "bob", MODELS);
+      const bobs = (await recall("bob")).join(" ");
+      expect(bobs.includes("long") && !bobs.includes("short"), "Bob read Alice's note.");
+    },
+  },
+  {
+    name: "Golden cases adverse-event-pause and safety-approval-resumes pass",
+    tryNext: "Hold the report with interrupt(), and send the approved reply only after a yes.",
+    run: async () => {
+      await freshStart();
+      for (const name of ["adverse-event-pause", "safety-approval-resumes"]) {
+        const golden = HCP_GOLDEN.cases.find((item) => item.name === name);
+        expect(golden !== undefined, `The golden set has no case named ${name}.`);
+        const result = await askTeam(golden.question, golden.persona, MODELS);
+        const verdict = grade(golden, result);
+        expect(verdict.ok, `${name}: ${verdict.reasons.join(", ")}`);
+      }
+      expect((await sentCount()) === 0, "A reply was sent before anyone approved it.");
+      expect((await pendingFor("dr-reviewer")).length === 2, "Both reports should be waiting.");
     },
   },
 ];

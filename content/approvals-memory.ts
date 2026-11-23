@@ -35,8 +35,8 @@ export const content: UnitContent = {
     rows: [
       [
         "A model ran before a human saw the report.",
-        "The agent answers a safety report before it saves an approval.",
-        "In pauseForHuman, save the approval and return the waiting message.",
+        "The graph never stops, so the agent answers a safety report at once.",
+        "In waitForPerson, call interrupt so the run stops until a person decides.",
       ],
       [
         "A person without the approves grant decided.",
@@ -51,40 +51,40 @@ export const content: UnitContent = {
       [
         "A teammate read Alice's note.",
         "recall reads every note in the company.",
-        "In recall, filter by the company and by the person.",
+        "In recallFor, search the store under the company and then the person.",
       ],
     ],
   },
   breaks: [
     {
-      file: "packages/core/src/team.ts",
-      rule: "a safety report must wait for a human",
-      find: 'if (result.route !== "escalate" && result.route !== "approve") return result;',
-      replace: 'if (result.route !== "nothing") return result;',
+      file: "packages/core/src/approvals.ts",
+      rule: "an adverse event must pause at interrupt and wait for a human",
+      find: "interrupt(payload) as Decision;",
+      replace: 'payload && ({ approved: true, approver: "nobody" } as Decision);',
     },
     {
       file: "packages/core/src/approvals.ts",
       rule: "only the named approver may decide",
-      find: "if (allowed.rows.length === 0) throw",
-      replace: "if (allowed.rows.length < 0) throw",
+      find: "if (grant.length === 0) throw",
+      replace: "if (grant.length < 0) throw",
     },
     {
       file: "packages/core/src/approvals.ts",
       rule: "an approval is decided once",
-      find: "WHERE id = $1 AND status = 'pending'",
-      replace: "WHERE id = $1 AND status <> 'none'",
+      find: "WHERE id = $1 AND status = 'pending'\",\n    [id],",
+      replace: "WHERE id = $1 AND status <> 'none'\",\n    [id],",
     },
     {
       file: "packages/core/src/approvals.ts",
       rule: "a rejection sends nothing",
-      find: "if (approved) {",
-      replace: "if (approved || !approved) {",
+      find: "|| !decision.approved) return;",
+      replace: "|| decision.approved === undefined) return;",
     },
     {
       file: "packages/core/src/approvals.ts",
-      rule: "memory stays with its owner",
-      find: "WHERE tenant = $1 AND person = $2 ORDER BY created",
-      replace: "WHERE tenant = $1 AND $2 <> '' ORDER BY created",
+      rule: "memory stays in its company",
+      find: "store.search([tenant, person]",
+      replace: "store.search([person]",
     },
   ],
 };
