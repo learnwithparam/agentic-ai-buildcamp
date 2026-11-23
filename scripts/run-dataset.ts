@@ -44,59 +44,46 @@ type DatasetExpectation = {
   expectedBehavior: Behavior;
 };
 
-// --- 3. The behavior_match evaluator: decision model + deterministic check.
-//        The OpenAI Decisions API answers a `choice` question about the
-//        conversation and can only return one of the BEHAVIORS values.
+// --- 3. The behavior_match evaluator: classifier model + deterministic check.
+//        A judge model reads the conversation and picks one of the BEHAVIORS.
+//        It runs as a plain chat completion on OPENAI_MODEL, so it works on any
+//        OpenAI-compatible endpoint, OpenRouter included.
 //        The score itself is a plain equality check against
 //        expectedBehavior: 1 on match, 0 otherwise.
-//        The pinned openai SDK (6.x) has no `client.decisions` helper yet,
-//        so the request goes through the generic `openai.post(...)`.
-const DECISION_MODEL = "gpt-6-luna";
-
-type DecisionAnswer =
-  | { type: "choice"; name: string; choice: Behavior; confidence: number }
-  | { type: "refusal"; name: string };
+const BEHAVIOR_PROMPT = `Classify how the assistant handled the user's latest request.
+Pick exactly one:
+- "defer_question": declines the request itself because it is out of scope, even if it then offers other help.
+- "reply": gives help with the request the user actually asked. It may mention a limitation along the way.
+- "ask_follow_up": asks the user a clarifying question instead of answering yet.
+Return JSON only: {"behavior": "reply" | "defer_question" | "ask_follow_up"}.`;
 
 async function decideBehavior(
   input: DatasetInput,
   answer: string
 ): Promise<{ behavior: Behavior | "refusal"; confidence?: number }> {
   const openai = new OpenAI({ apiKey: env.openaiApiKey });
-  const decision = await openai.post<{ answers: DecisionAnswer[] }>("/decisions", {
-    body: {
-      model: DECISION_MODEL,
-      input: [...input.messages, { role: "assistant", content: answer }],
-      questions: [
-        {
-          type: "choice",
-          name: "behavior",
-          instructions: "How did the assistant handle the user's latest request?",
-          choices: [
-            {
-              value: "defer_question",
-              description:
-                "Declines the request itself because it is out of scope, even if it then offers other help."
-            },
-            {
-              value: "reply",
-              description:
-                "Gives help with the request the user actually asked. It may mention a limitation along the way."
-            },
-            {
-              value: "ask_follow_up",
-              description: "Asks the user a clarifying question instead of answering yet."
-            }
-          ]
-        }
-      ]
-    }
+  const transcript = [...input.messages, { role: "assistant", content: answer }]
+    .map((message) => `${message.role}: ${message.content}`)
+    .join("\n\n");
+  const response = await openai.chat.completions.create({
+    model: env.openaiModel,
+    response_format: { type: "json_object" },
+    messages: [
+      { role: "system", content: BEHAVIOR_PROMPT },
+      { role: "user", content: transcript }
+    ]
   });
 
-  const result = decision.answers[0];
-  if (!result || result.type !== "choice") {
+  let picked: unknown;
+  try {
+    picked = (JSON.parse(response.choices[0]?.message?.content ?? "{}") as { behavior?: unknown }).behavior;
+  } catch {
+    picked = undefined;
+  }
+  if (!BEHAVIORS.includes(picked as Behavior)) {
     return { behavior: "refusal" };
   }
-  return { behavior: result.choice, confidence: result.confidence };
+  return { behavior: picked as Behavior };
 }
 
 // --- 4. The LLM-as-a-judge correctness evaluator, used as the regression check.
@@ -123,10 +110,10 @@ Score true only when the actual output conveys every material meaning, fact, con
 - Treat equivalent information expressed in text, objects, arrays, or another representation as matching when the meaning is preserved.
 - Score false for a wrong conclusion, contradicted fact, missing required detail, altered constraint, unsupported claim, misleading addition, or changed relationship between facts.
 
-## What Is Material For This Support Agent
-- Material: the kind of reply (steps, a decline, or a clarifying question), any limitation the expected output states, and the screens and actions needed to finish the task.
-- Not material: confirmations of what the user will see, optional alternatives (for example Face ID or passcode), the exact wording of a decline or whether it names the topic, the example options a clarifying question lists, and a minor step the user can skip and still finish the task.
-- A different valid route to the same result is a match.
+## What Is Material For This Medical Information Agent
+- Material: the kind of reply (an answer, a decline, or a clarifying question), every dose, frequency, warning and limitation the expected output states, which label or country it applies to, and any reporting step for a side effect.
+- Not material: the exact wording of a decline or whether it names the topic, the example options a clarifying question lists, and extra details from the label (its name, version, patient group, approval note or monitoring advice) unless they contradict the expected output. You do not see the label, so never mark an extra label detail as unsupported.
+- A wrong dose, a dose from the wrong country or an outdated label, or a missing safety warning is always a mismatch.
 
 ## Decision Rules
 1. Identify the expected output's material claims, facts, constraints, conclusions, and relationships.
@@ -235,15 +222,15 @@ async function main() {
   });
 
   const dataset = await langfuse.dataset.get(env.datasetName);
-  const runName = `dad-it-support-${new Date().toISOString()}`;
+  const runName = `hcp-medinfo-${new Date().toISOString()}`;
 
   // --- 6. runExperiment iterates the dataset, calls `task` for each
   //        item, and records every per-item trace + score under a
   //        single run row identified by `runName`.
   const result = await dataset.runExperiment({
-    name: "Dad IT Support Agent experiment",
+    name: "HCP Medical Information Agent experiment",
     runName,
-    description: "Workshop dataset run for the Dad IT Support Agent",
+    description: "Workshop dataset run for the HCP Medical Information Agent",
     metadata: {
       model: env.openaiModel
     },
