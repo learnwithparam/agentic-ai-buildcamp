@@ -1,16 +1,16 @@
-<img width="2400" height="600" alt="hero-b (1)" src="https://github.com/user-attachments/assets/a8fa4fbf-fd68-4167-acc4-0f68497602b3" />
+# Agentic AI Buildcamp: the AI engineering loop with Langfuse
 
-# Langfuse Workshop - the AI engineering loop, end to end
+You build one small agent and run the whole loop on it: tracing, prompt management, monitoring, datasets, experiments and evaluation. Every step runs on your own laptop. Langfuse runs locally in Docker, and the model runs on OpenRouter.
 
-This is a step-by-step Langfuse workshop built on a small TypeScript sample application: the HCP Medical Information Agent. The workshop covers the full AI engineering loop with Langfuse: tracing, prompt management, monitoring, datasets, experiments, and evaluation.
+The agent is the HCP Medical Information Agent. Doctors and pharmacists ask a medical information desk about five invented medicines. The agent answers from a label library and names the label it used. Under the hood it is a plain OpenAI SDK tool-calling loop with two local tools.
 
-The workshop is the hands-on version of many concepts explained in the [Langfuse Academy](https://langfuse.com/academy). The complementary materials are called out respectively.
+![The AI engineering loop](./docs/images/AI-engineering-loop.png)
 
-You can complete the workshop on your own from the learner lessons, or use the instructor notes to teach the same material to a group.
-
-> Langfuse runs on your machine from [`langfuse/`](./langfuse/), and the model runs on OpenRouter. Every lesson runs on that local stack.
+![The HCP Medical Information Agent: the greeting, suggestion chips and the label library side panel.](./docs/images/sample_app.png)
 
 ## Run it
+
+You need Docker with about 6 GB of memory, Node `^20.19.0 || >=22.12.0`, and an OpenRouter key with a few dollars of credit.
 
 ```bash
 docker compose -f langfuse/docker-compose.yml -f langfuse/workshop.override.yml up -d
@@ -19,87 +19,58 @@ npm ci
 npm run dev
 ```
 
-Open the app at [http://localhost:3333](http://localhost:3333) and Langfuse at [http://localhost:5174](http://localhost:5174) (`learner@workshop.local` / `workshop-password`). Then:
+Open the app at [http://localhost:3333](http://localhost:3333) and Langfuse at [http://localhost:5174](http://localhost:5174). Sign in to Langfuse as `learner@workshop.local` with the password `workshop-password`.
+
+## Lessons
+
+Each lesson names the checkpoint tag to check out, what to change, and how to check that it worked.
+
+| Step | Lesson | Checkpoint | What you do |
+| --- | --- | --- | --- |
+| 00 | [Setup](./docs/learner/00-setup.md) | `checkpoint/00-setup` | Start Langfuse, add your keys, run the app. |
+| 01 | [Base app](./docs/learner/01-base-app.md) | `checkpoint/01-base-app` | Tour the running app. Nothing to build. |
+| 02 | [Tracing](./docs/learner/02-tracing.md) | `checkpoint/02-tracing` | Trace every agent step: generations, the agent root and tool calls. |
+| 03 | [Prompt management](./docs/learner/03-prompt-management.md) | `checkpoint/03-prompt-management` | Move the system prompt into Langfuse and link it to every generation. |
+| 04 | [Monitoring](./docs/learner/04-monitoring.md) | `checkpoint/04-monitoring` | Read production traces: error analysis and live signals. |
+| 05 | [Build eval datasets](./docs/learner/05-dataset.md) | `checkpoint/05-dataset` | Turn the failures from error analysis into a dataset. |
+| 06 | [Experiments](./docs/learner/06-experiments.md) | `checkpoint/06-experiments` | Run the agent on the dataset and score every item. |
+| 07 | [Evaluate a change](./docs/learner/07-evaluation.md) | `checkpoint/07-evaluation` | Change the prompt, rerun the dataset, compare the two runs. |
+| 08 | [Wrap-up](./docs/learner/08-wrap-up.md) | `checkpoint/08-wrap-up` | Apply the loop to your own app. |
+
+Helper commands used by the lessons:
 
 ```bash
-npm run prompt:publish                  # the agent prompt
-npm run langfuse:seed:otel              # production traces for lesson 04
-npm run langfuse:seed:error-analysis    # 20 traces for error analysis
-npm run dataset:seed                    # the 27-item eval dataset
-npm run dataset:run                     # one scored experiment run
+npm run prompt:publish                  # lesson 03: publish the agent prompt
+npm run langfuse:seed:otel              # lesson 04: production traces
+npm run langfuse:seed:error-analysis    # lesson 04: 20 traces for error analysis
+npm run dataset:seed                    # lesson 05: the 27-item eval dataset
+npm run dataset:run                     # lessons 06 and 07: one scored experiment run
 ```
 
-## For learners
+## How the checkpoints work
 
-Start with the learner lessons in [`docs/learner/`](./docs/learner/). Each lesson tells you which checkpoint to check out, what to change in code or configure in Langfuse, and how to verify the result.
+`main` holds the finished app. For hands-on work, check out the tag named at the top of the lesson, make the change it asks for, and check the result before you move on.
 
-Use the learner path if you want to:
+`checkpoint/00-setup` and `checkpoint/01-base-app` hold the same untraced app. Setup uses it to check keys, install and ports. Base app uses it for the tour. Tracing starts in `checkpoint/02-tracing`.
 
-- Log your first trace from a real LLM app and understand what you are looking at.
-- Move a prompt into Langfuse so changes are versioned and linked to traces.
-- Make sense of production traces: cost and latency, error analysis, and signals.
-- Build an eval dataset, run experiments, and evaluate changes with evidence.
-- Inspect a complete TypeScript reference implementation you can copy patterns from.
-
-No instructor is required. The learner lessons are complete enough to run the workshop in self-guided mode.
-
-## For instructors
-
-The instructor guide is for people who want to teach Langfuse to others. Use the notes in [`docs/instructor/`](./docs/instructor/) alongside the learner lessons when you are facilitating a live workshop, recording a walkthrough, or adapting the material for a team.
-
-For preparation we included a guide and slides on how to prepare for the workshop [`docs/preparation_and_materials/`](./docs/preparation_and_materials/).
-
-The workshop does not depend on an instructor. The instructor notes add teaching points, demo rhythm, setup reminders, and common pitfalls; they are not required for someone completing the workshop alone.
-
-## Workshop scope
-
-The sample app is a small web chat for doctors and pharmacists. They ask the medical information desk about five invented medicines, and the agent answers from an in-memory label library with the label it used. Under the hood, it is a normal OpenAI SDK tool-calling loop with two local tools, running on OpenRouter.
-
-![The AI Engineering Loop](./docs/images/AI-engineering-loop.png)
-
-![The HCP Medical Information Agent sample app: the greeting, suggestion chips, and the label library side panel.](./docs/images/sample_app.png)
-
-`main` contains the complete reference app and current workshop docs. Use it to inspect the finished implementation or compare your work against the end state. The exercises themselves start from checkpoint tags.
-
-## Modules
-
-| Step | Learner lesson | Instructor notes | Checkpoint | What you will learn |
-| --- | --- | --- | --- | --- |
-| 00 | [Setup](./docs/learner/00-setup.md) | [Instructor notes](./docs/instructor/00-setup.md) | `checkpoint/00-setup` | Keys, install, run the app. |
-| 01 | [Base App](./docs/learner/01-base-app.md) | [Instructor notes](./docs/instructor/01-base-app.md) | `checkpoint/01-base-app` | Tour the running app. Nothing to build. |
-| 02 | [Tracing](./docs/learner/02-tracing.md) | [Instructor notes](./docs/instructor/02-tracing.md) | `checkpoint/02-tracing` | Log every agent step: generations, agent root, tool spans. |
-| 03 | [Prompt Management](./docs/learner/03-prompt-management.md) | [Instructor notes](./docs/instructor/03-prompt-management.md) | `checkpoint/03-prompt-management` | Move the system prompt into Langfuse. |
-| 04 | [Monitoring](./docs/learner/04-monitoring.md) | [Instructor notes](./docs/instructor/04-monitoring.md) | `checkpoint/04-monitoring` | Make sense of production traces: dashboards, error analysis, and signals. |
-| 05 | [Build eval datasets](./docs/learner/05-dataset.md) | [Instructor notes](./docs/instructor/05-dataset.md) | `checkpoint/05-dataset` | Decide what to evaluate and build a dataset from error analysis. |
-| 06 | [Experiments](./docs/learner/06-experiments.md) | [Instructor notes](./docs/instructor/06-experiments.md) | `checkpoint/06-experiments` | Run the agent against the dataset and score every item. |
-| 07 | [Evaluation](./docs/learner/07-evaluation.md) | [Instructor notes](./docs/instructor/07-evaluation.md) | `checkpoint/07-evaluation` | Change one thing, rerun the dataset, compare runs. |
-| 08 | [Wrap-up](./docs/learner/08-wrap-up.md) | [Instructor notes](./docs/instructor/08-wrap-up.md) | `checkpoint/08-wrap-up` | Apply the loop to your own app. |
-
-## How to work through it
-
-`main` is the complete reference implementation. For hands-on work, check out the checkpoint named in the lesson you are starting, make the missing changes, and verify the result before moving on.
-
-`checkpoint/00-setup` and `checkpoint/01-base-app` intentionally contain the same untraced base app. Setup uses that state to validate keys, dependencies, and ports; Base App uses it for orientation. Tracing starts in `02-tracing`.
-
-The workshop server and npm helper scripts treat the repository `.env` as the Node-side source of truth. Local shell exports from other projects do not override `.env`, so change workshop keys, Langfuse host, prompt labels, and dataset names in that file.
-
-The workshop is small enough to finish in a sitting, and every module can also be used independently if you only care about one part of the loop.
+The server and the npm scripts read the repository `.env` first, so a stray shell export from another project does not win. Change keys, the Langfuse host, prompt labels and dataset names in that file.
 
 ## Repository layout
 
-- [`docs/learner/`](./docs/learner/) contains the self-guided workshop lessons.
-- [`docs/instructor/`](./docs/instructor/) contains facilitator notes for teaching the same lessons.
-- [`docs/images/`](./docs/images/) contains screenshots and diagrams, grouped by lesson.
-- [`src/`](./src/) contains the sample app.
-- [`scripts/`](./scripts/) contains dataset and prompt helper scripts used in later lessons.
+- [`docs/learner/`](./docs/learner/) holds the lessons.
+- [`docs/images/`](./docs/images/) holds the screenshots and diagrams, one folder per lesson.
+- [`langfuse/`](./langfuse/) holds the local Langfuse stack.
+- [`src/`](./src/) holds the sample app.
+- [`scripts/`](./scripts/) holds the prompt, seed and dataset scripts.
+- [`data/`](./data/) holds the eval dataset.
 
 ## Where to go next
 
-- Walk the modules in order starting from [`docs/learner/00-setup.md`](./docs/learner/00-setup.md).
-- Jump to whichever chapter matches what you want to learn.
-- Install the [Langfuse skill](https://github.com/langfuse/skills) (`/langfuse`) to apply the patterns from this workshop to your own codebase.
-- For bigger-picture material on each chapter, use the [Langfuse Academy](https://langfuse.com/academy).
+- Start at [`docs/learner/00-setup.md`](./docs/learner/00-setup.md) and walk the lessons in order.
+- Or jump to the lesson that matches what you want to learn. Each one starts from its own checkpoint.
+- Install the [Langfuse skill](https://github.com/langfuse/skills) (`/langfuse`) to apply the same patterns to your own codebase.
+- For the bigger picture behind each lesson, read the [Langfuse Academy](https://langfuse.com/academy).
 
-## License
+## Credits and license
 
-MIT, see [LICENSE](LICENSE).
+This buildcamp is adapted from the Langfuse workshop. MIT, see [LICENSE](LICENSE).
