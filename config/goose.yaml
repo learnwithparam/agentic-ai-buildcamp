@@ -1,0 +1,10 @@
+# Goose reads this extension to reach the team over MCP.
+# Start the server first with `bun run serve`, then add this block to your Goose config.
+extensions:
+  hcp-team:
+    enabled: true
+    type: streamable_http
+    name: hcp-team
+    description: Ask the medical affairs team
+    uri: http://localhost:3000/mcp
+    timeout: 300

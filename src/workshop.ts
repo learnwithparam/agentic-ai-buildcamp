@@ -124,7 +124,7 @@ export const UNITS: Unit[] = [
     job: "Let the team reach the agent where they already work",
     needs: "analytics-mcp",
     after: null,
-    built: false,
+    built: true,
     cases: ["top-territory-launch"],
   },
   {

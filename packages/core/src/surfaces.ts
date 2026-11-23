@@ -1,12 +1,22 @@
-// Three doors lead to one agent: a web chat, an MCP tool and a command line.
-// Each door only turns its own format into a question and back. The answer is always the same.
-// Until sign-in is on, a door trusts the person named in the request. That is for local use only.
+// Every surface asks the same agent and shows the same reply.
+// A reply is words plus an optional chart. The chart is a json-render spec that any surface draws.
+// The words stream out one piece at a time, so a reader sees them as they arrive.
+import { toUIMessageStream } from "@ai-sdk/langchain";
+import type { Spec } from "@json-render/core";
+import { AIMessageChunk } from "@langchain/core/messages";
 import { jwtVerify, SignJWT } from "jose";
 import { PEOPLE } from "../../../data/catalog/people";
 import type { Agent } from "./team";
 
+export const MODEL_NAME = "hcp-team";
+
+export type Reply = { text: string; chart?: Spec };
+export type SurfaceAgent = (question: string, person: string) => Promise<Reply>;
+export type Row = [label: string, value: number];
+export type Sse = { event?: string; data: string };
+
 export const TOOL_NAME = "ask_team";
-const DEFAULT_PERSON = "alice";
+export const DEFAULT_PERSON = "alice";
 const PROTOCOL_VERSION = "2025-03-26";
 const METHOD_NOT_FOUND = -32601;
 
@@ -51,6 +61,80 @@ document.getElementById("ask").addEventListener("submit", async (event) => {
 </script></body></html>`;
 
 // #region step:surfaces
+type Elements = Spec["elements"];
+
+const NO_STYLE = { className: null };
+
+function barElements(rows: Row[]): Elements {
+  const biggest = Math.max(1, ...rows.map(([, value]) => value));
+  const elements: Elements = {};
+  rows.forEach(([label, value], index) => {
+    const percent = Math.round((value / biggest) * 100);
+    const props = { value: percent, max: 100, label: `${label}: ${value}` };
+    elements[`bar-${index}`] = { type: "Progress", props };
+  });
+  return elements;
+}
+
+// One spec holds a bar for each row and a table of the same rows.
+export function chartSpec(title: string, rows: Row[], columns = ["Name", "Value"]): Spec {
+  const bars = barElements(rows);
+  const card = { title, description: null, maxWidth: "md", centered: null, ...NO_STYLE };
+  const stack = { direction: "vertical", gap: "sm", align: null, justify: null, ...NO_STYLE };
+  const table = {
+    columns,
+    rows: rows.map(([label, value]) => [label, String(value)]),
+    caption: null,
+  };
+  return {
+    root: "card",
+    elements: {
+      card: { type: "Card", props: card, children: ["bars", "table"] },
+      bars: { type: "Stack", props: stack, children: Object.keys(bars) },
+      table: { type: "Table", props: table },
+      ...bars,
+    },
+  };
+}
+
+// Break the text into words that keep their trailing space, and send each as a model chunk.
+async function* wordChunks(text: string): AsyncGenerator<AIMessageChunk> {
+  for (const word of text.split(/(?<=\s)/)) yield new AIMessageChunk({ content: word });
+}
+
+// The AI SDK turns LangChain chunks into text-delta parts. We keep only the words.
+export async function* wordsOf(text: string): AsyncGenerator<string> {
+  const parts = toUIMessageStream(wordChunks(text));
+  for await (const part of parts) {
+    if (part.type === "text-delta") yield part.delta;
+  }
+}
+
+function contentChunk(content: string) {
+  const delta = { content };
+  return { object: "chat.completion.chunk", model: MODEL_NAME, choices: [{ index: 0, delta }] };
+}
+
+// The events of one chat reply: a word per event, then the chart, then the end marker.
+export async function* chatEvents(reply: Reply): AsyncGenerator<Sse> {
+  for await (const word of wordsOf(reply.text)) {
+    yield { data: JSON.stringify(contentChunk(word)) };
+  }
+  if (reply.chart !== undefined) yield { event: "chart", data: JSON.stringify(reply.chart) };
+  yield { data: "[DONE]" };
+}
+// #stub
+//~ // TODO(surfaces): stream the reply one word per event, then send the chart and the end marker
+//~ export async function* chatEvents(reply: Reply): AsyncGenerator<Sse> {
+//~   yield { data: JSON.stringify(reply) };
+//~ }
+//~
+//~ export function chartSpec(_title: string, _rows: Row[], _columns?: string[]): Spec {
+//~   return { root: "none", elements: {} };
+//~ }
+// #endregion
+
+// The first board, kept so the sign-in unit still has a door to test. The Hono server replaces it.
 export async function chatResponse(request: Request, agent: Agent): Promise<Response> {
   const body = (await request.json()) as ChatBody;
   const question = textOf(body.question);
@@ -105,23 +189,6 @@ export async function cliText(args: string[], agent: Agent): Promise<string> {
   const result = await agent(question, personOf(flagValue(args, "--person")));
   return result.text;
 }
-// #stub
-//~ // TODO(surfaces): turn each door's format into a question, call the agent, and turn it back
-//~ export async function chatResponse(_request: Request, _agent: Agent): Promise<Response> {
-//~   return new Response("Not built yet.", { status: 501 });
-//~ }
-//~
-//~ export async function mcpReply(
-//~   _message: McpMessage,
-//~   _agent: Agent,
-//~ ): Promise<McpReply | undefined> {
-//~   return undefined;
-//~ }
-//~
-//~ export async function cliText(_args: string[], _agent: Agent): Promise<string> {
-//~   return "Not built yet.";
-//~ }
-// #endregion
 
 const SECRET = new TextEncoder().encode(process.env.AUTH_SECRET ?? "dev-secret-for-local-use-only");
 

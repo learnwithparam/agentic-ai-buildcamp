@@ -1,8 +1,7 @@
 import type { UnitContent } from "../src/content";
 
 export const content: UnitContent = {
-  opening:
-    "What happens when the team wants the same agent in a browser, a chat tool and a terminal?",
+  opening: "What happens when the team wants one agent and its chart on the web and in a terminal?",
   production:
     "A field team uses a browser. An analyst uses a chat tool. An engineer uses a terminal.",
   terms: [
@@ -23,74 +22,87 @@ export const content: UnitContent = {
     },
   ],
   picture: `flowchart LR
-  W[Web chat] --> A[One agent]
-  M[MCP tool] --> A
-  C[Command line] --> A
-  A --> R[Router, documents and numbers]
-  R --> T[The same answer]`,
+  W[Web chat] --> S[Hono server]
+  M[MCP tool] --> S
+  C[Ink terminal] --> S
+  S --> A[One agent]
+  A --> R[Words and a chart spec]
+  R --> T[The same answer on every surface]`,
   stuck: {
-    correct: "Six green badges, and the same answer on every surface.",
+    correct: "Seven green badges, and the same answer on every surface.",
     wrong: "Each surface writes its own answer, so they drift apart.",
-    hint: "Each door only changes the format. The answer text comes from the agent alone.",
+    hint: "Each door only changes the format. The words and the chart come from the agent alone.",
     rows: [
       [
-        "The web chat took an empty question.",
-        "The chat door does not check the question before it calls the agent.",
-        "In chatResponse, return status 400 when the question is empty.",
+        "The stream sent one event, so nothing streamed.",
+        "The server waited for the whole reply and sent it at the end.",
+        "In chatEvents, send one event for each word.",
+      ],
+      [
+        "The MCP answer differs from the web answer.",
+        "One door changes the text before it sends it.",
+        "Return reply.text from the same agent call on every surface.",
       ],
       [
         "The tool list is missing ask_team.",
-        "The MCP door does not list its tool.",
-        "In mcpReply, answer tools/list with the ask_team tool.",
+        "The MCP door does not register its tool.",
+        "In mcpServer, register the ask_team tool.",
       ],
       [
-        "An unknown method did not return an error.",
-        "The MCP door answers every method the same way.",
-        "In mcpReply, return error code -32601 for a method it does not know.",
-      ],
-      [
-        "The web and MCP answers differ.",
-        "One door changes the text before it sends it.",
-        "Make each door return result.text from the same agent call, with no extra wording.",
+        "The terminal frame changed:",
+        "The terminal draws the bars or the table in a new way.",
+        "In ReplyView, draw one bar for each Progress part.",
       ],
     ],
   },
   breaks: [
     {
       file: "packages/core/src/surfaces.ts",
-      rule: "the web chat must refuse an empty question",
-      find: 'if (question === "") return new Response(',
-      replace: 'if (question === "~") return new Response(',
+      rule: "the reply must stream in many events, not one",
+      find: "for (const word of text.split(/(?<=\\s)/))",
+      replace: "for (const word of [text])",
     },
     {
       file: "packages/core/src/surfaces.ts",
-      rule: "the MCP door must list its tool",
-      find: "reply.result = { tools: toolList() };",
-      replace: "reply.result = { tools: [] };",
+      rule: "the chart must follow the words",
+      find: "if (reply.chart !== undefined) yield",
+      replace: "if (reply.chart === undefined) yield",
     },
     {
-      file: "packages/core/src/surfaces.ts",
-      rule: "the MCP door must report an unknown method",
-      find: 'reply.error = { code: METHOD_NOT_FOUND, message: "Method not found" };',
-      replace: "reply.result = {};",
+      file: "packages/core/src/server.ts",
+      rule: "MCP must give the same words as the web",
+      find: 'const content = [{ type: "text" as const, text: reply.text }];',
+      replace: 'const content = [{ type: "text" as const, text: reply.text.toUpperCase() }];',
     },
     {
-      file: "packages/core/src/surfaces.ts",
-      rule: "the command line must ask for a question",
-      find: 'return "Add --question with your question.";',
-      replace: 'return "";',
+      file: "packages/core/src/server.ts",
+      rule: "the chat route must refuse an empty question",
+      find: 'if (question === "") return context.json',
+      replace: 'if (question === "~") return context.json',
     },
     {
-      file: "packages/core/src/surfaces.ts",
-      rule: "every door must give the same answer",
-      find: 'return { content: [{ type: "text", text: result.text }] };',
-      replace: 'return { content: [{ type: "text", text: result.text.toUpperCase() }] };',
+      file: "packages/core/src/server.ts",
+      rule: "sign-in must stay a stub until access control",
+      find: 'access-control module." }, 501)',
+      replace: 'access-control module." }, 200)',
     },
     {
-      file: "packages/core/src/surfaces.ts",
-      rule: "the board page must hold a form",
-      find: '<form id="ask">',
-      replace: '<div id="ask">',
+      file: "packages/core/src/cli.tsx",
+      rule: "the terminal must draw the bars",
+      find: '"█".repeat(',
+      replace: '"".repeat(',
+    },
+    {
+      file: "packages/core/src/web.tsx",
+      rule: "the web page must draw the chart bars",
+      find: "Progress: shadcnComponents.Progress,",
+      replace: "Progress: shadcnComponents.Text,",
+    },
+    {
+      file: "config/goose.yaml",
+      rule: "Goose must point at the MCP route",
+      find: "uri: http://localhost:3000/mcp",
+      replace: "uri: http://localhost:3000/chat",
     },
   ],
 };

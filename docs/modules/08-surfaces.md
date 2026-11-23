@@ -6,11 +6,12 @@ Job: let the team reach the agent where they already work.
 
 ```mermaid
 flowchart LR
-  W[Web chat] --> A[One agent]
-  M[MCP tool] --> A
-  C[Command line] --> A
-  A --> R[Router, documents and numbers]
-  R --> T[The same answer]
+  W[Web chat] --> S[Hono server]
+  M[MCP tool] --> S
+  C[Ink terminal] --> S
+  S --> A[One agent]
+  A --> R[Words and a chart spec]
+  R --> T[The same answer on every surface]
 ```
 
 ## Why this matters
@@ -19,113 +20,124 @@ People do not all work in one place. A field team likes a browser. An analyst ma
 
 Each place is a **surface**. If every surface has its own logic, the answers drift apart. Then nobody knows which answer to trust.
 
-So we build one agent and three thin doors. Each door only changes the format. The answer always comes from the agent.
+So we build one agent behind one server. Each surface only changes the format. The words and the chart always come from the agent.
 
 ## What you will have at the end
 
-- A web chat that streams the answer as an event.
+- A Hono server that streams the answer, one word at a time.
 - An **MCP** tool that a chat tool can call.
-- A command line that asks one question.
+- A web page that draws the chart with json-render.
+- A terminal chat that draws the same chart with Ink.
 - Proof that all three give the same answer.
 
 ## See it fail first
 
-What happens when the team wants the same agent in a browser, a chat tool and a terminal? Today the agent only runs from a script. Nobody else can reach it.
+What happens when the team wants one agent and its chart on the web and in a terminal? Today the agent only runs from a script. The chart has nowhere to show.
 
-For example, ask which territory led OncoX new prescriptions from July to September. A script can answer. A browser tab and a chat tool cannot.
+For example, ask which territory led OncoX new prescriptions from July to September. A script can print a number. A browser tab and a chat tool cannot reach it.
 
-## Step 1: build the web chat
+## Step 1: stream the reply as events
 
-The browser sends a question. The server calls the agent and sends the result back as one **server-sent event**. That is a message the server pushes over an open request.
+The server sends the reply as **server-sent events**. That is a message the server pushes over one open request. It sends one event for each word, then the chart, then the end marker.
 
-Until a later module adds sign-in, everyone acts as one dev user. The chat reads the person from the request and falls back to alice.
-
-### packages/core/src/surfaces.ts
-
-```ts
-export async function chatResponse(request: Request, agent: Agent): Promise<Response> {
-  const body = (await request.json()) as ChatBody;
-  const question = textOf(body.question);
-  if (question === "") return new Response("Send a question.", { status: 400 });
-  const result = await agent(question, personOf(body.person));
-  const event = `event: answer\ndata: ${JSON.stringify(result)}\n\n`;
-  return new Response(event, { headers: { "content-type": "text/event-stream" } });
-}
-```
-
-## Step 2: build the MCP door
-
-**MCP** is a shared way for chat tools to call your tools. The door answers three methods. It says what it is, lists its one tool, and runs the tool. Any other method gets a clear error.
+The words go through `@ai-sdk/langchain`. It turns model chunks into text parts, so the web page can show words as they arrive.
 
 ### packages/core/src/surfaces.ts
 
 ```ts
-function toolList(): unknown[] {
-  const properties = { question: { type: "string" }, person: { type: "string" } };
-  const inputSchema = { type: "object", properties, required: ["question"] };
-  return [{ name: TOOL_NAME, description: "Ask the medical affairs team.", inputSchema }];
+// Break the text into words that keep their trailing space, and send each as a model chunk.
+async function* wordChunks(text: string): AsyncGenerator<AIMessageChunk> {
+  for (const word of text.split(/(?<=\s)/)) yield new AIMessageChunk({ content: word });
 }
 
-async function callTool(call: ToolCall | undefined, agent: Agent): Promise<unknown> {
-  if (call === undefined || call.arguments === undefined) {
-    return { isError: true, content: [{ type: "text", text: "Send a question." }] };
+// The AI SDK turns LangChain chunks into text-delta parts. We keep only the words.
+export async function* wordsOf(text: string): AsyncGenerator<string> {
+  const parts = toUIMessageStream(wordChunks(text));
+  for await (const part of parts) {
+    if (part.type === "text-delta") yield part.delta;
   }
-  const question = textOf(call.arguments.question);
-  if (question === "")
-    return { isError: true, content: [{ type: "text", text: "Send a question." }] };
-  const result = await agent(question, personOf(call.arguments.person));
-  return { content: [{ type: "text", text: result.text }] };
-}
-
-export async function mcpReply(message: McpMessage, agent: Agent): Promise<McpReply | undefined> {
-  if (message.id === undefined) return undefined;
-  const reply: McpReply = { jsonrpc: "2.0", id: message.id };
-  if (message.method === "initialize") {
-    const serverInfo = { name: "hcp-showcase", version: "1.0.0" };
-    reply.result = { protocolVersion: PROTOCOL_VERSION, capabilities: { tools: {} }, serverInfo };
-  } else if (message.method === "tools/list") {
-    reply.result = { tools: toolList() };
-  } else if (message.method === "tools/call") {
-    reply.result = await callTool(message.params, agent);
-  } else {
-    reply.error = { code: METHOD_NOT_FOUND, message: "Method not found" };
-  }
-  return reply;
 }
 ```
 
-## Step 3: build the command line
+Expect: no output yet. These two functions only run when the server calls them.
 
-The command line reads a flag, calls the same agent, and prints the text. With no question it tells you what to add.
+## Step 2: serve the routes with Hono
 
-### packages/core/src/surfaces.ts
+The Hono app has five routes. One streams the chat, one resumes a paused thread, and one lists approvals that wait. One is a sign-in stub, and one is the MCP door.
+
+Until the access-control module, the caller names the person. That is for local use only.
+
+### packages/core/src/server.ts
 
 ```ts
-function flagValue(args: string[], flag: string): string {
-  const position = args.indexOf(flag);
-  if (position === -1 || position + 1 >= args.length) return "";
-  return args[position + 1];
-}
-
-export async function cliText(args: string[], agent: Agent): Promise<string> {
-  const question = flagValue(args, "--question");
-  if (question === "") return "Add --question with your question.";
-  const result = await agent(question, personOf(flagValue(args, "--person")));
-  return result.text;
+function addChatRoutes(app: Hono, deps: Deps): void {
+  app.post("/v1/chat/completions", async (context) => {
+    const body = await bodyOf(context);
+    const question = questionOf(body);
+    if (question === "") return context.json({ error: "Send a question." }, 400);
+    return streamReply(context, await deps.agent(question, personOf(context, body)));
+  });
 }
 ```
 
-## Step 4: verify
+Expect: no output yet. The server starts in the last step.
+
+## Step 3: add the MCP door
+
+**MCP** is a shared way for chat tools to call your tools. This door uses Streamable HTTP at the path /mcp. It lists one tool named ask_team and runs it.
+
+The Goose config in config/goose.yaml points at the same path.
+
+### packages/core/src/server.ts
+
+```ts
+function mcpServer(deps: Deps): McpServer {
+  const server = new McpServer({ name: "hcp-showcase", version: "1.0.0" });
+  const inputSchema = { question: z.string().min(1), person: z.string().optional() };
+  const description = "Ask the medical affairs team. The reply may carry a chart.";
+  server.registerTool(TOOL_NAME, { description, inputSchema }, async ({ question, person }) => {
+    const reply = await deps.agent(question, person ?? DEFAULT_PERSON);
+    const content = [{ type: "text" as const, text: reply.text }];
+    if (reply.chart !== undefined) {
+      content.push({ type: "text" as const, text: JSON.stringify(reply.chart) });
+    }
+    return { content };
+  });
+  return server;
+}
+```
+
+Expect: no output yet. A chat tool calls this door once the server runs.
+
+## Step 4: draw the chart on the web and in the terminal
+
+The chart is one json-render spec. The web page draws it with the shadcn parts. The terminal draws it with Ink, with colour, bars and a table.
+
+### packages/core/src/web.tsx
+
+```tsx
+export function ChartView(props: { spec: Spec }) {
+  return (
+    <JSONUIProvider registry={registry}>
+      <Renderer spec={props.spec} registry={registry} />
+    </JSONUIProvider>
+  );
+}
+```
+
+Expect: no output yet. The checks draw this page in the next step.
+
+## Step 5: verify
 
 ```bash
 bun run verify surfaces
 ```
 
-Expect: six green badges and the line "Every check passed."
+Expect: seven green badges and the line "Every check passed."
 
 ## Try it yourself
 
-Start the web door and ask from the terminal. For example, run the two commands in order.
+Start the server and ask from the terminal. For example, run the two commands in order. They need a model key, or a recorded reply.
 
 ```bash
 bun run serve
@@ -134,20 +146,19 @@ bun run serve
 Expect: a line that says the team is on a local address.
 
 ```bash
-bun run ask --question "Which territory led OncoX new prescriptions from July to September?"
+bun run chat --question "Which territory led OncoX new prescriptions from July to September?"
 ```
 
-Expect: one line with a territory and a total. It needs a model key, or a recorded reply.
+Expect: words that stream in, then coloured bars and a table.
 
 ## Stuck?
 
-| You see                                    | Why                                                                  | Fix                                                                                |
-| ------------------------------------------ | -------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| The web chat took an empty question.       | The chat door does not check the question before it calls the agent. | In chatResponse, return status 400 when the question is empty.                     |
-| The tool list is missing ask_team.         | The MCP door does not list its tool.                                 | In mcpReply, answer tools/list with the ask_team tool.                             |
-| An unknown method did not return an error. | The MCP door answers every method the same way.                      | In mcpReply, return error code -32601 for a method it does not know.               |
-| The web and MCP answers differ.            | One door changes the text before it sends it.                        | Make each door return result.text from the same agent call, with no extra wording. |
-| The board page has no form.                | The page at the root path is missing.                                | In route, return the board page for GET /.                                         |
+| You see                                         | Why                                                           | Fix                                                          |
+| ----------------------------------------------- | ------------------------------------------------------------- | ------------------------------------------------------------ |
+| The stream sent one event, so nothing streamed. | The server waited for the whole reply and sent it at the end. | In chatEvents, send one event for each word.                 |
+| The MCP answer differs from the web answer.     | One door changes the text before it sends it.                 | Return reply.text from the same agent call on every surface. |
+| The tool list is missing ask_team.              | The MCP door does not register its tool.                      | In mcpServer, register the ask_team tool.                    |
+| The terminal frame changed:                     | The terminal draws the bars or the table in a new way.        | In ReplyView, draw one bar for each Progress part.           |
 
 If you are still stuck, start from a clean copy of this step.
 
