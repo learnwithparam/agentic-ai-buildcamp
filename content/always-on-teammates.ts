@@ -89,5 +89,35 @@ export const content: UnitContent = {
       find: "const seen = await rivalsSeen();",
       replace: "const seen: string[] = [];",
     },
+    {
+      file: "apps/product-teammates/src/always-on.ts",
+      rule: "the Monday clock is 09:00 on Monday",
+      find: 'export const MONDAY_CRON = "0 9 * * 1";',
+      replace: 'export const MONDAY_CRON = "0 8 * * 1";',
+    },
+    {
+      file: "apps/product-teammates/src/always-on.ts",
+      rule: "pg-boss must drop a crowd of events",
+      find: "const options = { singletonKey, singletonSeconds: WINDOW_SECONDS };",
+      replace: "const options = { singletonKey: String(Math.random()) };",
+    },
+    {
+      file: "apps/product-teammates/src/always-on.ts",
+      rule: "the post must stay short",
+      find: "post: post.slice(0, POST_LIMIT)",
+      replace: "post: post.repeat(10)",
+    },
+    {
+      file: "apps/product-teammates/src/always-on.ts",
+      rule: "the card must offer approve and reject",
+      find: '      { id: "reject", label: "Reject", needs: "approves briefings" },\n',
+      replace: "",
+    },
+    {
+      file: "apps/product-teammates/src/always-on.ts",
+      rule: "the golden gate must catch a stale price",
+      find: 'if (found.kind !== "naive") {',
+      replace: "if (true) {",
+    },
   ],
 };
