@@ -40,9 +40,10 @@ Do not stop at a PR to `main` when checkpoints still carry the old shared state.
 
 ## Documentation scope
 
-- Keep the root `README.md` focused on learners and instructors: workshop scope, entry points, module map, and minimal checkpoint usage.
+- Keep the root `README.md` focused on learners: workshop scope, how to run it, the lesson map, and minimal checkpoint usage.
+- Facilitator notes live in the private teach repo (`teach/courses/agentic-ai-buildcamp`), never in this repo.
 - Learner lessons open with `## Why …` (why the practice matters), then `## Goal` (what this lab achieves), then `## Starting point` (the checkout), then the numbered steps.
-- Do not recreate overview files such as `docs/README.md`, `docs/learner/README.md`, or `docs/checkpoints.md`. Put learner-facing overview content in the root README or the learner lessons; put facilitator content in instructor lessons; put maintainer-only checkpoint strategy here.
+- Do not recreate overview files such as `docs/README.md`, `docs/learner/README.md`, or `docs/checkpoints.md`. Put learner-facing overview content in the root README or the learner lessons; put maintainer-only checkpoint strategy here.
 
 ## Checkpoint strategy
 
