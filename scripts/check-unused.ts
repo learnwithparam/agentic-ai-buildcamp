@@ -79,7 +79,8 @@ export function findProblems(files: Map<string, string>, tracked: string[]): str
 
   const known = new Set(tracked.flatMap((path) => path.split("/").map((_, index, parts) => parts.slice(0, index + 1).join("/"))));
   for (const [path, body] of bodies) {
-    if (!CODE.test(basename(path))) continue;
+    // Test fixtures name made-up paths on purpose.
+    if (!CODE.test(basename(path)) || path.endsWith(".test.ts")) continue;
     for (const match of body.matchAll(/["'`]((?:\.\.?\/)*(?:scripts|data|docs|public|src|langfuse)\/[\w./-]+)["'`]/g)) {
       const raw = match[1];
       const target = raw.startsWith(".") ? posix.normalize(posix.join(posix.dirname(path), raw)) : raw;
