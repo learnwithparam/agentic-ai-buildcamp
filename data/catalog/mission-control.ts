@@ -58,15 +58,69 @@ export function churnRate(plan: string, weekStart: string): number {
   return row.churned / row.signups;
 }
 
+// The same funnel by channel. The August dip sits in paid ads, so a total hides where it came from.
+export type ChannelRow = {
+  week_start: string;
+  channel: string;
+  signups: number;
+  activated: number;
+};
+
+export const CHANNELS = ["organic", "paid", "partner"];
+export const DIP_CHANNEL = "paid";
+const CHANNEL_SHARE: Record<string, number> = { organic: 0.5, paid: 0.3, partner: 0.2 };
+const CHANNEL_SEED = 20261123;
+
+function buildChannelFunnel(): ChannelRow[] {
+  const random = seededRandom(CHANNEL_SEED);
+  const rows: ChannelRow[] = [];
+  const weeks = [...new Set(PRODUCT_FUNNEL.map((row) => row.week_start))];
+  for (const weekStart of weeks) {
+    const total = PRODUCT_FUNNEL.filter((row) => row.week_start === weekStart).reduce(
+      (sum, row) => sum + row.signups,
+      0,
+    );
+    for (const channel of CHANNELS) {
+      const signups = Math.round(total * CHANNEL_SHARE[channel]);
+      const dip = channel === DIP_CHANNEL && weekStart === ACTIVATION_DIP_WEEK ? 0.3 : 1;
+      const activated = Math.round(signups * 0.6 * dip * noiseAround(random, 0.03));
+      rows.push({ week_start: weekStart, channel, signups, activated });
+    }
+  }
+  return rows;
+}
+
+export const CHANNEL_FUNNEL: ChannelRow[] = buildChannelFunnel();
+
+export function channelActivation(channel: string, weekStart: string): number {
+  const row = CHANNEL_FUNNEL.find(
+    (item) => item.channel === channel && item.week_start === weekStart,
+  );
+  if (row === undefined) throw new Error(`No channel row for ${channel} on ${weekStart}.`);
+  return Number((row.activated / row.signups).toFixed(3));
+}
+
 export type Competitor = {
   name: string;
   change: string; // what happened between the two snapshots
   before: string; // the page text last week
   after: string; // the page text today
   hidden?: string; // text that sits in a tab the page keeps closed
+  // One snapshot a week. The last two are the before and after pages.
+  history: { week: string; text: string }[];
 };
 
-export const COMPETITORS: Competitor[] = [
+const SNAPSHOT_WEEKS = ["2026-10-26", "2026-11-02", "2026-11-09", "2026-11-16"];
+
+type Rival = Omit<Competitor, "history">;
+
+function withHistory(rival: Rival): Competitor {
+  const texts = [rival.before, rival.before, rival.before, rival.after];
+  const history = SNAPSHOT_WEEKS.map((week, index) => ({ week, text: texts[index] }));
+  return { ...rival, history };
+}
+
+const RIVALS: Rival[] = [
   {
     name: "Pulsedesk",
     change: "price-rise",
@@ -93,3 +147,5 @@ export const COMPETITORS: Competitor[] = [
     after: "Business plan: 99 dollars a month.",
   },
 ];
+
+export const COMPETITORS: Competitor[] = RIVALS.map(withHistory);

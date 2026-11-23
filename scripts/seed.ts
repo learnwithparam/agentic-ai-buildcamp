@@ -7,6 +7,7 @@ import { COMMERCIAL_DISPENSES, TERRITORY_RX_WEEKLY } from "../data/catalog/analy
 import { GLYPH_WIDTH, glyphRows } from "../data/catalog/block-font";
 import { DOCUMENTS, type HcpDocument } from "../data/catalog/documents";
 import {
+  CHANNEL_FUNNEL,
   COMPETITORS,
   type Competitor,
   PRODUCT_FUNNEL,
@@ -88,6 +89,17 @@ async function drawText(pdf: PDFDocument, page: Page, document: HcpDocument): Pr
     const down = 700 - Math.floor(index / columns) * 20;
     page.drawText(sentence, { x: across, y: down, size: 10, font, maxWidth: 240 });
   });
+  document.table?.forEach((cells, row) => {
+    cells.forEach((cell, column) => {
+      page.drawText(cell, { x: 50 + column * 160, y: 600 - row * 18, size: 10, font });
+    });
+  });
+  document.footnotes?.forEach((line, index) => {
+    page.drawText(line, { x: 50, y: 110 - index * 12, size: 7, font });
+  });
+  if (document.hidden !== undefined) {
+    page.drawText(document.hidden, { x: 50, y: 30, size: 4, font, color: rgb(1, 1, 1) });
+  }
   const note = `Version ${document.version}, from ${document.effective}. Invented for training.`;
   page.drawText(note, { x: 50, y: 60, size: 8, font });
 }
@@ -110,6 +122,7 @@ const TABLES: Record<string, string> = {
   "pharma_b.commercial_dispenses":
     "region text, product text, month text, units_dispensed int, net_sales_usd int",
   "analytics.product_funnel": "week_start date, plan text, signups int, activated int, churned int",
+  "analytics.funnel_by_channel": "week_start date, channel text, signups int, activated int",
   prescribers: "name text, npi text, email text, specialty text, territory text",
   people: "name text, display_name text, tenant text, role text, country text, clearance int",
   grants: "person text, relation text, object text",
@@ -139,6 +152,7 @@ function writeSql(): void {
     insertAll("pharma_a.territory_rx_weekly", TERRITORY_RX_WEEKLY),
     insertAll("pharma_b.commercial_dispenses", COMMERCIAL_DISPENSES),
     insertAll("analytics.product_funnel", PRODUCT_FUNNEL),
+    insertAll("analytics.funnel_by_channel", CHANNEL_FUNNEL),
     insertAll("prescribers", PRESCRIBERS),
     insertAll("people", peopleRows()),
     insertAll("grants", GRANTS),
@@ -162,6 +176,8 @@ function writeCompetitors(): void {
       const name = `${rival.name.toLowerCase()}-${when}.html`;
       writeFileSync(join(OUTPUT, "competitors", name), page);
     }
+    const history = JSON.stringify(rival.history, null, 2);
+    writeFileSync(join(OUTPUT, "competitors", `${rival.name.toLowerCase()}-history.json`), history);
   }
 }
 

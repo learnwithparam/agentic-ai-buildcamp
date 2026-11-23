@@ -10,7 +10,10 @@ import {
   resetWorkspace,
   submitBriefing,
 } from "../apps/product-teammates/src/workspace";
-import { MISSION_CONTROL_GOLDEN } from "../data/catalog/golden-mission-control";
+import {
+  MISSION_CONTROL_GOLDEN,
+  MISSION_CONTROL_LAB_CASES,
+} from "../data/catalog/golden-mission-control";
 import { grade } from "../src/grade";
 import { type Check, expect } from "../src/verify";
 
@@ -23,7 +26,9 @@ const CORE = "core-growth";
 const STEALTH = "enterprise-stealth";
 
 function caseOf(name: string) {
-  const found = MISSION_CONTROL_GOLDEN.cases.find((item) => item.name === name);
+  const found = [...MISSION_CONTROL_GOLDEN.cases, ...MISSION_CONTROL_LAB_CASES].find(
+    (item) => item.name === name,
+  );
   expect(found !== undefined, `The golden set has no case named ${name}.`);
   return found;
 }

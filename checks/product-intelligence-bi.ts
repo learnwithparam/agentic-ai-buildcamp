@@ -2,7 +2,10 @@
 
 import { loadSkills, pickSkill, runSkill } from "../apps/product-teammates/src/analyst";
 import { askMission } from "../apps/product-teammates/src/mission";
-import { MISSION_CONTROL_GOLDEN } from "../data/catalog/golden-mission-control";
+import {
+  MISSION_CONTROL_GOLDEN,
+  MISSION_CONTROL_LAB_CASES,
+} from "../data/catalog/golden-mission-control";
 import { churnRate } from "../data/catalog/mission-control";
 import { flushTraces, traced } from "../packages/core/src/telemetry";
 import { grade } from "../src/grade";
@@ -17,7 +20,9 @@ const NO_PAGES = {
 };
 
 function caseOf(name: string) {
-  const found = MISSION_CONTROL_GOLDEN.cases.find((item) => item.name === name);
+  const found = [...MISSION_CONTROL_GOLDEN.cases, ...MISSION_CONTROL_LAB_CASES].find(
+    (item) => item.name === name,
+  );
   expect(found !== undefined, `The golden set has no case named ${name}.`);
   return found;
 }

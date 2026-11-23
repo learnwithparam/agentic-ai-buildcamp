@@ -3,13 +3,18 @@
 import { askMission } from "../apps/product-teammates/src/mission";
 import { readPage, resetSnapshots } from "../apps/product-teammates/src/research";
 import { type RivalSite, siteWorld, startRivalSite } from "../apps/product-teammates/src/rivals";
-import { MISSION_CONTROL_GOLDEN } from "../data/catalog/golden-mission-control";
+import {
+  MISSION_CONTROL_GOLDEN,
+  MISSION_CONTROL_LAB_CASES,
+} from "../data/catalog/golden-mission-control";
 import { rows } from "../packages/core/src/db";
 import { grade } from "../src/grade";
 import { type Check, expect } from "../src/verify";
 
 function caseOf(name: string) {
-  const found = MISSION_CONTROL_GOLDEN.cases.find((item) => item.name === name);
+  const found = [...MISSION_CONTROL_GOLDEN.cases, ...MISSION_CONTROL_LAB_CASES].find(
+    (item) => item.name === name,
+  );
   expect(found !== undefined, `The golden set has no case named ${name}.`);
   return found;
 }

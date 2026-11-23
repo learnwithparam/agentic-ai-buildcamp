@@ -63,7 +63,15 @@ export const UNITS: Unit[] = [
     needs: "documents-freshness",
     after: null,
     built: true,
-    cases: ["trivia-template", "off-label-refused", "adverse-event-pause"],
+    cases: [
+      "trivia-template",
+      "painter-template",
+      "thanks-template",
+      "off-label-refused",
+      "adverse-event-pause",
+      "friendly-email-hides-rash",
+      "hospital-after-greeting",
+    ],
   },
   {
     slug: "grounded-answer",
@@ -74,14 +82,7 @@ export const UNITS: Unit[] = [
     needs: "intent-routing",
     after: null,
     built: true,
-    cases: [
-      "unanswerable-refused",
-      "wrong-country-label",
-      "safety-letter-quoted",
-      "scanned-page-read",
-      "driving-faq",
-      "inhaler-label-us",
-    ],
+    cases: [],
   },
   {
     slug: "agent-loop",
@@ -147,7 +148,7 @@ export const UNITS: Unit[] = [
     needs: "access-control",
     after: null,
     built: true,
-    cases: ["safety-approval-resumes"],
+    cases: ["safety-approval-resumes", "approve-oncox-reply", "approve-inhaler-reply"],
   },
   {
     slug: "guardrails-workers",
@@ -182,13 +183,12 @@ export const UNITS: Unit[] = [
     built: false,
     cases: [
       "price-swap",
-      "rival-renamed-plan",
       "rival-feature-removed",
-      "rival-unchanged",
       "unchanged-page-skipped",
-      "cookie-wall",
-      "hidden-price-tabs",
       "trivia-redirected",
+      "joke-template",
+      "thanks-redirected",
+      "rival-legal-notice-escalate",
     ],
   },
   {
@@ -200,13 +200,7 @@ export const UNITS: Unit[] = [
     needs: "surfaces",
     after: "surfaces",
     built: true,
-    cases: [
-      "funnel-drop",
-      "churn-skill",
-      "churn-rate-quiet-week",
-      "no-email-in-trace",
-      "chart-spec-valid",
-    ],
+    cases: ["funnel-drop", "churn-skill", "no-email-in-trace", "chart-spec-valid"],
   },
   {
     slug: "tenancy-and-memory",
@@ -220,7 +214,8 @@ export const UNITS: Unit[] = [
     cases: [
       "titan-hidden",
       "titan-visible-to-owner",
-      "tone-memory-scoped",
+      "delete-my-data-escalate",
+      "titan-to-press-escalate",
       "approval-resumes",
       "writer-cannot-approve",
     ],
@@ -234,7 +229,14 @@ export const UNITS: Unit[] = [
     needs: "release-gate",
     after: "release-gate",
     built: true,
-    cases: ["event-to-run", "debounce", "monday-briefing", "crash-resume", "publish-approval"],
+    cases: [
+      "event-to-run",
+      "debounce",
+      "monday-briefing",
+      "crash-resume",
+      "publish-approval",
+      "approve-price-alert",
+    ],
   },
 ];
 

@@ -1,5 +1,5 @@
 // Module 04: the agent answers only from active documents, and its claim is checked.
-import { HCP_GOLDEN } from "../data/catalog/golden-hcp";
+import { HCP_GOLDEN, HCP_LAB_CASES } from "../data/catalog/golden-hcp";
 import { answerGrounded, checkClaim, groundedPrompt } from "../packages/core/src/grounded";
 import { activeDocuments, ingestAll, resetDocuments } from "../packages/core/src/ingestion";
 import { type Check, expect } from "../src/verify";
@@ -13,7 +13,7 @@ async function freshStart(): Promise<void> {
 }
 
 function questionOf(name: string): string {
-  const found = HCP_GOLDEN.cases.find((item) => item.name === name);
+  const found = [...HCP_GOLDEN.cases, ...HCP_LAB_CASES].find((item) => item.name === name);
   expect(found !== undefined, `The golden set has no case named ${name}.`);
   return found.question;
 }
