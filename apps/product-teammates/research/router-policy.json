@@ -1,0 +1,12 @@
+{
+  "owner": "the product manager",
+  "reply": "That is outside research. Ask me about a rival price, changelog or strategy.",
+  "rules": [
+    {
+      "route": "answer",
+      "why": "a question about a rival",
+      "words": ["price", "pricing", "plan", "changelog", "strategy", "teardown", "pulsedesk"]
+    }
+  ],
+  "otherwise": "template"
+}

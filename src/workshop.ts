@@ -179,7 +179,7 @@ export const UNITS: Unit[] = [
     job: "Tell the product lead when a rival changes its price",
     needs: "grounded-answer",
     after: "grounded-answer",
-    built: false,
+    built: true,
     cases: [
       "price-swap",
       "rival-renamed-plan",

@@ -1,0 +1,41 @@
+{
+  "source": "HAND-BUILT FIXTURE. Not a live Stagehand recording. A person wrote it from the mock site pages in apps/product-teammates/mock-site/history. A live recording needs a model key and has not run.",
+  "pages": {
+    "week-1/pricing": {
+      "rival": "Pulsedesk",
+      "page": "pricing",
+      "plans": [{ "name": "Starter", "priceUsd": 0 }, { "name": "Team", "priceUsd": 49 }]
+    },
+    "week-1/changelog": {
+      "rival": "Pulsedesk",
+      "page": "changelog",
+      "entries": [{ "date": "2026-11-02", "title": "Dark mode for every board" }]
+    },
+    "week-2/pricing": {
+      "rival": "Pulsedesk",
+      "page": "pricing",
+      "plans": [{ "name": "Starter", "priceUsd": 0 }, { "name": "Team", "priceUsd": 79 }]
+    },
+    "week-2/changelog": {
+      "rival": "Pulsedesk",
+      "page": "changelog",
+      "entries": [
+        { "date": "2026-11-02", "title": "Dark mode for every board" },
+        { "date": "2026-11-16", "title": "New price for the Team plan" }
+      ]
+    },
+    "week-3/pricing": {
+      "rival": "Pulsedesk",
+      "page": "pricing",
+      "plans": [{ "name": "Starter", "priceUsd": 0 }, { "name": "Team", "priceUsd": 79 }]
+    },
+    "week-3/changelog": {
+      "rival": "Pulsedesk",
+      "page": "changelog",
+      "entries": [
+        { "date": "2026-11-02", "title": "Dark mode for every board" },
+        { "date": "2026-11-16", "title": "New price for the Team plan" }
+      ]
+    }
+  }
+}

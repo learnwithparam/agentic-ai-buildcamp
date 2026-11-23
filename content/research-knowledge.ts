@@ -85,5 +85,41 @@ export const content: UnitContent = {
       find: 'return { route: "template", text: OUTSIDE, citations: [] };',
       replace: 'return { route: "answer", text: OUTSIDE, citations: [] };',
     },
+    {
+      file: "apps/product-teammates/src/capture.ts",
+      rule: "a price that moved must be reported",
+      find: "if (from !== undefined && from !== to) moves.push",
+      replace: "if (from !== undefined && from === to) moves.push",
+    },
+    {
+      file: "apps/product-teammates/src/capture.ts",
+      rule: "a page that did not change must be skipped",
+      find: 'return outcome === "unchanged_skipped" ? "unchanged" : "changed";',
+      replace: 'return outcome === "replaced" ? "unchanged" : "changed";',
+    },
+    {
+      file: "apps/product-teammates/src/capture.ts",
+      rule: "every page must go through the freshness step",
+      find: "const outcome = await ingestDocument(document);",
+      replace: 'const outcome = "added" as Outcome;',
+    },
+    {
+      file: "apps/product-teammates/src/capture.ts",
+      rule: "every answer must be checked against its snapshots",
+      find: "const problem = checkClaim(reply, seen);",
+      replace: "const problem = undefined as string | undefined;",
+    },
+    {
+      file: "apps/product-teammates/src/capture.ts",
+      rule: "a strategy PDF must be read",
+      find: "return readPdfText(file);",
+      replace: 'return "";',
+    },
+    {
+      file: "apps/product-teammates/research/router-policy.json",
+      rule: "trivia must be redirected",
+      find: '"otherwise": "template"',
+      replace: '"otherwise": "answer"',
+    },
   ],
 };

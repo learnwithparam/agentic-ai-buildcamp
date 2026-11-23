@@ -27,6 +27,9 @@ A rival page is messy. It has a cookie banner, a script and a tab that stays clo
 - A snapshot for each rival, saved only when the page changes.
 - A report with the old text and the new text.
 - A reply for any question outside the job.
+- A Stagehand reader for the mock rival site, with a recorded file for replay.
+- Snapshots kept through the document step, so a page that did not change is skipped.
+- A router policy the product manager owns, and a cited answer.
 
 ## See it fail first
 
@@ -101,13 +104,61 @@ export function reportOn(watch: Watch): string {
 }
 ```
 
+## Step 4: read the rival site with Stagehand
+
+Stagehand is a tool that opens a browser and pulls out the facts you ask for. The mock rival site lives in `apps/product-teammates/mock-site`. Its pages have a history. In week 1 the Team plan costs 49 USD. In week 2 it costs 79 USD.
+
+You have no model key in replay. So a recorded file plays back what Stagehand returned. A person built that file by hand from the mock pages, and the file says so. A live run needs a key and is a separate step.
+
+### apps/product-teammates/src/capture.ts
+
+```ts
+export function priceMoves(before: string, after: string): PriceMove[] {
+  const old = pricesIn(before);
+  const moves: PriceMove[] = [];
+  for (const [plan, to] of pricesIn(after)) {
+    const from = old.get(plan);
+    if (from !== undefined && from !== to) moves.push({ plan, from, to });
+  }
+  return moves;
+}
+```
+
+## Step 5: keep a snapshot and skip a page that did not move
+
+Each page becomes a small PDF. The document step reads it and keeps one row. A page with the same bytes is skipped. For example, week 3 looks like week 2, so no new snapshot is saved.
+
+Write `capturePage` so it calls `ingestDocument` and reports `unchanged` when the file is skipped.
+
+## Step 6: send trivia away with a policy
+
+The product manager owns the word list in `apps/product-teammates/research/router-policy.json`. A question with none of the words gets the plain reply, and no page is read.
+
+### apps/product-teammates/src/capture.ts
+
+```ts
+export function routeByPolicy(question: string, policy = loadPolicy()): AgentResult["route"] {
+  const words: string[] = question.toLowerCase().match(/[a-z]+/g) ?? [];
+  for (const rule of policy.rules) {
+    if (rule.words.some((word) => words.includes(word))) return rule.route;
+  }
+  return policy.otherwise;
+}
+```
+
+## Step 7: cite every answer
+
+The writer sends a claim. The claim must cite a snapshot it was shown. It may use only the numbers in that snapshot. A wrong price, a missing citation or an unseen snapshot is refused.
+
+A strategy brief is a PDF. The `readStrategy` function reads it with xberg. The playbook for a full teardown is in `apps/product-teammates/research/competitor-teardown.skill.md`.
+
 ## Verify the lab
 
 ```bash
 bun run verify research-knowledge
 ```
 
-Expect: six green badges and the line "Every check passed."
+Expect: eleven green badges and the line "Every check passed."
 
 ## Try it yourself
 
