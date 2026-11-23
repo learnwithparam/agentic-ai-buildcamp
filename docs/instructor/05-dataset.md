@@ -9,8 +9,8 @@ Learner guide: [05 Build eval datasets](../learner/05-dataset.md)
 
 ## Instructor notes
 
-- Start with the goal, not the items: decide what you want to evaluate (for Specs, correct answers and the right reply/defer/follow-up behavior), then pick cases that exercise it.
-- Point out that 9 of the 25 items come from the 4.1 error analysis traces (`"source": "error-analysis"`), including multi-turn conversations where an out-of-scope question arrives after a normal fix. The other 16 cover cases error analysis didn't include, so the step 07 prompt is also measured on cases it wasn't written from.
+- Start with the goal, not the items: decide what you want to evaluate (for the agent, correct answers and the right reply/defer/follow-up behavior), then pick cases that exercise it.
+- Point out that the 27 items cover five skills, and each `idealAnswer` is copied from the label ids in `metadata.source`. The defer and follow-up items match the failures from 4.1 error analysis. The rag and agentic items cover cases error analysis didn't include, so the step 07 prompt is also measured on cases it wasn't written from.
 - The code path is intentionally simple: seed curated JSON into Langfuse, then inspect the hosted dataset.
 - Call out why `expectedOutput` has two fields: `idealAnswer` feeds the `correctness` LLM-as-a-judge callback, and `expectedBehavior` (`reply`, `defer_question`, or `ask_follow_up`) feeds the `behavior_match` callback in the next chapter.
 - Connect this chapter back to monitoring: good dataset items often come from surprising production traces. Show one error-analysis trace next to its dataset item.

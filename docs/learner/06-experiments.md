@@ -38,7 +38,7 @@ Your dataset is seeded in Langfuse. `scripts/run-dataset.ts` is already in the r
 
 In 05 you decided what the dataset should evaluate: correct answers, and the right behavior (reply, defer, or ask a follow-up). Each goal gets one evaluator, and each reads its own field from `expectedOutput`:
 
-- **`behavior_match`** (decision model + deterministic match): *did Specs reply, defer, or ask a follow-up when we expected it to?* The OpenAI Decisions API picks one of three fixed labels, and the script compares that label with `expectedBehavior`.
+- **`behavior_match`** (decision model + deterministic match): *did the agent reply, defer, or ask a follow-up when we expected it to?* The OpenAI Decisions API picks one of three fixed labels, and the script compares that label with `expectedBehavior`.
 - **`correctness`** (LLM-as-a-judge regression check): *is the answer still correct, or did a change make it worse?* A semantic-equivalence check against `idealAnswer`: paraphrases pass, missing required detail or a contradicted fact fails. A prompt fix that makes the agent refuse too much, or drop a step, shows up here.
 
 Treat this set as a **starting point**: the simplest check for each goal from 05. Impersonation and lengthy replies get no evaluator here, so read traces for those, and add one (for example a word-count check) if they become worth tracking.
@@ -52,7 +52,7 @@ Open `scripts/run-dataset.ts`. The file is annotated with numbered comments (`//
 - Uses `dataset.runExperiment(...)` to roll all per-item traces into a single run row.
 - Attaches `behavior_match` and `correctness` as callback evaluators on that same call.
 
-The traces produced are the same shape as production traces: same `dad-it-support-chat-turn` root, same OpenAI generation, same tool spans. No extra Langfuse UI setup is required for any of the scores.
+The traces produced are the same shape as production traces: same `hcp-medinfo-chat-turn` root, same OpenAI generation, same tool spans. No extra Langfuse UI setup is required for any of the scores.
 
 Both scores are **callback evaluators** inside `runExperiment`. They run in your process right after each item finishes, so the console summary and the Langfuse run already include every score when the script exits. We intentionally avoid Langfuse Platform evaluators in this chapter: configuring one needs existing experiment data to preview and map variables, which creates a chicken-and-egg problem before your first run.
 
@@ -62,7 +62,7 @@ The whole run is one call to `runExperiment`. The shape boils down to:
 
 ```ts
 await dataset.runExperiment({
-  name: "Dad IT Support Agent experiment",
+  name: "HCP Medical Information Agent experiment",
   runName,           // unique label for this run; shows up in the Experiments tab
   description: "...",
   metadata: { model: env.openaiModel },
@@ -107,7 +107,7 @@ Why split it this way?
 - The score itself is a plain equality check, so it is easy to read and to trust.
 - Decisions returns a bounded answer fast and cheaply, so this second model call barely adds to the run time.
 
-Low-confidence labels are worth reading by hand. They usually mean the answer mixes behaviors, for example declining an out-of-scope request and then walking Dad through it anyway.
+Low-confidence labels are worth reading by hand. They usually mean the answer mixes behaviors, for example declining an off-label question and then answering it anyway.
 
 ## Step 4: Review the `correctness` regression check
 
@@ -123,7 +123,7 @@ npm run dataset:run
 
 The script finishes by printing a formatted run summary in the console. Item-level traces and both scores show up in Langfuse as the run executes. Because the evaluators are callbacks, you should already see `behavior_match` and `correctness` in that console summary, not as a later async fill-in.
 
-This first run is your **baseline experiment**. It uses the production `dad-it-support-agent` prompt from monitoring, so expect misses on the out-of-scope and vague items, including out-of-scope questions that come up mid-conversation. In 07 you compare it against the prompt suggested at the end of error analysis.
+This first run is your **baseline experiment**. It uses the production `hcp-medinfo-agent` prompt from monitoring, so expect misses on the out-of-scope and vague items, including out-of-scope questions that come up mid-conversation. In 07 you compare it against the prompt suggested at the end of error analysis.
 
 ## What to inspect in Langfuse
 
@@ -140,7 +140,7 @@ This first run is your **baseline experiment**. It uses the production `dad-it-s
 
 ## Wrap-up
 
-The two scores match the two goals from 05: **behavior match** for "did Specs reply, defer, or ask a follow-up when it should?" and **correctness** for "is the answer still correct, or did the change make it worse?" Both run as callbacks on `runExperiment`, so the first workshop run is fully scored without platform evaluator setup.
+The two scores match the two goals from 05: **behavior match** for "did the agent reply, defer, or ask a follow-up when it should?" and **correctness** for "is the answer still correct, or did the change make it worse?" Both run as callbacks on `runExperiment`, so the first workshop run is fully scored without platform evaluator setup.
 
 They are a starting point. The suite grows with your error analysis: each new failure category you decide to track becomes a dataset item and, where needed, an evaluator.
 
