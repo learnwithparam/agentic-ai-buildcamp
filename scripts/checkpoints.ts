@@ -1,8 +1,8 @@
-// bun run checkpoints --dry          build every checkpoint in .checkpoints/ and type-check each one
-// bun run checkpoints --branches     the same, then write one branch per unit (the release job does this)
-// bun run checkpoints --prove        also run verify inside each checkpoint (the release job does this)
-//                                    the unit before it must pass and the unit itself must fail
-// bun run checkpoints --at <tag>     rebuild every checkpoint from an old release tag
+// bun run checkpoints --dry        build every checkpoint in .checkpoints/ and type-check each one
+// bun run checkpoints --branches   the same, then write one branch per unit (the release job)
+// bun run checkpoints --prove      also run verify inside each checkpoint (the release job)
+//                                  the unit before it must pass and the unit itself must fail
+// bun run checkpoints --at <tag>   rebuild every checkpoint from an old release tag
 //
 // A checkpoint is a branch, because a branch is meant to move and a published tag is not.
 // A checkpoint is a pure function of one main commit, so any release tag can rebuild it.
