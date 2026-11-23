@@ -1,0 +1,48 @@
+name: Sync checkpoint tags
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-checkpoints
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Sync main onto checkpoint tags
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          ./scripts/sync-checkpoints.sh --verify --push 2>&1 | tee "$RUNNER_TEMP/sync.log"
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "## Checkpoint sync"
+            echo
+            echo '```'
+            cat "$RUNNER_TEMP/sync.log" 2>/dev/null || echo "No sync log."
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
