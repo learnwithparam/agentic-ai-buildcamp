@@ -69,7 +69,6 @@ import {
   TraceSeedSnapshot,
   TraceSeedTraceBundle,
   chunkIngestionBatch,
-  defaultTraceSeedPath,
   hasFlag,
   orderObservationsParentFirst,
   readNumberFlag,
@@ -528,7 +527,8 @@ function buildEdgeCaseBundles(snapshot: TraceSeedSnapshot): TraceSeedTraceBundle
 }
 
 async function main() {
-  const inputPath = readStringFlag("--input") ?? defaultTraceSeedPath(import.meta.url);
+  const inputPath = readStringFlag("--input");
+  if (!inputPath) throw new Error("Pass --input <traces.json>. The seed scripts pass it for you.");
   const limit = readNumberFlag("--limit");
   const dryRun = hasFlag("--dry-run");
   const includeScores = !hasFlag("--no-scores");
