@@ -53,7 +53,7 @@ Langfuse ships a published **Detect User Disagreement** template. It is an LLM-a
 Pick **Detect User Disagreement** for the mapping in this step.
 
 1. In Langfuse, open **Evaluators → New Evaluator** and pick **Detect User Disagreement** from the **Template Gallery**.
-2. On the right side, select the trace root as a sample observation. Filter to the `production` environment if the panel is showing something else. We are targeting the root observation of type Agent, the place where the overall trace input and output is logged. **Hint**: If you hover over the filters in the filter bar, you will see what each of those filter out. You can also 'Ask AI' to configure your filters.
+2. On the right side, select the trace root as a sample observation. The panel already filters on `isRootObservation:true`, so pick an `hcp-medinfo-chat-turn` row of type **AGENT**. That is the root observation, where the overall trace input and output is logged. **Hint**: hover a filter chip to see what it filters out.
 
    ![Select the trace root as a sample observation in the evaluator setup panel.](../../images/monitoring/select-sample-observation.png)
 
@@ -70,7 +70,7 @@ Pick **Detect User Disagreement** for the mapping in this step.
 
    ![Test the User Disagreement evaluator on the selected sample observation.](../../images/monitoring/user-disagreement-test-evaluator.png)
 
-5. Finally click on **Create evaluator**. In the upcoming screen you can see a rough cost estimation per week and set a sampling rate. As soon as you click on execute, your first evaluator is running.
+5. Finally click on **Create evaluator**. The next screen shows which observations the evaluator scores, a sampling rate, and a weekly cost estimate (locally it can read **Unavailable**). Leave **Run evaluator on past observations** off. As soon as you click **Execute**, your first evaluator is running.
 
    ![Execute the saved evaluator on incoming observations using the configured filters.](../../images/monitoring/user-disagreement-execute-evaluator.png)
 
@@ -90,7 +90,7 @@ Code evaluators are a good fit for that pattern: no model call, no prompt design
 3. Run a test on the evaluator.
 4. Click on **Create Evaluator** and then on execute.
 
-This evaluator runs as TypeScript inside Langfuse's sandbox, so it does not use the OpenRouter connection.
+This evaluator runs as TypeScript, so it does not use the OpenRouter connection. Langfuse Cloud runs it in a sandbox. The local Langfuse runs it inside its worker, which `langfuse/workshop.override.yml` turns on with `LANGFUSE_CODE_EVAL_DISPATCHER: insecure-local`. Without that line, saving shows "Code evaluations are not enabled for this deployment".
 
 ## Step 3: Verify the monitors
 
@@ -112,11 +112,16 @@ In Langfuse, wait for the evaluators to run (refresh after a few seconds), then 
 
 ![Filter Tracing for traces with a specific evaluator score.](../../images/monitoring/filter-traces-by-evaluator-score.png)
 
-Locally, build a dashboard in **Dashboards → New dashboard** with one chart per score. On Langfuse Cloud you can also ask Halo to turn conversation signals into a dashboard to see the developments over time. Stay on a page Halo can use as context, open the **Dashboard** tab, and ask it to chart the signals you evaluate.
+To watch the signals over time, put them on a dashboard:
 
-![Ask Halo, on the Dashboard tab, to chart the conversation signals over time.](../../images/monitoring/halo-conversation-signals-prompt.png)
+1. Open **Dashboards → Widgets → New widget**.
+2. Pick the **Scores Boolean** view, add the filter **Boolean Value** `=` `true`, and break it down by **Name**.
+3. Name it `Conversation signals (true)`, choose **Horizontal Bar Chart**, and save.
+4. Open **Dashboards → New dashboard**, name it `Conversation signals`, choose **Add Widget**, and pick the widget. Set the range to the past 7 days.
 
-![A dashboard of conversation signals, with one chart per score.](../../images/monitoring/user-frustration-dashboard.png)
+![A dashboard of conversation signals, with one bar per signal score.](../../images/monitoring/user-frustration-dashboard.png)
+
+The seeded traffic already carries signal scores, so the bars are not empty before your own two turns.
 
 User disagreement is a high-signal event. When a user pushes back on an answer the agent just gave, something almost certainly went wrong: wrong tool result, missing context, an answer from a label for the wrong country. These are the traces you want to read first, and they're prime candidates to turn into dataset items in [05 Build eval datasets](../05-dataset.md).
 
@@ -128,12 +133,13 @@ Open a few traces already in the project and compare them with the two turns you
 
 A [decision model](https://langfuse.com/docs/evaluation/evaluation-methods/decision-models) returns a typed answer for each question instead of free-form text, so it is the cheaper evaluator when you do not need written reasoning.
 
-Using this, we can capture a variety of signals at once.
+Using this, we can capture a variety of signals in one call.
 
-1. Go to the evaluator library.
-2. Select **Detect conversation signals**.
-3. Test it on one or two examples.
-4. Save.
+1. Open **Evaluators → New Evaluator** and choose **Decision model**.
+2. Add one question per signal, for example a yes or no "Does the user disagree with the last answer?" and a score "How frustrated is the clinician?".
+3. Test it on one or two root observations and save.
+
+Decision models need a direct OpenAI, Google AI Studio or TypeSafe connection. The OpenRouter connection from this lab does not appear there, so skip this bonus unless you have one of those keys.
 
 ## Wrap-up
 
