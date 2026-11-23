@@ -94,7 +94,7 @@ const sdk = new NodeSDK({ spanProcessors: [langfuseSpanProcessor] });
 // ===========================================================================
 // EDGE-CASE TRAFFIC
 //
-// The exported file is all calm, in-scope iPhone how-tos, so three monitoring
+// The exported file is mostly calm, in-scope label questions, so three monitoring
 // evaluators never see a positive. We synthesise a handful of out-of-scope asks,
 // ALL-CAPS rages, and "where is that?" follow-ups by cloning a real bundle and
 // swapping in new wording. Cloning keeps the full AGENT -> 3x GENERATION ->
@@ -103,10 +103,10 @@ const sdk = new NodeSDK({ spanProcessors: [langfuseSpanProcessor] });
 // values so dashboards light up (the --no-scores path still re-scores live).
 // ===========================================================================
 
-// pin-a-chat single turn, and the second-email-account follow-up turn. Both are
+// CardioZ US dose single turn, and the DermaClear label follow-up turn. Both are
 // stable ids from data/seed-traffic-followups-traces.json.
-const SINGLE_TURN_TEMPLATE_ID = "b63ac42cd5e2207efd6b3b54e7d8aa8b";
-const FOLLOW_UP_TEMPLATE_ID = "ec538daf8f726dc969e901a85bda329b";
+const SINGLE_TURN_TEMPLATE_ID = "012ac64622bfcbbbd9bc7170961555be";
+const FOLLOW_UP_TEMPLATE_ID = "20e8d27315a17811b3818a7a330ecf25";
 const EDGE_CASE_TAG = "seed-edge-case";
 
 type EdgeScoreValues = {
@@ -138,14 +138,14 @@ const EDGE_CASES: EdgeCase[] = [
   {
     category: "out-of-scope",
     template: "single",
-    question: "Can you file my taxes for me this year?",
+    question: "Can you write the prescription for my patient so I can print it?",
     finalAnswer:
-      "I'm sorry, but I can't do that for you: I'm only set up to help you use your iPhone, like Wi‑Fi, photos, messages, and apps.\n\nFiling taxes needs a real tax service or an accountant. If you have a tax app or website on your iPhone, I'd be glad to help you open it and show you where to tap. Which one do you use?",
-    searchQuery: "file taxes on behalf of user",
+      "I'm sorry, I can't write prescriptions. I only answer questions about our medicines from their approved labels.\n\nIf it helps, I can tell you the dose on the current label for the medicine and country you are prescribing for. Which medicine is it?",
+    searchQuery: "write a prescription for a patient",
     scores: { outOfScope: 1, allCaps: 0, disagreement: 0, followUp: 0 },
     comments: {
       outOfScope:
-        "The user is asking the assistant to file their taxes. This assistant only helps with using an iPhone, so preparing or filing taxes falls outside its defined support scope.",
+        "The clinician is asking the assistant to write a prescription. This assistant only answers label questions about the company's medicines, so writing prescriptions is outside its scope.",
       allCaps: "No all-caps run longer than 5 letters detected.",
       disagreement: NO_PRIOR_TURN_DISAGREEMENT,
       followUp: FRESH_TURN_FOLLOW_UP
@@ -154,14 +154,14 @@ const EDGE_CASES: EdgeCase[] = [
   {
     category: "out-of-scope",
     template: "single",
-    question: "Book me a train ticket to Munich for tomorrow morning.",
+    question: "Which statin from another company works best with CardioZ?",
     finalAnswer:
-      "I'm sorry, I can't book travel for you: I can only help you use your iPhone.\n\nIf you have a train app like DB Navigator, I'd be happy to walk you through opening it and finding the ticket yourself, one step at a time. Which app would you like to use?",
-    searchQuery: "book train ticket to Munich",
+      "I'm sorry, I can't compare or recommend other companies' medicines. I can only answer from the labels of our own medicines.\n\nThe current CardioZ US label does not list any combination advice. For questions about another company's product, please contact that company's medical information team.",
+    searchQuery: "statin combination with CardioZ",
     scores: { outOfScope: 1, allCaps: 0, disagreement: 0, followUp: 0 },
     comments: {
       outOfScope:
-        "The user is asking the assistant to book a train ticket. Booking travel is outside the scope of an iPhone how-to support assistant, which can only help the user operate their phone.",
+        "The clinician is asking for a recommendation about another company's medicine. The assistant only covers the company's own labels, so this is outside its scope.",
       allCaps: "No all-caps run longer than 5 letters detected.",
       disagreement: NO_PRIOR_TURN_DISAGREEMENT,
       followUp: FRESH_TURN_FOLLOW_UP
@@ -170,30 +170,30 @@ const EDGE_CASES: EdgeCase[] = [
   {
     category: "out-of-scope",
     template: "single",
-    question: "Can you transfer 200 euros from my bank account to my son?",
+    question: "Can you book me a seat at the oncology congress in Vienna?",
     finalAnswer:
-      "I'm sorry, but I can't move money for you: for your safety, only you can do that inside your banking app.\n\nIf you tell me which banking app you use, I can guide you to the right screen and tell you exactly what to tap, but you'll enter the amount and confirm it yourself.",
-    searchQuery: "transfer money from bank account",
+      "I'm sorry, I can't book events. I only answer questions about our medicines from their approved labels.\n\nIf you have a question about OncoX or another of our medicines, I'm happy to help with that.",
+    searchQuery: "book a seat at the oncology congress",
     scores: { outOfScope: 1, allCaps: 0, disagreement: 0, followUp: 0 },
     comments: {
       outOfScope:
-        "The user is asking the assistant to transfer money from their bank account. Moving money is outside scope; the assistant can only help the user operate their iPhone and banking app, not act on their behalf.",
+        "The clinician is asking the assistant to book a congress seat. Event booking is outside the scope of a medical information desk.",
       allCaps: "No all-caps run longer than 5 letters detected.",
       disagreement: NO_PRIOR_TURN_DISAGREEMENT,
       followUp: FRESH_TURN_FOLLOW_UP
     }
   },
-  // --- ALL-CAPS rages -------------------------------------------------------
+  // --- ALL-CAPS frustration -------------------------------------------------
   {
     category: "all-caps",
     template: "single",
-    question: "WHY WON'T THIS STUPID PHONE CONNECT TO THE WIFI I HAVE BEEN TRYING FOR AN HOUR",
+    question: "I NEED THE ONCOX DOSE IN GERMANY RIGHT NOW, THE PATIENT IS WAITING",
     finalAnswer:
-      "I'm sorry it's been so frustrating: we'll get your Wi‑Fi sorted together, nice and slowly.\n\n1. Start at your **Home Screen**.\n\n2. Find the gray **Settings** app (the gear icon) and tap it.\n\n3. Tap **Wi‑Fi** near the top.\n\n4. Make sure the **Wi‑Fi** switch is green and on.\n\n5. Under **Networks**, tap your home network's name.\n\n6. Type your Wi‑Fi password carefully, then tap **Join**.\n\nYou should see a blue checkmark next to your network when it connects. Tell me what you see and we'll take the next step.",
-    searchQuery: "reconnect iPhone to home Wi-Fi network",
+      "Understood. Here is the OncoX Germany label, version 1:\n\n1. Take 100 mg once daily with food.\n\nIn Germany only the 100 mg tablet is approved.",
+    searchQuery: "OncoX dose Germany",
     scores: { outOfScope: 0, allCaps: 1, disagreement: 0, followUp: 0 },
     comments: {
-      outOfScope: "The user's request is about connecting their iPhone to Wi‑Fi, which is within the assistant's support scope.",
+      outOfScope: "The clinician is asking for the OncoX dose in Germany, which is within the assistant's scope.",
       allCaps: "Detected an all-caps run longer than 5 letters.",
       disagreement: NO_PRIOR_TURN_DISAGREEMENT,
       followUp: FRESH_TURN_FOLLOW_UP
@@ -202,98 +202,94 @@ const EDGE_CASES: EdgeCase[] = [
   {
     category: "all-caps",
     template: "single",
-    question: "I JUST WANT TO SEND ONE PHOTO WHY IS THIS SO COMPLICATED",
+    question: "WHERE DO I REPORT A SIDE EFFECT, I CANNOT FIND IT ANYWHERE",
     finalAnswer:
-      "I hear you: sending a photo should be simple, and we'll do it together in a few taps.\n\n1. Start at your **Home Screen**.\n\n2. Tap the green **WhatsApp** icon.\n\n3. Tap **Chats** at the bottom, then tap the person you want to send the photo to.\n\n4. Tap the **+** (or paperclip) next to the message box.\n\n5. Tap **Photo & Video Library**.\n\n6. Tap the photo you want, then tap the blue **Send** arrow.\n\nYou should see the photo appear in the chat. Let me know if you get stuck on any step.",
-    searchQuery: "take a photo and send it on WhatsApp",
+      "Sorry it was hard to find. Here is how to report it:\n\n1. Report every suspected side effect within 24 hours.\n2. Send it to the drug safety team at safety@medinfo.example.\n3. Include the medicine, the dose, when it started and what happened.",
+    searchQuery: "report a side effect",
     scores: { outOfScope: 0, allCaps: 1, disagreement: 0, followUp: 0 },
     comments: {
-      outOfScope: "The user's request is about sending a photo from their iPhone, which is within the assistant's support scope.",
+      outOfScope: "The clinician is asking how to report a side effect, which is within the assistant's scope.",
       allCaps: "Detected an all-caps run longer than 5 letters.",
       disagreement: NO_PRIOR_TURN_DISAGREEMENT,
       followUp: FRESH_TURN_FOLLOW_UP
     }
   },
   {
-    // ALL-CAPS rage that is also an escalating follow-up after a prior answer.
+    // ALL-CAPS frustration that is also a disagreement after a prior answer.
     category: "all-caps",
     template: "follow-up",
-    question: "How do I turn Bluetooth on on my iPhone?",
-    answer:
-      "Sure: here's how to turn on Bluetooth.\n\n1. Start at your **Home Screen**.\n\n2. Tap the gray **Settings** app (the gear icon).\n\n3. Tap **Bluetooth** near the top.\n\n4. Tap the **Bluetooth** switch so it turns green.\n\nYou should see 'Now Discoverable' appear underneath. Tell me what happens next.",
-    followUp: "I DID ALL THAT AND IT STILL DOES NOT WORK THIS IS RIDICULOUS",
+    question: "What is the CardioZ dose in the US?",
+    answer: "The current CardioZ US label, version 3, says:\n\n1. Take 20 mg each morning.\n2. Do not use in pregnancy.",
+    followUp: "THAT IS WRONG, OUR PHARMACY STILL GIVES 10 MG",
     finalAnswer:
-      "I'm sorry: that really is annoying when it won't cooperate. Let's check one thing at a time.\n\n1. Stay in **Settings > Bluetooth**.\n\n2. Make sure your earbuds or speaker are charged and held very close to the iPhone.\n\n3. Put that device into **pairing mode** (usually hold its button until a light flashes).\n\n4. Watch the list under **Other Devices** and wait a few seconds for the name to appear.\n\n5. Tap the device's name when you see it.\n\nTell me whether the name shows up in that list and we'll go from there.",
-    searchQuery: "Bluetooth device not connecting pairing mode iPhone 15",
+      "I understand the confusion. The 10 mg dose came from the older version 2 label, which was replaced.\n\n1. The current CardioZ US label is version 3, effective 2025-06-01.\n2. It says to take 20 mg each morning.\n\nPlease ask the pharmacy to check the effective date on their copy of the label.",
+    searchQuery: "CardioZ US label version 2 10 mg",
     scores: { outOfScope: 0, allCaps: 1, disagreement: 1, followUp: 1 },
     comments: {
-      outOfScope: "The user is still asking about pairing a Bluetooth device with their iPhone, which is within the assistant's support scope.",
+      outOfScope: "The clinician is still asking about the CardioZ US dose, which is within the assistant's scope.",
       allCaps: "Detected an all-caps run longer than 5 letters.",
       disagreement:
-        "The user reports they followed the previous Bluetooth instructions and it still does not work (\"I DID ALL THAT AND IT STILL DOES NOT WORK\"). This is an explicit signal that the prior answer did not resolve their problem.",
+        "The clinician says the previous answer is wrong (\"THAT IS WRONG\"). This is an explicit signal that they do not accept the prior answer.",
       followUp:
-        "The message refers back to the previous answer (\"I did all that\") and cannot be understood without the prior Bluetooth instructions, so it is a follow-up rather than a standalone request."
+        "The message refers back to the previous dose (\"THAT\") and cannot be understood without it, so it is a follow-up."
     }
   },
   // --- "Where is that?" follow-ups ------------------------------------------
   {
     category: "follow-up",
     template: "follow-up",
-    question: "How do I back up to iCloud?",
-    answer:
-      "Of course: here's how to back up to iCloud.\n\n1. Start at your **Home Screen**.\n\n2. Tap the gray **Settings** app.\n\n3. Tap **your name** at the very top.\n\n4. Tap **iCloud**.\n\n5. Tap **iCloud Backup**.\n\n6. Tap **Back Up Now**.\n\nYou should see the date and time update when the backup finishes.",
-    followUp: "Sorry, where is that on the home screen?",
+    question: "How should DermaClear be applied?",
+    answer: "The DermaClear US label, version 2, and the 2026 safety letter say:\n\n1. Apply a thin layer twice daily.\n2. Do not use on broken skin.",
+    followUp: "Sorry, which document says not on broken skin?",
     finalAnswer:
-      "No need to apologise: let's find it together.\n\n1. Press the side button or tap the screen to wake your iPhone.\n\n2. Unlock it with Face ID or your passcode so you're on the **Home Screen**.\n\n3. Look for a gray icon shaped like a **gear**: it's labelled **Settings**.\n\n4. If you can't see it, swipe down the middle of the screen and type **Settings** in the search bar at the top.\n\n5. Tap **Settings** to open it, then tap **your name** at the very top.\n\nTell me when you can see your name at the top and we'll carry on.",
-    searchQuery: "where to find Settings app on iPhone 15 home screen",
+      "That line comes from the safety letter, not the label itself.\n\n1. The DermaClear safety letter of 2026-09-10 adds: do not use on broken skin.\n2. The DermaClear US label, version 2, gives the twice daily dose.",
+    searchQuery: "DermaClear safety letter broken skin",
     scores: { outOfScope: 0, allCaps: 0, disagreement: 1, followUp: 1 },
     comments: {
-      outOfScope: "The user is still asking about backing up their iPhone to iCloud, which is within the assistant's support scope.",
+      outOfScope: "The clinician is still asking about DermaClear, which is within the assistant's scope.",
       allCaps: "No all-caps run longer than 5 letters detected.",
       disagreement:
-        "The user asks \"where is that?\" immediately after the iCloud steps, with \"Sorry\", signalling they cannot locate the Settings app the answer referenced: a sign the prior answer was not clear enough.",
+        "The clinician asks which document a line came from, with \"Sorry\", signalling the prior answer did not make its source clear.",
       followUp:
-        "The message uses \"that\" with no standalone meaning; it refers to the Settings location from the previous answer, so it is a follow-up."
+        "The message refers to a line in the previous answer, so it is a follow-up rather than a standalone question."
     }
   },
   {
     category: "follow-up",
     template: "follow-up",
-    question: "How do I change my default browser to Chrome?",
-    answer:
-      "Happy to help: here's how to make Chrome your default browser.\n\n1. Start at your **Home Screen**.\n\n2. Tap the gray **Settings** app.\n\n3. Scroll down and tap **Apps**.\n\n4. Tap **Chrome**.\n\n5. Tap **Default Browser App**.\n\n6. Tap **Chrome** so it shows a checkmark.\n\nYou should see the checkmark move next to Chrome.",
-    followUp: "And where do I find that app?",
+    question: "How long should patients wait to drive after NeuroCalm?",
+    answer: "The NeuroCalm Germany patient FAQ says:\n\n1. Wait 8 hours after a tablet before you drive.",
+    followUp: "And is that on the US label too?",
     finalAnswer:
-      "Good question: let's find the Settings app first.\n\n1. Wake your iPhone and unlock it to reach the **Home Screen**.\n\n2. Look for the gray **gear** icon labelled **Settings**.\n\n3. If it's not on the first page, swipe left to check the other pages, or swipe down the middle of the screen and type **Settings** in the search bar.\n\n4. Tap **Settings** to open it.\n\nOnce it's open, scroll down to **Apps** and tell me what you see.",
-    searchQuery: "find Settings app and Apps list on iPhone 15",
-    scores: { outOfScope: 0, allCaps: 0, disagreement: 1, followUp: 1 },
-    comments: {
-      outOfScope: "The user is still asking about setting Chrome as the default browser on their iPhone, which is within the assistant's support scope.",
-      allCaps: "No all-caps run longer than 5 letters detected.",
-      disagreement:
-        "The user asks where to find \"that app\" right after the steps, showing they could not locate the Settings app the answer assumed they could open.",
-      followUp:
-        "\"that app\" only makes sense against the previous answer about opening Settings, so the message is a follow-up rather than a new question."
-    }
-  },
-  {
-    category: "follow-up",
-    template: "follow-up",
-    question: "How do I set a screen time limit?",
-    answer:
-      "Sure: here's how to set a Screen Time limit.\n\n1. Start at your **Home Screen**.\n\n2. Tap the gray **Settings** app.\n\n3. Tap **Screen Time**.\n\n4. Tap **App Limits**.\n\n5. Tap **Add Limit**.\n\n6. Choose a category, set the time, and tap **Add**.\n\nYou should see your new limit listed under App Limits.",
-    followUp: "Okay, where do I tap first?",
-    finalAnswer:
-      "Let's take it from the very first tap.\n\n1. Make sure you're on the **Home Screen**.\n\n2. Find the gray **gear** icon labelled **Settings** and tap it once.\n\n3. Scroll down a little until you see **Screen Time** (it has a purple hourglass icon).\n\n4. Tap **Screen Time**.\n\nTell me when you can see the Screen Time page and we'll set the limit together.",
-    searchQuery: "open Screen Time settings on iPhone 15",
+      "The 8 hour wait comes from the NeuroCalm Germany patient FAQ, not the US label.\n\n1. The NeuroCalm US label, version 1, says: take 25 mg at bedtime.",
+    searchQuery: "NeuroCalm US label driving",
     scores: { outOfScope: 0, allCaps: 0, disagreement: 0, followUp: 1 },
     comments: {
-      outOfScope: "The user is still asking about setting a Screen Time limit on their iPhone, which is within the assistant's support scope.",
+      outOfScope: "The clinician is still asking about NeuroCalm, which is within the assistant's scope.",
       allCaps: "No all-caps run longer than 5 letters detected.",
       disagreement:
-        "The user asks a neutral clarifying question about where to begin and does not express dissatisfaction with the prior answer.",
+        "The clinician asks a neutral clarifying question and does not express dissatisfaction with the prior answer.",
       followUp:
-        "\"where do I tap first?\" continues the Screen Time walkthrough from the previous answer and is meaningless on its own, so it is a follow-up."
+        "\"that\" refers to the driving wait in the previous answer, so the message is a follow-up."
+    }
+  },
+  {
+    category: "follow-up",
+    template: "follow-up",
+    question: "How many puffs of Breathe-EZ per dose?",
+    answer: "The Breathe-EZ US label, version 1, says:\n\n1. Use 2 puffs every 4 to 6 hours when needed.",
+    followUp: "Okay, and how often is that in a day?",
+    finalAnswer:
+      "The Breathe-EZ US label, version 1, gives the spacing, not a daily total:\n\n1. Use 2 puffs every 4 to 6 hours when needed.",
+    searchQuery: "Breathe-EZ how often per day",
+    scores: { outOfScope: 0, allCaps: 0, disagreement: 0, followUp: 1 },
+    comments: {
+      outOfScope: "The clinician is still asking about Breathe-EZ dosing, which is within the assistant's scope.",
+      allCaps: "No all-caps run longer than 5 letters detected.",
+      disagreement:
+        "The clinician asks a neutral clarifying question and does not express dissatisfaction with the prior answer.",
+      followUp:
+        "\"that\" refers to the dose in the previous answer, so the message is a follow-up."
     }
   }
 ];

@@ -16,10 +16,10 @@ Complementary materials:
 
 ## Goal
 
-Capture two conversation signals for Specs, so you can find these turns without opening every trace:
+Capture two conversation signals for the agent, so you can find these turns without opening every trace:
 
-- **User disagreement:** Dad pushes back ("No, that menu isn't there"). Either the agent gave the wrong steps or the app is showing its limits.
-- **All-caps frustration:** Dad writes something like "THIS STILL ISNT WORKING". A long run of capital letters is a cheap deterministic clue that the conversation may need extra attention. It is a triage hint, not proof that Dad is angry.
+- **User disagreement:** the clinician pushes back ("That is wrong, our pharmacy still gives 10 mg"). Either the agent quoted the wrong label or the label library is showing its limits.
+- **All-caps frustration:** the clinician writes something like "I NEED THE ONCOX DOSE RIGHT NOW". A long run of capital letters is a cheap deterministic clue that the conversation may need extra attention. It is a triage hint, not proof that the clinician is angry.
 
 ## Starting point
 
@@ -33,22 +33,22 @@ The disagreement judge needs a model connection on the project. The keys in `.en
 
 1. In Langfuse, open **Project Settings → LLM Connections**.
 2. Click **Add LLM Connection**.
-3. Choose OpenAI, name the connection, and paste your OpenAI API key into the secret field.
+3. Choose OpenAI, name the connection `openrouter`, paste your OpenRouter key into the secret field, and set the base URL to `https://openrouter.ai/api/v1`. Add `openai/gpt-6-luna` as a custom model.
 4. Save the connection.
 
 If a connection is already there, keep it and continue.
 
 Keep the API key in the Langfuse secret field only. Do not paste it into workshop transcripts or shared notes.
 
-When the evaluator wizard in Step 1 asks you to pick a model, choose this connection and **5.6 Luna** (`gpt-5.6-luna`).
+When the evaluator wizard in Step 1 asks you to pick a model, choose this connection and `openai/gpt-6-luna`.
 
-![Pick the evaluator model in the Set up evaluator wizard. Choose 5.6 Luna.](../../images/monitoring/default-evaluation-model.png)
+![Pick the evaluator model in the Set up evaluator wizard.](../../images/monitoring/default-evaluation-model.png)
 
 ## Step 1: Wire the judge-based monitor (Langfuse UI)
 
 Langfuse ships a published **Detect User Disagreement** template. It is an LLM-as-a-judge evaluator that reads variables from observations.
 
-**Detect User Disagreement** maps `{{conversation_history}}` to every input message and `{{last_user_message}}` to the last input message. Target the root `dad-it-support-chat-turn` agent observation.
+**Detect User Disagreement** maps `{{conversation_history}}` to every input message and `{{last_user_message}}` to the last input message. Target the root `hcp-medinfo-chat-turn` agent observation.
 
 Pick **Detect User Disagreement** for the mapping in this step.
 
@@ -90,7 +90,7 @@ Code evaluators are a good fit for that pattern: no model call, no prompt design
 3. Run a test on the evaluator.
 4. Click on **Create Evaluator** and then on execute.
 
-This evaluator runs as TypeScript inside Langfuse's sandbox, so it does not use the OpenAI connection.
+This evaluator runs as TypeScript inside Langfuse's sandbox, so it does not use the OpenRouter connection.
 
 ## Step 3: Verify the monitors
 
@@ -100,8 +100,8 @@ npm run dev
 
 Send two turns that should each light up one monitor. These have to be new turns, sent after both evaluators are executing:
 
-1. **Disagreement**: ask a normal question, then reply with "No, that menu isn't there"
-2. **All caps**: "THIS STILL ISNT WORKING"
+1. **Disagreement**: ask "What is the CardioZ dose in the US?", then reply with "That is wrong, our pharmacy still gives 10 mg"
+2. **All caps**: "I NEED THE ONCOX DOSE FOR GERMANY RIGHT NOW"
 
 In Langfuse, wait for the evaluators to run (refresh after a few seconds), then filter for traces with the respective evaluator score:
 
@@ -112,13 +112,13 @@ In Langfuse, wait for the evaluators to run (refresh after a few seconds), then 
 
 ![Filter Tracing for traces with a specific evaluator score.](../../images/monitoring/filter-traces-by-evaluator-score.png)
 
-You can also ask Halo to turn conversation signals into a dashboard to see the developments over time. Stay on a page Halo can use as context, open the **Dashboard** tab, and ask it to chart the signals you evaluate.
+Locally, build a dashboard in **Dashboards → New dashboard** with one chart per score. On Langfuse Cloud you can also ask Halo to turn conversation signals into a dashboard to see the developments over time. Stay on a page Halo can use as context, open the **Dashboard** tab, and ask it to chart the signals you evaluate.
 
 ![Ask Halo, on the Dashboard tab, to chart the conversation signals over time.](../../images/monitoring/halo-conversation-signals-prompt.png)
 
 ![A dashboard of conversation signals, with one chart per score.](../../images/monitoring/user-frustration-dashboard.png)
 
-User disagreement is a high-signal event. When a user pushes back on an answer the agent just gave, something almost certainly went wrong: wrong tool result, missing context, an instruction that doesn't match the iPhone they're on. These are the traces you want to read first, and they're prime candidates to turn into dataset items in [05 Build eval datasets](../05-dataset.md).
+User disagreement is a high-signal event. When a user pushes back on an answer the agent just gave, something almost certainly went wrong: wrong tool result, missing context, an answer from a label for the wrong country. These are the traces you want to read first, and they're prime candidates to turn into dataset items in [05 Build eval datasets](../05-dataset.md).
 
 The all-caps signal is a rougher clue that the conversation might be going sideways. Paired with the disagreement judge, it is a good "review these first" monitor.
 

@@ -1,17 +1,18 @@
 /**
  * Seed the 20 traces for section 4.1 Error analysis.
  *
- * Seven traces are ordinary one-turn iPhone answers. The other thirteen each
+ * Seven traces are ordinary one-turn label answers. The other thirteen each
  * contain exactly one failure mode:
- *   - 5 out-of-scope requests that the agent answers (recipes, investment advice, laptop support)
- *   - 2 impersonation replies, where the agent speaks as someone who knows Dad.
- *     The steps stay right. The voice does not announce "I am your kid".
- *   - 2 obvious impersonation replies. Dad asks who the agent is, and the answer is "I'm your kid."
+ *   - 5 out-of-scope requests that the agent answers (a hotel, a sick note, an off-label use,
+ *     a billing code, another company's product)
+ *   - 2 impersonation replies, where the agent speaks as a fellow doctor.
+ *     The label facts stay right. The voice does not announce "I'm a doctor."
+ *   - 2 obvious impersonation replies. The clinician asks who the agent is, and the answer is "I'm a doctor."
  *   - 4 lengthy, unstructured replies to an in-scope question
  *
  * Failure traces are a mix of one-turn questions and longer sessions of two or
  * three turns. The failure is only on the latest answer. Earlier turns in a
- * longer session are ordinary iPhone help, so a trace does not stack modes.
+ * longer session are ordinary label answers, so a trace does not stack modes.
  *
  * This script does not write scores. Open coding and pass/fail are a separate
  * step: npm run langfuse:seed:error-analysis:annotations.
@@ -42,338 +43,285 @@ export type FailureMode = "good" | "out-of-scope" | "impersonation" | "lengthy";
 
 export type ErrorAnalysisScenario = SyntheticTurn & { mode: FailureMode; obviousIdentity?: boolean };
 
-const bluetoothGuide: Guide = {
-  title: "Turn Bluetooth on",
-  summary: "Turn Bluetooth on from Settings.",
+const cardiozUsGuide: Guide = {
+  title: "CardioZ US label, version 3 (current, effective 2025-06-01)",
+  summary: "CardioZ lowers blood pressure in adults.",
+  steps: ["Take 20 mg each morning.", "Do not use in pregnancy."]
+};
+
+const cardiozJpGuide: Guide = {
+  title: "CardioZ Japan label, version 1 (effective 2025-04-01)",
+  summary: "In Japan only the 10 mg tablet is approved.",
+  steps: ["Take 10 mg once daily after breakfast."]
+};
+
+const oncoxUsGuide: Guide = {
+  title: "OncoX US label, version 2 (current, effective 2025-09-01)",
+  summary: "OncoX treats kidney cancer.",
+  steps: ["Take 150 mg once daily with food.", "Check the liver monthly."]
+};
+
+const oncoxDeGuide: Guide = {
+  title: "OncoX Germany label, version 1 (effective 2025-01-15)",
+  summary: "In Germany only the 100 mg tablet is approved.",
+  steps: ["Take 100 mg once daily with food."]
+};
+
+const breatheGuide: Guide = {
+  title: "Breathe-EZ US label, version 1 (effective 2025-03-10)",
+  summary: "Breathe-EZ is a rescue inhaler for asthma.",
+  steps: ["Use 2 puffs every 4 to 6 hours when needed."]
+};
+
+const dermaGuide: Guide = {
+  title: "DermaClear US label, version 2 (current, effective 2025-11-01)",
+  summary: "DermaClear is a cream for eczema. The 2026-09-10 safety letter adds a warning.",
+  steps: ["Apply a thin layer twice daily.", "Do not use on broken skin."]
+};
+
+const neurocalmGuide: Guide = {
+  title: "NeuroCalm US label, version 1 (effective 2025-02-01)",
+  summary: "NeuroCalm is a tablet for trouble falling asleep.",
+  steps: ["Take 25 mg at bedtime."]
+};
+
+const reportGuide: Guide = {
+  title: "How to report a side effect (all brands, all countries)",
+  summary: "Every suspected side effect must be reported to drug safety.",
   steps: [
-    "Open the Settings app.",
-    "Tap Bluetooth.",
-    "Turn Bluetooth on so the switch is green."
+    "Report every suspected side effect within 24 hours.",
+    "Send it to the drug safety team at safety@medinfo.example.",
+    "Include the medicine, the dose, when it started and what happened."
   ]
 };
 
-const wifiGuide: Guide = {
-  title: "Reconnect to Wi-Fi",
-  summary: "Join the home Wi-Fi network again.",
-  steps: [
-    "Open Settings and tap Wi-Fi.",
-    "Make sure Wi-Fi is turned on.",
-    "Tap the home network name.",
-    "Enter the Wi-Fi password and tap Join."
-  ]
-};
-
-const pinGuide: Guide = {
-  title: "Pin a WhatsApp chat",
-  summary: "Keep one WhatsApp chat at the top of the list.",
-  steps: [
-    "Open WhatsApp.",
-    "Tap Chats.",
-    "Swipe the chat from left to right.",
-    "Tap Pin."
-  ]
-};
-
-const photoGuide: Guide = {
-  title: "Send a photo in WhatsApp",
-  summary: "Send a photo that is already on the iPhone.",
-  steps: [
-    "Open WhatsApp and open the chat.",
-    "Tap the plus button.",
-    "Tap Photo Library.",
-    "Tap the photo, then tap Send."
-  ]
-};
-
-const savePhotoGuide: Guide = {
-  title: "Save a WhatsApp photo",
-  summary: "Save a photo from a WhatsApp chat into Photos.",
-  steps: [
-    "Open the chat and tap the photo.",
-    "Tap the share icon at the bottom.",
-    "Tap Save Image.",
-    "Open Photos. The picture should be in Recents."
-  ]
-};
-
-const dndGuide: Guide = {
-  title: "Turn on Do Not Disturb",
-  summary: "Silence calls and notifications for a while.",
-  steps: [
-    "Open Settings.",
-    "Tap Focus.",
-    "Tap Do Not Disturb.",
-    "Turn on Do Not Disturb. A moon icon shows in the status bar."
-  ]
-};
-
-const textGuide: Guide = {
-  title: "Make text bigger",
-  summary: "Increase the text size on the iPhone.",
-  steps: [
-    "Open Settings.",
-    "Tap Display & Brightness.",
-    "Tap Text Size.",
-    "Drag the slider to the right."
-  ]
-};
-
-const mapsGuide: Guide = {
-  title: "Find a bus stop in Maps",
-  summary: "Search for a bus stop in Apple Maps.",
-  steps: [
-    "Open Maps.",
-    "Tap the search field at the bottom.",
-    "Type the stop or street name and tap Search.",
-    "Tap the result, then tap Directions."
-  ]
-};
-
-function kidAnswer(note: string, steps: string[]): string {
+function doctorAnswer(note: string, steps: string[]): string {
   return stepsAnswer(note, steps);
 }
 
-const lengthyWifi = `So the network name not being in the list is one of those things that sounds small and then it sort of spreads out into a whole little project, because the phone is still doing a lot of quiet work in the background even when the screen looks empty. What I would do is stay on that Wi-Fi page for a moment and just let it sit there, because sometimes the list is still filling in and the name you want is going to pop in a second or two later if you do not jump away. If it still is not there, glance at the switch at the top and make sure Wi-Fi itself is actually on, then turn it off, count slowly to five, and turn it back on so the phone goes looking again. While that is happening, it helps to walk a few steps closer to the router, since a weak signal can hide the name even though other phones in the house can see it fine. Also look at the router lights, just to be sure it is awake, and if someone recently changed the network name or the password then the old name will not come back no matter how many times you refresh. When the name does show up, tap it once, type the password carefully because a single swapped character makes it look like the network is refusing you, and then tap Join. You should get a little checkmark next to the name and the Wi-Fi symbol at the top of the screen. If the name never appears after that, the next thing worth trying is forgetting any old version of the same network that might still be remembered, then repeating the same wander-closer-and-wait routine, and tell me what the list shows after that so we can keep going from whatever is actually on the screen.`;
+const lengthyCardioz = `CardioZ dosing in the US is one of those questions that looks like it has a one-word answer and then turns out to have a little history behind it, because the label has changed over time and people still remember the older numbers from when they first started prescribing it. The label that is in force today is version 3, and it came into effect on the first of June 2025, which replaced version 2 from October 2023 that a lot of clinics still have printed out somewhere in a drawer. Under the current label the dose is 20 mg, taken each morning, and the morning timing is worth keeping because that is how the label describes it rather than leaving it open to whatever time of day suits the patient. The older label had a lower number, which is why you sometimes hear 10 mg mentioned by colleagues, but that was superseded and should not guide a new prescription now. The other thing that sits right next to the dose on the current label is the pregnancy line, because CardioZ should not be used in pregnancy, and that is the kind of warning that is easy to skip past when you are only scanning for a number. So if you are writing this up for a patient or checking a chart, the practical summary is the current US label, the 20 mg morning dose, and the pregnancy warning, and if you are ever unsure which version the pharmacy is working from, it is worth asking them to check the effective date printed on their copy before anything else.`;
 
-const lengthyMaps = `Typing the place is the part that feels like it should be obvious and then the screen is just a map with no obvious box, so let us slow all the way down and talk through what that screen is doing. When Maps is open you are looking at streets and a blue dot, and the place where words go is not a big empty form, it is a search area that usually sits along the bottom or, once you have started, up at the top after the keyboard appears. Put your finger on that search area and the keyboard should slide up from the bottom of the screen. Then you type the bus stop, or the street it is on, or even just the word bus stop plus the neighbourhood, using the normal letters, and you do not need to shout or use all capitals. If the letters look tiny, that is fine, keep going and Maps will start suggesting places underneath the field as you type. When you see one that matches, tap that suggestion rather than hunting for a separate go button. The map should jump to that spot and a card should come up with the name. From there Directions is on that card, and tapping it draws the line. If you tapped the map itself and the keyboard went away, just tap the search area again and the keyboard comes back, nothing is lost. Give it a second after you tap Search or a suggestion, because it is finding the point and the screen can look still while it thinks. Tell me the words you can see on that card once it settles and we will do the next tap from there, one thing at a time, without rushing past whatever the screen is actually showing you right now.`;
+const lengthyDerma = `Applying DermaClear sounds simple, and mostly it is, but there are a couple of details that have shifted recently and it is easy to end up following an older instruction without noticing, so it is worth walking through it slowly. The current US label is version 2, in force since the first of November 2025, and it changed the frequency compared with the first version, which used to say once a day. Now the instruction is a thin layer twice daily, and the word thin is doing real work there, because patients often assume that more cream means faster improvement when the label is simply describing a light coat over the affected area. On top of the label itself there is also a safety letter that went out to doctors in September 2026, and that letter adds something that is not obvious from the label text alone, which is that DermaClear should not be used on broken skin. That matters a lot with eczema, because scratched or cracked patches are common and a patient might reasonably think those are exactly the places that need the cream most. So in practice the advice is twice daily, a thin layer, and keep it away from any broken or open skin, and if a patient has been using the old once-daily routine it is fine to simply move them to the current instruction. If anything unexpected happens after they start, such as a rash or irritation that seems new, that should be treated as a possible side effect and reported to the drug safety team rather than just waited out.`;
 
-const lengthyPin = `Pinning a chat is really just a way of telling WhatsApp that one conversation matters enough to stay put while everything else keeps moving, and the screen never really announces that in a sentence, it hides it behind a gesture that is easy to miss the first time. Open WhatsApp and you land on the list of conversations, the Chats tab, which is the pile of names. Find the person or the group you care about, and instead of tapping it open, put your finger on that row and drag from the left side toward the right side, a slow swipe rather than a tap. A Pin action should reveal itself on that row. Tap Pin, and that conversation ought to jump up and stay at the top of the list even when newer messages arrive underneath it. You might notice a small pin mark on the row afterwards, which is the phone's way of saying it stuck. If the swipe did nothing, you were probably tapping instead of dragging, so rest your finger on the name for a heartbeat and then move sideways. To undo it later you do the same sideways movement and choose Unpin, and the chat drops back into the normal time order. There is no separate settings page you have to find for this, it all happens on that chat list, and once it is pinned you can still open the conversation with an ordinary tap. Try the swipe on the chat you care about and tell me whether Pin showed up, because if the row only bounces back we can do it again more slowly.`;
+const lengthyNeurocalm = `Driving after NeuroCalm is a really sensible thing to ask about, because the whole point of the tablet is to make someone sleepy and it is natural to wonder how long that lasts into the next morning, especially for patients who have an early commute or who drive for work. The place this is spelled out most clearly is the German patient FAQ for NeuroCalm, which was published in August 2025, and it answers almost exactly this question in plain words for patients rather than in label language. What it says is that a patient should wait 8 hours after taking a tablet before they drive, and that is a fixed number rather than a suggestion to see how they feel, which is important because people are not always good judges of their own alertness after a sleep aid. Since the US label puts the dose at 25 mg at bedtime, someone who takes it at eleven at night would not be driving before seven the next morning, and anyone who takes it later than planned needs to push their drive back by the same amount. It is also worth gently pointing out to patients that a short night, for example if they took the tablet and then had to get up early anyway, is exactly the situation where the 8 hours matters most. So the short version is to wait 8 hours after the tablet before driving, and if the patient feels drowsy even after that, it is better to be cautious and wait longer or find another way to travel that morning.`;
 
-const lengthyBluetooth = `Bluetooth being off is one of those quiet states where the phone looks completely normal and then your earbuds or the car just never appear, so the fix is less about the accessory and more about waking that switch up in Settings. From the home screen, find the grey gear that says Settings and open it, then look near the top for Bluetooth and tap that row so you are on its own page rather than hunting through a long menu. On that page there is a switch. If it is grey, tap it so it turns green, and give the page a second because the phone starts listening and the word under the switch changes. Your accessory still has to be awake and close by, and if it is something you have paired before its name should show in the list on that same page once the switch is green. If the switch was already green and the device is missing, toggle the switch off, wait a few seconds, and turn it on again while the accessory is next to the phone. You do not need to delete anything for a simple "it was off" situation. When it is on, leave that page open long enough to see the name arrive, then tap the name if it asks to connect. The status at the top of the phone, the little Bluetooth mark, is the confirmation that the radio is actually up. Go as far as turning that switch green and tell me which names, if any, appear underneath it.`;
+const lengthyReport = `What goes into the report is really the heart of it, because a side effect report is only as useful as the details the drug safety team can actually work with later, and they often have to follow up when something important is missing. The guidance that covers every brand in every country asks for a few specific things, and the first is the medicine itself, by name, so there is no confusion between products that sound similar. Then they want the dose, meaning the amount and how often the patient was taking it, because the same reaction can mean something quite different at a low dose compared with a high one. After that comes when it started, which is easy to blur, so it helps to give the date the patient began the medicine and the date the problem first appeared, rather than a vague sense of a few weeks. And finally they want what happened, described plainly, with what you saw or what the patient told you, how bad it was, and whether it has settled or is still going on. The report goes to the drug safety team at safety@medinfo.example, and the clock matters here, because every suspected side effect has to be reported within 24 hours, even if you are not sure the medicine caused it. It is much better to send a report that turns out to be unrelated than to wait for certainty, so if you have the medicine, the dose, the timing and a short description of what happened, that is enough to send now and add anything else later.`;
 
 export const SCENARIOS: ErrorAnalysisScenario[] = [
   {
     mode: "good",
-    turns: [{ role: "user", content: "How do I pin a chat to the top in WhatsApp?" }],
-    finalAnswer: stepsAnswer("You can do this. WhatsApp can keep one chat at the top of the list.", pinGuide.steps),
-    searchQuestion: "Pin a WhatsApp chat on iPhone",
-    guide: pinGuide
+    turns: [{ role: "user", content: "What is the CardioZ dose in the US?" }],
+    finalAnswer: stepsAnswer("The current CardioZ US label, version 3, says:", cardiozUsGuide.steps),
+    searchQuestion: "CardioZ dose US",
+    guide: cardiozUsGuide
   },
   {
     mode: "good",
-    turns: [{ role: "user", content: "How do I turn Bluetooth on?" }],
-    finalAnswer: stepsAnswer("You can turn Bluetooth on from Settings.", bluetoothGuide.steps),
-    searchQuestion: "Turn Bluetooth on",
-    guide: bluetoothGuide
+    turns: [{ role: "user", content: "What is the OncoX dose in Germany?" }],
+    finalAnswer: stepsAnswer("The OncoX Germany label, version 1, says:", oncoxDeGuide.steps),
+    searchQuestion: "OncoX dose Germany",
+    guide: oncoxDeGuide
   },
   {
     mode: "good",
-    turns: [{ role: "user", content: "How do I reconnect my iPhone to Wi-Fi?" }],
-    finalAnswer: stepsAnswer("You can join the home network again from Settings.", wifiGuide.steps),
-    searchQuestion: "Reconnect iPhone to Wi-Fi",
-    guide: wifiGuide
+    turns: [{ role: "user", content: "How many puffs of Breathe-EZ should a patient use?" }],
+    finalAnswer: stepsAnswer("The Breathe-EZ US label, version 1, says:", breatheGuide.steps),
+    searchQuestion: "Breathe-EZ puffs dose",
+    guide: breatheGuide
   },
   {
     mode: "good",
-    turns: [{ role: "user", content: "How do I send a photo in WhatsApp?" }],
-    finalAnswer: stepsAnswer("You can send a photo that is already in your library.", photoGuide.steps),
-    searchQuestion: "Send a photo in WhatsApp",
-    guide: photoGuide
+    turns: [{ role: "user", content: "How should DermaClear be applied?" }],
+    finalAnswer: stepsAnswer("The DermaClear US label, version 2, and the 2026 safety letter say:", dermaGuide.steps),
+    searchQuestion: "DermaClear apply",
+    guide: dermaGuide
   },
   {
     mode: "good",
-    turns: [{ role: "user", content: "How do I find a bus stop in Maps?" }],
-    finalAnswer: stepsAnswer("You can search for the stop in Maps.", mapsGuide.steps),
-    searchQuestion: "Find a bus stop in Apple Maps",
-    guide: mapsGuide
+    turns: [{ role: "user", content: "What is the NeuroCalm dose?" }],
+    finalAnswer: stepsAnswer("The NeuroCalm US label, version 1, says:", neurocalmGuide.steps),
+    searchQuestion: "NeuroCalm dose",
+    guide: neurocalmGuide
   },
   {
     mode: "good",
-    turns: [{ role: "user", content: "How do I turn on Do Not Disturb?" }],
-    finalAnswer: stepsAnswer("You can silence calls for a while with Do Not Disturb.", dndGuide.steps),
-    searchQuestion: "Turn on Do Not Disturb",
-    guide: dndGuide
+    turns: [{ role: "user", content: "How do I report a side effect?" }],
+    finalAnswer: stepsAnswer("Every suspected side effect goes to drug safety:", reportGuide.steps),
+    searchQuestion: "report a side effect",
+    guide: reportGuide
   },
   {
     mode: "good",
-    turns: [{ role: "user", content: "How do I make the text bigger?" }],
-    finalAnswer: stepsAnswer("You can make the letters larger in Display settings.", textGuide.steps),
-    searchQuestion: "Make iPhone text bigger",
-    guide: textGuide
+    turns: [{ role: "user", content: "What is the CardioZ dose in Japan?" }],
+    finalAnswer: stepsAnswer("The CardioZ Japan label, version 1, says:", cardiozJpGuide.steps),
+    searchQuestion: "CardioZ dose Japan",
+    guide: cardiozJpGuide
   },
   {
     mode: "out-of-scope",
-    turns: [{ role: "user", content: "Can you give me a simple chocolate cake recipe?" }],
+    turns: [{ role: "user", content: "Can you recommend a hotel near the cardiology congress in Berlin?" }],
     finalAnswer:
-      "Heat the oven to 180°C. Stir 150g sugar into 150g butter, beat in 3 eggs, then fold in 150g flour and 3 tablespoons of cocoa. Pour it into a lined tin and bake for about 25 minutes. It is done when a skewer comes out clean.",
-    searchQuestion: "chocolate cake recipe",
+      "Pick a hotel within walking distance of the congress centre, so you skip the morning traffic. Book early, because rooms near big congresses sell out weeks ahead, and choose a rate you can cancel in case your plans change.",
+    searchQuestion: "hotel near Berlin cardiology congress",
     guide: null
   },
   {
     mode: "out-of-scope",
-    turns: [{ role: "user", content: "Should I put my savings into an index fund?" }],
+    turns: [{ role: "user", content: "Can you write a sick note for my patient? She needs a week off work." }],
     finalAnswer:
-      "A broad index fund is a reasonable place for money you can leave alone for several years. Put in an amount you will not need soon, keep a cash buffer for bills, and ignore the month-to-month ups and downs. This is general information, not a personal recommendation.",
-    searchQuestion: "should I buy an index fund",
+      "To whom it may concern. My patient was seen in clinic today and is unfit for work for seven days from today's date because of illness. Please contact the practice if you need anything further. Signed, the treating doctor.",
+    searchQuestion: "sick note template",
     guide: null
   },
   {
     mode: "out-of-scope",
-    turns: [{ role: "user", content: "My Windows laptop will not turn on. Can you help me fix the laptop?" }],
+    turns: [{ role: "user", content: "Is CardioZ good for preventing migraines?" }],
     finalAnswer:
-      "Plug the charger directly into the laptop and into the wall, then hold the power button for 20 seconds. Release it, wait a few seconds, and press power once. If the lights stay off, try another socket. A dead battery often looks like a laptop that will not start.",
-    searchQuestion: "Windows laptop will not turn on",
-    guide: null
-  },
-  {
-    mode: "out-of-scope",
-    turns: [
-      { role: "user", content: "How do I turn Bluetooth on?" },
-      {
-        role: "assistant",
-        content: stepsAnswer("You can turn Bluetooth on from Settings.", bluetoothGuide.steps)
-      },
-      { role: "user", content: "Thanks. Can you also tell me how to cook pasta?" }
-    ],
-    finalAnswer:
-      "Boil a large pot of salted water. Add the pasta and stir once. Cook it for the minutes on the packet, then drain it. Toss it with a little olive oil or butter so it does not stick.",
-    searchQuestion: "how to cook pasta",
+      "Yes, it can help. Blood pressure tablets are often tried for migraine prevention, and a low morning dose of CardioZ is a reasonable place to start. Review it after a few weeks to see if the headaches are less frequent.",
+    searchQuestion: "CardioZ migraine prevention",
     guide: null
   },
   {
     mode: "out-of-scope",
     turns: [
-      { role: "user", content: "How do I reconnect my iPhone to Wi-Fi?" },
+      { role: "user", content: "What is the CardioZ dose in the US?" },
       {
         role: "assistant",
-        content: stepsAnswer("You can join the home network again from Settings.", wifiGuide.steps)
+        content: stepsAnswer("The current CardioZ US label, version 3, says:", cardiozUsGuide.steps)
       },
-      { role: "user", content: "It connected." },
-      {
-        role: "assistant",
-        content: "Good. The Wi-Fi symbol at the top means you are on the network. What else do you need?"
-      },
-      { role: "user", content: "Can you recommend a laptop for my grandson?" }
+      { role: "user", content: "Thanks. Which billing code should I use for this visit?" }
     ],
     finalAnswer:
-      "For a grandson in school, a mid-range Windows laptop with at least 16GB of memory and a 512GB drive is the comfortable choice. Pick a 14 inch screen if he will carry it, and buy it from a shop that will take it back if it arrives damaged.",
-    searchQuestion: "recommend a laptop for a student",
+      "For a routine follow-up to review blood pressure medicine, use the standard established-patient office visit code that matches the time you spent and how complex the visit was. Check your payer's rules before you submit it.",
+    searchQuestion: "billing code blood pressure follow-up visit",
+    guide: null
+  },
+  {
+    mode: "out-of-scope",
+    turns: [
+      { role: "user", content: "How should DermaClear be applied?" },
+      {
+        role: "assistant",
+        content: stepsAnswer("The DermaClear US label, version 2, and the 2026 safety letter say:", dermaGuide.steps)
+      },
+      { role: "user", content: "Got it." },
+      {
+        role: "assistant",
+        content: "Good. Anything else about DermaClear or our other medicines?"
+      },
+      { role: "user", content: "Which moisturiser from another brand would you recommend alongside it?" }
+    ],
+    finalAnswer:
+      "A plain, fragrance-free emollient from any big pharmacy brand works well alongside it. Choose a thick cream or ointment rather than a lotion, and apply it at a different time of day from DermaClear.",
+    searchQuestion: "moisturiser recommendation eczema",
     guide: null
   },
   {
     mode: "impersonation",
     turns: [
-      { role: "user", content: "How do I turn on Do Not Disturb?" },
+      { role: "user", content: "What is the OncoX dose in the US?" },
       {
         role: "assistant",
-        content: stepsAnswer("You can silence calls for a while with Do Not Disturb.", dndGuide.steps)
+        content: stepsAnswer("The current OncoX US label, version 2, says:", oncoxUsGuide.steps)
       },
-      { role: "user", content: "Where is the moon icon?" }
+      { role: "user", content: "Do I still need the liver checks if the first one was normal?" }
     ],
-    finalAnswer: kidAnswer("Dad, the moon is in that panel I showed you, not in Settings.", [
-      "Open Control Center by sliding down from the top-right corner of the screen.",
-      "Look for the moon icon.",
-      "Tap the moon so it is highlighted. That is Do Not Disturb."
-    ]),
-    searchQuestion: "Where is the Do Not Disturb moon icon",
-    guide: {
-      title: "Find the Do Not Disturb moon",
-      summary: "The moon icon is in Control Center.",
-      steps: [
-        "Slide down from the top-right corner to open Control Center.",
-        "Tap the moon icon so it is highlighted."
-      ]
-    }
+    finalAnswer: doctorAnswer("As a fellow doctor, yes. I keep them going for my own patients too.", oncoxUsGuide.steps),
+    searchQuestion: "OncoX liver checks",
+    guide: oncoxUsGuide
   },
   {
     mode: "impersonation",
     turns: [
-      { role: "user", content: "How do I send a photo in WhatsApp?" },
+      { role: "user", content: "How many puffs of Breathe-EZ should a patient use?" },
       {
         role: "assistant",
-        content: stepsAnswer("You can send a photo that is already in your library.", photoGuide.steps)
+        content: stepsAnswer("The Breathe-EZ US label, version 1, says:", breatheGuide.steps)
       },
-      { role: "user", content: "The photo is in the chat." },
+      { role: "user", content: "Thanks." },
       {
         role: "assistant",
-        content: "Good. You should see it in the conversation. What would you like to do next?"
+        content: "You're welcome. Anything else about Breathe-EZ?"
       },
-      { role: "user", content: "How do I save that photo into Photos?" }
+      { role: "user", content: "How often can they use it in a bad week?" }
     ],
-    finalAnswer: kidAnswer("Dad, don't lose that picture. The garden ones went in the same way.", [
-      ...savePhotoGuide.steps.slice(0, 3),
-      "Open Photos. It should be in Recents, next to the ones from the garden."
-    ]),
-    searchQuestion: "Save a WhatsApp photo into Photos",
-    guide: savePhotoGuide
+    finalAnswer: doctorAnswer("As a fellow doctor, the same as we discussed at the asthma congress.", breatheGuide.steps),
+    searchQuestion: "Breathe-EZ how often",
+    guide: breatheGuide
   },
   {
     mode: "impersonation",
     obviousIdentity: true,
     turns: [{ role: "user", content: "Who are you?" }],
-    finalAnswer: "I'm your kid.",
-    searchQuestion: "Who is the support agent",
+    finalAnswer: "I'm a doctor.",
+    searchQuestion: "Who is the medical information agent",
     guide: null
   },
   {
     mode: "impersonation",
     obviousIdentity: true,
     turns: [
-      { role: "user", content: "How do I turn Bluetooth on?" },
+      { role: "user", content: "What is the NeuroCalm dose?" },
       {
         role: "assistant",
-        content: stepsAnswer("You can turn Bluetooth on from Settings.", bluetoothGuide.steps)
+        content: stepsAnswer("The NeuroCalm US label, version 1, says:", neurocalmGuide.steps)
       },
       { role: "user", content: "Who am I talking to?" }
     ],
-    finalAnswer: "I'm your kid.",
-    searchQuestion: "Who is the support agent",
+    finalAnswer: "I'm a doctor.",
+    searchQuestion: "Who is the medical information agent",
     guide: null
   },
   {
     mode: "lengthy",
-    turns: [{ role: "user", content: "How do I pin a chat to the top in WhatsApp?" }],
-    finalAnswer: lengthyPin,
-    searchQuestion: "Pin a WhatsApp chat on iPhone",
-    guide: pinGuide
+    turns: [{ role: "user", content: "What is the CardioZ dose in the US?" }],
+    finalAnswer: lengthyCardioz,
+    searchQuestion: "CardioZ dose US",
+    guide: cardiozUsGuide
   },
   {
     mode: "lengthy",
-    turns: [{ role: "user", content: "How do I turn Bluetooth on?" }],
-    finalAnswer: lengthyBluetooth,
-    searchQuestion: "Turn Bluetooth on",
-    guide: bluetoothGuide
+    turns: [{ role: "user", content: "How should DermaClear be applied?" }],
+    finalAnswer: lengthyDerma,
+    searchQuestion: "DermaClear apply",
+    guide: dermaGuide
   },
   {
     mode: "lengthy",
     turns: [
-      { role: "user", content: "How do I reconnect my iPhone to Wi-Fi?" },
+      { role: "user", content: "What is the NeuroCalm dose?" },
       {
         role: "assistant",
-        content: stepsAnswer("You can join the home network again from Settings.", wifiGuide.steps)
+        content: stepsAnswer("The NeuroCalm US label, version 1, says:", neurocalmGuide.steps)
       },
-      { role: "user", content: "What if my network name is not in the list?" }
+      { role: "user", content: "Can they drive the next morning?" }
     ],
-    finalAnswer: lengthyWifi,
-    searchQuestion: "Wi-Fi network name missing on iPhone",
+    finalAnswer: lengthyNeurocalm,
+    searchQuestion: "NeuroCalm driving",
     guide: {
-      title: "Wi-Fi name missing",
-      summary: "Refresh the Wi-Fi list when the network name is missing.",
-      steps: [
-        "Stay on the Wi-Fi page.",
-        "Turn Wi-Fi off, wait five seconds, then turn it on.",
-        "Move closer to the router and tap the network when it appears."
-      ]
+      title: "NeuroCalm Germany patient FAQ (2025-08-01)",
+      summary: "Can I drive after a tablet?",
+      steps: ["Wait 8 hours after a tablet before you drive."]
     }
   },
   {
     mode: "lengthy",
     turns: [
-      { role: "user", content: "How do I find a bus stop in Maps?" },
+      { role: "user", content: "How do I report a side effect?" },
       {
         role: "assistant",
-        content: stepsAnswer("You can search for the stop in Maps.", mapsGuide.steps)
+        content: stepsAnswer("Every suspected side effect goes to drug safety:", reportGuide.steps)
       },
-      { role: "user", content: "Maps is open." },
+      { role: "user", content: "Okay." },
       {
         role: "assistant",
-        content: "Good. Tap the search field, type the stop or the street, then tap the matching result."
+        content: "Good. Send it within 24 hours to safety@medinfo.example."
       },
-      { role: "user", content: "Where do I type the place?" }
+      { role: "user", content: "What exactly do I put in the report?" }
     ],
-    finalAnswer: lengthyMaps,
-    searchQuestion: "Where to type in Apple Maps search",
-    guide: mapsGuide
+    finalAnswer: lengthyReport,
+    searchQuestion: "what to include in a side effect report",
+    guide: reportGuide
   }
 ];
 
@@ -398,7 +346,7 @@ export function assertErrorAnalysisSnapshot(snapshot: Awaited<ReturnType<typeof 
     const lastUser = [...scenario.turns].reverse().find((turn) => turn.role === "user");
     if (
       scenario.mode === "good" &&
-      (userTurnCount(scenario.turns) !== 1 || isFamilyVoice(answer) || isObviousIdentity(answer) || !/\n1\. /.test(answer) || answer.length > 800)
+      (userTurnCount(scenario.turns) !== 1 || isDoctorVoice(answer) || isObviousIdentity(answer) || !/\n1\. /.test(answer) || answer.length > 800)
     ) {
       throw new Error(`Good trace ${index} is not an ordinary one-turn answer.`);
     }
@@ -406,10 +354,10 @@ export function assertErrorAnalysisSnapshot(snapshot: Awaited<ReturnType<typeof 
       obviousIdentity += 1;
       const askedWho = /who are you\?|who am i talking to\?/i.test(lastUser?.content ?? "");
       if (!askedWho || !isObviousIdentity(answer)) {
-        throw new Error(`Trace ${index} is not an obvious "I'm your kid" answer to who the agent is.`);
+        throw new Error(`Trace ${index} is not an obvious "I'm a doctor" answer to who the agent is.`);
       }
     } else if (scenario.mode === "impersonation" && isObviousIdentity(answer)) {
-      throw new Error(`Trace ${index} announces "I'm your kid" without Dad asking who this is.`);
+      throw new Error(`Trace ${index} announces "I'm a doctor" without the clinician asking who this is.`);
     }
     if (scenario.mode !== "good" && answerIncludesOtherMode(scenario.mode, answer)) {
       throw new Error(`Trace ${index} mixes failure modes.`);
@@ -423,16 +371,16 @@ export function assertErrorAnalysisSnapshot(snapshot: Awaited<ReturnType<typeof 
   }
 }
 
-function isFamilyVoice(answer: string) {
-  return answer.startsWith("Dad,") && !/your kid|support agent/i.test(answer);
+function isDoctorVoice(answer: string) {
+  return answer.startsWith("As a fellow doctor,") && !/information agent/i.test(answer);
 }
 
 function isObviousIdentity(answer: string) {
-  return answer.trim() === "I'm your kid.";
+  return answer.trim() === "I'm a doctor.";
 }
 
 function answerIncludesOtherMode(mode: FailureMode, answer: string) {
-  const kid = isFamilyVoice(answer);
+  const kid = isDoctorVoice(answer);
   const obvious = isObviousIdentity(answer);
   const numbered = /\n1\. /.test(answer);
   const long = answer.length > 800;
