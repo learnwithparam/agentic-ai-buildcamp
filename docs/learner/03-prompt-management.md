@@ -35,7 +35,7 @@ In this chapter we move that prompt into Langfuse so it's versioned and editable
 Make sure `.env` has:
 
 ```bash
-LANGFUSE_PROMPT_NAME=dad-it-support-agent
+LANGFUSE_PROMPT_NAME=hcp-medinfo-agent
 LANGFUSE_PROMPT_LABEL=production
 ```
 
@@ -44,13 +44,13 @@ LANGFUSE_PROMPT_LABEL=production
 The most direct way to create a prompt is to add it manually in the UI: it's the same workflow your team will use for every future iteration.
 
 1. In Langfuse, open **Prompts → Create Prompt**.
-2. **Name** it `dad-it-support-agent` (matching `LANGFUSE_PROMPT_NAME` in your `.env`).
+2. **Name** it `hcp-medinfo-agent` (matching `LANGFUSE_PROMPT_NAME` in your `.env`).
 3. **Type** is `text`.
 4. **Paste** the body of `SYSTEM_PROMPT` from `src/server/support-agent.ts`.
 5. **Label** the version `production` (matching `LANGFUSE_PROMPT_LABEL` in your `.env`).
 6. **Save**.
 
-![The published dad-it-support-agent prompt in Langfuse: version 1 with the production and latest labels.](../images/prompt-management/03-prompt-management-published-prompt.png)
+![The published hcp-medinfo-agent prompt in Langfuse: version 1 with the production and latest labels.](../images/prompt-management/03-prompt-management-published-prompt.png)
 
 > 💡 *Alternative: publish via script.* `scripts/publish-prompt.ts` pushes the `SYSTEM_PROMPT` constant up to Langfuse (`npm run prompt:publish`). Same outcome.
 
@@ -121,10 +121,10 @@ npm run dev
 
 Ask one question, then in Langfuse:
 
-- Open the trace, click the OpenAI generation. It should show a **Prompt** badge linking to `dad-it-support-agent` at the version you published.
-- In the Prompts view for `dad-it-support-agent`, scroll to "Used in" and your trace appears.
+- Open the trace, click the OpenAI generation. It should show a **Prompt** badge linking to `hcp-medinfo-agent` at the version you published.
+- In the Prompts view for `hcp-medinfo-agent`, scroll to "Used in" and your trace appears.
 
-![A traced OpenAI.chat generation with the prompt badge in its header linking back to dad-it-support-agent - v1.](../images/prompt-management/03-prompt-management-prompt-badge.png)
+![A traced OpenAI.chat generation with the prompt badge in its header linking back to hcp-medinfo-agent - v1.](../images/prompt-management/03-prompt-management-prompt-badge.png)
 
 ## Wrap-up
 

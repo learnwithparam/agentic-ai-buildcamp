@@ -1,6 +1,6 @@
 ---
 title: "Workshop: Setup"
-description: "Set up the workshop app with OpenAI and Langfuse credentials, then verify the local Dad IT Support Agent."
+description: "Set up the workshop app with OpenAI and Langfuse credentials, then verify the local HCP Medical Information Agent."
 ---
 
 # 00 Setup
@@ -17,25 +17,32 @@ Have the workshop app running locally with both OpenAI and Langfuse credentials 
 
 An older version fails in a way that is easy to misread. Vite's platform-specific binary is an optional dependency, so npm skips it **without reporting an error**: `npm install` looks like it succeeded, and the problem only appears later when `npm run dev` cannot start Vite. If you upgrade Node after installing, re-run `npm ci` so the skipped binary is fetched.
 
-**Langfuse AI Features, which include Halo.** New organizations usually have these on unless someone opted out. If [Halo](https://langfuse.com/docs/api-and-data-platform/features/halo) is missing from the project, an organization owner or admin turns AI Features back on under **Organization Settings → General → AI Features**. The workshop also uses the other features this setting covers, such as Ask AI in filters.
+**Docker Desktop** (or another Docker engine) with about 6 GB of memory free. Langfuse runs on your machine, not in the cloud.
+
+**An OpenRouter key.** The app uses the official OpenAI SDK, pointed at OpenRouter. The model is `openai/gpt-6-luna`.
 
 ## Starting point
 
 Clone the workshop repository, enter it, then check out the setup checkpoint for this chapter:
 
 ```bash
-git clone https://github.com/langfuse/langfuse-workshop.git
-cd langfuse-workshop
+git clone https://github.com/learnwithparam/agentic-ai-buildcamp.git
+cd agentic-ai-buildcamp
 git checkout checkpoint/00-setup
 ```
 
 This checkpoint intentionally contains the same untraced base app as `checkpoint/01-base-app`. Use it to confirm that your API keys, dependencies, and local ports work before switching to the build chapters. The Langfuse keys are configured now, but traces start only after you add instrumentation in `02-tracing`.
 
-## Step 1: Get the API keys
+## Step 1: Start Langfuse and get the keys
 
-1. **OpenAI**: [platform.openai.com](https://platform.openai.com) → API Keys → create one. Copy the `sk-...` value; you will paste it into `.env` in Step 3.
-2. **Langfuse**: sign up at [langfuse.com](https://langfuse.com) on the **EU region**, create a project, and copy the public + secret keys from **Settings → API Keys**. You will paste those into `.env` in Step 3 as well.
-3. **AI Features**: confirm Halo is visible in the project. New organizations usually have this on unless someone opted out. If Halo is missing, an owner or admin enables **Organization Settings → General → AI Features**.
+1. **Langfuse**: start it on your machine.
+
+   ```bash
+   docker compose -f langfuse/docker-compose.yml -f langfuse/workshop.override.yml up -d
+   ```
+
+   The first start downloads the images and takes a few minutes. Then open [http://localhost:3000](http://localhost:3000) and sign in as `learner@workshop.local` with the password `workshop-password`. The override file creates that user, the `HCP MedInfo` project, and its keys `pk-lf-workshop` and `sk-lf-workshop`, so there is nothing to click.
+2. **OpenRouter**: [openrouter.ai](https://openrouter.ai) → Keys → create one. Copy the `sk-or-...` value. You paste it into `.env` in Step 3.
 
 ## Step 2: Install the Langfuse skill and CLI
 
@@ -61,13 +68,20 @@ npx skills add langfuse/skills --skill "langfuse"
 cp .env.example .env
 ```
 
-Fill in:
+Fill in your OpenRouter key:
 
 ```bash
-OPENAI_API_KEY=sk-...
-LANGFUSE_PUBLIC_KEY=pk-lf-...
-LANGFUSE_SECRET_KEY=sk-lf-...
-LANGFUSE_BASE_URL=https://cloud.langfuse.com
+OPENAI_API_KEY=sk-or-...
+```
+
+The other values already point at OpenRouter and your local Langfuse:
+
+```bash
+OPENAI_BASE_URL=https://openrouter.ai/api/v1
+OPENAI_MODEL=openai/gpt-6-luna
+LANGFUSE_PUBLIC_KEY=pk-lf-workshop
+LANGFUSE_SECRET_KEY=sk-lf-workshop
+LANGFUSE_BASE_URL=http://localhost:3000
 ```
 
 Leave the rest of the defaults as they are.
@@ -85,25 +99,24 @@ npm run dev
 
 Leave `npm run dev` running while you edit. Client changes hot-reload via Vite; server code and `.env` changes restart the API automatically. You do not need to stop and start the app for normal workshop edits.
 
-Open [http://127.0.0.1:3333](http://127.0.0.1:3333) to access the Dad IT Support Agent UI.
+Open [http://127.0.0.1:3333](http://127.0.0.1:3333) to access the HCP Medical Information Agent UI.
 
 ## Step 5: Confirm what you see
 
-You should see the **Dad IT Support Agent** chat:
+You should see the **HCP Medical Information Agent** chat:
 
-- the Specs mascot up top
-- a greeting from Specs
+- the agent title up top
+- a greeting from the agent
 - suggestion chips below the greeting
-- the iPhone panel on the right ("Dad" + iPhone 15 details)
+- the side panel on the right (the signed-in clinician and the label library)
 
-![How Specs handles a ticket: one agent, two tools, one model, each hop an observation in the trace.](../images/specs_illustration.png)
 
 
 ## How to verify you are done
 
 - `npm run dev` is running and the UI loads at `http://127.0.0.1:3333`.
-- The browser shows the Specs greeting, not an error.
-- Sending one of the suggestion chips returns a real iPhone answer from the model.
+- The browser shows the agent greeting, not an error.
+- Sending one of the suggestion chips returns a real label answer from the model.
 
 ## End state
 
