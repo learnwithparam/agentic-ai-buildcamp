@@ -39,7 +39,7 @@ Chat agents benefit from capturing signals. Any agent that interacts with a pers
 
 For the agent, we start with two conversation signals. We identify whether the clinician disagrees with the answer, and whether the clinician is writing in all caps. Both are strong signs that the last answer failed, or at least that the conversation is worth looking into.
 
-![Conversation signals over time, one chart per score.](../images/monitoring/user-frustration-dashboard.png)
+![Conversation signals on a dashboard, one bar per signal score.](../images/monitoring/user-frustration-dashboard.png)
 
 The Academy page on [capturing signals](https://langfuse.com/academy/monitoring/capturing-signals) maps explicit ratings, behavioral signals, conversation signals, and outcomes.
 
