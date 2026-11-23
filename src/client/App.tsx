@@ -3,22 +3,22 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { ChatMessage, ChatRequest, ChatResponse, SupportContext } from "../shared/types";
 
-const SESSION_STORAGE_KEY = "dad-it-support-session";
+const SESSION_STORAGE_KEY = "hcp-medinfo-session";
 
 const SUGGESTIONS = [
-  "How do I turn Bluetooth on?",
-  "How do I send a photo on WhatsApp?",
-  "Why does my Wi-Fi keep dropping?",
-  "How do I free up storage on my phone?"
+  "What is the CardioZ dose in the US?",
+  "How often should DermaClear be applied?",
+  "Can CardioZ be used for migraine prevention?",
+  "My patient got a rash on DermaClear. What do I do?"
 ];
 
 const PHONE = {
-  ownerName: "Dad",
-  ownerSub: "Signed in · iPhone 15",
-  model: "iPhone 15",
-  finish: "Black, 128 GB",
-  os: "iOS 18.5",
-  purchased: "Sep 2023"
+  ownerName: "Dr. Weber",
+  ownerSub: "Signed in · GP, Germany",
+  model: "Label library",
+  finish: "5 brands, 4 countries",
+  os: "Today: 2026-11-20",
+  purchased: "Nov 2026"
 };
 
 function createSessionId() {
@@ -41,7 +41,7 @@ function createMessage(role: ChatMessage["role"], content: string): ChatMessage 
 function createGreeting(): ChatMessage {
   return createMessage(
     "assistant",
-    "Hi Dad. I'm here for whatever's bothering your iPhone: Wi-Fi, Bluetooth, photos, messages, maps, you name it.\n\nAsk me **one** thing at a time and I'll walk you through it, step by step."
+    "Hello Doctor. Ask me about doses, warnings, studies or side effect reporting for CardioZ, OncoX, Breathe-EZ, DermaClear and NeuroCalm.\n\nTell me the **country** too, because labels differ."
   );
 }
 
@@ -116,7 +116,7 @@ function PhonePanel() {
         </div>
       </div>
 
-      <p className="side-eyebrow">// Your phone</p>
+      <p className="side-eyebrow">// Library</p>
 
       <div className="lf-corners phone-card">
         <div className="phone-hero">
@@ -127,7 +127,7 @@ function PhonePanel() {
             <div className="model">{PHONE.model}</div>
             <div className="os">{PHONE.os}</div>
             <div className="age">
-              {PHONE.finish} · bought {PHONE.purchased}
+              {PHONE.finish} · updated {PHONE.purchased}
             </div>
           </div>
         </div>
@@ -144,7 +144,7 @@ function TopBar() {
       <div className="title-row">
         <span className="eyebrow">// support workspace</span>
         <span className="title">
-          <span className="mark">Dad</span> IT Support Agent
+          <span className="mark">HCP</span> Medical Information Agent
         </span>
       </div>
       <span className="spacer"></span>
@@ -257,7 +257,7 @@ export function App() {
             </div>
             <div className="who">
               <h2>
-                Hi Dad, I'm <span className="mark">Specs</span>.
+                Hello Doctor, I'm <span className="mark">MedInfo</span>.
               </h2>
             </div>
           </header>
@@ -275,7 +275,7 @@ export function App() {
                         <p>{m.content}</p>
                       )}
                     </div>
-                    <div className="meta">{m.role === "user" ? "you · just now" : "specs · just now"}</div>
+                    <div className="meta">{m.role === "user" ? "you · just now" : "medinfo · just now"}</div>
                   </div>
                 </div>
               ))}
@@ -293,7 +293,7 @@ export function App() {
                         <span></span>
                       </div>
                     </div>
-                    <div className="meta">specs · checking…</div>
+                    <div className="meta">medinfo · checking…</div>
                   </div>
                 </div>
               )}
@@ -316,7 +316,7 @@ export function App() {
               <div className="composer-box">
                 <textarea
                   ref={taRef}
-                  placeholder="What's going on with your phone?"
+                  placeholder="Ask about a medicine, dose or side effect"
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
                   onKeyDown={onKeyDown}
