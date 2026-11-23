@@ -9,7 +9,7 @@ Learner guide: [00 Setup](../learner/00-setup.md)
 
 ## Instructor notes
 
-- Every learner runs the same pinned Langfuse from `langfuse/docker-compose.yml`, so the UI matches the screenshots. Halo is Cloud only. The lesson 04 steps that use it say how to do them by hand.
+- Every learner runs the same pinned Langfuse from `langfuse/docker-compose.yml`, so the UI matches the screenshots. Lesson 04 clusters failures and builds dashboards by hand, because the AI features are Cloud only.
 - Use `checkpoint/00-setup` as the stable base-app checkout. It should be equivalent to `checkpoint/01-base-app`, not the complete reference app.
 - `main` contains the complete reference implementation, but learners should use the checkpoint so setup and base-app orientation share the same starting state.
 - Make learners confirm the UI loads at `127.0.0.1:3333` and that a suggestion-chip chat turn returns a real answer.
