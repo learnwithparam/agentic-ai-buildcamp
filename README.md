@@ -8,7 +8,7 @@ The workshop is the hands-on version of many concepts explained in the [Langfuse
 
 You can complete the workshop on your own from the learner lessons, or use the instructor notes to teach the same material to a group.
 
-> Langfuse runs on your machine from [`langfuse/`](./langfuse/), and the model runs on OpenRouter. The Halo steps in lesson 04 need Langfuse Cloud, and each one says how to do it by hand locally.
+> Langfuse runs on your machine from [`langfuse/`](./langfuse/), and the model runs on OpenRouter. Every lesson runs on that local stack.
 
 ## Run it
 
