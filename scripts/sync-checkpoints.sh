@@ -12,7 +12,7 @@
 #
 # Usage (from repo root, clean working tree):
 #   ./scripts/sync-checkpoints.sh                    # update tags locally
-#   ./scripts/sync-checkpoints.sh --verify           # also typecheck each tag
+#   ./scripts/sync-checkpoints.sh --verify           # also run npm run check on each tag
 #   ./scripts/sync-checkpoints.sh --verify --push    # then force-push moved tags
 set -euo pipefail
 
@@ -83,7 +83,8 @@ trap cleanup EXIT
 
 mkdir -p "$STAGE/source" "$STAGE/keep"
 git archive "$SOURCE_REF" | tar -x -C "$STAGE/source"
-rm -rf "$STAGE/source/.github"
+# The workflow and this script only run on main. A tag without them stays clean.
+rm -rf "$STAGE/source/.github" "$STAGE/source/scripts/sync-checkpoints.sh"
 
 sync_regions() {
   python3 - "$1" "$2" <<'PY'
@@ -140,8 +141,8 @@ for tag in "${TAGS[@]}"; do
   fi
 
   if [[ "$VERIFY" -eq 1 ]]; then
-    echo "    typecheck"
-    npm run -s typecheck
+    echo "    npm run check"
+    npm run -s check
   fi
 
   git commit -q -m "$(cat <<MSG
