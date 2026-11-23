@@ -9,7 +9,7 @@ export const TOOL_DEFINITIONS: OpenAI.Chat.Completions.ChatCompletionTool[] = [
     type: "function",
     function: {
       name: "get_support_context",
-      description: "Look up Dad's known device setup so the answer stays grounded.",
+      description: "Look up the brands, countries and desk rules so the answer stays grounded.",
       parameters: {
         type: "object",
         properties: {},
@@ -21,13 +21,13 @@ export const TOOL_DEFINITIONS: OpenAI.Chat.Completions.ChatCompletionTool[] = [
     type: "function",
     function: {
       name: "search_help_library",
-      description: "Search the local help library for practical step-by-step device instructions.",
+      description: "Search the label library: labels, safety letters, study summaries and FAQs.",
       parameters: {
         type: "object",
         properties: {
           question: {
             type: "string",
-            description: "Dad's practical device question."
+            description: "The clinician's question, with the brand and country when known."
           }
         },
         required: ["question"],
