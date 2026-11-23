@@ -41,7 +41,6 @@ Helper commands used by the lessons:
 
 ```bash
 npm run prompt:publish                  # lesson 03: publish the agent prompt
-npm run langfuse:seed:otel              # lesson 04: production traces
 npm run langfuse:seed:error-analysis    # lesson 04: 20 traces for error analysis
 npm run dataset:seed                    # lesson 05: the 27-item eval dataset
 npm run dataset:run                     # lessons 06 and 07: one scored experiment run
@@ -70,6 +69,7 @@ The server and the npm scripts read the repository `.env` first, so a stray shel
 - Or jump to the lesson that matches what you want to learn. Each one starts from its own checkpoint.
 - Install the [Langfuse skill](https://github.com/langfuse/skills) (`/langfuse`) to apply the same patterns to your own codebase.
 - For the bigger picture behind each lesson, read the [Langfuse Academy](https://langfuse.com/academy).
+- To see where this loop goes in a real company, read the two case studies: [an enterprise HCP system](./case-studies/enterprise-agentic-hcp-system.md) and [autonomous AI teammates](./case-studies/autonomous-ai-teammates.md).
 
 ## Credits and license
 
