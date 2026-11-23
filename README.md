@@ -2,15 +2,32 @@
 
 # Langfuse Workshop - the AI engineering loop, end to end
 
-This is a step-by-step Langfuse workshop built on a small TypeScript sample application: the Dad IT Support Agent. The workshop covers the full AI engineering loop with Langfuse: tracing, prompt management, monitoring, datasets, experiments, and evaluation.
+This is a step-by-step Langfuse workshop built on a small TypeScript sample application: the HCP Medical Information Agent. The workshop covers the full AI engineering loop with Langfuse: tracing, prompt management, monitoring, datasets, experiments, and evaluation.
 
 The workshop is the hands-on version of many concepts explained in the [Langfuse Academy](https://langfuse.com/academy). The complementary materials are called out respectively.
 
 You can complete the workshop on your own from the learner lessons, or use the instructor notes to teach the same material to a group.
 
-> ⚠️ Use **Langfuse Cloud** so you have the latest features this workshop describes. Self-hosted instances may be on an older version and will not match the lessons.
->
-> Confirm **AI Features** are on for your organization. New organizations usually have them on unless someone opted out. If **Halo** is missing, an owner or admin turns them back on under **Organization Settings → General → AI Features**.
+> Langfuse runs on your machine from [`langfuse/`](./langfuse/), and the model runs on OpenRouter. The Halo steps in lesson 04 need Langfuse Cloud, and each one says how to do it by hand locally.
+
+## Run it
+
+```bash
+docker compose -f langfuse/docker-compose.yml -f langfuse/workshop.override.yml up -d
+cp .env.example .env      # then set OPENAI_API_KEY to your OpenRouter key
+npm ci
+npm run dev
+```
+
+Open the app at [http://localhost:3333](http://localhost:3333) and Langfuse at [http://localhost:3000](http://localhost:3000) (`learner@workshop.local` / `workshop-password`). Then:
+
+```bash
+npm run prompt:publish                  # the agent prompt
+npm run langfuse:seed:otel              # production traces for lesson 04
+npm run langfuse:seed:error-analysis    # 20 traces for error analysis
+npm run dataset:seed                    # the 27-item eval dataset
+npm run dataset:run                     # one scored experiment run
+```
 
 ## For learners
 
@@ -36,11 +53,11 @@ The workshop does not depend on an instructor. The instructor notes add teaching
 
 ## Workshop scope
 
-The sample app is a small web chat where Dad opens the chat to get iPhone help. The agent is named **Specs** and answers with step-by-step instructions. Under the hood, it is a normal OpenAI tool-calling loop with two local tools.
+The sample app is a small web chat for doctors and pharmacists. They ask the medical information desk about five invented medicines, and the agent answers from an in-memory label library with the label it used. Under the hood, it is a normal OpenAI SDK tool-calling loop with two local tools, running on OpenRouter.
 
 ![The AI Engineering Loop](./docs/images/AI-engineering-loop.png)
 
-![The Dad IT Support Agent sample app: Specs greeting Dad, suggestion chips, and the iPhone side panel.](./docs/images/sample_app.png)
+![The HCP Medical Information Agent sample app: the greeting, suggestion chips, and the label library side panel.](./docs/images/sample_app.png)
 
 `main` contains the complete reference app and current workshop docs. Use it to inspect the finished implementation or compare your work against the end state. The exercises themselves start from checkpoint tags.
 

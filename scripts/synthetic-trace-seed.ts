@@ -11,13 +11,13 @@ import {
 
 // Real exported turns from data/seed-traffic-followups-traces.json. Cloning them keeps
 // the AGENT -> GENERATION/TOOL tree, token usage, and cost identical to live traffic.
-const SINGLE_TURN_TEMPLATE_ID = "b63ac42cd5e2207efd6b3b54e7d8aa8b";
-const FOLLOW_UP_TEMPLATE_ID = "ec538daf8f726dc969e901a85bda329b";
+const SINGLE_TURN_TEMPLATE_ID = "012ac64622bfcbbbd9bc7170961555be";
+const FOLLOW_UP_TEMPLATE_ID = "20e8d27315a17811b3818a7a330ecf25";
 const TEMPLATE_FILE = resolveFromScript(import.meta.url, "../data/seed-traffic-followups-traces.json");
 const TEMPLATE_CONVERSATION_MARKERS = [
-  "How do I pin a chat to the top in WhatsApp?",
-  "How do I set up a second email account",
-  "How do I get there from the start?"
+  "What is the CardioZ dose in the US?",
+  "What is DermaClear used for?",
+  "Where is that on the label?"
 ];
 
 export type ChatTurn = { role: "user" | "assistant"; content: string };
@@ -66,7 +66,7 @@ export async function buildSyntheticSnapshot(
     schemaVersion: 1,
     exportedAt: new Date().toISOString(),
     filters: {
-      traceName: "dad-it-support-chat-turn",
+      traceName: "hcp-medinfo-chat-turn",
       includeSynthetic: true,
       exclusionRules: [`built by ${options.seedSource} seed`]
     },
@@ -104,14 +104,14 @@ function buildBundle(
   shiftTimestamps(bundle, targetTimestamp - Date.parse(bundle.trace.timestamp));
 
   const sessionId = `seed-session-${options.sessionPrefix}-${String(index + 1).padStart(3, "0")}`;
-  const userId = "seed-user-dad";
+  const userId = "seed-user-clinician";
   const messages = conversationMessages(scenario.turns, targetTimestamp);
 
   bundle.trace.input = { ...(asRecord(bundle.trace.input) ?? {}), messages, sessionId, userId };
   bundle.trace.output = { ...(asRecord(bundle.trace.output) ?? {}), answer: scenario.finalAnswer };
   bundle.trace.sessionId = sessionId;
   bundle.trace.userId = userId;
-  bundle.trace.tags = [...new Set([...(bundle.trace.tags ?? []), "dad-it-support", "langfuse-workshop", options.tag])];
+  bundle.trace.tags = [...new Set([...(bundle.trace.tags ?? []), "hcp-medinfo", "langfuse-workshop", options.tag])];
   bundle.trace.metadata = { ...(asRecord(bundle.trace.metadata) ?? {}), seedSource: options.seedSource };
   bundle.scores = [];
 
