@@ -28,7 +28,7 @@ We work in five steps: gather traces, write a note on each, group the notes into
 git checkout checkpoint/04-monitoring
 ```
 
-We use 20 sample traces to get started. Usually 50–100 sample traces are recommended for a first pass.
+We use 20 sample traces to get started. Usually 50 to 100 sample traces are recommended for a first pass.
 
 ## Step 0: Set expectations
 

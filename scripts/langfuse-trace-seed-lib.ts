@@ -7,7 +7,6 @@ export const TRACE_SEED_SCHEMA_VERSION = 1;
 export const DEFAULT_TRACE_SEED_LIMIT = 100;
 export const DEFAULT_TRACE_SEED_NAME = "hcp-medinfo-chat-turn";
 export const DEFAULT_TRACE_SEED_TAG = "workshop-seed";
-export const DEFAULT_TRACE_SEED_FILE = "../data/seed-production-traces.json";
 export const MAX_INGESTION_BATCH_BYTES = 3_000_000;
 
 export type TraceSeedValue = string | number | boolean | null | TraceSeedValue[] | { [key: string]: TraceSeedValue };
@@ -142,10 +141,6 @@ export function todayRange(reference = new Date()) {
 export function resolveFromScript(scriptUrl: string, relativePath: string) {
   const currentDir = path.dirname(fileURLToPath(scriptUrl));
   return path.resolve(currentDir, relativePath);
-}
-
-export function defaultTraceSeedPath(scriptUrl: string) {
-  return resolveFromScript(scriptUrl, DEFAULT_TRACE_SEED_FILE);
 }
 
 export function createTraceSeedIdMaps(params: {
