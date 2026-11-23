@@ -1,11 +1,8 @@
-verify-report.json
 node_modules
-.world/
-.state/
-traces/
-.venv/
-__pycache__/
+dist
+.DS_Store
 .env
-assignment/result.json
-test-results/
-.data/
+.env.local
+.env.test
+.vite
+coverage
