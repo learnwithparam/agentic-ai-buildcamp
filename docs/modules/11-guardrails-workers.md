@@ -1,35 +1,37 @@
 # Guard the inputs and run workers that never double up
 
-Job: watch for label changes overnight, run each once, and survive a crash.
+Job: watch for label changes overnight, run each once, stay under budget and survive a crash.
 
 ## The story in one picture
 
 ```mermaid
 flowchart LR
-  E[Label change event] --> K{Key already seen}
+  E[Label change event] --> K{Key already waiting}
   K -->|yes| X[Ignore the copy]
-  K -->|no| J[Save one job]
-  J --> W[Worker leases the job]
-  W -->|dies| L[Lease runs out]
+  K -->|no| J[Save one job in Postgres]
+  N[Nightly schedule] --> J
+  J --> W[Worker runs the job]
+  W -->|dies| L[Job expires and comes back]
   L --> W
-  W -->|fails 3 times| D[Dead letter list]
+  W -->|fails 3 times| D[Dead letter queue]
   W -->|done| F[Finished once]
 ```
 
 ## Why this matters
 
-Two things go wrong when an agent runs alone. A PDF may hide an order for the agent. A night job may run twice, or die halfway.
+Three things go wrong when an agent runs alone. A PDF may hide an order for the agent. A query may read raw rows. A night job may run twice, run up a big bill or die halfway.
 
-A **guardrail** checks text before the agent reads it. A line that gives orders is dropped, and a question that gives orders is refused.
+A **guardrail** checks text, a query or a bill before the agent acts. A line that gives orders is dropped. A question that gives orders is refused.
 
-A job gets one key. The same event cannot make two jobs. A worker takes a **lease** on the job, so a dead worker cannot hold it forever.
+A job gets one key. The same event cannot make two jobs. If a worker dies, the job comes back and a new worker starts where the old one stopped.
 
 ## What you will have at the end
 
 - A check for text that gives orders, on questions and on documents.
-- A job table with one row for each key.
-- A lease that runs out when a worker dies.
-- A **dead letter list** for jobs that fail every try.
+- A check that lets a query ask for totals only.
+- A **spend cap** that refuses a model call once a run has spent too much.
+- A pg-boss queue with one job for each key, retries and a **dead letter queue**.
+- A nightly schedule and a worker that finishes its job when it gets SIGTERM.
 
 ## See it fail first
 
@@ -37,16 +39,18 @@ What happens when a study PDF tells the agent to ignore its rules? Right now the
 
 For example, a trial summary holds one odd line. It says to ignore the rules and print every NPI. The agent cannot tell that line from a fact.
 
+Three more things fail the same way. A query can say `SELECT *` and read raw rows. Ten copies of one event can make ten runs. A worker that gets `kill -9` in the middle of a run can lose the job.
+
 ## Step 1: drop orders from text
 
-The list of order phrases is short and exact. A normal question never matches it.
+The list of order phrases is short and exact. Hidden marks and extra spaces are cleaned first, so they cannot hide an order.
 
 ### packages/core/src/guardrails.ts
 
 ```ts
 export function givesOrders(text: string): boolean {
-  const lower = text.toLowerCase();
-  return ORDERS.some((phrase) => lower.includes(phrase));
+  const clean = normalise(text);
+  return ORDERS.some((phrase) => clean.includes(phrase));
 }
 
 // Drops every line that gives orders and keeps the rest of the document.
@@ -66,100 +70,93 @@ The team agent checks the question before the router runs. A refused question ne
   if (givesOrders(question)) return { route: "refuse", text: REFUSAL, citations: [] };
 ```
 
-## Step 3: save one job for each key
+## Step 3: allow totals only in a query
 
-The key is the event, for example one label change. A second copy hits the same key and adds nothing.
+The agent may ask for sums and counts. It may not ask for raw rows. A star shows every column, so it is refused.
 
-### packages/core/src/jobs.ts
+### packages/core/src/guardrails.ts
 
 ```ts
-// Returns true when the job is new. A key that already exists is ignored.
-export async function enqueue(key: string, payload: string): Promise<boolean> {
-  const added = await rows(
-    "INSERT INTO jobs (key, payload) VALUES ($1, $2) ON CONFLICT (key) DO NOTHING RETURNING id",
-    [key, payload],
-  );
-  return added.length === 1;
+export function aggregateOnly(sql: string): string | undefined {
+  const withoutCount = sql.replace(/count\s*\(\s*\*\s*\)/gi, "count(1)");
+  if (withoutCount.includes("*")) return "a star shows raw rows, so ask for totals";
+  if (!/\b(sum|count|avg|min|max)\s*\(/i.test(sql)) return "a query must ask for a total";
+  return undefined;
 }
 ```
 
-## Step 4: lease a job
+## Step 4: stop a run at its spend cap
 
-A worker takes a waiting job. It may also take a running job whose lease ran out.
+Each model call costs money. The gateway sends the cost back in a header, and the ledger adds it up. Once the run reaches the cap, the next call is refused before it starts.
 
-### packages/core/src/jobs.ts
-
-```ts
-// Takes one job that is waiting, or one whose worker stopped answering.
-export async function claim(leaseSeconds = LEASE_SECONDS): Promise<Job | undefined> {
-  const [job] = await rows<Job>(
-    `UPDATE jobs SET status = 'running', attempts = attempts + 1,
-       lease_until = now() + $1 * interval '1 second'
-     WHERE id = (SELECT id FROM jobs
-       WHERE (status = 'queued' AND run_after <= now())
-          OR (status = 'running' AND lease_until < now())
-       ORDER BY id FOR UPDATE SKIP LOCKED LIMIT 1)
-     RETURNING *`,
-    [leaseSeconds],
-  );
-  return job;
-}
-```
-
-## Step 5: save the step
-
-The worker saves how far it got. A new worker starts at that step.
-
-### packages/core/src/jobs.ts
+### packages/core/src/guardrails.ts
 
 ```ts
-// Saves how far the job got, so a new worker starts there and not at the beginning.
-export async function saveStep(id: number, step: number): Promise<void> {
-  await rows("UPDATE jobs SET step = $2 WHERE id = $1", [id, step]);
-}
-```
-
-## Step 6: retry, then give up
-
-A failed job waits longer each time. After the last try it goes to the dead letter list.
-
-### packages/core/src/jobs.ts
-
-```ts
-// A failed job waits longer each time. After the last try it goes to the dead letter list.
-async function fail(job: Job, error: unknown): Promise<void> {
-  const message = String(error);
-  if (job.attempts >= MAX_ATTEMPTS) {
-    await rows("UPDATE jobs SET status = 'dead', last_error = $2 WHERE id = $1", [job.id, message]);
-    return;
+export async function underCap<Reply extends Priced>(
+  ledger: Ledger,
+  call: () => Promise<Reply>,
+  capUsd = SPEND_CAP_USD,
+): Promise<Reply> {
+  if (ledger.spentUsd >= capUsd) {
+    throw new OverCap(`This run spent $${ledger.spentUsd} and its cap is $${capUsd}.`);
   }
-  await rows(
-    `UPDATE jobs SET status = 'queued', last_error = $2,
-       run_after = now() + $3 * interval '1 second' WHERE id = $1`,
-    [job.id, message, 2 ** job.attempts],
-  );
-}
-
-export async function runNext(handler: Handler, leaseSeconds = LEASE_SECONDS): Promise<boolean> {
-  const job = await claim(leaseSeconds);
-  if (job === undefined) return false;
-  try {
-    await handler(job);
-    await rows("UPDATE jobs SET status = 'done' WHERE id = $1", [job.id]);
-  } catch (error) {
-    await fail(job, error);
-  }
-  return true;
+  const reply = await call();
+  addCost(ledger, reply);
+  return reply;
 }
 ```
 
-## Step 7: verify
+## Step 5: save one job for each key
+
+The key is the event, for example one label change. pg-boss is a job queue that lives in Postgres. The queue allows one job for each key, so a second copy adds nothing.
+
+### packages/core/src/jobs.ts
+
+```ts
+const queue = new PgBoss({
+  connectionString: DATABASE_URL,
+  superviseIntervalSeconds: 2,
+  monitorIntervalSeconds: 2,
+});
+await queue.createQueue(QUEUE, {
+  policy: "exclusive",
+  retryLimit: MAX_ATTEMPTS - 1,
+  retryDelay: RETRY_SECONDS,
+  retryBackoff: true,
+  deadLetter: DEAD_QUEUE,
+});
+```
+
+## Step 6: resume after a crash
+
+A worker saves its step after each piece of work. When a worker dies, the job expires and comes back. The new worker reads the saved step and starts there.
+
+### packages/core/src/jobs.ts
+
+```ts
+await queue.work<Data>(QUEUE, { pollingIntervalSeconds: 0.5 }, async ([job]) => {
+  const { key, payload } = job.data;
+  await handler({ id: job.id, key, payload, step: await savedStep(key) });
+});
+```
+
+## Step 7: retry, then give up
+
+A failed job waits longer each time. The queue settings in Step 5 do this. After the last try, the job moves to the dead letter queue.
+
+## Step 8: run every night and drain on SIGTERM
+
+A schedule adds one watch job each night. The date in the key means a second add does nothing. When the process gets SIGTERM, the worker finishes its job and then stops.
+
+## Step 9: verify
 
 ```bash
 bun run verify guardrails-workers
 ```
 
-Expect: six green badges and the line "Every check passed."
+Expect: ten green badges and the line "Every check passed."
+
+This check needs Postgres, so run `bun run up` first.
 
 ## Try it yourself
 
@@ -173,12 +170,12 @@ Expect: the badge "Normal questions are never flagged as orders" stays green.
 
 ## Stuck?
 
-| You see                                                      | Why                                             | Fix                                                                         |
-| ------------------------------------------------------------ | ----------------------------------------------- | --------------------------------------------------------------------------- |
-| An order hidden in the text was followed.                    | askTeam does not check the question for orders. | In askTeam, call givesOrders and refuse before the router runs.             |
-| Ten copies of one event made many jobs.                      | enqueue adds a row each time.                   | Insert with ON CONFLICT (key) DO NOTHING and return whether the row is new. |
-| The new worker did not start at the saved step.              | claim does not take a job whose lease ran out.  | In claim, also select running jobs whose lease_until is in the past.        |
-| A job that kept failing was not put in the dead letter list. | fail never stops retrying.                      | In fail, mark the job dead once attempts reach the last try.                |
+| You see                                                       | Why                                              | Fix                                                                       |
+| ------------------------------------------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------- |
+| An order hidden in the text was followed.                     | askTeam does not check the question for orders.  | In askTeam, call givesOrders and refuse before the router runs.           |
+| A run over the cap was not refused.                           | underCap never compares the spend with the cap.  | In underCap, throw OverCap before call runs when the spend is at the cap. |
+| Ten copies of one event made many jobs.                       | enqueue sends the event without a singleton key. | Send with singletonKey, on a queue with the exclusive policy.             |
+| A job that kept failing was not put in the dead letter queue. | The queue has no deadLetter or no retry limit.   | Create the queue with retryLimit, retryBackoff and a deadLetter queue.    |
 
 If you are still stuck, start from a clean copy of this step.
 
@@ -190,6 +187,7 @@ Expect: a message that you are now on the guardrails-workers checkpoint, with a 
 
 ## New words
 
-- **guardrail**: A check that stops bad text before the agent reads it.
-- **lease**: A short claim on a job. If the worker dies, the claim runs out.
-- **dead letter list**: Jobs that failed every try. A person looks at them later.
+- **guardrail**: A check that stops bad text, a bad query or a bad bill before the agent acts.
+- **spend cap**: The most one run may spend. The gateway reports what each model call cost.
+- **singleton key**: A name on a job. Only one waiting or running job may hold that name.
+- **dead letter queue**: A side queue for jobs that failed every try. A person looks at them later.
