@@ -7,10 +7,10 @@ export const env = {
   langfusePublicKey: process.env.LANGFUSE_PUBLIC_KEY ?? "",
   langfuseSecretKey: process.env.LANGFUSE_SECRET_KEY ?? "",
   langfuseBaseUrl: process.env.LANGFUSE_BASE_URL ?? "https://cloud.langfuse.com",
-  langfusePromptName: process.env.LANGFUSE_PROMPT_NAME ?? "dad-it-support-agent",
+  langfusePromptName: process.env.LANGFUSE_PROMPT_NAME ?? "hcp-medinfo-agent",
   langfusePromptLabel: process.env.LANGFUSE_PROMPT_LABEL ?? "production",
   workshopPromptVariant: process.env.WORKSHOP_PROMPT_VARIANT ?? "default",
-  datasetName: process.env.DATASET_NAME ?? "dad-it-support-workshop"
+  datasetName: process.env.DATASET_NAME ?? "hcp-medinfo-workshop"
 };
 
 export function isLangfuseConfigured() {
