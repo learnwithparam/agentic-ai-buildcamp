@@ -2,7 +2,15 @@
 import { DOCUMENTS, stateOf } from "../data/catalog/documents";
 import { HCP_GOLDEN } from "../data/catalog/golden-hcp";
 import { PEOPLE, personNamed } from "../data/catalog/people";
-import { can } from "../packages/core/src/access";
+import {
+  applyWalls,
+  can,
+  demoPassword,
+  personFromCookie,
+  reportAs,
+  signIn,
+} from "../packages/core/src/access";
+import { rows } from "../packages/core/src/db";
 import { activeDocuments, ingestAll, resetDocuments } from "../packages/core/src/ingestion";
 import { serve } from "../packages/core/src/surfaces";
 import { type Agent, askTeam, type Models } from "../packages/core/src/team";
@@ -39,6 +47,7 @@ async function askAs(name: string, spy: Spy) {
   return askTeam(theCase.question, theCase.persona, spy.models);
 }
 
+const FAR_FUTURE = 9999999999;
 const WAIT = AbortSignal.timeout.bind(AbortSignal, 10000);
 
 async function login(base: string, person: string): Promise<string> {
@@ -152,6 +161,55 @@ export const checks: Check[] = [
       } finally {
         server.stop(true);
       }
+    },
+  },
+  {
+    name: "A wrong password is refused and the right one signs in",
+    tryNext: "In signIn, check the password with Bun.password.verify before you sign anything.",
+    run: async () => {
+      const wrong = await signIn("alice", "not-the-password");
+      expect(wrong === undefined, "A wrong password signed in.");
+      const nobody = await signIn("mallory", demoPassword("alice"));
+      expect(nobody === undefined, "An unknown person signed in.");
+      const cookie = await signIn("alice", demoPassword("alice"));
+      expect(cookie !== undefined, "The right password did not sign in.");
+      const person = await personFromCookie(cookie);
+      expect(person?.name === "alice", "The session cookie did not name the person.");
+    },
+  },
+  {
+    name: "A tampered session cookie is refused",
+    tryNext: "In personFromCookie, verify the signature with jwtVerify and trust only its subject.",
+    run: async () => {
+      const cookie = await signIn("carol", demoPassword("carol"));
+      expect(cookie !== undefined, "The right password did not sign in.");
+      const [head, body, tail] = cookie.replace("session=", "").split(";")[0].split(".");
+      const claims = JSON.stringify({ sub: "alice", exp: FAR_FUTURE });
+      const swapped = Buffer.from(claims).toString("base64url");
+      const forged = [`session=${head}.${swapped}.${tail}`, `session=${head}.${body}.x${tail}`];
+      for (const header of forged) {
+        const person = await personFromCookie(header);
+        expect(person === undefined, "A changed cookie was accepted.");
+      }
+      expect((await personFromCookie(null)) === undefined, "A missing cookie gave a person.");
+    },
+  },
+  {
+    name: "Postgres refuses a query across companies",
+    tryNext: "In reportAs, run SET LOCAL ROLE with the company's own role before the query.",
+    run: async () => {
+      await applyWalls();
+      const own = await reportAs("pharma-a", "SELECT count(*) AS total FROM territory_rx_weekly");
+      expect(Number(own[0].total) > 0, "A company could not read its own report data.");
+      let refused = false;
+      try {
+        await reportAs("pharma-a", "SELECT count(*) FROM pharma_b.commercial_dispenses");
+      } catch {
+        refused = true;
+      }
+      expect(refused, "Postgres let one company read the other company's schema.");
+      const roles = await rows("SELECT rolname FROM pg_roles WHERE rolname LIKE 'tenant_%'");
+      expect(roles.length === 2, "There is not one database role for each company.");
     },
   },
 ];

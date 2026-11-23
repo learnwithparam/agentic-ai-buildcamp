@@ -1,8 +1,9 @@
 // Who may see what. The rule is written twice: as can() in code, and as a policy in the database.
 // The agent asks can() first. The database is a second wall that holds even if the code is wrong.
+import { jwtVerify, SignJWT } from "jose";
 import { BRANDS } from "../../../data/catalog/brands";
 import type { DocumentType } from "../../../data/catalog/documents";
-import { GRANTS, type Person, type Role } from "../../../data/catalog/people";
+import { GRANTS, PEOPLE, type Person, type Role } from "../../../data/catalog/people";
 import { inTransaction, rows } from "./db";
 import type { StoredDocument } from "./ingestion";
 
@@ -39,6 +40,11 @@ function ownerOf(brand: string): string {
   const found = BRANDS.find((item) => item.name === brand);
   if (found === undefined) return "nobody";
   return found.tenant;
+}
+
+// The local demo password for each person. A real product never keeps a rule like this.
+export function demoPassword(name: string): string {
+  return `buildcamp-${name}`;
 }
 
 // #region step:access-control
@@ -120,6 +126,7 @@ GRANT SELECT ON documents TO app_reader`;
 export async function applyWalls(): Promise<void> {
   await rows(wallFunction());
   await rows(WALL_SETUP);
+  await applyTenantRoles();
 }
 
 // This query runs as the reader role. The policy picks the rows.
@@ -137,6 +144,86 @@ export async function readUnderWall(
       [brand, country],
     );
     return found.rows as StoredDocument[];
+  });
+}
+// Sign-in. A local demo password for each person. A real product reads hashes from its own store.
+const SESSION_KEY = new TextEncoder().encode(
+  process.env.AUTH_SECRET ?? "dev-secret-for-local-use-only",
+);
+const COOKIE_NAME = "session";
+const HASH_OPTIONS = { algorithm: "argon2id", memoryCost: 4096, timeCost: 2 } as const;
+const hashes = new Map<string, string>();
+
+async function hashFor(name: string): Promise<string> {
+  const known = hashes.get(name);
+  if (known !== undefined) return known;
+  const made = await Bun.password.hash(demoPassword(name), HASH_OPTIONS);
+  hashes.set(name, made);
+  return made;
+}
+
+// Returns the signed session cookie, or nothing when the name or password is wrong.
+export async function signIn(name: string, password: string): Promise<string | undefined> {
+  const person = PEOPLE.find((item) => item.name === name);
+  // An unknown name still costs one hash check, so the answer takes the same time.
+  const stored = await hashFor(person === undefined ? PEOPLE[0].name : person.name);
+  const right = await Bun.password.verify(password, stored);
+  if (person === undefined || !right) return undefined;
+  const token = await new SignJWT({})
+    .setProtectedHeader({ alg: "HS256" })
+    .setSubject(person.name)
+    .setExpirationTime("2h")
+    .sign(SESSION_KEY);
+  return `${COOKIE_NAME}=${token}; HttpOnly; SameSite=Lax; Path=/`;
+}
+
+// Reads the person from a Cookie header. A forged, changed or expired cookie gives nobody.
+export async function personFromCookie(header: string | null): Promise<Person | undefined> {
+  if (header === null) return undefined;
+  const prefix = `${COOKIE_NAME}=`;
+  const parts = header.split(";").map((part) => part.trim());
+  const pair = parts.find((part) => part.startsWith(prefix));
+  if (pair === undefined) return undefined;
+  try {
+    const token = pair.slice(prefix.length);
+    const { payload } = await jwtVerify(token, SESSION_KEY, { algorithms: ["HS256"] });
+    return PEOPLE.find((item) => item.name === payload.sub);
+  } catch {
+    return undefined;
+  }
+}
+
+// Each company gets its own database role. The role reads only its own data.
+function roleOf(tenant: string): string {
+  return `tenant_${tenant.replace("-", "_")}`;
+}
+
+function schemaFor(tenant: string): string {
+  return tenant.replace("-", "_");
+}
+
+export async function applyTenantRoles(): Promise<void> {
+  for (const tenant of new Set(BRANDS.map((brand) => brand.tenant))) {
+    const role = roleOf(tenant);
+    const schema = schemaFor(tenant);
+    await rows(`DO $$ BEGIN
+      IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = '${role}') THEN
+        CREATE ROLE ${role};
+      END IF;
+    END $$`);
+    await rows(`GRANT ${role} TO CURRENT_USER`);
+    await rows(`GRANT USAGE ON SCHEMA ${schema} TO ${role}`);
+    await rows(`GRANT SELECT ON ALL TABLES IN SCHEMA ${schema} TO ${role}`);
+  }
+}
+
+// A read-only report. Postgres refuses other data once the role is set.
+export async function reportAs(tenant: string, sql: string): Promise<Record<string, unknown>[]> {
+  return inTransaction(async (run) => {
+    await run("SET TRANSACTION READ ONLY");
+    await run(`SET LOCAL ROLE ${roleOf(tenant)}`);
+    await run(`SET LOCAL search_path = ${schemaFor(tenant)}`);
+    return (await run(sql)).rows as Record<string, unknown>[];
   });
 }
 // #stub
@@ -162,5 +249,22 @@ export async function readUnderWall(
 //~     [brand, country],
 //~   );
 //~   return found;
+//~ }
+//~
+//~ export async function signIn(_name: string, _password: string): Promise<string | undefined> {
+//~   return undefined;
+//~ }
+//~
+//~ export async function personFromCookie(_header: string | null): Promise<Person | undefined> {
+//~   return undefined;
+//~ }
+//~
+//~ export async function applyTenantRoles(): Promise<void> {}
+//~
+//~ export async function reportAs(
+//~   _tenant: string,
+//~   sql: string,
+//~ ): Promise<Record<string, unknown>[]> {
+//~   return rows(sql);
 //~ }
 // #endregion

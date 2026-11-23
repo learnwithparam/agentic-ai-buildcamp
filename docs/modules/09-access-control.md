@@ -211,13 +211,118 @@ export async function loginResponse(request: Request): Promise<Response> {
 }
 ```
 
-## Step 5: verify
+## Step 5: check a password and sign a cookie
+
+The older sign-in in Step 4 takes a name and nothing else. Now a person must prove who they are. `Bun.password` checks the password against a stored hash. A **hash** is a scrambled copy of a password that cannot be turned back.
+
+After a good sign-in, the code signs a **session cookie** with `jose`. The browser sends the cookie on each request. A cookie that someone changed fails the signature check, so it gives nobody.
+
+The demo passwords are public and for local use only. A real product reads hashes from its own store.
+
+### packages/core/src/access.ts
+
+```ts
+// The local demo password for each person. A real product never keeps a rule like this.
+export function demoPassword(name: string): string {
+  return `buildcamp-${name}`;
+}
+
+const SESSION_KEY = new TextEncoder().encode(
+  process.env.AUTH_SECRET ?? "dev-secret-for-local-use-only",
+);
+const COOKIE_NAME = "session";
+const HASH_OPTIONS = { algorithm: "argon2id", memoryCost: 4096, timeCost: 2 } as const;
+const hashes = new Map<string, string>();
+
+async function hashFor(name: string): Promise<string> {
+  const known = hashes.get(name);
+  if (known !== undefined) return known;
+  const made = await Bun.password.hash(demoPassword(name), HASH_OPTIONS);
+  hashes.set(name, made);
+  return made;
+}
+
+// Returns the signed session cookie, or nothing when the name or password is wrong.
+export async function signIn(name: string, password: string): Promise<string | undefined> {
+  const person = PEOPLE.find((item) => item.name === name);
+  // An unknown name still costs one hash check, so the answer takes the same time.
+  const stored = await hashFor(person === undefined ? PEOPLE[0].name : person.name);
+  const right = await Bun.password.verify(password, stored);
+  if (person === undefined || !right) return undefined;
+  const token = await new SignJWT({})
+    .setProtectedHeader({ alg: "HS256" })
+    .setSubject(person.name)
+    .setExpirationTime("2h")
+    .sign(SESSION_KEY);
+  return `${COOKIE_NAME}=${token}; HttpOnly; SameSite=Lax; Path=/`;
+}
+
+// Reads the person from a Cookie header. A forged, changed or expired cookie gives nobody.
+export async function personFromCookie(header: string | null): Promise<Person | undefined> {
+  if (header === null) return undefined;
+  const pair = header.split(";").find((part) => part.trim().startsWith(`${COOKIE_NAME}=`));
+  if (pair === undefined) return undefined;
+  try {
+    const token = pair.trim().slice(COOKIE_NAME.length + 1);
+    const { payload } = await jwtVerify(token, SESSION_KEY, { algorithms: ["HS256"] });
+    return PEOPLE.find((item) => item.name === payload.sub);
+  } catch {
+    return undefined;
+  }
+}
+```
+
+## Step 6: give each company a database role
+
+The `can()` function is the first wall and row-level security is the second. The report tool needs a third. Each company gets its own database role. That role may read only its own data schema.
+
+The report runs in a read-only transaction. The command SET LOCAL ROLE switches to the company's role for that transaction only. If a query names the other company's schema, Postgres refuses it.
+
+### packages/core/src/access.ts
+
+```ts
+// One database role for each company. The role can read only that company's data schema.
+function roleOf(tenant: string): string {
+  return `tenant_${tenant.replace("-", "_")}`;
+}
+
+function schemaFor(tenant: string): string {
+  return tenant.replace("-", "_");
+}
+
+export async function applyTenantRoles(): Promise<void> {
+  for (const tenant of new Set(BRANDS.map((brand) => brand.tenant))) {
+    const role = roleOf(tenant);
+    const schema = schemaFor(tenant);
+    await rows(`DO $$ BEGIN
+      IF NOT EXISTS (SELECT FROM pg_roles WHERE rolname = '${role}') THEN
+        CREATE ROLE ${role};
+      END IF;
+    END $$`);
+    await rows(`GRANT ${role} TO CURRENT_USER`);
+    await rows(`GRANT USAGE ON SCHEMA ${schema} TO ${role}`);
+    await rows(`GRANT SELECT ON ALL TABLES IN SCHEMA ${schema} TO ${role}`);
+  }
+}
+
+// The read-only report transaction. SET LOCAL ROLE makes Postgres refuse the other company's data.
+export async function reportAs(tenant: string, sql: string): Promise<Record<string, unknown>[]> {
+  return inTransaction(async (run) => {
+    await run("SET TRANSACTION READ ONLY");
+    await run(`SET LOCAL ROLE ${roleOf(tenant)}`);
+    await run(`SET LOCAL search_path = ${schemaFor(tenant)}`);
+    return (await run(sql)).rows as Record<string, unknown>[];
+  });
+}
+```
+
+## Step 7: verify
 
 ```bash
 bun run verify access-control
 ```
 
-Expect: six green badges and the line "Every check passed."
+Expect: nine green badges and the line "Every check passed."
 
 ## Try it yourself
 

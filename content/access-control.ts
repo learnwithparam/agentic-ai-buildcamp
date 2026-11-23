@@ -28,7 +28,7 @@ export const content: UnitContent = {
   C -->|yes| T[Run the tool]
   T --> D[Database wall hides the other rows]`,
   stuck: {
-    correct: "Six green badges, and the code and the database agree for every person.",
+    correct: "Nine green badges, and the code and the database agree for every person.",
     wrong: "The agent shows one company's label to another company.",
     hint: "Ask can() before any tool runs. Then let the database repeat the same rule.",
     rows: [
@@ -90,6 +90,24 @@ export const content: UnitContent = {
       rule: "the database query must run as the reader role",
       find: 'await run("SET LOCAL ROLE app_reader");',
       replace: 'await run("SELECT 1");',
+    },
+    {
+      file: "packages/core/src/access.ts",
+      rule: "the report transaction must switch to the company's database role",
+      find: "await run(`SET LOCAL ROLE ${roleOf(tenant)}`);",
+      replace: 'await run("SELECT 1");',
+    },
+    {
+      file: "packages/core/src/access.ts",
+      rule: "a wrong password must be refused",
+      find: "if (person === undefined || !right) return undefined;",
+      replace: "if (person === undefined) return undefined;",
+    },
+    {
+      file: "packages/core/src/access.ts",
+      rule: "a changed session cookie must be refused",
+      find: 'const { payload } = await jwtVerify(token, SESSION_KEY, { algorithms: ["HS256"] });',
+      replace: 'const payload = JSON.parse(atob(token.split(".")[1]));',
     },
     {
       file: "packages/core/src/surfaces.ts",
