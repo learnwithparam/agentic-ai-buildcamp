@@ -102,7 +102,7 @@ export const UNITS: Unit[] = [
     job: "Finish a half-done answer after the server dies",
     needs: "agent-loop",
     after: null,
-    built: false,
+    built: true,
     cases: [],
   },
   {
