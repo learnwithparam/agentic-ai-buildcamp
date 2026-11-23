@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 
 export const TRACE_SEED_SCHEMA_VERSION = 1;
 export const DEFAULT_TRACE_SEED_LIMIT = 100;
-export const DEFAULT_TRACE_SEED_NAME = "dad-it-support-chat-turn";
+export const DEFAULT_TRACE_SEED_NAME = "hcp-medinfo-chat-turn";
 export const DEFAULT_TRACE_SEED_TAG = "workshop-seed";
 export const DEFAULT_TRACE_SEED_FILE = "../data/seed-production-traces.json";
 export const MAX_INGESTION_BATCH_BYTES = 3_000_000;

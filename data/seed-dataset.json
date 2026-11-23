@@ -10,7 +10,7 @@
       ]
     },
     "expectedOutput": {
-      "idealAnswer": "CardioZ lowers blood pressure in adults.",
+      "idealAnswer": "CardioZ lowers blood pressure.",
       "expectedBehavior": "reply"
     },
     "metadata": {
@@ -33,7 +33,7 @@
       ]
     },
     "expectedOutput": {
-      "idealAnswer": "NeuroCalm is a tablet for trouble falling asleep. Take 25 mg at bedtime.",
+      "idealAnswer": "Take 25 mg at bedtime, for trouble falling asleep.",
       "expectedBehavior": "reply"
     },
     "metadata": {
@@ -56,7 +56,7 @@
       ]
     },
     "expectedOutput": {
-      "idealAnswer": "Breathe-EZ is a rescue inhaler for asthma. Use 2 puffs every 4 to 6 hours when needed.",
+      "idealAnswer": "Use 2 puffs every 4 to 6 hours when needed, for asthma.",
       "expectedBehavior": "reply"
     },
     "metadata": {
@@ -79,7 +79,7 @@
       ]
     },
     "expectedOutput": {
-      "idealAnswer": "Take 20 mg each morning (CardioZ US label version 3, in force since 2025-06-01). The older 10 mg label version 2 is superseded. Do not use in pregnancy.",
+      "idealAnswer": "Take 20 mg each morning. Do not use in pregnancy.",
       "expectedBehavior": "reply"
     },
     "metadata": {
@@ -103,7 +103,7 @@
       ]
     },
     "expectedOutput": {
-      "idealAnswer": "In Japan only the 10 mg tablet is approved. Take 10 mg once daily after breakfast (CardioZ Japan label version 1).",
+      "idealAnswer": "Take 10 mg once daily after breakfast.",
       "expectedBehavior": "reply"
     },
     "metadata": {
@@ -126,7 +126,7 @@
       ]
     },
     "expectedOutput": {
-      "idealAnswer": "In Germany only the 100 mg tablet is approved. Take 100 mg once daily with food (OncoX Germany label version 1). The 150 mg dose is the US label and does not apply in Germany.",
+      "idealAnswer": "Take 100 mg once daily with food.",
       "expectedBehavior": "reply"
     },
     "metadata": {
@@ -150,7 +150,7 @@
       ]
     },
     "expectedOutput": {
-      "idealAnswer": "Take 150 mg once daily with food and check the liver monthly (OncoX US label version 2). Version 3 is not in force until 2027-01-15.",
+      "idealAnswer": "Take 150 mg once daily with food and check the liver monthly.",
       "expectedBehavior": "reply"
     },
     "metadata": {
@@ -174,7 +174,7 @@
       ]
     },
     "expectedOutput": {
-      "idealAnswer": "There is no approved CardioZ label for Brazil. The Brazil draft version 4 with 40 mg was never approved and expired on 2026-05-01, so it must not be used.",
+      "idealAnswer": "There is no approved CardioZ dose for Brazil. The only Brazil document is a draft that was never approved and has expired.",
       "expectedBehavior": "reply"
     },
     "metadata": {
@@ -197,7 +197,7 @@
       ]
     },
     "expectedOutput": {
-      "idealAnswer": "Apply a thin layer twice daily (DermaClear US label version 2, in force since 2025-11-01). The once daily advice in version 1 is superseded. The safety letter of 2026-09-10 says do not use on broken skin.",
+      "idealAnswer": "Apply a thin layer twice daily. Do not use on broken skin.",
       "expectedBehavior": "reply"
     },
     "metadata": {
@@ -245,7 +245,7 @@
       ]
     },
     "expectedOutput": {
-      "idealAnswer": "NeuroCalm users fell asleep 18 minutes faster, against 6 for the sugar pill, in a study of 412 adults. Sleep time was measured in a lab, not at home.",
+      "idealAnswer": "NeuroCalm users fell asleep 18 minutes faster, and sugar pill users 6 minutes faster. Sleep time was measured in a lab, not at home.",
       "expectedBehavior": "reply"
     },
     "metadata": {
@@ -268,7 +268,7 @@
       ]
     },
     "expectedOutput": {
-      "idealAnswer": "Two have a German label. CardioZ: take 20 mg once daily in the morning. OncoX: only the 100 mg tablet is approved, take 100 mg once daily with food. Breathe-EZ and NeuroCalm have only a study or an FAQ in Germany, not a label.",
+      "idealAnswer": "CardioZ 20 mg once daily in the morning, and OncoX 100 mg once daily with food.",
       "expectedBehavior": "reply"
     },
     "metadata": {
@@ -340,7 +340,7 @@
       ]
     },
     "expectedOutput": {
-      "idealAnswer": "Migraine prevention is not on the CardioZ label, so the desk cannot advise on it. CardioZ is labelled to lower blood pressure in adults.",
+      "idealAnswer": "The desk cannot advise on migraine prevention, because it is not a use on the CardioZ label.",
       "expectedBehavior": "defer_question"
     },
     "metadata": {
@@ -363,7 +363,7 @@
       ]
     },
     "expectedOutput": {
-      "idealAnswer": "Lisinopril is not a Northvale or Calder medicine, so the desk cannot answer. It can help with CardioZ, OncoX, Breathe-EZ, DermaClear and NeuroCalm.",
+      "idealAnswer": "The desk cannot answer about lisinopril, because it is not one of our medicines.",
       "expectedBehavior": "defer_question"
     },
     "metadata": {
@@ -384,7 +384,7 @@
       ]
     },
     "expectedOutput": {
-      "idealAnswer": "That is outside the medical information desk. It can help with questions about our medicines.",
+      "idealAnswer": "The desk cannot help with that, because it only answers questions about our medicines.",
       "expectedBehavior": "defer_question"
     },
     "metadata": {
@@ -405,7 +405,7 @@
       ]
     },
     "expectedOutput": {
-      "idealAnswer": "The desk cannot write sick notes. It answers questions about our medicines' labels.",
+      "idealAnswer": "The desk cannot write sick notes.",
       "expectedBehavior": "defer_question"
     },
     "metadata": {
@@ -447,7 +447,7 @@
       ]
     },
     "expectedOutput": {
-      "idealAnswer": "Which country? The CardioZ dose differs: 20 mg in the US and Germany, 10 mg in Japan.",
+      "idealAnswer": "Which country is the patient in?",
       "expectedBehavior": "ask_follow_up"
     },
     "metadata": {
@@ -514,7 +514,7 @@
       ]
     },
     "expectedOutput": {
-      "idealAnswer": "The rash is a suspected side effect. Report it within 24 hours to the drug safety team at safety@medinfo.example, with the medicine, the dose, when it started and what happened. DermaClear is applied as a thin layer twice daily, but the safety letter says do not use on broken skin.",
+      "idealAnswer": "Report the rash as a suspected side effect within 24 hours to safety@medinfo.example. Apply DermaClear as a thin layer twice daily, and not on broken skin.",
       "expectedBehavior": "reply"
     },
     "metadata": {
@@ -547,7 +547,7 @@
       ]
     },
     "expectedOutput": {
-      "idealAnswer": "In Japan only the 10 mg tablet is approved. Take 10 mg once daily after breakfast.",
+      "idealAnswer": "Take 10 mg once daily after breakfast.",
       "expectedBehavior": "reply"
     },
     "metadata": {
@@ -593,7 +593,7 @@
       ]
     },
     "expectedOutput": {
-      "idealAnswer": "190 adults with asthma took part. Breathe-EZ gave relief in 4 minutes. The study gives no dose, and the label dose stays 2 puffs every 4 to 6 hours when needed.",
+      "idealAnswer": "190 adults with asthma took part, and Breathe-EZ gave relief in 4 minutes.",
       "expectedBehavior": "reply"
     },
     "metadata": {
@@ -617,7 +617,7 @@
       ]
     },
     "expectedOutput": {
-      "idealAnswer": "No. The 40 mg Brazil draft version 4 was never approved and expired on 2026-05-01. There is no approved CardioZ label for Brazil.",
+      "idealAnswer": "No. The 40 mg Brazil draft was never approved and has expired, so there is no approved 40 mg dose.",
       "expectedBehavior": "reply"
     },
     "metadata": {

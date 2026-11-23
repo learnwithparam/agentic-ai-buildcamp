@@ -17,10 +17,10 @@ async function main() {
   try {
     await langfuse.api.datasets.create({
       name: env.datasetName,
-      description: "Starter workshop dataset for the Dad IT Support Agent",
+      description: "Starter workshop dataset for the HCP Medical Information Agent",
       metadata: {
         source: "repo-seed",
-        workshop: "langfuse-dad-it-support"
+        workshop: "langfuse-hcp-medinfo"
       }
     });
   } catch (error) {
