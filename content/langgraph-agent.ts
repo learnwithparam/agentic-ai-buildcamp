@@ -3,7 +3,7 @@ import type { UnitContent } from "../src/content";
 export const content: UnitContent = {
   opening: "What happens to a half-done answer when the server dies?",
   production:
-    "A real server restarts after every deploy. A saved thread lets the agent finish the work it began.",
+    "A real server restarts after every deploy. A saved thread lets the agent finish its work.",
   terms: [
     {
       id: "graph",

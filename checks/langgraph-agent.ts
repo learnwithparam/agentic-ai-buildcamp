@@ -15,6 +15,7 @@ import { DATABASE_URL } from "../packages/core/src/db";
 import { type Check, expect } from "../src/verify";
 
 const CASE = "multi-hop-cited";
+const PROBE_MS = 2000;
 const STUDY = "neurocalm-us-study-summary";
 
 function question(): string {
@@ -39,7 +40,10 @@ export const threeHops: Decide = async (trail) => {
 const forever: Decide = async () => ({ tool: "find_study", input: "NeuroCalm" });
 
 export async function postgresIsUp(): Promise<boolean> {
-  const client = new pg.Client({ connectionString: DATABASE_URL, connectionTimeoutMillis: 2000 });
+  const client = new pg.Client({
+    connectionString: DATABASE_URL,
+    connectionTimeoutMillis: PROBE_MS,
+  });
   try {
     await client.connect();
     await client.end();

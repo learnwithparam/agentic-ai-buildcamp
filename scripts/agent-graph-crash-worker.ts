@@ -1,4 +1,4 @@
-// A worker that dies in the middle of the graph. The langgraph-agent check starts it as a real process.
+// A worker that dies in the middle of the graph. The langgraph-agent check starts it.
 import { threeHops } from "../checks/langgraph-agent";
 import { buildAgentGraph, openCheckpointer, runAgent } from "../packages/core/src/agent-graph";
 

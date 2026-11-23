@@ -121,8 +121,8 @@ export function resumeAgent(graph: AgentGraph, threadId: string) {
 //~   return { thread: "none" };
 //~ }
 //~
-//~ export async function openCheckpointer(): Promise<undefined> {
-//~   return undefined;
+//~ export async function openCheckpointer(): Promise<{ end: () => Promise<void> }> {
+//~   return { end: async () => {} };
 //~ }
 //~
 //~ export async function runAgent(_graph: AgentGraph, _question: string, _threadId: string) {
