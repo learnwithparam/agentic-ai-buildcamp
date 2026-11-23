@@ -7,8 +7,10 @@
 //   3. The cheapest model in config/model-pool.json that has what the role needs.
 // Prices come from config/model-catalog.json, written by: bun run models
 //
-// LLM_PROVIDER is replay or openrouter. Replay is the default. It plays back recorded replies and
+// LLM_PROVIDER is replay or gateway. Replay is the default. It plays back recorded replies and
 // needs no key. MODEL_MODE=replay forces replay. The checks set it.
+// Gateway sends every call to LiteLLM (bun run up --gateway), which calls the model on OpenRouter.
+// The role is the model name the gateway knows. Its config is written by: bun run gateway-config
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { LanguageModel } from "ai";
@@ -16,7 +18,7 @@ import { MS_PER_DAY, MS_PER_MINUTE } from "../src/time";
 
 export const ROLES = ["fast", "smart", "decide", "judge", "vision"] as const;
 export type Role = (typeof ROLES)[number];
-export const PROVIDERS = ["replay", "openrouter"] as const;
+export const PROVIDERS = ["replay", "gateway"] as const;
 export type Provider = (typeof PROVIDERS)[number];
 
 // What each job needs from a model. A model without it cannot do the job.
@@ -43,6 +45,10 @@ export type Choice = { id: string; passRate: number; costPerCase: number };
 const FOLDER = import.meta.dir;
 // The one place that names where models are called. Code adds only the end of the path.
 export const OPENROUTER_API = "https://openrouter.ai/api";
+export const GATEWAY_URL = "http://localhost:4000/v1";
+// The gateway listens on this machine only. This key guards nothing real.
+export const GATEWAY_KEY_DEFAULT = "sk-buildcamp-local";
+export const COST_HEADER = "x-litellm-response-cost";
 export const CALL_TIMEOUT_MS = MS_PER_MINUTE;
 export const TOKENS_PER_PRICE_UNIT = 1_000_000;
 export const MAX_CATALOG_AGE_DAYS = 30;
@@ -97,15 +103,11 @@ export async function languageModel(role: Role, env = process.env): Promise<Lang
       "LLM_PROVIDER is replay: answer from the recordings, there is no model to call.",
     );
   }
-  if (!env.OPENROUTER_API_KEY) {
-    throw new Error(
-      "LLM_PROVIDER is openrouter but OPENROUTER_API_KEY is not set. " +
-        "Put it in .env (see .env.example), or use LLM_PROVIDER=replay.",
-    );
-  }
-  const { createOpenRouter } = await import("@openrouter/ai-sdk-provider");
-  const openrouter = createOpenRouter({ apiKey: env.OPENROUTER_API_KEY });
-  return openrouter(modelId(role, env), { usage: { include: true } });
+  const { createOpenAI } = await import("@ai-sdk/openai");
+  const address = env.GATEWAY_URL ?? GATEWAY_URL;
+  const key = env.LITELLM_MASTER_KEY ?? GATEWAY_KEY_DEFAULT;
+  const options = { ["baseURL"]: address, apiKey: key };
+  return createOpenAI(options).chat(role);
 }
 
 export function catalogAgeDays(now = Date.now()): number {

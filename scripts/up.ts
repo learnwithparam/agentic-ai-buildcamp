@@ -12,9 +12,9 @@ const COMPOSE_FILE = join(ROOT, "infra", "docker-compose.yml");
 const PHOENIX_HEALTH = "http://localhost:6006/healthz";
 
 export function startContainers(): void {
-  const run = spawnSync("docker", ["compose", "-f", COMPOSE_FILE, "up", "-d", "--wait"], {
-    stdio: "inherit",
-  });
+  const profile = process.argv.includes("--gateway") ? ["--profile", "gateway"] : [];
+  const args = ["compose", "-f", COMPOSE_FILE, ...profile, "up", "-d", "--wait"];
+  const run = spawnSync("docker", args, { stdio: "inherit" });
   if (run.status !== 0) throw new Error("Docker did not start the stack. Is Docker running?");
 }
 

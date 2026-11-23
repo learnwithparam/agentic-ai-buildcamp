@@ -1,0 +1,29 @@
+# Written by: bun run gateway-config. Do not edit by hand.
+model_list:
+  - model_name: fast
+    litellm_params:
+      model: openrouter/tencent/hy4-flash
+      api_key: os.environ/OPENROUTER_API_KEY
+  - model_name: fast-backup
+    litellm_params:
+      model: openrouter/nvidia/nemotron-3.5-lightning
+      api_key: os.environ/OPENROUTER_API_KEY
+  - model_name: smart
+    litellm_params:
+      model: openrouter/openai/gpt-6-luna
+      api_key: os.environ/OPENROUTER_API_KEY
+  - model_name: smart-backup
+    litellm_params:
+      model: openrouter/nvidia/nemotron-3.5-lightning
+      api_key: os.environ/OPENROUTER_API_KEY
+  - model_name: judge
+    litellm_params:
+      model: openrouter/anthropic/claude-haiku-5.5
+      api_key: os.environ/OPENROUTER_API_KEY
+router_settings:
+  fallbacks:
+    - fast: [fast-backup]
+    - smart: [smart-backup]
+litellm_settings:
+  max_budget: 5
+  drop_params: true

@@ -17,6 +17,28 @@ services:
       timeout: 3s
       retries: 30
 
+  # The model gateway. It starts only with: bun run up --gateway
+  litellm:
+    profiles: ["gateway"]
+    image: ghcr.io/berriai/litellm:v1.109.1
+    command: ["--config", "/app/config.yaml", "--port", "4000"]
+    ports:
+      - "127.0.0.1:4000:4000"
+    volumes:
+      - ./litellm.yaml:/app/config.yaml:ro
+    environment:
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY:-sk-buildcamp-local}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          'python3 -c "import urllib.request as u; u.urlopen(''http://localhost:4000/health/liveliness'')"',
+        ]
+      interval: 3s
+      timeout: 5s
+      retries: 40
+
   phoenix:
     image: arizephoenix/phoenix:version-21.0.0
     environment:

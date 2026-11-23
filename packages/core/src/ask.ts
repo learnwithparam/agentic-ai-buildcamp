@@ -1,9 +1,9 @@
 // One model call. In replay it reads a recording. On a live provider it calls the model.
 // MODEL_MODE=record with a live provider also saves the reply for replay.
-// Each call is a span. It holds the tokens and the cost of the answer. The cost is what
-// OpenRouter charged for the call, read from the reply.
+// Each call is a span. It holds the tokens and the cost of the answer. The cost is what the
+// gateway reports for the call, read from the reply headers.
 import { generateText } from "ai";
-import { languageModel, modelId, provider, type Role } from "../../../config/models";
+import { COST_HEADER, languageModel, modelId, provider, type Role } from "../../../config/models";
 import { type Recorded, replayReply, saveRecording } from "./replay";
 import { type Tags, traced } from "./telemetry";
 
@@ -11,12 +11,12 @@ async function callModel(role: Role, prompt: string): Promise<Recorded> {
   if (provider() === "replay") return replayReply(role, prompt);
   const model = await languageModel(role);
   const result = await generateText({ model, prompt });
-  const billed = result.providerMetadata?.openrouter?.usage as { cost?: number } | undefined;
+  const billed = Number(result.response.headers?.[COST_HEADER]);
   const reply = {
     text: result.text,
     inputTokens: result.usage.inputTokens ?? 0,
     outputTokens: result.usage.outputTokens ?? 0,
-    costUsd: billed?.cost ?? -1,
+    costUsd: Number.isNaN(billed) ? -1 : billed,
   };
   if (process.env.MODEL_MODE === "record") saveRecording(role, prompt, reply);
   return reply;
