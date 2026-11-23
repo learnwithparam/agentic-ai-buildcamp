@@ -1,6 +1,6 @@
 ---
 title: "Workshop: HCP Medical Information Agent Base App"
-description: "Tour the TypeScript support agent before instrumentation: chat UI, Express API, OpenAI tool loop, local tools, and support data."
+description: "Tour the TypeScript medical information agent before instrumentation: chat UI, Express API, OpenAI tool loop, local tools, and label data."
 ---
 
 # 01 Base App

@@ -6,8 +6,8 @@
  * on each: open coding (text) and pass or fail. Those items are then marked
  * completed. Other items already in the queue are left alone.
  *
- * The notes describe what the reply did. They do not name the clusters, so
- * Halo still has to find them. A pass is a short numbered list from the label.
+ * The notes describe what the reply did. They do not name the clusters, so the
+ * learner still has to find them. A pass is a short numbered list from the label.
  * A fail answers something other than our medicines, speaks as a human doctor,
  * or runs on as one long paragraph.
  *

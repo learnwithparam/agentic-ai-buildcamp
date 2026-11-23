@@ -1,6 +1,6 @@
 ---
 title: "Workshop: Run Langfuse Experiments"
-description: "Run the support agent across the Langfuse dataset, score every item with callback evaluators inside runExperiment, and inspect scored experiment runs."
+description: "Run the medical information agent across the Langfuse dataset, score every item with callback evaluators inside runExperiment, and inspect scored experiment runs."
 ---
 
 # 06 Experiments
@@ -113,7 +113,7 @@ Low-confidence labels are worth reading by hand. They usually mean the answer mi
 
 The last callback in `evaluators` calls OpenAI with a **semantic-equivalence** judge prompt. It treats `idealAnswer` as the source of truth and asks whether the agent answer preserves every material meaning, fact, and constraint: paraphrases are fine; missing required detail or a contradicted fact is not. The callback maps the judge's true/false result to a `correctness` score of `0` or `1` plus a short reasoning comment.
 
-The judge uses your existing `OPENAI_API_KEY` / `OPENAI_MODEL` from `.env`: the same credentials the agent already uses. `behavior_match` uses the same `OPENAI_API_KEY`, with `gpt-6-luna` fixed in the script. You do **not** need the Langfuse-side default evaluator model from session 4 for this chapter.
+The judge uses your existing `OPENAI_API_KEY` / `OPENAI_MODEL` from `.env`: the same credentials the agent already uses. `behavior_match` uses the same `OPENAI_API_KEY`, with the model set by `DECISION_MODEL` (`openai/gpt-6-luna-decisions` by default). You do **not** need the Langfuse-side default evaluator model from session 4 for this chapter.
 
 ## Step 5: Run the dataset
 
