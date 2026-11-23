@@ -1,6 +1,6 @@
 ---
 title: "Workshop: 4.1 Error Analysis"
-description: "Seed 20 traces, annotate them in a queue, and use Halo to cluster failure modes, create category scores, and chart how often each one appears."
+description: "Seed 20 traces, annotate them in a queue, cluster the notes into failure modes, add a category score, and chart how often each one appears."
 ---
 
 # 4.1 Error analysis
@@ -35,7 +35,7 @@ We use 20 sample traces to get started. Usually 50–100 sample traces are recom
 To be able to judge the outputs, we need to establish a few expectations towards the application:
 
 - The agent shall always respond in a structured and easy to understand manner, so the user can follow.
-- The agent is made specifically for IT support questions, more specifically for phone help.
+- The agent answers questions about our medicines only, from the approved label for the right country.
 - The agent should talk about itself as an AI agent and not pretend to be something or someone else.
 
 ## Step 1: Gather traces
@@ -60,11 +60,9 @@ In [Tracing](http://localhost:3000/project/hcp-medinfo/traces), select the last 
 
 ## Step 3: Cluster into categories
 
-Halo is an AI feature of Langfuse Cloud. The local Langfuse in this repo does not turn it on, so on a local run do this step by hand: read the notes, name the clusters yourself, and add the category scores in **Settings → Scores**.
+Read your `open coding` notes for the failing traces side by side. Group the notes that describe the same problem, and give each group a short name. Three or four groups is plenty for 20 traces.
 
-On Cloud, after the set, ask Halo to find clusters. Stay on the annotation queue so the current page is in context, open Halo, and ask it to cluster the annotations.
-
-![Ask Halo to cluster the annotations into failure modes.](../../images/monitoring/halo-cluster-annotations.png)
+A quick way to see all notes at once: open **Scores**, search `name:"open coding"`, and read the **Comment** column.
 
 <details>
 <summary>The clusters should look roughly like this</summary>
@@ -77,9 +75,10 @@ On Cloud, after the set, ask Halo to find clusters. Stay on the annotation queue
 
 ## Step 4: Label and measure
 
-1. Ask Halo to create categorical scores for the clusters it found.
-2. Go through the queue again and assign each failing trace to a category.
-3. Ask Halo to build a dashboard for the frequency of each category. One bar per failure. The longest bar is the failure that shows up most often.
+1. Open **Settings → Scores** and create a score config named `failure category`, of type **Categorical**, with one category per cluster you named.
+2. Open **Human annotation**, edit the `error analysis` queue, and add `failure category` to its score configs.
+3. Go through the queue again and assign each failing trace to a category.
+4. Open **Dashboards → Widgets → New widget**. Pick the **Scores Categorical** view, filter on the score name `failure category`, break it down by the string value, and choose **Horizontal Bar Chart**. Save it and add it to a dashboard. One bar per failure. The longest bar is the failure that shows up most often.
 
    ![Failure categories, with one bar per failure mode.](../../images/monitoring/failure-categories.png)
 
