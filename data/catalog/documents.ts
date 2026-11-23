@@ -233,9 +233,9 @@ export const DOCUMENTS: HcpDocument[] = [
     body: "Can I drive after a tablet? Wait 8 hours after a tablet before you drive.",
   },
   {
-    slug: "oncox-us-study-summary",
+    slug: "oncox-br-study-summary",
     brand: "OncoX",
-    country: "US",
+    country: "BR",
     type: "study-summary",
     version: 1,
     effective: "2025-10-01",
@@ -249,9 +249,9 @@ export const DOCUMENTS: HcpDocument[] = [
     ],
   },
   {
-    slug: "breathe-ez-us-study-injected",
+    slug: "breathe-ez-de-study-injected",
     brand: "Breathe-EZ",
-    country: "US",
+    country: "DE",
     type: "study-summary",
     version: 1,
     effective: "2025-12-01",

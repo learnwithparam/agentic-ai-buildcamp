@@ -1,6 +1,6 @@
 // bun run seed: builds every file the course reads from the catalog, with a fixed seed.
 // Two runs give the same bytes. Output goes to .data/ (documents, sql, competitors).
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import { COMMERCIAL_DISPENSES, TERRITORY_RX_WEEKLY } from "../data/catalog/analytics";
@@ -190,6 +190,7 @@ function writeMemos(): void {
 
 export async function seed(): Promise<void> {
   for (const folder of ["documents", "sql", "competitors", "workspaces"]) {
+    rmSync(join(OUTPUT, folder), { recursive: true, force: true }); // no stale file survives
     mkdirSync(join(OUTPUT, folder), { recursive: true });
   }
   for (const document of DOCUMENTS) await writeDocument(document);
