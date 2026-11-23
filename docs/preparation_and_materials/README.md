@@ -17,8 +17,8 @@ This is a high-level guide on how to give the Langfuse workshop to your own audi
 
 ## Preparation
 
-- Use **Langfuse Cloud**. Supporting self-hosted setups would mean maintaining the workshop against too many Langfuse versions, and this workshop is not about learning how to self-host Langfuse. It is about current features in their most up-to-date form. If participants ask about a company or local self-hosted instance, steer them to Cloud.
-- Confirm participants have **AI Features** on, which includes Halo. New organizations usually have this on unless someone opted out. If it is off, an organization owner or admin turns it back on under **Organization Settings → General → AI Features**.
+- Have participants pull the Langfuse images before the session: `docker compose -f langfuse/docker-compose.yml -f langfuse/workshop.override.yml pull`.
+- Each participant needs an OpenRouter key with a few dollars of credit.
 - Update slides with training info. Ideally, copy them first.
 - Go through the workshop yourself.
 - Optional but generally recommended: prep an OpenAI API key for participants to use. Make sure to limit spend and delete it afterwards.
