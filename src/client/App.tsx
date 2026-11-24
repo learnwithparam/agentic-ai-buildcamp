@@ -4,7 +4,7 @@ import { useLangGraphRuntime } from "@assistant-ui/react-langgraph";
 import { createThread, loadMe, loadThread, signIn, signOut, streamRun, type Me } from "./chat/api";
 import { Thread } from "./chat/Thread";
 
-function Chat({ tenantId }: { tenantId: string }) {
+function Chat({ tenantId, medicines }: { tenantId: string; medicines: string[] }) {
   const runtime = useLangGraphRuntime({
     create: createThread,
     load: loadThread,
@@ -16,7 +16,7 @@ function Chat({ tenantId }: { tenantId: string }) {
   });
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <Thread tenantId={tenantId} />
+      <Thread tenantId={tenantId} medicines={medicines} />
     </AssistantRuntimeProvider>
   );
 }
@@ -81,7 +81,7 @@ function SignedIn({ me }: { me: Me }) {
           Sign out
         </button>
       </header>
-      <Chat key={chat} tenantId={me.user.tenantId} />
+      <Chat key={chat} tenantId={me.user.tenantId} medicines={me.company.medicines} />
     </div>
   );
 }
