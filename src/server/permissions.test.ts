@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import { after, before, test } from "node:test";
-import { CredentialsMethod, OpenFgaClient } from "@openfga/sdk";
+import type { OpenFgaClient } from "@openfga/sdk";
 import { loadMedinfoCases } from "../../scripts/hcp-cases";
-import { modelJson, syncDocumentTuples } from "../../scripts/fga-model";
+import { createTestStore } from "../../scripts/fga-model";
 import { env } from "./env";
 import { LABEL_SECTIONS, searchLabels } from "./labels";
 import { readableDocuments } from "./permissions";
@@ -12,16 +12,10 @@ import { SEED_USERS, type Identity } from "./users";
 // document facts. The test makes its own store and deletes it after, so the app's store is untouched.
 
 if (!env.fgaApiToken) throw new Error("FGA_API_TOKEN is not set. Run npm run identity:setup (lesson 11).");
-const credentials = { method: CredentialsMethod.ApiToken, config: { token: env.fgaApiToken } } as const;
 let client: OpenFgaClient;
 
 before(async () => {
-  const admin = new OpenFgaClient({ apiUrl: env.fgaApiUrl, credentials });
-  const { id: storeId } = await admin.createStore({ name: `medinfo-test-${Date.now()}` });
-  const store = new OpenFgaClient({ apiUrl: env.fgaApiUrl, storeId, credentials });
-  const { authorization_model_id } = await store.writeAuthorizationModel(modelJson());
-  client = new OpenFgaClient({ apiUrl: env.fgaApiUrl, storeId, authorizationModelId: authorization_model_id, credentials });
-  await syncDocumentTuples(client);
+  ({ client } = await createTestStore(env.fgaApiUrl, env.fgaApiToken));
 });
 after(async () => {
   await client?.deleteStore();
