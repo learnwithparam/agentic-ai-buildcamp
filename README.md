@@ -37,6 +37,7 @@ Each lesson names the checkpoint tag to check out, what to change, and how to ch
 | 07 | [Evaluate a change](./docs/learner/07-evaluation.md) | `checkpoint/07-evaluation` | Change the prompt, rerun the dataset, compare the two runs. |
 | 08 | [Midpoint](./docs/learner/08-midpoint.md) | `checkpoint/08-midpoint` | Read the loop as one system, and apply it to your own app. |
 | 09 | [Calibrate a judge](./docs/learner/09-advanced-evals.md) | `checkpoint/09-advanced-evals` | Label 21 answers, measure an LLM judge against them, and let it into the pass only above the bar. |
+| 10 | [Route every model call through an AI gateway](./docs/learner/10-ai-gateway.md) | `checkpoint/10-ai-gateway` | Give each service its own gateway key, models and daily budget, and stop out-of-scope requests before any model call. |
 
 Helper commands used by the lessons:
 
