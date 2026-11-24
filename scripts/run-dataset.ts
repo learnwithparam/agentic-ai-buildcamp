@@ -20,24 +20,16 @@ import { LangfuseSpanProcessor } from "@langfuse/otel";
 import { LangfuseClient } from "@langfuse/client";
 import OpenAI from "openai";
 import { env } from "../src/server/env";
-import { answerConversation, type ConversationLine } from "../src/server/medinfo-agent";
+import { answerConversation } from "../src/server/medinfo-agent";
+import { BEHAVIORS, type Behavior, type CaseExpectation, type CaseInput } from "./hcp-cases";
 
 const langfuseSpanProcessor = new LangfuseSpanProcessor();
 const sdk = new NodeSDK({ spanProcessors: [langfuseSpanProcessor] });
 sdk.start();
 
-// --- 2. Dataset item shape (must match data/seed-dataset.json).
-type DatasetInput = {
-  messages: ConversationLine[];
-};
-
-const BEHAVIORS = ["defer_question", "reply", "ask_follow_up"] as const;
-type Behavior = (typeof BEHAVIORS)[number];
-
-type DatasetExpectation = {
-  idealAnswer: string;
-  expectedBehavior: Behavior;
-};
+// --- 2. Dataset item shape: scripts/hcp-cases.ts builds each item from data/hcp/evals/medinfo.yaml.
+type DatasetInput = CaseInput;
+type DatasetExpectation = CaseExpectation;
 
 // --- 3. The behavior_match evaluator: decision model + deterministic check.
 //        The Decisions API answers a `choice` question about the conversation

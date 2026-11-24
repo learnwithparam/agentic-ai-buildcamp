@@ -105,18 +105,18 @@ Open [http://127.0.0.1:3333](http://127.0.0.1:3333) to access the HCP Medical In
 
 You should see the **HCP Medical Information Agent** chat:
 
-- the agent title up top
-- a greeting from the agent
-- suggestion chips below the greeting
-- the side panel on the right (the signed-in clinician and the label library)
+- the agent title up top, with the desk it answers for: `pharma_a`, `CardioNex`, and the countries `US · DE · JP`
+- the heading **Ask about CardioNex**
+- three suggested questions below it
+- the message box at the bottom
 
-![The HCP Medical Information Agent: the greeting, suggestion chips and the label library side panel.](../images/sample_app.png)
+![The HCP Medical Information Agent: the desk badges, the heading and three suggested questions.](../images/sample_app.png)
 
 ## How to verify you are done
 
 - `npm run dev` is running and the UI loads at `http://127.0.0.1:3333`.
-- The browser shows the agent greeting, not an error.
-- Sending one of the suggestion chips returns a real label answer from the model.
+- The browser shows the **Ask about CardioNex** heading, not an error.
+- Clicking the first suggested question shows two tool cards, `get_desk_rules` and `search_labels`, then an answer that ends with the label it used.
 
 ## End state
 

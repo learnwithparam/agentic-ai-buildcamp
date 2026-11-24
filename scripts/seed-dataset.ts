@@ -1,9 +1,10 @@
 import "../src/server/load-env";
 import { LangfuseClient } from "@langfuse/client";
-import seedDataset from "../data/seed-dataset.json";
 import { env } from "../src/server/env";
+import { loadMedinfoCases } from "./hcp-cases";
 
 async function main() {
+  const cases = loadMedinfoCases();
   if (!env.langfusePublicKey || !env.langfuseSecretKey) {
     throw new Error("Langfuse credentials are required to seed a dataset.");
   }
@@ -17,9 +18,9 @@ async function main() {
   try {
     await langfuse.api.datasets.create({
       name: env.datasetName,
-      description: "Starter workshop dataset for the HCP Medical Information Agent",
+      description: "HCP medinfo cases from the pinned dataset repo copy in data/hcp",
       metadata: {
-        source: "repo-seed",
+        source: "data/hcp/evals/medinfo.yaml",
         workshop: "langfuse-hcp-medinfo"
       }
     });
@@ -29,7 +30,7 @@ async function main() {
     }
   }
 
-  for (const item of seedDataset) {
+  for (const item of cases) {
     await langfuse.api.datasetItems.create({
       id: item.id,
       datasetName: env.datasetName,
@@ -40,7 +41,7 @@ async function main() {
   }
 
   await langfuse.flush();
-  console.log(`Seeded dataset "${env.datasetName}" with ${seedDataset.length} items.`);
+  console.log(`Seeded dataset "${env.datasetName}" with ${cases.length} items.`);
 }
 
 void main();
