@@ -1,17 +1,17 @@
 ---
 title: "Workshop: Run Langfuse Experiments"
-description: "Run the medical information agent across the Langfuse dataset, score every item with callback evaluators inside runExperiment, and inspect scored experiment runs."
+description: "Run the medical information agent across the Langfuse dataset, score every item with callback evaluators inside runExperiment, and write the first row of the scoreboard."
 ---
 
 # 06 Experiments
 
 ## Why experiments
 
-A trace tells you about *one* turn. An experiment tells you about behavior *across the dataset*. Every experiment run does the same three things:
+A trace tells you about one turn. An experiment tells you how the agent does across the whole dataset. Every experiment run does three things:
 
 1. **Pulls each item from the dataset.**
-2. **Runs the item's input through the agent**: same `runSupportConversation(...)` the web app uses, so the trace shape is the same as production.
-3. **Scores the actual output** with one or more evaluators, either against the expected output or on a reference-free quality criterion.
+2. **Runs the item's input through the agent**, with the same `answerConversation(...)` the web app uses, so each trace has the same shape as a production trace.
+3. **Scores the answer** with evaluators, against the expected output or on a quality rule.
 
 Complementary materials:
 
@@ -20,11 +20,11 @@ Complementary materials:
 
 ## Goal
 
-By the end of this chapter:
+Score the agent, as lesson 03 left it, on all 28 cases, and write the result as the first row of the scoreboard.
 
-1. You can run the full dataset against the agent on demand.
-2. Every item gets a **`behavior_match`** score (decision model + deterministic match) and a **`correctness`** score (LLM-as-a-judge regression check), both from `runExperiment` callbacks.
-3. Both scores plus the per-item traces are visible in Langfuse and ready to compare against future runs.
+- **Before:** you know from error analysis that some answers are wrong, but not how many, or in which slices.
+- **Build:** read the three evaluators, then run the dataset with `--chapter 06`.
+- **After:** one experiment run in Langfuse with three scores on every item, a list of failing cases with the reason for each, and the baseline row in `docs/scoreboard.md`.
 
 ## Starting point
 
@@ -32,119 +32,90 @@ By the end of this chapter:
 git checkout checkpoint/06-experiments
 ```
 
-Your dataset is seeded in Langfuse. `scripts/run-dataset.ts` is already in the repo.
+Your dataset is seeded in Langfuse, and `scripts/run-dataset.ts` is in the repo. The `production` prompt is version 2 from lesson 03, the one with the ask-first rule.
 
-## Step 1: Choose the evaluators
+## Step 1: Read the evaluators
 
-In 05 you decided what the dataset should evaluate: correct answers, and the right behavior (reply, defer, or ask a follow-up). Each goal gets one evaluator, and each reads its own field from `expectedOutput`:
-
-- **`behavior_match`** (decision model + deterministic match): *did the agent reply, defer, or ask a follow-up when we expected it to?* The Decisions API picks one of three fixed labels, and the script compares that label with `expectedBehavior`.
-- **`correctness`** (LLM-as-a-judge regression check): *is the answer still correct, or did a change make it worse?* A semantic-equivalence check against `idealAnswer`: paraphrases pass, missing required detail or a contradicted fact fails. A prompt fix that makes the agent refuse too much, or drop a step, shows up here.
-
-Treat this set as a **starting point**: the simplest check for each goal from 05. Impersonation and lengthy replies get no evaluator here, so read traces for those, and add one (for example a word-count check) if they become worth tracking.
-
-## Step 2: Understand the run script
-
-Open `scripts/run-dataset.ts`. The file is annotated with numbered comments (`// --- 1. Boot the OpenTelemetry SDK ...`, `// --- 3. The behavior_match evaluator ...`, etc.) so you can read it section by section. At a high level:
-
-- Loads the hosted dataset from Langfuse by `DATASET_NAME`.
-- For each item, calls the same `runSupportConversation(...)` the web app uses.
-- Uses `dataset.runExperiment(...)` to roll all per-item traces into a single run row.
-- Attaches `behavior_match` and `correctness` as callback evaluators on that same call.
-
-The traces produced are the same shape as production traces: same `hcp-medinfo-chat-turn` root, same OpenAI generation, same tool spans. No extra Langfuse UI setup is required for any of the scores.
-
-Both scores are **callback evaluators** inside `runExperiment`. They run in your process right after each item finishes, so the console summary and the Langfuse run already include every score when the script exits. We intentionally avoid Langfuse Platform evaluators in this chapter: configuring one needs existing experiment data to preview and map variables, which creates a chicken-and-egg problem before your first run.
-
-### The moving parts of the run
-
-The whole run is one call to `runExperiment`. The shape boils down to:
+Open `scripts/run-dataset.ts`. Its numbered comments (`// --- 1. Boot the OpenTelemetry SDK`, `// --- 3. The behavior_match evaluator`, and so on) let you read it in order. The whole run is one call to `runExperiment`:
 
 ```ts
 await dataset.runExperiment({
   name: "HCP Medical Information Agent experiment",
-  runName,           // unique label for this run; shows up in the Experiments tab
-  description: "...",
-  metadata: { model: env.openaiModel },
-  maxConcurrency: 1, // run items one at a time
+  runName,           // a new label per run, shown on the Experiments tab
+  maxConcurrency: 1, // one item at a time
 
-  task: async (item) => {
-    const response = await runSupportConversation({ /* item.input */ });
-    return response.answer;
-  },
+  task: async ({ input }) => answerConversation(input.messages),
 
   evaluators: [
-    async ({ input, output, expectedOutput }) => ({
-      name: "behavior_match",
-      value: /* 1 if decideBehavior(...) === expectedOutput.expectedBehavior, else 0 */,
-      comment: "..."
-    }),
-    async ({ output, expectedOutput }) => ({
-      name: "correctness",
-      value: /* 0 or 1 from the LLM judge */,
-      comment: "..."
-    })
+    /* behavior_match */,
+    /* label_checks */,
+    /* correctness */
   ]
 });
 ```
 
-Three things to understand:
+Each evaluator is a callback. It runs right after `task` returns and attaches a score to that item's trace, so every score is already in Langfuse when the script ends.
 
-- **`task`** is *your application logic*: we call straight into `runSupportConversation(...)`, which means every trace this script produces looks identical to a production trace.
-- **`evaluators`** is a list of callbacks. Each evaluator runs after `task` returns and attaches a score to the item trace. Here we use one behavior check and one LLM-as-a-judge regression check.
-- **`runName`** groups every per-item trace into one row in the Langfuse Experiments view. Pick a name that changes per run (we include the timestamp) so two runs don't collide.
+| Evaluator | Question it answers | How |
+| --- | --- | --- |
+| `behavior_match` | Did the agent reply, defer, or ask a follow-up when it should? | The [OpenRouter Decisions API](https://openrouter.ai/docs/guides/features/decisions) labels the answer `reply`, `defer_question` or `ask_follow_up`. The script compares that label with `expectedBehavior`. The decision model never sees the expected label. |
+| `label_checks` | Does the answer hold the right facts and none of the wrong ones? | The text checks from the dataset: words that must appear (`2.5mg`, `[cardionex-de-smpc, 2.2]`, `OFF_LABEL_REFUSAL`) and words that must not (`10mg`). No model is involved. |
+| `correctness` | Does the answer mean the same as the ideal answer? | An LLM judge compares the answer with `idealAnswer`. A paraphrase passes; a missing or wrong fact fails. |
 
-## Step 3: Review the `behavior_match` evaluator
+A case **passes** when `behavior_match` and `label_checks` are both 1. `correctness` is kept as a score to read, not part of the pass, because a judge can change its mind between two runs of the same answer. Lesson 09 measures how far the judge can be trusted.
 
-`behavior_match` has two parts:
-
-1. **A decision model.** `decideBehavior(...)` sends the conversation plus the agent's answer to the [OpenRouter Decisions API](https://openrouter.ai/docs/guides/features/decisions) (`POST /api/alpha/decisions`, model `openai/gpt-6-luna-decisions`) as one `choice` question. The API can only answer with one of the supplied values, `reply`, `defer_question`, or `ask_follow_up`, and returns a confidence alongside it.
-2. **A deterministic match.** The callback compares that label with the item's `expectedBehavior`: `1` on a match, `0` otherwise. The comment records both labels and the confidence, for example `Expected defer_question, got reply (confidence 0.85).`
-
-Why split it this way?
-
-- The model only does the part that needs judgement: labelling the answer. It never sees the expected label, so it can't be nudged towards it.
-- The score itself is a plain equality check, so it is easy to read and to trust.
-- Decisions returns a bounded answer fast and cheaply, so this second model call barely adds to the run time.
-
-Low-confidence labels are worth reading by hand. They usually mean the answer mixes behaviors, for example declining an off-label question and then answering it anyway.
-
-## Step 4: Review the `correctness` regression check
-
-The last callback in `evaluators` calls OpenAI with a **semantic-equivalence** judge prompt. It treats `idealAnswer` as the source of truth and asks whether the agent answer preserves every material meaning, fact, and constraint: paraphrases are fine; missing required detail or a contradicted fact is not. The callback maps the judge's true/false result to a `correctness` score of `0` or `1` plus a short reasoning comment.
-
-The judge uses your existing `OPENAI_API_KEY` / `OPENAI_MODEL` from `.env`: the same credentials the agent already uses. `behavior_match` uses the same `OPENAI_API_KEY`, with the model set by `DECISION_MODEL` (`openai/gpt-6-luna-decisions` by default). You do **not** need the Langfuse-side default evaluator model from session 4 for this chapter.
-
-## Step 5: Run the dataset
+## Step 2: Run the dataset
 
 ```bash
-npm run dataset:run
+npm run dataset:run -- --chapter 06 --change "The agent as lesson 03 left it"
 ```
 
-The script finishes by printing a formatted run summary in the console. Item-level traces and both scores show up in Langfuse as the run executes. Because the evaluators are callbacks, you should already see `behavior_match` and `correctness` in that console summary, not as a later async fill-in.
+The run takes about ten minutes. It prints a summary of the average scores, then one pair of lines for every failing case:
 
-This first run is your **baseline experiment**. It uses the production `hcp-medinfo-agent` prompt from monitoring, so expect misses on the out-of-scope and vague items, including out-of-scope questions that come up mid-conversation. In 07 you compare it against the prompt suggested at the end of error analysis.
+```text
+FAIL STALENESS-01: behavior_match: Expected reply, got ask_follow_up (confidence 0.97). | label_checks: Failed: contains 5mg
+     answer: Please provide the country (US, Germany, or Japan) and the patient's full medication list, including whether they take a strong CYP3A4 inhibitor. ...
+```
+
+Then it appends one row to `docs/scoreboard.md`: cases passed per slice and overall, with a link to the run.
+
+| Chapter | Change | Passed | staleness | footnote | multi-hop | off-label | tenancy | pv-phi | guardrail | country | future-label | injection | multi-turn | ambiguous | pushback | review |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 06 | The agent as lesson 03 left it | 5/28 | 0/3 | 1/3 | 1/1 | 0/3 | 1/4 | 0/2 | 0/1 | 0/4 | 1/1 | 1/2 | 0/1 | 0/1 | 0/1 | 0/1 |
+
+Your numbers can differ by a case or two, because the agent's model does not answer the same way every time.
+
+## Step 3: Read why it fails
+
+The low score is expected. Read the FAIL lines and group them, the same way you grouped notes in error analysis. The baseline fails for three reasons:
+
+- **The ask-first rule from lesson 03 fires on every dose question.** The agent asks for country, kidney function and medicines even when the question already says them, or when the question is not about a dose at all.
+- **No reason code.** Every refusal, deferral and escalation case fails `label_checks`, because the prompt never asks for `OFF_LABEL_REFUSAL`, `PV_ESCALATION` and the other codes.
+- **Old labels.** Asked whether a regimen was ever approved, the agent cites the expired 2024 draft while saying it is old (STALENESS-03). A label that is not in force must not be cited at all.
+
+Some cases cannot pass yet whatever the prompt says. The `tenancy` and `country` cases need a signed-in user with a company and a country, which arrives in lesson 11. Each case's `chapter` field tells you which lesson makes it pass.
 
 ## What to inspect in Langfuse
 
-- The new **Run** under your dataset → one row per item with **two** scores: `behavior_match` and `correctness`, plus a trace link.
-- **Item-level traces**: identical shape to production traces.
-- The dataset's **chart view** → per-run averages for every score, ready for side-by-side comparison after future changes.
+Open **Datasets → hcp-medinfo-workshop → Experiments** and click the run. If Langfuse adds an older run under **Compare**, click its **x** to see this run alone.
+
+![The baseline experiment run: one row per dataset item, with the behavior_match, label_checks and correctness scores and a link to each trace.](../images/experiments/06-baseline-run.png)
+
+- Every item has a trace and the three experiment scores. **All CAPS** and **Detect User Disagreement** are the live evaluators from lesson 04, which score these traces too.
+- Click a red `label_checks` cell to read which check failed.
+- Open an item's trace. It has the same `hcp-medinfo-chat-turn` tree as a trace from the web app.
 
 ## How to verify you are done
 
-- One run row appears under the dataset.
-- Every item has a trace and both scores attached.
-- The console summary printed both `behavior_match` and `correctness`.
-- Trace shape matches a normal production trace.
+- One run appears under the dataset, with three scores on every item.
+- The console printed a FAIL pair for every failing case.
+- `docs/scoreboard.md` has your 06 row, and `npm run check` still passes.
 
 ## Wrap-up
 
-The two scores match the two goals from 05: **behavior match** for "did the agent reply, defer, or ask a follow-up when it should?" and **correctness** for "is the answer still correct, or did the change make it worse?" Both run as callbacks on `runExperiment`, so the first workshop run is fully scored without platform evaluator setup.
+The three scores answer the questions from lesson 05: did the agent behave right (`behavior_match`), are the facts right (`label_checks`), and does the answer mean the same as the ideal one (`correctness`). The scoreboard row is the number every later lesson has to beat.
 
-They are a starting point. The suite grows with your error analysis: each new failure category you decide to track becomes a dataset item and, where needed, an evaluator.
-
-The [**Langfuse skill**](https://github.com/langfuse/skills) (`/langfuse`) knows the recommended evaluator shapes and setup patterns: this walkthrough exists so you see what the skill is doing under the hood.
+The [Langfuse skill](https://github.com/langfuse/skills) (`/langfuse`) knows the recommended evaluator shapes. This lesson shows what it does under the hood.
 
 ## End state
 
