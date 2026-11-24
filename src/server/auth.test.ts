@@ -4,7 +4,10 @@ import { after, before, test } from "node:test";
 import { createLocalJWKSet, exportJWK, generateKeyPair, SignJWT, type JWTPayload } from "jose";
 import * as oidc from "openid-client";
 import { createApp } from "./app";
+import { testDesk } from "./test-desk";
 import { createAuth, PUBLIC_ROUTES } from "./auth";
+import { createPool, migrate } from "./db";
+import { env } from "./env";
 import { createRoutes } from "./routes";
 import { hashId, newId, type PendingLogin, type Session, type SessionStore } from "./sessions";
 
@@ -103,15 +106,23 @@ const listRoutes = (router: { stack: unknown[] }) =>
     layer.route ? Object.keys(layer.route.methods).map((method) => `${method.toUpperCase()} ${layer.route!.path}`) : []
   );
 
+// Threads live in Postgres since lesson 13, so the thread tests use the test database.
+if (!env.testDatabaseUrl) throw new Error("TEST_DATABASE_URL is not set. Run npm run identity:setup (lesson 11).");
+const pool = createPool(env.testDatabaseUrl);
+
 let base = "";
 let close = () => {};
 before(async () => {
-  const server = createApp(auth).listen(0, "127.0.0.1");
+  await migrate(pool);
+  const server = createApp(auth, testDesk(pool)).listen(0, "127.0.0.1");
   await new Promise((resolve) => server.once("listening", resolve));
   base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
   close = () => server.close();
 });
-after(() => close());
+after(async () => {
+  close();
+  await pool.end();
+});
 
 const asCookie = (sessionId: string) => ({ Cookie: `${auth.cookieName}=${sessionId}`, Origin: APP });
 const asBearer = (value: string) => ({ Authorization: `Bearer ${value}` });
@@ -122,11 +133,11 @@ test("only sign-in, the callback and sign-out are open without signing in", () =
 });
 
 test("every other route refuses a request that is not signed in", async () => {
-  const guarded = listRoutes(createRoutes(auth));
+  const guarded = listRoutes(createRoutes(auth, testDesk()));
   assert.ok(guarded.length >= 4, `expected the thread routes, found ${guarded.join(", ")}`);
   for (const route of guarded) {
     const [method, path] = route.split(" ");
-    const response = await fetch(base + path.replace(":threadId", crypto.randomUUID()), {
+    const response = await fetch(base + path.replace(/:\w+/g, crypto.randomUUID()), {
       method,
       headers: { "Content-Type": "application/json", Origin: APP },
       body: method === "GET" ? undefined : JSON.stringify({ messages: [{ id: "q", type: "human", content: "Hello" }] })
@@ -162,11 +173,19 @@ test("the company and country come from the token, nowhere else", async () => {
     name: "Chidi Okafor",
     email: "chidi.okafor@pharma-b.example.com",
     tenantId: "pharma_b",
-    country: "US"
+    country: "US",
+    roles: []
   });
   // Keycloak's other claim shape, with organization attributes on, reads the same.
   const attributes = await me(asBearer(await token({ ...rivera, organization: { pharma_a: { id: "org-1" } } })));
   assert.equal(((await attributes.json()) as { user: { tenantId: string } }).user.tenantId, "pharma_a");
+});
+
+// Lesson 13. A reviewer is a Keycloak realm role in the token. Any other role is not one.
+test("reviewer roles come from the token's realm roles, and only the two the desk knows", async () => {
+  const claims = { ...rivera, realm_access: { roles: ["default-roles-medinfo", "medical-reviewer", "admin"] } };
+  const response = await me(asBearer(await token(claims)));
+  assert.deepEqual(((await response.json()) as { user: { roles: string[] } }).user.roles, ["medical-reviewer"]);
 });
 
 test("a signed-in doctor with no single known company or no country is refused", async () => {

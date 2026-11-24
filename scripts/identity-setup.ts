@@ -14,7 +14,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { CredentialsMethod, OpenFgaClient } from "@openfga/sdk";
 import { parse } from "dotenv";
-import { SEED_USERS, TENANTS } from "../src/server/users";
+import { REVIEWER_ROLES, SEED_REVIEWERS, SEED_USERS, TENANTS, type ReviewerRole } from "../src/server/users";
 import { modelJson, syncDocumentTuples } from "./fga-model";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -274,33 +274,63 @@ function setupMcpClient() {
   });
 }
 
-async function setupDoctors(organizations: Record<string, string>, password: string) {
-  for (const doctor of SEED_USERS) {
+type Person = { email: string; firstName: string; lastName: string; tenantId: string; country: string; role?: ReviewerRole };
+
+// Lesson 13. A reviewer is a realm role, so it is in the token's realm_access claim. The app reads
+// only these two; OpenFGA then asks whether the role holds for the item's company.
+async function setupReviewerRoles(): Promise<Record<ReviewerRole, { id: string; name: string }>> {
+  const descriptions: Record<ReviewerRole, string> = {
+    "medical-reviewer": "Approves drafts before they are sent (lesson 13)",
+    "safety-reviewer": "Files or dismisses adverse event reports (lesson 13)"
+  };
+  const roles = {} as Record<ReviewerRole, { id: string; name: string }>;
+  for (const name of REVIEWER_ROLES) {
+    const body = { name, description: descriptions[name] };
+    const found = await kcJson<{ id: string; name: string }>(`/${REALM}/roles/${name}`);
+    if (found) await kc("PUT", `/${REALM}/roles/${name}`, body);
+    else await kc("POST", `/${REALM}/roles`, body);
+    roles[name] = (await kcJson<{ id: string; name: string }>(`/${REALM}/roles/${name}`))!;
+  }
+  console.log(`Realm roles: ${REVIEWER_ROLES.join(", ")}`);
+  return roles;
+}
+
+async function setupPeople(
+  people: readonly Person[],
+  organizations: Record<string, string>,
+  roles: Record<ReviewerRole, { id: string; name: string }>,
+  password: string
+) {
+  for (const person of people) {
     const body = {
-      username: doctor.email,
-      email: doctor.email,
+      username: person.email,
+      email: person.email,
       emailVerified: true,
-      firstName: doctor.firstName,
-      lastName: doctor.lastName,
+      firstName: person.firstName,
+      lastName: person.lastName,
       enabled: true,
-      attributes: { country: [doctor.country] }
+      attributes: { country: [person.country] }
     };
-    let [user] = (await kcJson<{ id: string }[]>(`/${REALM}/users?email=${encodeURIComponent(doctor.email)}&exact=true`))!;
+    let [user] = (await kcJson<{ id: string }[]>(`/${REALM}/users?email=${encodeURIComponent(person.email)}&exact=true`))!;
     if (user) await kc("PUT", `/${REALM}/users/${user.id}`, body);
     else {
       await kc("POST", `/${REALM}/users`, body);
-      [user] = (await kcJson<{ id: string }[]>(`/${REALM}/users?email=${encodeURIComponent(doctor.email)}&exact=true`))!;
+      [user] = (await kcJson<{ id: string }[]>(`/${REALM}/users?email=${encodeURIComponent(person.email)}&exact=true`))!;
     }
     await kc("PUT", `/${REALM}/users/${user.id}/reset-password`, { type: "password", value: password, temporary: false });
-    // One company per doctor: leave any other, join the right one.
+    // One company per person: leave any other, join the right one.
     for (const [alias, organizationId] of Object.entries(organizations)) {
       const members = (await kcJson<{ id: string }[]>(`/${REALM}/organizations/${organizationId}/members?max=1000`)) ?? [];
       const isMember = members.some((member) => member.id === user.id);
-      if (alias === doctor.tenantId && !isMember) await kc("POST", `/${REALM}/organizations/${organizationId}/members`, user.id);
-      if (alias !== doctor.tenantId && isMember) await kc("DELETE", `/${REALM}/organizations/${organizationId}/members/${user.id}`);
+      if (alias === person.tenantId && !isMember) await kc("POST", `/${REALM}/organizations/${organizationId}/members`, user.id);
+      if (alias !== person.tenantId && isMember) await kc("DELETE", `/${REALM}/organizations/${organizationId}/members/${user.id}`);
     }
+    // At most one reviewer role, the listed one. A doctor has none.
+    const held = (await kcJson<{ id: string; name: string }[]>(`/${REALM}/users/${user.id}/role-mappings/realm`)) ?? [];
+    const wrong = held.filter((role) => (REVIEWER_ROLES as readonly string[]).includes(role.name) && role.name !== person.role);
+    if (wrong.length) await kc("DELETE", `/${REALM}/users/${user.id}/role-mappings/realm`, wrong);
+    if (person.role && !held.some((role) => role.name === person.role)) await kc("POST", `/${REALM}/users/${user.id}/role-mappings/realm`, [roles[person.role]]);
   }
-  console.log(`Doctors: ${SEED_USERS.map((doctor) => `${doctor.email} (${doctor.tenantId}, ${doctor.country})`).join(", ")}`);
 }
 
 // ---------- OpenFGA ----------
@@ -359,9 +389,13 @@ async function main() {
   const organizations = await setupOrganizations();
   await setupClient(appUrl, values.OIDC_CLIENT_SECRET);
   await setupMcpClient();
-  await setupDoctors(organizations, values.SEED_USER_PASSWORD);
+  const roles = await setupReviewerRoles();
+  await setupPeople(SEED_USERS, organizations, roles, values.SEED_USER_PASSWORD);
+  console.log(`Doctors: ${SEED_USERS.map((doctor) => `${doctor.email} (${doctor.tenantId}, ${doctor.country})`).join(", ")}`);
+  await setupPeople(SEED_REVIEWERS, organizations, roles, values.SEED_USER_PASSWORD);
+  console.log(`Reviewers: ${SEED_REVIEWERS.map((reviewer) => `${reviewer.email} (${reviewer.tenantId}, ${reviewer.role})`).join(", ")}`);
   await setupPermissions(values.FGA_API_TOKEN);
-  console.log(`\nDone. Open ${appUrl} and sign in as a doctor above; the password is SEED_USER_PASSWORD in your .env.`);
+  console.log(`\nDone. Open ${appUrl} and sign in as a doctor or a reviewer above; the password is SEED_USER_PASSWORD in your .env.`);
   console.log(`Keycloak admin: ${KEYCLOAK}/admin/master/console/#/${REALM} (user admin, password KEYCLOAK_ADMIN_PASSWORD in .env).`);
 }
 

@@ -1,18 +1,80 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import type { AiMessage } from "../shared/messages";
-import { buildGraph, reviewStep, runGraph } from "./graph";
+import { MemorySaver } from "@langchain/langgraph";
+import { aiText, type AiMessage, type ChatMessage } from "../shared/messages";
+import { buildGraph, fixedReply, reviewStep, runGraph, submitAdverseEvent, submitDraftStep, type ReviewSubmission } from "./graph";
+import type { Route, Tier } from "./tiers";
 import { scriptUser } from "./users";
+
+// Lesson 13. The tiers' wiring, with a fake router and a fake agent: no model calls. Each tier
+// must reach its own path, and only the review tier may wait for a human.
 
 const draft: AiMessage = { id: "draft", type: "ai", content: [{ type: "text", text: "Give 5mg once daily." }], tool_calls: [] };
 
-test("a turn that pauses for review still returns the drafted messages", async () => {
-  const graph = buildGraph({ agent: () => ({ messages: [draft] }), tools: () => ({}), review: reviewStep });
-  const result = await runGraph(
-    graph,
-    { threadId: "review-pause", user: scriptUser(), messages: [{ id: "q", type: "human", content: "Draft a reply to Dr. Lee about CardioNex dosing." }] },
-    () => {}
+function routedGraph(tier: Tier, visited: string[]) {
+  const route: Route = { tier, reason: "test", asksForAdvice: false };
+  const seen = (name: string) => visited.push(name);
+  return buildGraph(
+    {
+      router: () => (seen("router"), { route }),
+      agent: () => (seen("agent"), { messages: [draft] }),
+      tools: () => (seen("tools"), {}),
+      submit: (state, config) => (seen("submit"), submitDraftStep(state, config, "trace-1")),
+      review: (state, config) => (seen("review"), reviewStep(state, config)),
+      safety: async (state, config) => (seen("safety"), await submitAdverseEvent(state, config, "PV_ESCALATION", "trace-1"), fixedReply(state, "PV_ESCALATION")),
+      stop: (state) => (seen("stop"), fixedReply(state, "OFF_LABEL_REFUSAL"))
+    },
+    new MemorySaver()
   );
+}
+
+function fakeInbox() {
+  const items: ReviewSubmission[] = [];
+  return { items, submit: async (item: ReviewSubmission) => (items.push(item), { dueAt: new Date("2026-11-27T09:00:00Z") }) };
+}
+
+const ask = (content: string): ChatMessage[] => [{ id: "q", type: "human", content }];
+const lastText = (messages: ChatMessage[]) => aiText(messages.filter((message): message is AiMessage => message.type === "ai").at(-1)!);
+
+for (const [tier, path, waits, kinds] of [
+  ["answer", ["router", "agent"], false, []],
+  ["review", ["router", "agent", "submit", "review"], true, ["draft"]],
+  ["safety", ["router", "safety"], false, ["adverse_event"]],
+  ["stop", ["router", "stop"], false, []]
+] as const) {
+  test(`the ${tier} tier runs ${path.join(" -> ")}`, async () => {
+    const visited: string[] = [];
+    const inbox = fakeInbox();
+    const result = await runGraph(routedGraph(tier, visited), { threadId: `t-${tier}`, user: scriptUser(), inbox, messages: ask("A question") }, () => {});
+    assert.deepEqual(visited, path);
+    assert.equal(result.waitingForApproval, waits);
+    assert.deepEqual(inbox.items.map((item) => item.kind), kinds);
+    // The dataset run's risk_tier score reads the tier from here.
+    assert.equal(result.route?.tier, tier);
+    // A safety reviewer reads the desk's reply next to the doctor's words, not the words twice.
+    if (tier === "safety") assert.deepEqual([inbox.items[0].question, inbox.items[0].body], ["A question", "PV_ESCALATION"]);
+  });
+}
+
+test("a draft is stamped in code and goes to the inbox once, however often its node runs", async () => {
+  const visited: string[] = [];
+  const inbox = fakeInbox();
+  const graph = routedGraph("review", visited);
+  const turn = { threadId: "t-stamp", user: scriptUser(), inbox };
+  const paused = await runGraph(graph, { ...turn, messages: ask("Draft a reply to Dr. Lee") }, () => {});
+  assert.equal(lastText(paused.messages), "REVIEW_REQUIRED\n\nGive 5mg once daily.");
+  assert.equal(inbox.items[0].body, "REVIEW_REQUIRED\n\nGive 5mg once daily.");
+  assert.equal(inbox.items[0].traceId, "trace-1");
+
+  const resumed = await runGraph(graph, { ...turn, resume: "approve" }, () => {});
+  assert.equal(resumed.waitingForApproval, false);
+  assert.equal(lastText(resumed.messages), "A medical reviewer approved this draft. It is ready to send.");
+  // The submit node does not run again on resume; the review node does, and writes nothing.
+  assert.equal(new Set(inbox.items.map((item) => item.id)).size, 1);
+});
+
+test("a script run with no inbox still pauses and returns the stamped draft", async () => {
+  const result = await runGraph(routedGraph("review", []), { threadId: "t-script", user: scriptUser(), messages: ask("Draft a reply") }, () => {});
   assert.equal(result.waitingForApproval, true);
-  assert.deepEqual(result.messages.map((message) => message.id), ["q", "draft"]);
+  assert.match(lastText(result.messages), /^REVIEW_REQUIRED/);
 });

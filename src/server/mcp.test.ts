@@ -8,6 +8,7 @@ import { createLocalJWKSet, exportJWK, generateKeyPair, SignJWT, type JWTPayload
 import { createTestStore } from "../../scripts/fga-model";
 import { MCP_CALLBACK_PORT, MCP_CLIENT_ID } from "../../scripts/identity-setup";
 import { createApp } from "./app";
+import { testDesk } from "./test-desk";
 import { createAuth } from "./auth";
 import { env } from "./env";
 import { createMcpRouter, MCP_PATH, MCP_PUBLIC_ROUTES, METADATA_PATH } from "./mcp";
@@ -58,7 +59,7 @@ before(async () => {
   env.fgaStoreId = store.storeId;
   env.fgaModelId = store.modelId;
   dropStore = async () => void (await store.client.deleteStore());
-  const server = createApp(auth).listen(0, "127.0.0.1");
+  const server = createApp(auth, testDesk()).listen(0, "127.0.0.1");
   await new Promise((resolve) => server.once("listening", resolve));
   base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
   close = () => server.close();

@@ -11,6 +11,8 @@ type user
 type company
   relations
     define member: [user]
+    define medical_reviewer: [user]
+    define safety_reviewer: [user]
 
 type country
   relations
@@ -22,3 +24,15 @@ type document
     define approved_in: [country]
     # Both must hold: your company owns it, and it is approved where you practise.
     define can_read: member from owner and doctor from approved_in
+
+# Lesson 13. Who may decide a waiting item. The reviewer roles come from the Keycloak token as
+# contextual tuples, like the doctor facts above. Each item's company is stored when it is made.
+type draft
+  relations
+    define company: [company]
+    define can_decide: medical_reviewer from company
+
+type adverse_event
+  relations
+    define company: [company]
+    define can_decide: safety_reviewer from company

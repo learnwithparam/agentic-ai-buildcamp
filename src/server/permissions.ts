@@ -9,7 +9,7 @@ import type { Identity } from "./users";
 
 let client: OpenFgaClient | undefined;
 
-function fga() {
+export function fga() {
   if (!env.fgaStoreId || !env.fgaModelId || !env.fgaApiToken) {
     throw new Error("OpenFGA is not configured. Run npm run identity:setup (lesson 11).");
   }
@@ -30,6 +30,16 @@ export function doctorTuples(user: Identity): TupleKey[] {
     { user: `user:${user.userId}`, relation: "member", object: `company:${user.tenantId}` },
     { user: `user:${user.userId}`, relation: "doctor", object: `country:${user.country}` }
   ];
+}
+
+// Lesson 13. A reviewer's role, from the same verified token: the Keycloak realm role says what
+// they review, the organization says for which company.
+export function reviewerTuples(user: Identity): TupleKey[] {
+  return user.roles.map((role) => ({
+    user: `user:${user.userId}`,
+    relation: role === "medical-reviewer" ? "medical_reviewer" : "safety_reviewer",
+    object: `company:${user.tenantId}`
+  }));
 }
 
 // The document facts OpenFGA stores: whose it is, and where it is approved. Derived from the

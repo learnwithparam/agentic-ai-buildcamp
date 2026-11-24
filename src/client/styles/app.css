@@ -315,7 +315,78 @@ pre {
 
 .approval-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
+}
+
+.approval-note {
+  margin: 0;
+  color: var(--fg2);
+  font-size: 14px;
+}
+
+.status-fail {
+  background: var(--failbg);
+  color: var(--fail);
+}
+
+/* Lesson 13: the review inbox. */
+.inbox {
+  max-width: 760px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 24px 16px 48px;
+  display: grid;
+  gap: 16px;
+  align-content: start;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.inbox h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.inbox-lead,
+.inbox-empty {
+  margin: 0;
+  color: var(--fg2);
+}
+
+.inbox-safety {
+  border-color: var(--fail);
+}
+
+.inbox-item .card-body {
+  display: grid;
+  gap: 6px;
+}
+
+.inbox-item .approval-draft {
+  margin: 0 0 6px;
+}
+
+.inbox-question {
+  margin: 0 0 6px;
+}
+
+.inbox-note {
+  min-height: 60px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  font: inherit;
+  resize: vertical;
+}
+
+.inbox-error {
+  margin: 0;
+  color: var(--fail);
+}
+
+a.button {
+  text-decoration: none;
 }
 
 .running {

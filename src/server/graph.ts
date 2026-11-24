@@ -1,6 +1,7 @@
 import type OpenAI from "openai";
 import { randomUUID } from "node:crypto";
-import { Annotation, Command, END, MemorySaver, START, StateGraph, interrupt } from "@langchain/langgraph";
+import { Annotation, Command, END, START, StateGraph, interrupt } from "@langchain/langgraph";
+import type { BaseCheckpointSaver } from "@langchain/langgraph";
 import type { LangGraphRunnableConfig } from "@langchain/langgraph";
 import {
   aiText,
@@ -15,12 +16,12 @@ import {
 import { env } from "./env";
 import { streamModelTurn, toOpenAIMessages } from "./stream-model";
 import type { Identity } from "./users";
+import type { Route } from "./tiers";
 import { TOOL_DEFINITIONS } from "./tools";
 
-// The agent graph: agent -> tools -> agent ... -> review -> end.
+// The agent graph. The router sorts the question into a risk tier (lesson 13, see buildGraph).
 // The agent node calls the model, the tools node runs what it asked for. Once the labels
-// are found, the agent answers with tools switched off. The
-// review node pauses a drafted reply until a human approves it.
+// are found, the agent answers with tools switched off. A draft waits for a medical reviewer.
 
 function mergeById(current: ChatMessage[], incoming: ChatMessage[]): ChatMessage[] {
   const merged = [...current];
@@ -33,7 +34,10 @@ function mergeById(current: ChatMessage[], incoming: ChatMessage[]): ChatMessage
 }
 
 export const State = Annotation.Root({
-  messages: Annotation<ChatMessage[]>({ reducer: mergeById, default: () => [] })
+  messages: Annotation<ChatMessage[]>({ reducer: mergeById, default: () => [] }),
+  // Lesson 13: the tier the router chose for the latest question, and when its reviewer is due.
+  route: Annotation<Route | null>({ reducer: (_current, next) => next, default: () => null }),
+  dueAt: Annotation<string | null>({ reducer: (_current, next) => next, default: () => null })
 });
 type GraphState = typeof State.State;
 type NodeResult = Promise<Partial<GraphState>> | Partial<GraphState>;
@@ -99,31 +103,75 @@ export async function toolsStep(
   return { messages: results };
 }
 
-// checkpoint-sync:begin review-rule
-// A request to draft a reply to a doctor always waits for a human reviewer.
-const DRAFT_REQUEST = /\b(draft|write)\b[\s\S]*\b(reply|email|letter|response|answer)\b/i;
-// checkpoint-sync:end review-rule
+// Lesson 13. What the review tier hands a human, and how the graph waits for them. The inbox is
+// passed in the run config: the web app gives the Postgres one, and scripts (the dataset run)
+// give none, so a throwaway thread writes no inbox row.
+export type ReviewSubmission = {
+  id: string;
+  kind: "draft" | "adverse_event";
+  threadId: string;
+  tenantId: string;
+  traceId?: string;
+  question: string;
+  body: string;
+};
+export interface ReviewInbox {
+  // Must be safe to call twice with the same id: a node runs again when its thread resumes.
+  submit(item: ReviewSubmission): Promise<{ dueAt: Date }>;
+}
 
-export function reviewStep(state: GraphState): Partial<GraphState> {
-  const question = lastHuman(state)?.content ?? "";
+export function inboxOf(config: LangGraphRunnableConfig): ReviewInbox | undefined {
+  return config.configurable?.inbox as ReviewInbox | undefined;
+}
+
+function threadIdOf(config: LangGraphRunnableConfig): string {
+  return String(config.configurable?.thread_id ?? "");
+}
+
+export const REVIEW_STAMP = "REVIEW_REQUIRED";
+
+// The draft is stamped in code, so the doctor and the reviewer see the same marker whatever the
+// model wrote, and it goes into the inbox before the graph waits.
+export async function submitDraftStep(state: GraphState, config: LangGraphRunnableConfig, traceId?: string): Promise<Partial<GraphState>> {
   const answer = last(state, "ai");
-  if (!answer || !DRAFT_REQUEST.test(question)) return {};
+  const question = lastHuman(state)?.content ?? "";
+  if (!answer) return {};
+  const text = aiText(answer);
+  const stamped = text.startsWith(REVIEW_STAMP) ? text : `${REVIEW_STAMP}\n\n${text}`;
+  const user = userOf(config);
+  const submitted = await inboxOf(config)?.submit({
+    id: `draft-${threadIdOf(config)}-${answer.id}`,
+    kind: "draft",
+    threadId: threadIdOf(config),
+    tenantId: user.tenantId,
+    traceId,
+    question,
+    body: stamped
+  });
+  const message: AiMessage = { ...answer, content: [{ type: "text", text: stamped }] };
+  return { messages: [message], dueAt: submitted?.dueAt.toISOString() ?? null };
+}
 
+export function reviewStep(state: GraphState, config: LangGraphRunnableConfig): Partial<GraphState> {
+  const answer = last(state, "ai");
+  if (!answer) return {};
   const decision = interrupt<ApprovalRequest, ApprovalDecision>({
     kind: "approval",
-    question,
-    draft: aiText(answer)
+    itemId: `draft-${threadIdOf(config)}-${answer.id}`,
+    question: lastHuman(state)?.content ?? "",
+    draft: aiText(answer),
+    dueAt: state.dueAt ?? ""
   });
   const note: AiMessage = {
-    id: `review-${randomUUID()}`,
+    id: `review-${answer.id}`,
     type: "ai",
     content: [
       {
         type: "text",
         text:
           decision === "approve"
-            ? "A reviewer approved this draft. It is ready to send."
-            : "A reviewer rejected this draft. Nothing was sent."
+            ? "A medical reviewer approved this draft. It is ready to send."
+            : "A medical reviewer rejected this draft. Nothing was sent."
       }
     ],
     tool_calls: []
@@ -131,46 +179,96 @@ export function reviewStep(state: GraphState): Partial<GraphState> {
   return { messages: [note] };
 }
 
-export function buildGraph(nodes: { agent: Node; tools: Node; review: Node }) {
+// The safety and stop tiers reply with fixed text and never call the agent.
+export function fixedReply(state: GraphState, text: string): Partial<GraphState> {
+  const question = lastHuman(state);
+  return { messages: [{ id: `reply-${question?.id ?? randomUUID()}`, type: "ai", content: [{ type: "text", text }], tool_calls: [] }] };
+}
+
+// The report holds the doctor's (scrubbed) words and the fixed reply the desk gave them.
+export async function submitAdverseEvent(state: GraphState, config: LangGraphRunnableConfig, reply: string, traceId?: string) {
+  const question = lastHuman(state);
+  const user = userOf(config);
+  return inboxOf(config)?.submit({
+    id: `ae-${threadIdOf(config)}-${question?.id ?? randomUUID()}`,
+    kind: "adverse_event",
+    threadId: threadIdOf(config),
+    tenantId: user.tenantId,
+    traceId,
+    question: question?.content ?? "",
+    body: reply
+  });
+}
+
+type Nodes = { router: Node; agent: Node; tools: Node; submit: Node; review: Node; safety: Node; stop: Node };
+
+// START -> router -> answer: agent <-> tools -> END
+//                 -> review: agent <-> tools -> submit -> review (waits for a human) -> END
+//                 -> safety: fixed reply, report to the safety inbox -> END
+//                 -> stop:   fixed refusal -> END
+// The router may also answer itself (the lesson 10 out-of-scope door), and then the turn ends.
+export function buildGraph(nodes: Nodes, checkpointer: BaseCheckpointSaver) {
   return new StateGraph(State)
+    .addNode("router", nodes.router)
     .addNode("agent", nodes.agent)
     .addNode("tools", nodes.tools)
+    .addNode("submit", nodes.submit)
     .addNode("review", nodes.review)
-    .addEdge(START, "agent")
-    .addConditionalEdges("agent", (state) => (last(state, "ai")?.tool_calls.length ? "tools" : "review"), [
-      "tools",
-      "review"
-    ])
+    .addNode("safety", nodes.safety)
+    .addNode("stop", nodes.stop)
+    .addEdge(START, "router")
+    .addConditionalEdges(
+      "router",
+      (state) => {
+        if (last(state, "ai")) return END;
+        const tier = state.route?.tier ?? "answer";
+        return tier === "safety" ? "safety" : tier === "stop" ? "stop" : "agent";
+      },
+      ["agent", "safety", "stop", END]
+    )
+    .addConditionalEdges(
+      "agent",
+      (state) => (last(state, "ai")?.tool_calls.length ? "tools" : state.route?.tier === "review" ? "submit" : END),
+      ["tools", "submit", END]
+    )
     .addEdge("tools", "agent")
+    .addEdge("submit", "review")
     .addEdge("review", END)
-    .compile({ checkpointer: new MemorySaver() });
+    .addEdge("safety", END)
+    .addEdge("stop", END)
+    .compile({ checkpointer });
 }
 
 type Graph = ReturnType<typeof buildGraph>;
 
 export type Turn = {
   threadId: string;
+  // Lesson 13: where review items go. Left out by scripts, whose threads are thrown away.
+  inbox?: ReviewInbox;
   // Lesson 11: who is asking, from the signed-in user's token. Tools read it from the run config.
   user: Identity;
   messages?: ChatMessage[];
   resume?: ApprovalDecision;
 };
 
-export type TurnResult = { messages: ChatMessage[]; waitingForApproval: boolean };
+// route is the tier this turn took (null when the input check refused before any routing).
+export type TurnResult = { messages: ChatMessage[]; waitingForApproval: boolean; route: Route | null };
 
 // Runs one turn and translates LangGraph's stream into the events the chat UI reads:
 // messages/partial while the model types, updates (with any pause), and values at the end.
 export async function runGraph(graph: Graph, turn: Turn, emit: (event: StreamEvent) => void): Promise<TurnResult> {
   // A resume carries the reviewer's decision back to the paused review node.
-  const input = turn.resume
+  const input: Parameters<Graph["stream"]>[0] = turn.resume
     ? (new Command({ resume: turn.resume }) as unknown as Parameters<Graph["stream"]>[0])
-    : { messages: turn.messages ?? [] };
+    : // A new question starts with no tier and no deadline from the last one.
+      { messages: turn.messages ?? [], route: null, dueAt: null };
   const stream = await graph.stream(input, {
-    configurable: { thread_id: turn.threadId, user: turn.user },
+    configurable: { thread_id: turn.threadId, user: turn.user, inbox: turn.inbox },
     streamMode: ["custom", "updates", "values"]
   });
   let messages: ChatMessage[] = [];
   let waitingForApproval = false;
+  let route: Route | null = null;
   for await (const [mode, chunk] of stream) {
     if (mode === "custom") {
       emit({ event: "messages/partial", data: [chunk] });
@@ -184,10 +282,11 @@ export async function runGraph(graph: Graph, turn: Turn, emit: (event: StreamEve
     } else if (mode === "values") {
       // When the graph pauses, LangGraph sends a values chunk that holds only __interrupt__.
       messages = (chunk as Partial<GraphState>).messages ?? messages;
+      route = (chunk as Partial<GraphState>).route ?? route;
       emit({ event: "values", data: chunk });
     }
   }
-  return { messages, waitingForApproval };
+  return { messages, waitingForApproval, route };
 }
 
 export async function readThread(graph: Graph, threadId: string) {
