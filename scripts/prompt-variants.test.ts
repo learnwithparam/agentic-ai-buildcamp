@@ -18,3 +18,14 @@ test("lesson 03 shows the same line the script publishes", () => {
   const page = readFileSync(new URL("../docs/learner/03-prompt-management.md", import.meta.url), "utf8");
   assert.ok(page.includes(ASK_FIRST_RULE), "docs/learner/03-prompt-management.md does not show ASK_FIRST_RULE");
 });
+
+// Lesson 04 ends with this prompt and lesson 07 tells learners to paste it, so both pages must
+// show it word for word. Lesson 04 quotes it, so a leading "> " on each line is allowed there.
+test("lessons 04 and 07 show the error-analysis prompt the script publishes", () => {
+  const prompt = PROMPT_VARIANTS["error-analysis"].trim();
+  for (const file of ["04-monitoring/error-analysis.md", "07-evaluation.md"]) {
+    const page = readFileSync(new URL(`../docs/learner/${file}`, import.meta.url), "utf8");
+    const unquoted = page.replace(/^> ?/gm, "");
+    assert.ok(unquoted.includes(prompt), `docs/learner/${file} does not show the error-analysis prompt`);
+  }
+});
