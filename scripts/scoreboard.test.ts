@@ -47,3 +47,10 @@ test("a learner's row goes to their own file, which starts with the reference he
   assert.deepEqual(checkScoreboard(readFileSync(file, "utf8")), []);
   assert.equal(readFileSync(file, "utf8").split("\n").filter((line) => line === row).length, 2);
 });
+
+test("a slice the run left out shows a dash, not 0 passed", () => {
+  const [first, second] = slices();
+  const cells = scoreboardRow("09", "Subset", [{ slice: first, passed: true }], "http://run").split("|").map((cell) => cell.trim());
+  assert.equal(cells[4], "1/1");
+  assert.equal(cells[3 + slices().indexOf(second) + 1], "-");
+});
