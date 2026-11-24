@@ -18,7 +18,8 @@ Canonical checkpoint tags:
 - `checkpoint/05-dataset`
 - `checkpoint/06-experiments`
 - `checkpoint/07-evaluation`
-- `checkpoint/08-wrap-up`
+- `checkpoint/08-midpoint`
+- `checkpoint/09-advanced-evals`
 
 What to propagate:
 
@@ -60,16 +61,17 @@ Canonical progression:
 - `03-prompt-management`: learners replace the code-only prompt path with a Langfuse-managed prompt plus local fallback.
 - `04-monitoring`: starts from the traced app. The overview introduces dashboards, error analysis, and production signals. Error analysis replays 20 recorded CardioNex turns with `npm run langfuse:seed:error-analysis` (13 pass, 7 fail: asking for facts the question already gave, answering where it should refuse, and missing the 2027 label), then an `error analysis` annotation queue with `open coding` (Text) and `pass or fail` (Categorical), which `npm run langfuse:seed:error-analysis:annotations` can fill for learners short on time. Learners cluster the notes, add a `failure category` Categorical score, and build the frequency widget. The page ends with the `error-analysis` prompt variant, and `scripts/prompt-variants.test.ts` checks the page shows it word for word. Capturing signals is the evaluator setup on those message-array observations.
 - `05-dataset` ("Build eval datasets"): decides what to evaluate (correct answers and reply/defer/follow-up behavior), then seeds 28 cases from the pinned dataset copy in `data/hcp/`. Each item carries `slice`, `chapter`, `riskTier`, `split` and `showcase` in `metadata`, and the text checks in `expectedOutput.checks`.
-- `06-experiments`: runs the app against the Langfuse dataset with `runExperiment` and three callback evaluators: `behavior_match` (Decisions API label plus exact match against `expectedBehavior`), `label_checks` (the dataset's text checks and reason codes) and an LLM-judge `correctness` score that is not part of the pass. `--chapter 06` appends the baseline row to the learner's git-ignored `my-scoreboard.md` and prints the reason for each failing case. `--reference` writes to `docs/scoreboard.md` instead: use it only for the rows the lessons quote.
+- `06-experiments`: runs the app against the Langfuse dataset with `runExperiment` and three callback evaluators: `behavior_match` (Decisions API label plus exact match against `expectedBehavior`), `label_checks` (the dataset's text checks and reason codes) and an LLM-judge `correctness` score that is not part of the pass. Tags 00 to 08 keep that runner as a milestone file; from 09 on, `correctness` is gone. `--chapter 06` appends the baseline row to the learner's git-ignored `my-scoreboard.md` and prints the reason for each failing case. `--reference` writes to `docs/scoreboard.md` instead: use it only for the rows the lessons quote.
 - `07-evaluation`: publishes the prompt from the end of `04-monitoring` error analysis (`WORKSHOP_PROMPT_VARIANT=error-analysis`), reruns the same dataset with `--chapter 07`, and compares it with the 06 run side by side.
-- `08-wrap-up`: recaps the mental model and points to next steps.
+- `08-midpoint`: recaps the mental model and points to next steps.
+- `09-advanced-evals`: labels 21 answers (eleven of the agent's own, ten edited copies) in a `faithfulness calibration` annotation queue, runs the hosted faithfulness evaluator on them by batch evaluation, and measures agreement with `npm run judge:calibrate` (Cohen's kappa, bar 0.6). `data/calibration/faithfulness.json` holds the reference labels and verdicts; `scripts/judge/faithfulness.test.ts` fails below the bar or when the rubric changed since. The judge joins the pass only for the multi-hop, footnote and review slices.
 
 What makes the checkpoints stitchable:
 
 - The OpenAI SDK is already in place before tracing starts, so step 2 is only about observability.
 - Prompt management falls back to the local prompt if the Langfuse prompt is absent.
 - Monitoring depends on stable message arrays on the agent/generation observations and the root `answer` field, not provider-specific internals.
-- Dataset items carry both `idealAnswer` and `expectedBehavior`, which feed the step-06 `correctness` and `behavior_match` callback evaluators.
+- Dataset items carry both `idealAnswer` and `expectedBehavior`, which feed the step-06 `correctness` (tags 00 to 08) and `behavior_match` callback evaluators.
 - Dataset and experiment scripts reuse the same app logic as the web UI; experiment scores are produced by `runExperiment` callbacks in the runner process.
 
 Recommended jump patterns:

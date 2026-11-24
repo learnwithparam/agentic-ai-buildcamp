@@ -14,10 +14,12 @@
     "start": "node dist/server/index.js",
     "prompt:publish": "tsx scripts/publish-prompt.ts",
     "dataset:seed": "tsx scripts/seed-dataset.ts",
+    "judge:calibrate": "tsx scripts/judge-calibrate.ts",
     "dataset:run": "tsx scripts/run-dataset.ts",
     "langfuse:seed:error-analysis": "tsx scripts/seed-error-analysis-traces.ts",
     "langfuse:seed:error-analysis:annotations": "tsx scripts/seed-error-analysis-annotations.ts",
-    "check": "npm run typecheck && tsx --test scripts/check-repo.test.ts src/server/graph.test.ts scripts/prompt-variants.test.ts scripts/error-analysis.test.ts scripts/scoreboard.test.ts && tsx scripts/check-repo.ts"
+    "langfuse:seed:calibration": "tsx scripts/seed-faithfulness-calibration.ts",
+    "check": "npm run typecheck && tsx --test scripts/check-repo.test.ts src/server/graph.test.ts scripts/prompt-variants.test.ts scripts/error-analysis.test.ts scripts/scoreboard.test.ts scripts/judge/faithfulness.test.ts && tsx scripts/check-repo.ts"
   },
   "dependencies": {
     "@assistant-ui/react": "0.15.38",

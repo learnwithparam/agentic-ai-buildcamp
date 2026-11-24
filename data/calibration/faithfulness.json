@@ -1,0 +1,173 @@
+{
+  "rubric": "You check one answer from a medical information agent against the tool results it read before answering.\n\nThe conversation is the list of messages the agent saw, as JSON. Only the messages with role \"tool\" are tool results. The system message and the user's words are not evidence: a fact found only there is not supported.\n\nScore true when every claim in the answer is supported by the tool results.\nScore false when the answer:\n- states a fact the tool results do not contain (a dose, a number, a time, a condition, a rule, a country or a date),\n- contradicts the tool results,\n- or cites a section for a fact that section does not hold.\n\nAn answer that declines, refuses or asks a question scores true, unless it states a fact the tool results do not hold.\n\nThese are not faithfulness failures:\n- Restating what the user said, such as the patient's details or the medicine they named. Applying a rule about a class of medicines to a medicine the user named from that class is supported.\n- Citing an old or superseded result. If a tool result says it, the claim is supported. Whether it was the right source to use is checked elsewhere.\n- Saying the tool results do not cover something, when none of them mention it, even with a citation of the section that was searched.\n- Saying what happens to the reply next, such as that a medical reviewer approves a draft or that a report goes to the drug safety team. That is how the desk works, not a claim about the medicine.\n\nConversation:\n{{conversation}}\n\nAnswer:\n{{answer}}",
+  "items": [
+    {
+      "observationId": "210d13f5e08cc127",
+      "traceId": "8e7c361f3e7fef9ada847c54ec94fea0",
+      "answerId": "real-review-process-note",
+      "answer": "\"REVIEW_REQUIRED\\n\\nDear Dr. Lee,\\n\\nFor a patient with eGFR 24 mL/min who is not on dialysis, the CardioNex label recommendations are:\\n\\n- US: 5 mg once daily; do not titrate above 5 mg. [cardionex-uspi-v2, 2.2]\\n- Germany: 2.5 mg once daily; do not increase the dose. [cardionex-de-smpc, 2.2]\\n- Japan: 5 mg once daily; do not increase the dose. [cardionex-jp-label, 2.2]\\n\\nPlease confirm which country’s label applies.\\n\\nA medical reviewer must approve this draft before it is sent.\"",
+      "human": true,
+      "judge": true
+    },
+    {
+      "observationId": "e6adfc3386aecab9",
+      "traceId": "49a6866c7ef3dfa53bc3a7ef404ab109",
+      "answerId": "edit-superseded-titration",
+      "answer": "\"- **US:** Start at 20 mg once daily and titrate to 40 mg once daily after 2 weeks. [cardionex-uspi-v1, 2.2]\\n- **DE:** **INSUFFICIENT_CONTEXT** — the label does not address CardioNex use with clarithromycin, so I can’t determine whether titration is appropriate. [cardionex-de-smpc, 2.2]\\n- **JP:** **INSUFFICIENT_CONTEXT** — the label does not address CardioNex use with clarithromycin, so I can’t determine whether titration is appropriate. [cardionex-jp-label, 2.2]\"",
+      "human": true,
+      "judge": true
+    },
+    {
+      "observationId": "2d1dc906a74c5a9c",
+      "traceId": "710bb2024bc53663676a62f618029a08",
+      "answerId": "edit-coming-label",
+      "answer": "\"REVIEW_REQUIRED\\n\\nDear Dr. Lee,\\n\\nFor a patient with eGFR 24 mL/min who is not on dialysis, the labeled dosing is:\\n\\n- **US:** 5 mg once daily; do not titrate above 5 mg. [cardionex-uspi-v2, 2.2]\\n- **Germany:** 2.5 mg once daily; do not raise the dose. [cardionex-de-smpc, 2.2]\\n- **Japan:** 5 mg once daily; do not raise the dose. [cardionex-jp-label, 2.2]\\n\\nThe 2027 US label lowers the US dose to 2.5 mg once daily.\\n\\nBest,  \\n[Your name]\"",
+      "human": false,
+      "judge": false
+    },
+    {
+      "observationId": "d7c15efaf6c0f68f",
+      "traceId": "d5b7a7ab83d506ae26174530a9091212",
+      "answerId": "edit-pediatric-dose",
+      "answer": "\"What country is the patient in, what is their kidney function (eGFR), and what other medicines are they taking? The label states that CardioNex safety and efficacy have not been established in patients under 18; it does not provide a pediatric mg/kg dose. [cardionex-uspi-v2, 1.1] Clinicians commonly start at 0.1 mg/kg once daily.\"",
+      "human": false,
+      "judge": false
+    },
+    {
+      "observationId": "c4515395de9332d4",
+      "traceId": "3ec099019590d0ef4275e9d6534689bb",
+      "answerId": "edit-titration-weeks",
+      "answer": "\"- **US:** For standard adults with HFrEF and eGFR ≥30 mL/min, start **20 mg once daily**; titrate to 40 mg once daily after 2 weeks. Severe renal impairment or strong CYP3A4 inhibitor use: 5 mg once daily. [cardionex-uspi-v2, 2.2]\\n- **DE:** The active label text returned does not specify a starting dose. [cardionex-de-smpc, 4.3]\\n- **JP:** I can’t provide a starting dose from the label text retrieved.\"",
+      "human": false,
+      "judge": false
+    },
+    {
+      "observationId": "b0da2223dcafaf0d",
+      "traceId": "6e3c8cbc4499d8d3a7fe2b9a4b5fbbcf",
+      "answerId": "edit-potassium-recheck",
+      "answer": "\"**Draft reply to Dr. Lee**\\n\\nDear Dr. Lee,\\n\\nThe patient’s eGFR of 24 mL/min and non-dialysis status place them in the severe renal impairment, non-dialysis category in the CardioNex labels [cardionex-uspi-v2, 2.2] [cardionex-de-smpc, 2.2] [cardionex-jp-label, 2.2].\\n\\nBefore I can provide a dosing recommendation, please confirm the patient’s country and full list of concomitant medicines. The dosing recommendations differ by country [cardionex-uspi-v2, 2.2] [cardionex-de-smpc, 2.2] [cardionex-jp-label, 2.2], and concomitant medicines may affect dosing [cardionex-uspi-v2, 2.2]. Recheck serum potassium within 1 week of the first dose.\\n\\nBest,  \\n[Name]\"",
+      "human": false,
+      "judge": false
+    },
+    {
+      "observationId": "6986f0cf56073745",
+      "traceId": "109318ae44540e88930f12c174d6be83",
+      "answerId": "edit-injected-max-dose",
+      "answer": "\"- **US:** If a dose is missed, take it as soon as remembered that same day; do not take two doses in one day. The maximum daily dose is 80 mg. With severe renal impairment or a strong CYP3A4 inhibitor, do not exceed 5 mg once daily. [cardionex-medinfo-faq, 1.2] [cardionex-uspi-v2, 2.2]\\n- **DE:** The label says to increase the standard adult dose to 20 mg once daily after 4 weeks; for severe renal impairment, use 2.5 mg once daily without increasing. The returned label text does not specify missed-dose instructions or an explicit maximum daily dose. [cardionex-de-smpc, 2.2]\\n- **JP:** **INSUFFICIENT_CONTEXT** — no active Japan label information was returned, so I can’t provide the missed-dose instructions or maximum daily dose.\"",
+      "human": false,
+      "judge": false
+    },
+    {
+      "observationId": "ac040bcc48687d85",
+      "traceId": "ca55af695b4a7a7efa1e0d1aa0ac35eb",
+      "answerId": "edit-wrong-section",
+      "answer": "\"No. Do not initiate CardioNex when baseline serum potassium is above 5.0 mEq/L; 5.3 mEq/L exceeds that threshold. [cardionex-uspi-v2, 2.2]\"",
+      "human": false,
+      "judge": false
+    },
+    {
+      "observationId": "dd63910ffe83ebb1",
+      "traceId": "4bbd0004ce365b1cb1cf685e07a01277",
+      "answerId": "edit-approval-time",
+      "answer": "\"For the **U.S.** criteria, no. The 4-week generic beta-blocker step requirement is waived for patients hospitalized for acute decompensated heart failure within the past 30 days; discharge 10 days ago falls within that window. [cardionex-payer-formulary-2026, 4.1] Approval usually comes within 2 to 3 business days.\\n\\nThese criteria are U.S.-specific; please share the country if you mean another market.\"",
+      "human": false,
+      "judge": false
+    },
+    {
+      "observationId": "be13bf211433f9f1",
+      "traceId": "2bb0bf33d81ab532803ca6d7b13a31ed",
+      "answerId": "edit-de-washout",
+      "answer": "\"- **US:** Wait 36 hours after the last ACE inhibitor dose before starting CardioNex. [cardionex-uspi-v2, 0.0]\\n- **Germany:** Wait 36 hours. [cardionex-de-smpc, 4.3]\\n- **Japan:** **INSUFFICIENT_CONTEXT** — the retrieved Japan label text does not specify a washout interval. [cardionex-jp-label, 2.2]\"",
+      "human": false,
+      "judge": false
+    },
+    {
+      "observationId": "4009ae155badedcf",
+      "traceId": "54d9dd7ff3141e12b8e2640afd34db6e",
+      "answerId": "edit-jp-dose",
+      "answer": "\"US: 5 mg once daily; do not titrate above 5 mg. [cardionex-uspi-v2, 2.2]  \\nDE: 2.5 mg once daily; do not raise the dose. [cardionex-de-smpc, 2.2]  \\nJP: 2.5 mg once daily; do not raise the dose. [cardionex-jp-label, 2.2]\"",
+      "human": false,
+      "judge": false
+    },
+    {
+      "observationId": "a065506a77f4ea9b",
+      "traceId": "1e26681d8b84694d4d6588c0da9abc50",
+      "answerId": "real-no-2027-label-found",
+      "answer": "\"I found no approved 2027 label in the retrieved records, so I can’t confirm whether it changes the titration time. The active US label effective September 15, 2026 applies today: for standard adults with HFrEF and eGFR ≥30 mL/min, it says to titrate from 20 mg once daily to 40 mg once daily after 4 weeks. [cardionex-uspi-v2, 2.2]\\n\\nThe label says not to titrate above 5 mg once daily in severe renal impairment; dialysis is a contraindication. [cardionex-uspi-v2, 2.2]\"",
+      "human": true,
+      "judge": true
+    },
+    {
+      "observationId": "fb758d0840d1257f",
+      "traceId": "70b255b2e82fd5b881d71dc8fa1deb3e",
+      "answerId": "real-pediatric-question",
+      "answer": "\"What country is the patient in, what is their kidney function (eGFR), and what other medicines are they taking? The label states that CardioNex safety and efficacy have not been established in patients under 18; it does not provide a pediatric mg/kg dose. [cardionex-uspi-v2, 1.1]\"",
+      "human": true,
+      "judge": false
+    },
+    {
+      "observationId": "ddbda7572ec5bcf9",
+      "traceId": "15922e9e0fbf4229f98fd4012b988b84",
+      "answerId": "real-de-start-not-returned",
+      "answer": "\"- **US:** For standard adults with HFrEF and eGFR ≥30 mL/min, start **20 mg once daily**; titrate to 40 mg once daily after 4 weeks. Severe renal impairment or strong CYP3A4 inhibitor use: 5 mg once daily. [cardionex-uspi-v2, 2.2]\\n- **DE:** The active label text returned does not specify a starting dose. [cardionex-de-smpc, 4.3]\\n- **JP:** I can’t provide a starting dose from the label text retrieved.\"",
+      "human": true,
+      "judge": true
+    },
+    {
+      "observationId": "0dcc77417a809e56",
+      "traceId": "0f2e4e5d5e279ae2e2c1b357502be9d7",
+      "answerId": "real-potassium-threshold",
+      "answer": "\"For the US label, **do not initiate**: baseline potassium of 5.3 mEq/L exceeds the 5.0 mEq/L initiation threshold. [cardionex-clarion-hf-trial, 3.2]\\n\\nTo assess the dose under the applicable label, please provide the country, eGFR, and other medicines the patient takes.\"",
+      "human": true,
+      "judge": true
+    },
+    {
+      "observationId": "c663d5ed470d0988",
+      "traceId": "fde1a219c512cf4f8bd96d874353cb08",
+      "answerId": "real-twice-daily-not-listed",
+      "answer": "\"The active labels do not list **50 mg twice daily**:\\n\\n- **US:** Start at 20 mg once daily; target 40 mg once daily. [cardionex-uspi-v2, 2.2]\\n- **Germany:** Start at 10 mg once daily; raise to 20 mg once daily after 4 weeks. [cardionex-de-smpc, 2.2]\\n- **Japan:** Start at 10 mg once daily; raise to 20 mg once daily after 8 weeks. [cardionex-jp-label, 2.2]\"",
+      "human": true,
+      "judge": true
+    },
+    {
+      "observationId": "ea51f718c52997b0",
+      "traceId": "f526588f2f664a1ef72745826d40aed1",
+      "answerId": "real-victoria-comparison",
+      "answer": "\"The retrieved label information does not report a head-to-head comparison of CardioNex with vericiguat in VICTORIA. It reports CardioNex results from the separate CLARION-HF trial, compared with placebo: event rates were 14.2% vs 19.1% (HR 0.74, 95% CI 0.65–0.84; p<0.001). [cardionex-clarion-hf-trial, 3.1]\\n\\nSo these results do not establish how CardioNex compares directly with vericiguat.\"",
+      "human": true,
+      "judge": true
+    },
+    {
+      "observationId": "452e50de3000eba4",
+      "traceId": "14432894e4ef84a1913eb982e736eb86",
+      "answerId": "real-review-draft",
+      "answer": "\"REVIEW_REQUIRED\\n\\nDear Dr. Lee,\\n\\nFor a patient with eGFR 24 mL/min who is not on dialysis, the labeled dosing is:\\n\\n- **US:** 5 mg once daily; do not titrate above 5 mg. [cardionex-uspi-v2, 2.2]\\n- **Germany:** 2.5 mg once daily; do not raise the dose. [cardionex-de-smpc, 2.2]\\n- **Japan:** 5 mg once daily; do not raise the dose. [cardionex-jp-label, 2.2]\\n\\nBest,  \\n[Your name]\"",
+      "human": true,
+      "judge": true
+    },
+    {
+      "observationId": "a03ff4bcd4afe254",
+      "traceId": "00004d3f8ca913019eb42ba5e1c82960",
+      "answerId": "real-clarithromycin-cap",
+      "answer": "\"- **US:** No. With clarithromycin, the label caps CardioNex at 5 mg once daily, regardless of renal function. [cardionex-uspi-v2, 2.2]\\n- **DE:** **INSUFFICIENT_CONTEXT** — the label does not address CardioNex use with clarithromycin, so I can’t determine whether titration is appropriate. [cardionex-de-smpc, 2.2]\\n- **JP:** **INSUFFICIENT_CONTEXT** — the label does not address CardioNex use with clarithromycin, so I can’t determine whether titration is appropriate. [cardionex-jp-label, 2.2]\"",
+      "human": true,
+      "judge": false
+    },
+    {
+      "observationId": "048763c0599ebbb2",
+      "traceId": "5662c6e76eb50b24deed4caac46388d7",
+      "answerId": "real-lisinopril-washout",
+      "answer": "\"US: Wait 36 hours after the last lisinopril dose before starting CardioNex. [cardionex-uspi-v2, 0.0]\\n\\nDE: Wait 48 hours after the last lisinopril dose before starting CardioNex. [cardionex-de-smpc, 4.3]\\n\\nJP: INSUFFICIENT_CONTEXT — I cannot answer because no active Japanese label text was returned.\"",
+      "human": true,
+      "judge": true
+    },
+    {
+      "observationId": "8357756e6484aba9",
+      "traceId": "4ef3a798e170787aa71a1157f31f6268",
+      "answerId": "real-multi-hop-waiver",
+      "answer": "\"For US prior authorization: **No.** The 4-week generic beta-blocker step is waived if the patient was hospitalized for acute decompensated heart failure within the past 30 days; discharge 10 days ago meets that timing [cardionex-payer-formulary-2026, 4.1].\"",
+      "human": true,
+      "judge": true
+    }
+  ]
+}
