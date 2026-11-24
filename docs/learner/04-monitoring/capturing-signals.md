@@ -90,7 +90,7 @@ Code evaluators are a good fit for that pattern: no model call, no prompt design
 3. Run a test on the evaluator.
 4. Click on **Create Evaluator** and then on execute.
 
-This evaluator runs as TypeScript, so it does not use the OpenRouter connection. Langfuse Cloud runs it in a sandbox. The local Langfuse runs it inside its worker, which `langfuse/workshop.override.yml` turns on with `LANGFUSE_CODE_EVAL_DISPATCHER: insecure-local`. Without that line, saving shows "Code evaluations are not enabled for this deployment".
+This evaluator runs as TypeScript, so it does not use the OpenRouter connection. Langfuse Cloud runs it in a sandbox. The local Langfuse runs it inside its worker, which `langfuse/workshop.override.yml` turns on with `LANGFUSE_CODE_EVAL_DISPATCHER: insecure-local`. Without that line, saving shows "Code evaluations are not enabled for this deployment". That worker also holds Langfuse's own secrets, and an evaluator can read them: lesson 12 moves code evaluators into a sandbox of their own.
 
 ## Step 3: Verify the monitors
 
