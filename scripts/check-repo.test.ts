@@ -91,6 +91,20 @@ test("a CSS class no component uses fails", () => {
   assert.doesNotMatch(problems.join("\n"), /class \.card is not used/);
 });
 
+test("coverage fails on an empty row, an unknown case and an uncovered case", () => {
+  const cases = '  - description: "[STALENESS-01] x"\n  - description: "[COUNTRY-01] y"\n';
+  const table = "| Promise | Chapter | Cases |\n|---|---|---|\n";
+  const passing = run({ "data/hcp/evals/medinfo.yaml": cases, "docs/coverage.md": table + "| Fresh | 07 | STALENESS-01, COUNTRY-01 |\n" });
+  assert.deepEqual(passing.filter((problem) => problem.startsWith("docs/coverage.md")), []);
+  const problems = run({
+    "data/hcp/evals/medinfo.yaml": cases,
+    "docs/coverage.md": table + "| Fresh | 07 | STALENESS-01, GHOST-09 |\n| Empty | 11 |  |\n",
+  }).join("\n");
+  assert.match(problems, /"Empty" has no case/);
+  assert.match(problems, /GHOST-09 is not a case/);
+  assert.match(problems, /case COUNTRY-01 is in no row/);
+});
+
 test("a README that names a different Node version fails", () => {
   const problems = run({ "README.md": base["README.md"].replace(">=22.18.0", ">=20") });
   assert.match(problems.join("\n"), /README\.md: does not name the Node version/);
