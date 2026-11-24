@@ -139,8 +139,8 @@ tests:
     vars:
       query: "How long must a patient wait after stopping lisinopril (an ACE inhibitor) before starting CardioNex?"
     assert:
-      - type: contains
-        value: "36-hour"
+      - type: regex
+        value: "36[- ]hours?"
       - type: regex
         value: "\\[cardionex-uspi-v2,\\s*0\\.0"
 
@@ -344,8 +344,8 @@ tests:
     assert:
       - type: contains
         value: "48"
-      - type: not-contains
-        value: "36-hour"
+      - type: not-regex
+        value: "36[- ]hours?"
       - type: regex
         value: "\\[cardionex-de-smpc,\\s*4\\.3"
 

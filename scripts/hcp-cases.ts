@@ -74,10 +74,14 @@ export function loadMedinfoCases(): CaseItem[] {
   });
 }
 
-// The checks write doses as "2.5mg". The agent writes "**2.5 mg**", so bold marks and the
-// space before "mg" are removed first. Nothing else is changed.
+// The checks write doses as "2.5mg" and ranges as "20 to 25". The agent writes "**2.5 mg**"
+// and "20–25", so bold marks go, the space before "mg" goes, and a dash between two numbers
+// becomes " to ". Nothing else is changed.
 export function normalizeAnswer(answer: string) {
-  return answer.replaceAll("**", "").replace(/(\d)\s+mg\b/g, "$1mg");
+  return answer
+    .replaceAll("**", "")
+    .replace(/(\d)\s+mg\b/g, "$1mg")
+    .replace(/(\d)\s*[–-]\s*(\d)/g, "$1 to $2");
 }
 
 // The checks an answer fails, matched the way promptfoo matches them in the dataset repo.
