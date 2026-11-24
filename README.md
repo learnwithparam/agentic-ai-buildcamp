@@ -39,6 +39,7 @@ Each lesson names the checkpoint tag to check out, what to change, and how to ch
 | 09 | [Calibrate a judge](./docs/learner/09-advanced-evals.md) | `checkpoint/09-advanced-evals` | Label 21 answers, measure an LLM judge against them, and let it into the pass only above the bar. |
 | 10 | [Route every model call through an AI gateway](./docs/learner/10-ai-gateway.md) | `checkpoint/10-ai-gateway` | Give each service its own gateway key, models and daily budget, and stop out-of-scope requests before any model call. |
 | 11 | [Sign doctors in with Keycloak and check permissions with OpenFGA](./docs/learner/11-sign-in-and-permissions.md) | `checkpoint/11-sign-in` | Take the company and country from a signed token, let OpenFGA decide which label text each doctor reads, and keep names and emails out of the trace. |
+| 12 | [Expose the desk over MCP with a sandbox for untrusted code](./docs/learner/12-mcp-and-sandbox.md) | `checkpoint/12-mcp-sandbox` | Let Claude Code search the labels with the doctor's own token, teach it the procedure with a skill, and run code evaluators in a QuickJS sandbox. |
 
 Helper commands used by the lessons:
 
