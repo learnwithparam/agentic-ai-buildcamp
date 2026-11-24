@@ -8,8 +8,9 @@
  *
  * A slice the run did not include shows "-", so a subset run never reads as 0 passed.
  *
- * A case passes when behavior_match and label_checks are both 1. The correctness judge is
- * left out of the pass, because an LLM judge can change its mind between two runs.
+ * A case passes when behavior_match and label_checks are both 1, and, on the slices the
+ * faithfulness judge covers (scripts/judge/faithfulness.ts), faithfulness too. That judge
+ * joined the pass only after lesson 09 measured it against human labels.
  *
  * npm run dataset:run -- --chapter 06 --change "..." appends a row to my-scoreboard.md.
  * check-repo calls checkScoreboard() on docs/scoreboard.md, so a row with the wrong shape fails CI.
