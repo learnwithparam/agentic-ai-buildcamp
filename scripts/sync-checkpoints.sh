@@ -46,6 +46,7 @@ TAGS=(
   checkpoint/09-advanced-evals
   checkpoint/10-ai-gateway
   checkpoint/11-sign-in
+  checkpoint/12-mcp-sandbox
 )
 
 # Files whose code is what the next lesson changes. Add a file here when a
@@ -65,20 +66,31 @@ AUTH_FILES="src/server/app.ts src/server/auth.ts src/server/auth.test.ts src/ser
   src/client/App.tsx src/client/chat/Thread.tsx src/client/chat/api.ts src/client/chat/suggestions.ts
   src/client/chat/suggestions.test.ts src/client/styles/app.css
   scripts/run-dataset.ts scripts/fga-model.ts scripts/fga-model.test.ts scripts/identity-setup.ts scripts/identity-smoke.ts"
+# Lesson 12 opens an MCP door for coding agents and runs Langfuse code evaluators in our own
+# sandbox; the files it changes and adds (MCP_FILES) stay as they were on tags before it, so
+# lesson 04 still runs evaluators with insecure-local.
+MCP_FILES="src/server/mcp.ts src/server/mcp.test.ts src/server/app.ts src/server/auth.ts scripts/identity-setup.ts
+  .mcp.json .claude/skills/hcp-labels/SKILL.md langfuse/workshop.override.yml scripts/langfuse-code-eval.ts
+  src/executor/sandbox.ts src/executor/server.ts src/executor/worker.ts src/executor/planted.ts
+  src/executor/executor.test.ts src/executor/package.json src/executor/package-lock.json
+  src/executor/Dockerfile src/executor/.dockerignore"
 milestone_files() {
   case "$1" in
     checkpoint/00-setup | checkpoint/01-base-app | checkpoint/02-tracing)
-      echo "src/server/index.ts src/server/medinfo-agent.ts src/server/tools.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES"
+      echo "src/server/index.ts src/server/medinfo-agent.ts src/server/tools.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES"
       ;;
     checkpoint/03-prompt-management)
-      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES"
+      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES"
       ;;
     # Lessons 06 and 07 run the dataset with the correctness judge; lesson 09 replaces it.
     checkpoint/04-* | checkpoint/05-* | checkpoint/06-* | checkpoint/07-* | checkpoint/08-* | checkpoint/09-*)
-      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES"
+      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES"
       ;;
     checkpoint/10-*)
-      echo "$AUTH_FILES"
+      echo "$AUTH_FILES $MCP_FILES"
+      ;;
+    checkpoint/11-*)
+      echo "$MCP_FILES"
       ;;
     *)
       echo ""

@@ -1,7 +1,7 @@
 import { execFileSync, spawnSync } from "node:child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import type { OpenFgaClient, TupleKey, WriteAuthorizationModelRequest } from "@openfga/sdk";
+import { CredentialsMethod, OpenFgaClient, type TupleKey, type WriteAuthorizationModelRequest } from "@openfga/sdk";
 import { LABEL_SECTIONS } from "../src/server/labels";
 import { documentTuples } from "../src/server/permissions";
 
@@ -49,4 +49,16 @@ export async function syncDocumentTuples(client: OpenFgaClient) {
   const deletes = [...stored].filter(([id]) => !wanted.has(id)).map(([, tuple]) => tuple);
   if (writes.length || deletes.length) await client.write({ writes, deletes }, { transaction: { disable: true, maxPerChunk: 50 } });
   return { written: writes.length, deleted: deletes.length, total: wanted.size };
+}
+
+// For the tests: a new store with the real rules and document facts, deleted by the caller, so
+// the app's own store is never touched and CI needs no setup beyond the OpenFGA server.
+export async function createTestStore(apiUrl: string, token: string) {
+  const credentials = { method: CredentialsMethod.ApiToken, config: { token } } as const;
+  const { id: storeId } = await new OpenFgaClient({ apiUrl, credentials }).createStore({ name: `medinfo-test-${Date.now()}` });
+  const store = new OpenFgaClient({ apiUrl, storeId, credentials });
+  const { authorization_model_id: modelId } = await store.writeAuthorizationModel(modelJson());
+  const client = new OpenFgaClient({ apiUrl, storeId, authorizationModelId: modelId, credentials });
+  await syncDocumentTuples(client);
+  return { client, storeId, modelId };
 }
