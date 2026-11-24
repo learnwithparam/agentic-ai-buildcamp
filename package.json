@@ -20,7 +20,10 @@
     "langfuse:seed:error-analysis:annotations": "tsx scripts/seed-error-analysis-annotations.ts",
     "langfuse:seed:calibration": "tsx scripts/seed-faithfulness-calibration.ts",
     "check": "npm run typecheck && tsx --test 'scripts/**/*.test.ts' 'src/**/*.test.ts' && tsx scripts/check-repo.ts",
-    "langfuse:gateway-keys": "tsx scripts/langfuse-gateway-keys.ts"
+    "langfuse:gateway-keys": "tsx scripts/langfuse-gateway-keys.ts",
+    "identity:setup": "tsx scripts/identity-setup.ts",
+    "infra:up": "docker compose --env-file .env -f infra/docker-compose.yml up -d --wait",
+    "identity:smoke": "tsx scripts/identity-smoke.ts"
   },
   "dependencies": {
     "@assistant-ui/react": "0.15.38",
@@ -35,10 +38,14 @@
     "@langfuse/openai": "6.1.1",
     "@langfuse/otel": "6.1.1",
     "@langfuse/tracing": "6.1.1",
+    "@openfga/sdk": "0.9.8",
     "@opentelemetry/sdk-node": "0.223.2",
     "dotenv": "18.0.10",
     "express": "5.3.0",
+    "jose": "6.2.17",
     "openai": "7.63.0",
+    "openid-client": "6.8.9",
+    "pg": "8.23.1",
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "react-markdown": "10.1.0",
@@ -48,6 +55,7 @@
   "devDependencies": {
     "@types/express": "5.0.6",
     "@types/node": "26.6.6",
+    "@types/pg": "8.23.1",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "@vitejs/plugin-react": "6.3.0",

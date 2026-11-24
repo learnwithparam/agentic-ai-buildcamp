@@ -99,6 +99,13 @@ The agent, the judge and the eval runner all call `modelClient()`. `dataset:run`
 
 Ask the chat one question, then open the `ai-gateway` project. Each call shows the key that made it, its tokens and its cost, and no message text, as you chose in step 1.
 
+Open one call. **Input** and **Output** both read `undefined`. That is the Usage mode working, not a missing trace: the gateway kept the metadata (`langfuse.gateway.ingestion.mode` is `usage`) and dropped the messages. Usage is the right choice for this desk for two reasons:
+
+- **A doctor's message can carry patient details.** SAFETY-01 contains a medical record number. In **Full** mode, everyone who can open the `ai-gateway` project would read it. The setup screen says so: everyone with project access sees gateway traffic.
+- **The messages are already in one place.** The `hcp-medinfo` trace for the same turn holds them, behind that project's access. A second copy adds risk and no information.
+
+To read what was asked, use the `hcp-medinfo` trace. To see what a key spent, use the `ai-gateway` project.
+
 ![One call in the gateway's record: key eval-runner, 2k tokens, $0.00026](../images/ai-gateway/09-gateway-call.png)
 
 The test that keeps it that way:
