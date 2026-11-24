@@ -9,7 +9,7 @@ description: "Set up the workshop app with OpenAI and Langfuse credentials, then
 
 Have the workshop app running locally with both OpenAI and Langfuse credentials in place. From here you can skim `01-base-app`, then start building in `02-tracing`.
 
-> ⚠️ Use **Langfuse Cloud** so you have the latest features this workshop describes. Self-hosted instances may be on an older version and will not match the lessons.
+> Langfuse runs on your own laptop in Docker for the whole workshop, from the compose files in `langfuse/`. You do not need a Langfuse Cloud account.
 
 ## Prerequisites
 
@@ -110,7 +110,7 @@ You should see the **HCP Medical Information Agent** chat:
 - suggestion chips below the greeting
 - the side panel on the right (the signed-in clinician and the label library)
 
-
+![The HCP Medical Information Agent: the greeting, suggestion chips and the label library side panel.](../images/sample_app.png)
 
 ## How to verify you are done
 

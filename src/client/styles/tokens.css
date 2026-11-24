@@ -1,0 +1,35 @@
+/* The one place a colour is written. These are the lwp-canvas light tokens.
+   scripts/check-repo.ts fails on a colour anywhere else in src/client. */
+
+@font-face {
+  font-family: Inconsolata;
+  src: url(../fonts/Inconsolata-Regular.ttf);
+  font-weight: 400;
+}
+@font-face {
+  font-family: Inconsolata;
+  src: url(../fonts/Inconsolata-Bold.ttf);
+  font-weight: 700;
+}
+
+:root {
+  --bg: #fafafa;
+  --surface: #ffffff;
+  --fg: #151515;
+  --fg2: #414141;
+  --muted: #606060;
+  --line: #dfdfdf;
+  --accent: #faff69;
+  --on-accent: #151515;
+  --pass: #008138;
+  --fail: #bf000f;
+  --wait: #b75000;
+  --passbg: #dcebe3;
+  --failbg: #f3dcde;
+  --waitbg: #f2e6dc;
+  --hl: #f4f5c8;
+  --sans: Inter, system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  --mono: Inconsolata, "Courier New", Courier, monospace;
+  --r: 4px;
+  color-scheme: light;
+}

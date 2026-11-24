@@ -1,0 +1,4 @@
+dispense_month,region_id,product_slug,scripts_filled,units_shipped,hcp_email
+2026-08,SW-02,brand_neurovex,820,2460,dr.patel@southwest-neuro.org
+2026-09,SW-02,brand_neurovex,940,2820,dr.gomez@heart-neuro-clinic.org
+2026-10,SW-02,brand_neurovex,1105,3315,dr.chen@metro-diabetes.org
