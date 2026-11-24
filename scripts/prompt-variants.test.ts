@@ -1,8 +1,11 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
-import { SYSTEM_PROMPT } from "../src/server/medinfo-agent";
-import { ASK_FIRST_RULE, PROMPT_VARIANTS } from "./prompt-variants";
+
+// medinfo-agent.ts builds its OpenAI client on import. CI has no key, and this test calls no model.
+process.env.OPENAI_API_KEY ||= "not-used-by-this-test";
+const { SYSTEM_PROMPT } = await import("../src/server/medinfo-agent");
+const { ASK_FIRST_RULE, PROMPT_VARIANTS } = await import("./prompt-variants");
 
 test("the ask-first variant is the system prompt plus one line", () => {
   const before = SYSTEM_PROMPT.split("\n");
