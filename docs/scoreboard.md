@@ -1,8 +1,13 @@
 # Scoreboard
 
-One row per scored chapter, written by `npm run dataset:run -- --chapter <nn> --change "<what changed>"`.
+The reference rows: one per scored chapter, from our own runs. The lessons quote these numbers.
+Your runs go to `my-scoreboard.md` at the repo root instead, so you can compare your row with ours
+column by column. That file is git-ignored, so it stays when you check out the next tag.
+
 Each slice cell is cases passed out of cases in that slice. A case passes when `behavior_match` and
 `label_checks` are both 1. `npm run check` fails when a row has the wrong number of cells.
+The run links point at the local Langfuse these rows ran on, so they open only there; your own
+rows link to your runs.
 
 | Chapter | Change | Passed | staleness | footnote | multi-hop | off-label | tenancy | pv-phi | guardrail | country | future-label | injection | multi-turn | ambiguous | pushback | review | Run |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
