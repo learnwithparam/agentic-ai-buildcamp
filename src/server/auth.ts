@@ -180,11 +180,19 @@ export function createAuth(config: AuthConfig) {
     next();
   }
 
+  // Where to send the doctor after sign-in: a path on this app, or "/". The value is read the way a
+  // browser reads it, so "/\evil.example" (which a browser treats as "//evil.example") is refused.
+  function pathOnThisApp(value: unknown): string {
+    if (typeof value !== "string" || !value.startsWith("/") || /[\\\u0000-\u001f\u007f]/.test(value)) return "/";
+    const url = new URL(value, appOrigin);
+    return url.origin === appOrigin ? `${url.pathname}${url.search}${url.hash}` : "/";
+  }
+
   const router = Router();
 
   router.get("/api/auth/sign-in", async (request, response, next) => {
     try {
-      const returnTo = typeof request.query.returnTo === "string" && /^\/(?!\/)/.test(request.query.returnTo) ? request.query.returnTo : "/";
+      const returnTo = pathOnThisApp(request.query.returnTo);
       const codeVerifier = oidc.randomPKCECodeVerifier();
       const state = oidc.randomState();
       const nonce = oidc.randomNonce();

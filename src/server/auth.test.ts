@@ -233,6 +233,18 @@ test("sign-in sends the doctor to Keycloak with PKCE and remembers the attempt o
   assert.equal(pending.returnTo, "/", "an off-site returnTo was kept");
 });
 
+// A browser reads "/\evil.example" as "//evil.example", another site. Only a path on this app may stay.
+test("sign-in keeps a returnTo only when it stays on this app", async () => {
+  const kept = async (returnTo: string) => {
+    await fetch(`${base}/api/auth/sign-in?returnTo=${encodeURIComponent(returnTo)}`, { redirect: "manual" });
+    return [...store.pending.values()].at(-1)!.returnTo;
+  };
+  for (const offSite of ["//evil.example", "/\\evil.example", "/\\/evil.example", "https://evil.example/", "/\tevil", "evil"]) {
+    assert.equal(await kept(offSite), "/", `${JSON.stringify(offSite)} was kept`);
+  }
+  assert.equal(await kept("/threads/abc?tab=sources#top"), "/threads/abc?tab=sources#top");
+});
+
 test("a callback with no sign-in attempt, or the wrong state, makes no session", async () => {
   const before = store.sessions.size;
   const none = await fetch(`${base}/api/auth/callback?code=x&state=y`, { redirect: "manual" });
