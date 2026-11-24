@@ -1,13 +1,13 @@
 ---
 title: "Workshop: Tracing an LLM Agent with Langfuse"
-description: "Instrument the medical information agent so one chat turn becomes a nested Langfuse trace with OpenAI generations, agent spans, and tool calls."
+description: "Instrument the medical information agent so one chat turn becomes one nested Langfuse trace with the model calls, the graph nodes, the tool calls and the chat session."
 ---
 
 # 02 Tracing
 
 ## Why we trace
 
-Tracing logs every step your agent takes. Every model call, every tool invocation, the inputs that went in and the outputs that came back, in the order they happened. It turns the agent from a black box into something you can open up and inspect after the fact, so when an answer is wrong you can point at the exact step where it went wrong.
+Tracing logs every step your agent takes: every model call, every tool call, what went in and what came back, in order. When an answer is wrong, you open the trace and point at the step where it went wrong.
 
 Complementary materials:
 
@@ -17,18 +17,19 @@ Complementary materials:
 
 ## Goal
 
-When a clinician asks "What is the CardioZ dose in the US?", the agent doesn't just hit the model once. Behind the scenes it asks the model what to do, calls `get_support_context` to fetch the brands and countries we cover, asks the model again, calls `search_help_library` for the CardioZ labels, then asks the model one more time to produce the answer. None of that is visible today.
+One chat turn becomes one trace in Langfuse, with every model call, every graph node and every tool call inside it.
 
-The goal of this chapter is to make every one of those steps visible in Langfuse: one chat turn becomes one nested trace with the agent run, the OpenAI generations, and the two tool calls all logged in order.
+## Before
 
-![One question becomes seven steps: plan, get_support_context, decide, search_help_library, write, answer.](../images/tracing/process_illustration.png)
+Ask **What is the approved use of CardioNex in Japan?** The answer looks fine. Behind it, the agent called the model three times and ran two tools, and you can see none of it. The `search_labels` card in the chat shows what was found, but not what the model was sent, what it cost, or how long each step took. And the chat forgets all of it when you close the tab.
 
-We will build up the trace in three steps that mirror the agent's structure:
+![One traced chat turn: the chat turn holds the agent and tools steps, each agent step holds a model call, each tools step holds the tool it ran, and the session groups every turn of one chat.](../images/diagrams/traced-chat-turn.svg)
 
-1. **First trace**: log the OpenAI generations themselves.
-2. **Nested traces**: group the generations under one agent run per turn.
-3. **Recording tool calls**: make each tool invocation its own observation.
+You build that trace in three steps:
 
+1. **Log each model call.**
+2. **Nest the calls in one turn.**
+3. **Log the tools and the session.**
 
 ## Starting point
 
@@ -36,36 +37,38 @@ We will build up the trace in three steps that mirror the agent's structure:
 git checkout checkpoint/02-tracing
 ```
 
-This is the blank slate for the tracing step: same code as `checkpoint/01-base-app`, with no Langfuse wiring yet. The Langfuse packages are already in `package.json`. Run `npm install` if you haven't. Make sure `.env` has your `OPENAI_API_KEY` and Langfuse keys.
+This is the same code as `checkpoint/01-base-app`, with no Langfuse wiring yet. The Langfuse packages are already in `package.json`. Run `npm install` if you haven't. Make sure `.env` has your `OPENAI_API_KEY` and the Langfuse keys from `00-setup`.
 
-## Step 1: First trace
+You edit three files: `src/server/index.ts`, `src/server/medinfo-agent.ts` and `src/server/tools.ts`. Keep `npm run dev` running; the server restarts on each save.
 
-We want observability on the OpenAI calls themselves to see what the inputs and outputs are, and how much cost, tokens and time is spent. Two changes are enough.
+## Step 1: Log each model call
 
 ### `src/server/index.ts`
 
-Start the Langfuse span processor near the top of the file:
+Start the Langfuse span processor at the top of the file, after the imports:
 
 ```ts
 import { NodeSDK } from "@opentelemetry/sdk-node";
 import { LangfuseSpanProcessor } from "@langfuse/otel";
 
-new NodeSDK({ spanProcessors: [new LangfuseSpanProcessor()] }).start();
-```
-
-The processor reads `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`, and `LANGFUSE_BASE_URL` from the Node process environment. In this workshop, the server loads the repository `.env` before the Langfuse SDK starts, so edit `.env` instead of relying on exported shell values.
-
-Side note: if the last trace sometimes shows up late when you stop or restart `npm run dev`, come back to `index.ts` and give `shutdown()` something to flush.
-
-**Near the top of the file**, replace the one-liner SDK start with named variables:
-
-```ts
 const langfuseSpanProcessor = new LangfuseSpanProcessor();
 const sdk = new NodeSDK({ spanProcessors: [langfuseSpanProcessor] });
 sdk.start();
 ```
 
-**Near the bottom of the file**, find the existing `shutdown` function (it already closes the server on `SIGINT` / `SIGTERM`) and add the flush + SDK shutdown:
+The processor reads `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY` and `LANGFUSE_BASE_URL`. The server loads the repository `.env` before this runs, so edit `.env`, not your shell.
+
+Let the health route say whether tracing is set up. Change the `env` import and the route:
+
+```ts
+import { env, isLangfuseConfigured } from "./env";
+```
+
+```ts
+response.json({ ok: true, tracingConfigured: isLangfuseConfigured() });
+```
+
+At the bottom, the existing `shutdown` function closes the server. Make it send the last traces before the process exits:
 
 ```ts
 async function shutdown() {
@@ -75,9 +78,9 @@ async function shutdown() {
 }
 ```
 
-You do not need this to understand the tracing model, but it avoids confusing "where did my last trace go?" moments in local dev.
+Without this, the last trace before a restart can go missing.
 
-### `src/server/support-agent.ts`
+### `src/server/medinfo-agent.ts`
 
 Add the import:
 
@@ -85,176 +88,149 @@ Add the import:
 import { observeOpenAI } from "@langfuse/openai";
 ```
 
-Then **wrap the OpenAI client where you create it**. Find this line in `runSupportConversation`:
-
-```ts
-const openai = new OpenAI({ apiKey: env.openaiApiKey });
-```
-
-and change it to:
+Then wrap the OpenAI client where it is created:
 
 ```ts
 const openai = observeOpenAI(new OpenAI({ apiKey: env.openaiApiKey }));
 ```
 
-That's the entire diff. No factory function, no separate raw client: `observeOpenAI` wraps the OpenAI client inline at the call site, and `openai.chat.completions.create(...)` below it now emits a trace for every call.
+That is the whole step. `observeOpenAI` logs every call made through the client.
 
+**Verify:** run `curl -s http://127.0.0.1:8787/api/health` and see `"tracingConfigured":true`. Ask the Japan question, then open **Tracing** in Langfuse. Each model call is its own `OpenAI.chat` trace, with the prompt, the reply, the tokens, the cost and the time. One question made three separate traces. Nothing says they belong together.
 
-**Verify:** `npm run dev`, ask one question, refresh Langfuse: you should see one generation per OpenAI call with prompt, response, tokens, and latency. Each generation is still its own top-level trace; we fix that next.
+![Langfuse Tracing after Step 1: one question made three separate OpenAI.chat traces.](../images/tracing/02-tracing-step-1.png)
 
-![Langfuse Traces view after Step 1: each chat turn appears as standalone openai-chat-completion generations.](../images/tracing/02-tracing-step-1.png)
+## Step 2: Nest the calls in one turn
 
-## Step 2: Nested traces
+Three loose calls do not show which question they answered. Wrap the turn, so everything inside it lands in one trace, and wrap each graph node, so you see the agent and tools steps.
 
-To put the generations into context we group them under one agent run per turn. Three edits in `src/server/support-agent.ts`: no function body changes.
+### `src/server/medinfo-agent.ts`
 
-**1. Add the import:**
+Add the import:
 
 ```ts
 import { observe } from "@langfuse/tracing";
 ```
 
-**2. Demote the existing function.** Find:
+Replace the client line from Step 1 and the graph with this:
 
 ```ts
-export async function runSupportConversation(request: ChatRequest): Promise<ChatResponse> {
-```
+const client = new OpenAI({ apiKey: env.openaiApiKey });
 
-Drop the `export` and rename the function from `runSupportConversation` to `runSupportConversationInner`:
-
-```ts
-async function runSupportConversationInner(request: ChatRequest): Promise<ChatResponse> {
-```
-
-The body stays exactly as it is.
-
-
-**3. Add the wrapped export at the bottom of the file:**
-
-```ts
-export const runSupportConversation = observe(runSupportConversationInner, {
-  name: "hcp-medinfo-chat-turn",
-  asType: "agent"
+const graph = buildGraph({
+  agent: observe(
+    (state, config) => agentStep(observeOpenAI(client), SYSTEM_PROMPT, state, config),
+    { name: "agent", asType: "span" }
+  ),
+  tools: observe((state) => toolsStep(state, executeTool), { name: "tools", asType: "span" }),
+  review: reviewStep
 });
 ```
 
-`index.ts` still imports `runSupportConversation` the same way. `observe(...)` auto-captures the function argument as the trace input and the return value as the trace output.
+The client is now wrapped inside the agent node. In `03-prompt-management`, each call passes the prompt it fetched from Langfuse, so the wrap has to happen per call.
 
-**Verify:** one chat turn should now show up as a single `hcp-medinfo-chat-turn` observation with the OpenAI generation nested underneath.
+Then wrap the turn. Replace the `runMedinfoTurn` line with:
 
-![Trace tree after Step 2: one hcp-medinfo-chat-turn agent root with the OpenAI generation as a child.](../images/tracing/02-tracing-step-2.png)
+```ts
+export const runMedinfoTurn = observe(
+  (turn: Turn, emit: (event: StreamEvent) => void) => runGraph(graph, turn, emit),
+  { name: "hcp-medinfo-chat-turn", asType: "agent" }
+);
+```
 
+`observe(...)` logs the function's argument as the input and its return value as the output. `routes.ts` still calls `runMedinfoTurn` the same way.
 
+**Verify:** ask the Japan question again. Langfuse shows one new `hcp-medinfo-chat-turn` trace. Open it: the turn holds `agent`, `tools`, `agent`, `tools`, `agent`, and each `agent` holds its `OpenAI.chat` call. The input is the chat thread and the question.
 
-## Step 3: Recording tool calls
+The `tools` steps are empty. You can see that a tool ran, but not which one, what it was given, or what it found.
 
-The OpenAI generation already mentions the tool calls in its `tool_calls` output, but we have no observation for the actual tool execution: no way to see what input went in and what came out. The same `observe(...)` pattern, can be applied to each tool.
+![The trace after Step 2: one hcp-medinfo-chat-turn holding the agent and tools steps, each agent step holding its model call.](../images/tracing/02-tracing-step-2.png)
+
+## Step 3: Log the tools and the session
 
 ### `src/server/tools.ts`
 
-Add the import and the two observed helpers above `executeTool`, then **replace the existing `executeTool` with the version below** so the switch calls the wrapped helpers instead of doing the work inline. `TOOL_DEFINITIONS` stays untouched.
+Add the import, wrap the two tool functions above `executeTool`, and call the wrapped ones:
 
 ```ts
 import { observe } from "@langfuse/tracing";
+```
 
-const getSupportContextTool = observe(
-  async () => {
-    const context = getSupportContext();
-
-    return {
-      ok: true,
-      context: {
-        id: context.id,
-        label: context.label,
-        devices: context.devices,
-        deviceSummary: context.deviceSummary,
-        responseStyle: context.responseStyle,
-        scopeHighlights: context.scopeHighlights,
-        notableApps: context.notableApps
-      }
-    };
-  },
-  { name: "get_support_context", asType: "tool" }
-);
-
-const searchHelpLibraryTool = observe(
-  async (input: { question: string }) => {
-    const guides = searchGuides(input.question);
-
-    return {
-      ok: true,
-      results: guides.map((guide) => ({
-        id: guide.id,
-        title: guide.title,
-        summary: guide.summary,
-        steps: guide.steps,
-        caution: guide.caution ?? null
-      }))
-    };
-  },
-  { name: "search_help_library", asType: "tool" }
-);
+```ts
+const getDeskRulesTool = observe(deskRules, { name: "get_desk_rules", asType: "tool" });
+const searchLabelsTool = observe(labelSearch, { name: "search_labels", asType: "tool" });
 
 export async function executeTool(name: string, input: Record<string, unknown>): Promise<ToolResult> {
   switch (name) {
-    case "get_support_context":
-      return getSupportContextTool();
-
-    case "search_help_library":
-      return searchHelpLibraryTool({ question: String(input.question ?? "") });
-
+    case "get_desk_rules":
+      return getDeskRulesTool();
+    case "search_labels":
+      return searchLabelsTool({ query: String(input.query ?? "") });
     default:
       return { ok: false, error: `Unsupported tool: ${name}` };
   }
 }
 ```
 
-If `npm run dev` stops with `Multiple exports with the same name "executeTool"`, the original `executeTool` is still further down the file. Delete it and keep only the version above.
+### `src/server/medinfo-agent.ts`
 
-![Trace after Step 3. hcp-medinfo-chat-turn with OpenAI generations, get_support_context, and search_help_library.](../images/tracing/02-tracing-step-3.png)
-
-
-## How to verify you are done
-
-- A single user turn creates one trace in Langfuse.
-- Root observation: `hcp-medinfo-chat-turn` (type `agent`).
-- Child generation from `observeOpenAI(...)` with prompt, response, tokens, latency.
-- Child tool observations: `get_support_context`, `search_help_library`.
-- Root input is the chat request; root output is the chat response.
-
-## Wrap-up
-
-Same pattern, different observation types, same concept: `observe(fn, { asType })` wraps a function and emits a span with the name and type you give it. `observeOpenAI(client)` is a specialized version of that wrap for the OpenAI SDK.
-
-A more straightforward way to add rich tracing in line with Langfuse best practices is the [**Langfuse skill**](https://github.com/langfuse/skills) (`/langfuse`). It applies the recommended patterns to your codebase without you hand-rolling each wrap. This walkthrough exists so you understand what the skill is doing under the hood.
-
-`observeOpenAI` itself wraps the official OpenAI SDK: under the hood it's the same as the Langfuse [auto-instrumentation for OpenAI JS](https://langfuse.com/integrations/model-providers/openai-js). If you're using a different SDK (Anthropic, Vercel AI SDK, your own HTTP client), the Langfuse [integrations catalogue](https://langfuse.com/integrations) has the equivalent wrapper or auto-instrumentation guide.
-
-## Appendix/Bonus section: User and session IDs
-
-The walkthrough above gets you tracing with a clean parent → generation → tool shape. The next thing most teams want is to **slice traces by user and by session**, so you can pull up "every turn this user has had with the agent" or "the full multi-turn session from yesterday morning."
-For simplicity reasons we skip this step in the live tracing walkthrough, but the checkpoints after tracing include it so later chapters can use session/user views without another code step. See information on [Sessions](https://langfuse.com/docs/observability/features/sessions) and [Users](https://langfuse.com/docs/observability/features/users) in the Langfuse docs.
-
-In short:
+Each chat has a thread id. Pass it to Langfuse as the session id, so every turn of one chat is grouped. Change the import:
 
 ```ts
-import { propagateAttributes } from "@langfuse/tracing";
+import { observe, propagateAttributes } from "@langfuse/tracing";
+```
 
-return propagateAttributes(
-  {
-    userId: request.userId ?? `workshop-${context.id}`,
-    sessionId: request.sessionId,
-    tags: ["langfuse-workshop", "hcp-medinfo"]
-  },
-  async () => {
-    // ...the same tool-calling loop...
-  }
+and run the graph inside `propagateAttributes`:
+
+```ts
+export const runMedinfoTurn = observe(
+  (turn: Turn, emit: (event: StreamEvent) => void) =>
+    propagateAttributes(
+      {
+        sessionId: turn.threadId,
+        traceName: "hcp-medinfo-chat-turn",
+        tags: ["langfuse-workshop", "hcp-medinfo"]
+      },
+      () => runGraph(graph, turn, emit)
+    ),
+  { name: "hcp-medinfo-chat-turn", asType: "agent" }
 );
 ```
 
-Anything inside the `propagateAttributes(...)` block, including all child spans emitted by `observeOpenAI`, automatically gets the `userId`, `sessionId`, and tags attached. The Langfuse **Users** view, **Sessions** view, and tag filters all light up as soon as the attributes are present.
+Everything inside the block, the model calls and tool calls included, gets the session id and the tags.
 
+**Verify:** ask the Japan question again and open the new trace. `get_desk_rules` and `search_labels` sit inside their `tools` steps. Click `search_labels`: the input is the query the model wrote, and the output is every label section it found. The top of the trace shows a **session** link and the two tags. Ask a second question in the same chat, and **Sessions** in Langfuse shows both turns under one session.
+
+![The trace after Step 3: get_desk_rules and search_labels inside their tools steps, with the search query and its results, and the session and tags on top.](../images/tracing/02-tracing-step-3.png)
+
+## Use it
+
+Ask the dose question from `01-base-app`: **What is the CardioNex dose for a US patient with eGFR 24 who is not on dialysis?** Open its trace and click `search_labels`. The results usually hold three US labels: `cardionex-uspi-v2` (active), `cardionex-uspi-v1` (superseded) and `cardionex-uspi-v3` (not in force until 2027). The right answer depends on the model picking `v2`. When it picks the wrong one, this is the step that shows why. Lesson 07 turns that into a test.
+
+## How to verify you are done
+
+- One chat turn creates one trace in Langfuse.
+- The root is `hcp-medinfo-chat-turn`, of type agent, with the chat thread as input.
+- Each `agent` step holds an `OpenAI.chat` generation with prompt, reply, tokens, cost and time.
+- Each `tools` step holds `get_desk_rules` or `search_labels`, with its input and output.
+- The trace has a session and the tags `langfuse-workshop` and `hcp-medinfo`.
+
+Compare your code with the finished version:
+
+```bash
+git diff checkpoint/03-prompt-management -- src/server
+```
+
+Only comments and the order of imports should differ.
+
+## Wrap-up
+
+One pattern does all of it: `observe(fn, { name, asType })` wraps a function and logs a step with that name and type. `observeOpenAI(client)` is the same idea, built for the OpenAI SDK.
+
+The [**Langfuse skill**](https://github.com/langfuse/skills) (`/langfuse`) applies these patterns to a codebase for you. This walkthrough shows what it does under the hood.
+
+`observeOpenAI` is the Langfuse [auto-instrumentation for OpenAI JS](https://langfuse.com/integrations/model-providers/openai-js). For another SDK, the [integrations catalogue](https://langfuse.com/integrations) has the matching wrapper. See [Sessions](https://langfuse.com/docs/observability/features/sessions) and [Users](https://langfuse.com/docs/observability/features/users) for more ways to group traces.
 
 ## End state
 
-This finished traced app is the starting point for `03-prompt-management` and `04-monitoring`.
+The traced app is the starting point for `03-prompt-management` and `04-monitoring`.

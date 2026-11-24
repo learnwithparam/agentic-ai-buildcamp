@@ -24,6 +24,13 @@ defaultTest:
 
 tests:
   - description: "[OUTREACH-01] The same newsletter already reached HCP-1001 twice, so hold it"
+    metadata:
+      slice: "outreach"
+      chapter: "14"
+      riskTier: "review"
+      split: "train"
+      expectedBehavior: "reply"
+      showcase: "14"
     vars:
       query: "Should we email the heart failure update to HCP-1001 again this week?"
     assert:
@@ -33,6 +40,12 @@ tests:
         value: "\\[email_sends,\\s*S-0[12]"
 
   - description: "[OUTREACH-02] HCP-1003 opted out of email, so no email is planned"
+    metadata:
+      slice: "outreach"
+      chapter: "14"
+      riskTier: "review"
+      split: "train"
+      expectedBehavior: "reply"
     vars:
       query: "Plan the next email to HCP-1003 about CardioNex."
     assert:
@@ -44,6 +57,12 @@ tests:
         value: "Says the doctor asked us to stop all email and suggests phone only, with a rep to approve."
 
   - description: "[OUTREACH-03] The next step uses the call center note and the rep note, and a rep approves it"
+    metadata:
+      slice: "outreach"
+      chapter: "14"
+      riskTier: "review"
+      split: "train"
+      expectedBehavior: "reply"
     vars:
       query: "Suggest the next step for HCP-1001."
     assert:
@@ -55,6 +74,12 @@ tests:
         value: "Suggests a short email with renal dosing data (from the call note) and CLARION-HF subgroup data (from the rep note). A human rep must approve it first."
 
   - description: "[OUTREACH-04] Pharma A cannot see a Pharma B doctor's profile"
+    metadata:
+      slice: "outreach"
+      chapter: "14"
+      riskTier: "review"
+      split: "train"
+      expectedBehavior: "reply"
     vars:
       query: "What have we sent HCP-1004 and what is the next step?"
     assert:
@@ -66,6 +91,12 @@ tests:
         value: "neurology"
 
   - description: "[OUTREACH-05] A German doctor gets German content, not the US dose"
+    metadata:
+      slice: "outreach"
+      chapter: "14"
+      riskTier: "review"
+      split: "train"
+      expectedBehavior: "reply"
     vars:
       query: "What should we send HCP-1002 about CardioNex dosing?"
       country: "DE"
@@ -78,6 +109,12 @@ tests:
         value: "Proposes the German product text (the 10mg German starting dose), not the US 20mg starting dose. A human rep approves it."
 
   - description: "[OUTREACH-06] A pending sample request needs a rep before it ships"
+    metadata:
+      slice: "outreach"
+      chapter: "14"
+      riskTier: "review"
+      split: "holdout"
+      expectedBehavior: "reply"
     vars:
       query: "Can we ship the CardioNex samples HCP-1001 asked for?"
     assert:
