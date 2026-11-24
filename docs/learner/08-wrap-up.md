@@ -37,7 +37,7 @@ git checkout checkpoint/08-wrap-up
 
 ## Read your scoreboard
 
-Open `docs/scoreboard.md`. It has two rows: the baseline from lesson 06 and the error-analysis prompt from lesson 07. Read them slice by slice:
+Open `my-scoreboard.md`. It has your two rows: the baseline from lesson 06 and the error-analysis prompt from lesson 07. [docs/scoreboard.md](../scoreboard.md) has ours, if you want a second opinion. Read them slice by slice:
 
 - A slice that went up is a failure category from error analysis that the new prompt answers.
 - A slice that stayed at zero needs more than a prompt. The `chapter` field of each case in `data/hcp/evals/medinfo.yaml` names the lesson that makes it pass. The `tenancy` cases, for example, need the signed-in user from lesson 11.
