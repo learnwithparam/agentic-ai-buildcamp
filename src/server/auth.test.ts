@@ -239,7 +239,7 @@ test("sign-in keeps a returnTo only when it stays on this app", async () => {
     await fetch(`${base}/api/auth/sign-in?returnTo=${encodeURIComponent(returnTo)}`, { redirect: "manual" });
     return [...store.pending.values()].at(-1)!.returnTo;
   };
-  for (const offSite of ["//evil.example", "/\\evil.example", "/\\/evil.example", "https://evil.example/", "/\tevil", "evil"]) {
+  for (const offSite of ["//evil.example", "/\\evil.example", "/\\/evil.example", "https://evil.example/", "/\tevil", "evil", "/.//evil.example", "/..//evil.example", "/a/..//evil.example"]) {
     assert.equal(await kept(offSite), "/", `${JSON.stringify(offSite)} was kept`);
   }
   assert.equal(await kept("/threads/abc?tab=sources#top"), "/threads/abc?tab=sources#top");

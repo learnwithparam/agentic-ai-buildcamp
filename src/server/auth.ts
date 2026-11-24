@@ -185,7 +185,9 @@ export function createAuth(config: AuthConfig) {
   function pathOnThisApp(value: unknown): string {
     if (typeof value !== "string" || !value.startsWith("/") || /[\\\u0000-\u001f\u007f]/.test(value)) return "/";
     const url = new URL(value, appOrigin);
-    return url.origin === appOrigin ? `${url.pathname}${url.search}${url.hash}` : "/";
+    // Check what is returned, not what came in: "/.//evil.example" normalizes to "//evil.example".
+    const path = `${url.pathname}${url.search}${url.hash}`;
+    return url.origin === appOrigin && !path.startsWith("//") ? path : "/";
   }
 
   const router = Router();
