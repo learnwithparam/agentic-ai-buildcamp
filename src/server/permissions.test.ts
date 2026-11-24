@@ -26,7 +26,8 @@ const doctor = (tenantId: string, country: string, userId = `kc-${tenantId}-${co
   name: "Test",
   email: `${userId}@example.com`,
   tenantId,
-  country
+  country,
+  roles: []
 });
 
 test("every dataset question, asked by every seeded doctor, finds only their company's text for their country", async () => {

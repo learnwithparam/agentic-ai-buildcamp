@@ -4,10 +4,10 @@ import { fileURLToPath } from "node:url";
 import type { Auth } from "./auth";
 import { isLangfuseConfigured } from "./env";
 import { createMcpRouter } from "./mcp";
-import { createRoutes } from "./routes";
+import { createRoutes, type Desk } from "./routes";
 
 // The whole HTTP surface in one place, so src/server/auth.test.ts can walk the same app the server runs.
-export function createApp(auth: Auth) {
+export function createApp(auth: Auth, desk: Desk) {
   const app = express();
   // Behind a TLS proxy in production, so request.protocol reads the original https.
   app.set("trust proxy", "loopback");
@@ -19,7 +19,7 @@ export function createApp(auth: Auth) {
   app.get("/api/health", (_request, response) => {
     response.json({ ok: true, tracingConfigured: isLangfuseConfigured() });
   });
-  app.use(createRoutes(auth));
+  app.use(createRoutes(auth, desk));
 
   const currentDir = path.dirname(fileURLToPath(import.meta.url));
   const clientDist = path.resolve(currentDir, "../../dist");

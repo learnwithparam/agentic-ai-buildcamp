@@ -1,5 +1,6 @@
 import { AuiIf, ComposerPrimitive, MessagePrimitive, ThreadPrimitive } from "@assistant-ui/react";
-import { useLangGraphInterruptState, useLangGraphSendCommand } from "@assistant-ui/react-langgraph";
+import { useLangGraphInterruptState } from "@assistant-ui/react-langgraph";
+import { formatDue } from "../inbox/format";
 import { SUGGESTIONS } from "./suggestions";
 import { DeskRulesCard, MarkdownText, OtherToolCard, SearchLabelsCard, Thinking } from "./parts";
 
@@ -28,30 +29,24 @@ function AssistantMessage() {
   );
 }
 
-// The draft is shown as the doctor would read it, without markdown marks.
-const plain = (text: string) => text.replace(/\*\*|__/g, "");
+type ApprovalRequest = { kind?: string; draft?: string; dueAt?: string };
 
-type ApprovalRequest = { kind?: string; draft?: string; question?: string };
-
-// Shown when the graph pauses at the review node. The reviewer's choice resumes it.
-function ApprovalCard() {
+// Lesson 13. Shown while the graph is paused at the review node. The doctor cannot approve their
+// own draft: a medical reviewer decides it in the inbox, and the thread continues from there.
+function WaitingCard() {
   const pause = useLangGraphInterruptState();
-  const sendCommand = useLangGraphSendCommand();
   const request = pause?.value as ApprovalRequest | undefined;
   if (request?.kind !== "approval") return null;
   return (
     <div className="card approval">
-      <div className="card-head">Waiting for a medical reviewer</div>
+      <div className="card-head">
+        <span>Waiting for a medical reviewer</span>
+        {request.dueAt && <span className="status status-wait">Due {formatDue(request.dueAt)}</span>}
+      </div>
       <div className="card-body">
-        <div className="approval-draft">{plain(request.draft ?? "")}</div>
-        <div className="approval-actions">
-          <button type="button" className="button button-primary" onClick={() => sendCommand({ resume: "approve" })}>
-            Approve and send
-          </button>
-          <button type="button" className="button" onClick={() => sendCommand({ resume: "reject" })}>
-            Reject
-          </button>
-        </div>
+        <p className="approval-note">
+          The draft above is not sent until a reviewer approves it. <a href="/inbox">Your inbox</a> shows the decision.
+        </p>
       </div>
     </div>
   );
@@ -78,7 +73,7 @@ export function Thread({ tenantId, medicines }: { tenantId: string; medicines: s
             </div>
           </AuiIf>
           <ThreadPrimitive.Messages components={{ UserMessage, AssistantMessage }} />
-          <ApprovalCard />
+          <WaitingCard />
         </div>
       </ThreadPrimitive.Viewport>
       <ComposerPrimitive.Root className="composer">
