@@ -1,10 +1,10 @@
 import { randomUUID } from "node:crypto";
-import OpenAI from "openai";
 import { observeOpenAI } from "@langfuse/openai";
 import { observe, propagateAttributes } from "@langfuse/tracing";
 import { LangfuseClient } from "@langfuse/client";
 import { aiText, type AiMessage, type ChatMessage, type StreamEvent } from "../shared/messages";
 import { env } from "./env";
+import { checkInput, modelClient } from "./gateway";
 import { agentStep, buildGraph, readThread, reviewStep, runGraph, toolsStep, type Turn } from "./graph";
 import { executeTool } from "./tools";
 
@@ -31,13 +31,18 @@ async function getPrompt() {
   catch { return null; }
 }
 
-const client = new OpenAI({ apiKey: env.openaiApiKey });
+function latestQuestion(messages: ChatMessage[]) {
+  return [...messages].reverse().find((message) => message.type === "human")?.content ?? "";
+}
 
 const graph = buildGraph({
   agent: observe(
     async (state, config) => {
+      // Lesson 10: a request the desk never answers gets its reply here, with no model call.
+      const refusal = checkInput(latestQuestion(state.messages));
+      if (refusal) return { messages: [{ id: `out-of-scope-${randomUUID()}`, type: "ai", content: [{ type: "text", text: refusal }], tool_calls: [] }] };
       const langfusePrompt = await getPrompt();
-      const openai = observeOpenAI(client, langfusePrompt ? { langfusePrompt } : undefined);
+      const openai = observeOpenAI(modelClient(), langfusePrompt ? { langfusePrompt } : undefined);
       return agentStep(openai, langfusePrompt?.prompt ?? SYSTEM_PROMPT, state, config);
     },
     { name: "agent", asType: "span" }

@@ -124,6 +124,11 @@ async function main() {
     });
   }
 
+  if (labelled.length === 0) {
+    console.log(`No answer has both a label and a judge score${since === -1 ? "" : " in this --since window"}. Run the batch evaluation, or widen the window.`);
+    process.exitCode = 1;
+    return;
+  }
   const kappa = cohenKappa(labelled);
   const matrix = confusion(labelled);
   console.log(`${labelled.length} answers with a label and a judge score${waiting.length ? `, ${waiting.length} not yet` : ""}.`);

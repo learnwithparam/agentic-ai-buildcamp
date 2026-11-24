@@ -67,6 +67,9 @@ export function findProblems(files: Map<string, string>, tracked: string[]): str
   const ruleFor = (path: string) => RULES.find((rule) => path.startsWith(rule.folder));
 
   const used = new Set(tracked.filter((path) => !ruleFor(path)));
+  // `npm run check` runs tests by glob ('scripts/**/*.test.ts'), so a test under a glob folder is in use.
+  const testFolders = [...(files.get("package.json") ?? "").matchAll(/'([\w/-]+)\/\*\*\/\*\.test\.ts'/g)].map((match) => `${match[1]}/`);
+  for (const path of tracked) if (path.endsWith(".test.ts") && testFolders.some((folder) => path.startsWith(folder))) used.add(path);
   const tokensFor = (path: string) => {
     const tokens = [path, basename(path)];
     if (path.endsWith(".ts")) tokens.push(`./${basename(path, ".ts")}`);

@@ -44,21 +44,26 @@ TAGS=(
   checkpoint/07-evaluation
   checkpoint/08-midpoint
   checkpoint/09-advanced-evals
+  checkpoint/10-ai-gateway
 )
 
 # Files whose code is what the next lesson changes. Add a file here when a
 # lesson starts editing it; remove it once no earlier tag differs from main.
+# A milestone file the tag does not have stays absent on it.
+# Lesson 10 moves every model call behind src/server/gateway.ts; the files it changes and
+# the gateway itself (GATEWAY_FILES) stay as they were on tags before it.
+GATEWAY_FILES="src/server/routes.ts scripts/judge/faithfulness.ts src/server/gateway.ts src/server/gateway.test.ts"
 milestone_files() {
   case "$1" in
     checkpoint/00-setup | checkpoint/01-base-app | checkpoint/02-tracing)
-      echo "src/server/index.ts src/server/medinfo-agent.ts src/server/tools.ts scripts/run-dataset.ts"
+      echo "src/server/index.ts src/server/medinfo-agent.ts src/server/tools.ts scripts/run-dataset.ts $GATEWAY_FILES"
       ;;
     checkpoint/03-prompt-management)
-      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts"
+      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES"
       ;;
     # Lessons 06 and 07 run the dataset with the correctness judge; lesson 09 replaces it.
-    checkpoint/04-* | checkpoint/05-* | checkpoint/06-* | checkpoint/07-* | checkpoint/08-*)
-      echo "scripts/run-dataset.ts"
+    checkpoint/04-* | checkpoint/05-* | checkpoint/06-* | checkpoint/07-* | checkpoint/08-* | checkpoint/09-*)
+      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES"
       ;;
     *)
       echo ""
@@ -129,7 +134,12 @@ for tag in "${TAGS[@]}"; do
 
   keep_files="$(milestone_files "$tag")"
   rm -rf "$STAGE/keep" && mkdir -p "$STAGE/keep"
+  absent=""
   for file in $keep_files; do
+    if ! git cat-file -e "HEAD:$file" 2>/dev/null; then
+      absent="$absent $file"
+      continue
+    fi
     mkdir -p "$STAGE/keep/$(dirname "$file")"
     git show "HEAD:$file" >"$STAGE/keep/$file"
   done
@@ -137,7 +147,11 @@ for tag in "${TAGS[@]}"; do
   git ls-files -z | grep -zv '^\.github/' | xargs -0 rm -f
   cp -a "$STAGE/source/." .
 
+  for file in $absent; do
+    rm -f "$file"
+  done
   for file in $keep_files; do
+    [[ " $absent " == *" $file "* ]] && continue
     cp "$STAGE/keep/$file" "$file"
     if [[ -f "$STAGE/source/$file" ]]; then
       sync_regions "$STAGE/source/$file" "$file"
@@ -165,7 +179,7 @@ MSG
 )"
 
   git tag -f "$tag" HEAD >/dev/null
-  [[ " ${MOVED[*]} " == *" refs/tags/$tag "* ]] || MOVED+=("refs/tags/$tag")
+  [[ " ${MOVED[*]-} " == *" refs/tags/$tag "* ]] || MOVED+=("refs/tags/$tag")
   echo "    updated $(git rev-parse --short HEAD)"
 done
 

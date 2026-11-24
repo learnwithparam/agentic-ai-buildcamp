@@ -19,8 +19,9 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import OpenAI from "openai";
+import { observeOpenAI } from "@langfuse/openai";
 import { env } from "../../src/server/env";
+import { modelClient } from "../../src/server/gateway";
 
 export const SCORE_NAME = "faithfulness";
 
@@ -64,7 +65,7 @@ export function renderRubric(conversation: Message[], answer: string) {
 }
 
 export async function judgeFaithfulness(conversation: Message[], answer: string): Promise<Verdict> {
-  const openai = new OpenAI({ apiKey: env.openaiApiKey });
+  const openai = observeOpenAI(modelClient(), { generationName: "faithfulness-judge" });
   const response = await openai.chat.completions.create({
     model: env.openaiModel,
     response_format: { type: "json_object" },

@@ -109,3 +109,10 @@ test("a README that names a different Node version fails", () => {
   const problems = run({ "README.md": base["README.md"].replace(">=22.18.0", ">=20") });
   assert.match(problems.join("\n"), /README\.md: does not name the Node version/);
 });
+
+test("a test is in use when the check script's glob covers its folder, and only then", () => {
+  const pkg = JSON.stringify({ engines: { node: ">=22.18.0" }, scripts: { dev: "vite", seed: "tsx scripts/seed.ts", check: "tsx --test 'scripts/**/*.test.ts'" } });
+  const problems = run({ "package.json": pkg, "scripts/lib.test.ts": "", "README.md": base["README.md"] + "\n`npm run check`\n" }).join("\n");
+  assert.doesNotMatch(problems, /scripts\/lib\.test\.ts/);
+  assert.match(run({ "scripts/lib.test.ts": "" }).join("\n"), /scripts\/lib\.test\.ts/);
+});
