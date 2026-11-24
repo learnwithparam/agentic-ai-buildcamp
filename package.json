@@ -17,33 +17,36 @@
     "dataset:run": "tsx scripts/run-dataset.ts",
     "langfuse:seed:error-analysis": "tsx scripts/seed-error-analysis-traces.ts",
     "langfuse:seed:error-analysis:annotations": "tsx scripts/seed-error-analysis-annotations.ts",
-    "check": "npm run typecheck && tsx --test scripts/check-unused.test.ts && tsx scripts/check-unused.ts"
+    "check": "npm run typecheck && tsx --test scripts/check-repo.test.ts && tsx scripts/check-repo.ts"
   },
   "dependencies": {
-    "@langfuse/client": "latest",
-    "@langfuse/openai": "latest",
-    "@langfuse/otel": "latest",
-    "@langfuse/tracing": "latest",
-    "@opentelemetry/sdk-node": "^0.218.0",
-    "dotenv": "latest",
-    "express": "latest",
-    "openai": "latest",
-    "react": "latest",
-    "react-dom": "latest",
-    "react-markdown": "latest",
-    "remark-gfm": "latest",
-    "zod": "latest"
+    "@langfuse/client": "6.1.1",
+    "@langfuse/openai": "6.1.1",
+    "@langfuse/otel": "6.1.1",
+    "@langfuse/tracing": "6.1.1",
+    "@opentelemetry/sdk-node": "0.223.2",
+    "dotenv": "18.0.10",
+    "express": "5.3.0",
+    "openai": "7.63.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "react-markdown": "10.1.0",
+    "remark-gfm": "4.0.1",
+    "zod": "4.6.7"
   },
   "devDependencies": {
-    "@types/express": "latest",
-    "@types/node": "latest",
-    "@types/react": "latest",
-    "@types/react-dom": "latest",
-    "@vitejs/plugin-react": "latest",
-    "concurrently": "latest",
-    "tsup": "latest",
-    "tsx": "latest",
-    "typescript": "latest",
-    "vite": "latest"
+    "@types/express": "5.0.6",
+    "@types/node": "26.6.6",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.3.0",
+    "concurrently": "10.0.7",
+    "tsup": "9.0.0",
+    "tsx": "4.23.15",
+    "typescript": "7.0.2",
+    "vite": "8.3.8"
+  },
+  "engines": {
+    "node": ">=22.18.0"
   }
 }
