@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "medinfo": {
+      "type": "http",
+      "url": "http://127.0.0.1:3333/api/mcp",
+      "oauth": {
+        "clientId": "medinfo-mcp",
+        "callbackPort": 33418
+      }
+    }
+  }
+}

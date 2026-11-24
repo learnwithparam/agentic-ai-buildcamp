@@ -276,7 +276,7 @@ export function createAuth(config: AuthConfig) {
     }
   });
 
-  return { router, requireUser, sameOrigin, identityOf, cookieName: SESSION_COOKIE };
+  return { router, requireUser, sameOrigin, identityOf, verifyToken: verify, issuer: config.issuer, appUrl: config.appUrl, cookieName: SESSION_COOKIE };
 }
 
 export type Auth = ReturnType<typeof createAuth>;

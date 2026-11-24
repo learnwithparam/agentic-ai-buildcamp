@@ -1,0 +1,10 @@
+{
+  "name": "code-eval-executor",
+  "private": true,
+  "type": "module",
+  "description": "Lesson 12: runs Langfuse code evaluators in QuickJS. Built by src/executor/Dockerfile.",
+  "dependencies": {
+    "amaro": "1.3.0",
+    "quickjs-emscripten": "0.32.0"
+  }
+}
