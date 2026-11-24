@@ -10,10 +10,14 @@
 // Comments in code do not count. An npm script is used when a doc shows `npm run <name>` as code,
 // or another npm script calls it. Every dependency is pinned to an exact version, so every
 // checkout installs the same packages.
+//
+// The chat app: no name from the upstream app it was cut from survives in src/, colours are written
+// only in tokens.css, and every CSS class is used by a component. The data/hcp copy matches its lock.
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { basename, posix } from "node:path";
 import { fileURLToPath } from "node:url";
+import { verifyDatasetCopy } from "./sync-dataset";
 
 const CODE = /\.(ts|tsx|mjs|js|sh|ya?ml)$|^package\.json$/;
 const RULES: Array<{ folder: string; usedBy: RegExp }> = [
@@ -25,6 +29,12 @@ const RULES: Array<{ folder: string; usedBy: RegExp }> = [
 ];
 // Scripts people run by habit, never named in a lesson.
 const ENTRY_SCRIPTS = new Set(["dev", "build", "start", "typecheck", "check"]);
+// Names from the upstream support app. The HCP agent replaced all of them.
+const UPSTREAM_NAMES = ["PhonePanel", "deviceSummary", "notableApps", "search_help_library", "support-agent", "runSupportConversation", "Northvale", "CardioZ"];
+const DATASET_COPY = "data/hcp/";
+const TOKENS_FILE ="src/client/styles/tokens.css";
+const COLOUR = /#[0-9a-f]{3,8}\b|\b(?:rgba?|hsla?|oklch)\(/i;
+const withoutBlockComments = (body: string) => body.replace(/\/\*[\s\S]*?\*\//g, "");
 const TEXT = /\.(ts|tsx|mjs|js|md|json|ya?ml|sh|html|css)$/;
 
 function stripComments(path: string, body: string): string {
@@ -75,6 +85,8 @@ export function findProblems(files: Map<string, string>, tracked: string[]): str
   }
   for (const path of tracked) {
     const rule = ruleFor(path);
+    // data/hcp/ is a copy of the dataset repo; verifyDatasetCopy fails on any file not in its lock.
+    if (path.startsWith(DATASET_COPY)) continue;
     if (rule && !used.has(path)) problems.push(`${path}: nothing in use reads, links or calls it. Use it or delete it.`);
   }
 
@@ -116,6 +128,29 @@ export function findProblems(files: Map<string, string>, tracked: string[]): str
     const called = new RegExp(`npm(:| run )${token}(?![\\w:-])`).test(calls);
     if (!named && !called) problems.push(`package.json script "${name}": no doc shows it and no script calls it.`);
   }
+
+  for (const [path, body] of bodies) {
+    if (!path.startsWith("src/")) continue;
+    for (const name of UPSTREAM_NAMES) {
+      if (body.includes(name)) problems.push(path + ": still names " + name + " from the upstream app.");
+    }
+    if (path.startsWith("src/client/") && path !== TOKENS_FILE && /\.(css|tsx|ts|html)$/.test(path)) {
+      const colour = COLOUR.exec(withoutBlockComments(body));
+      if (colour) problems.push(path + ": writes the colour " + colour[0] + ". Colours live only in " + TOKENS_FILE + ".");
+    }
+  }
+  const components = [...bodies]
+    .filter(([path]) => path.startsWith("src/client/") && path.endsWith(".tsx"))
+    .map(([, body]) => body)
+    .join("\n");
+  for (const [path, body] of files) {
+    if (!path.startsWith("src/client/") || !path.endsWith(".css")) continue;
+    // Keep only selectors: drop comments, font urls and declaration blocks.
+    const selectors = withoutBlockComments(body).replace(/url\([^)]*\)/g, "").replace(/\{[^}]*\}/g, "{}");
+    for (const className of new Set([...selectors.matchAll(/\.([a-zA-Z][\w-]*)/g)].map((match) => match[1]))) {
+      if (!names(components, className)) problems.push(path + ": class ." + className + " is not used by any component.");
+    }
+  }
   return problems;
 }
 
@@ -124,12 +159,12 @@ function main() {
   const files = new Map(
     tracked.filter((path) => TEXT.test(path) && path !== "package-lock.json").map((path) => [path, readFileSync(path, "utf8")]),
   );
-  const problems = findProblems(files, tracked);
+  const problems = [...findProblems(files, tracked), ...verifyDatasetCopy()];
   if (problems.length > 0) {
     console.error(problems.join("\n"));
     process.exit(1);
   }
-  console.log("check-repo: every watched file and npm script is in use, every named path exists, every dependency is pinned");
+  console.log("check-repo: every watched file and npm script is in use, every named path exists, every dependency is pinned, the chat app is clean, data/hcp matches its lock");
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) main();
