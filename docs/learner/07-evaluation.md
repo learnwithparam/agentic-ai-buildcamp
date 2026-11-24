@@ -20,7 +20,7 @@ Complementary materials:
 
 Prove that the prompt from error analysis helps, and see what it breaks.
 
-- **Before:** the 06 row of `docs/scoreboard.md`, with the agent as lesson 03 left it.
+- **Before:** your 06 row in `my-scoreboard.md`, with the agent as lesson 03 left it.
 - **Build:** publish the error-analysis prompt as a new version, and rerun the same dataset with `--chapter 07`.
 - **After:** a 07 row in the scoreboard, and the two runs side by side in Langfuse, item by item.
 
@@ -88,9 +88,9 @@ Either way, the `production` label now points at the new version.
 npm run dataset:run -- --chapter 07 --change "The error-analysis prompt"
 ```
 
-It runs the same 28 cases with the same three evaluators as lesson 06, prints a FAIL pair for each failing case, and appends the 07 row to `docs/scoreboard.md`.
+It runs the same 28 cases with the same three evaluators as lesson 06, prints a FAIL pair for each failing case, and appends the 07 row to `my-scoreboard.md`, under your 06 row.
 
-When we ran it, the two rows were:
+When we ran it, the two rows were (they are also in [docs/scoreboard.md](../scoreboard.md)):
 
 | Chapter | Change | Passed | staleness | footnote | multi-hop | off-label | tenancy | pv-phi | guardrail | country | future-label | injection | multi-turn | ambiguous | pushback | review |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -127,7 +127,7 @@ What to look for:
 ## How to verify you are done
 
 - Two runs appear under the dataset, each linked to its prompt version.
-- `docs/scoreboard.md` has a 06 row and a 07 row, and `npm run check` passes.
+- `my-scoreboard.md` has your 06 row and your 07 row, and `npm run check` passes.
 - You can name, for each case that changed, the rule that changed it.
 
 ## Wrap-up
