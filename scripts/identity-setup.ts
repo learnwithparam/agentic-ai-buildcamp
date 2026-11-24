@@ -185,30 +185,21 @@ async function organizationScopeId(): Promise<string> {
   return (await kcJson<ClientScope[]>(`/${REALM}/client-scopes`))!.find((scope) => scope.name === "organization")!.id;
 }
 
-async function setupClient(appUrl: string, clientSecret: string) {
-  const settings = {
-    clientId: CLIENT_ID,
-    name: "HCP Medical Information",
-    protocol: "openid-connect",
-    enabled: true,
-    // Confidential: the secret stays on the server. The browser never holds a token.
-    publicClient: false,
-    clientAuthenticatorType: "client-secret",
-    secret: clientSecret,
-    standardFlowEnabled: true,
-    // The password grant and the implicit flow are off: the only way in is Keycloak's sign-in page.
-    directAccessGrantsEnabled: false,
-    implicitFlowEnabled: false,
-    serviceAccountsEnabled: false,
-    redirectUris: [`${appUrl}/api/auth/callback`],
-    webOrigins: [],
-    attributes: { "pkce.code.challenge.method": "S256", "post.logout.redirect.uris": `${appUrl}/` }
-  };
-  let [client] = (await kcJson<{ id: string }[]>(`/${REALM}/clients?clientId=${CLIENT_ID}`))!;
+// Lesson 12: an MCP client (Claude Code) signs in through Keycloak in the browser and listens on
+// this port on the doctor's own machine for the code. Same port as oauth.callbackPort in .mcp.json.
+export const MCP_CLIENT_ID = "medinfo-mcp";
+export const MCP_CALLBACK_PORT = 33418;
+
+type ClientSettings = { clientId: string; redirectUris: string[] } & Record<string, unknown>;
+
+// One routine for every client of this app: the settings, the two claims the API reads, and the
+// organization scope. Creates the client or brings it back to these settings.
+async function upsertClient(settings: ClientSettings) {
+  let [client] = (await kcJson<{ id: string }[]>(`/${REALM}/clients?clientId=${settings.clientId}`))!;
   if (client) await kc("PUT", `/${REALM}/clients/${client.id}`, { ...settings, id: client.id });
   else {
     await kc("POST", `/${REALM}/clients`, settings);
-    [client] = (await kcJson<{ id: string }[]>(`/${REALM}/clients?clientId=${CLIENT_ID}`))!;
+    [client] = (await kcJson<{ id: string }[]>(`/${REALM}/clients?clientId=${settings.clientId}`))!;
   }
 
   const mappers: Mapper[] = [
@@ -241,7 +232,46 @@ async function setupClient(appUrl: string, clientSecret: string) {
   }
   // The organization claim is always in the token, so the app never has to ask for it.
   await kc("PUT", `/${REALM}/clients/${client.id}/default-client-scopes/${await organizationScopeId()}`);
-  console.log(`Client ${CLIENT_ID}: redirect ${settings.redirectUris[0]}`);
+  console.log(`Client ${settings.clientId}: redirect ${settings.redirectUris.join(", ")}`);
+}
+
+const NO_SHORTCUTS = {
+  protocol: "openid-connect",
+  enabled: true,
+  standardFlowEnabled: true,
+  // The password grant and the implicit flow are off: the only way in is Keycloak's sign-in page.
+  directAccessGrantsEnabled: false,
+  implicitFlowEnabled: false,
+  serviceAccountsEnabled: false,
+  webOrigins: []
+};
+
+function setupClient(appUrl: string, clientSecret: string) {
+  return upsertClient({
+    ...NO_SHORTCUTS,
+    clientId: CLIENT_ID,
+    name: "HCP Medical Information",
+    // Confidential: the secret stays on the server. The browser never holds a token.
+    publicClient: false,
+    clientAuthenticatorType: "client-secret",
+    secret: clientSecret,
+    redirectUris: [`${appUrl}/api/auth/callback`],
+    attributes: { "pkce.code.challenge.method": "S256", "post.logout.redirect.uris": `${appUrl}/` }
+  });
+}
+
+// Lesson 12. A program on the doctor's laptop cannot keep a secret, so this client is public and
+// PKCE is required: a stolen code is useless without the verifier only that program holds. The
+// token it gets is the doctor's own, with the same audience, company and country as the chat.
+function setupMcpClient() {
+  return upsertClient({
+    ...NO_SHORTCUTS,
+    clientId: MCP_CLIENT_ID,
+    name: "HCP Medical Information for MCP clients",
+    publicClient: true,
+    redirectUris: [`http://localhost:${MCP_CALLBACK_PORT}/callback`, `http://127.0.0.1:${MCP_CALLBACK_PORT}/callback`],
+    attributes: { "pkce.code.challenge.method": "S256" }
+  });
 }
 
 async function setupDoctors(organizations: Record<string, string>, password: string) {
@@ -328,13 +358,17 @@ async function main() {
   await setupCountryAttribute();
   const organizations = await setupOrganizations();
   await setupClient(appUrl, values.OIDC_CLIENT_SECRET);
+  await setupMcpClient();
   await setupDoctors(organizations, values.SEED_USER_PASSWORD);
   await setupPermissions(values.FGA_API_TOKEN);
   console.log(`\nDone. Open ${appUrl} and sign in as a doctor above; the password is SEED_USER_PASSWORD in your .env.`);
   console.log(`Keycloak admin: ${KEYCLOAK}/admin/master/console/#/${REALM} (user admin, password KEYCLOAK_ADMIN_PASSWORD in .env).`);
 }
 
-main().catch((error) => {
-  console.error(error instanceof Error ? error.message : error);
-  process.exit(1);
-});
+const isDirectRun = Boolean(process.argv[1]) && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if (isDirectRun) {
+  main().catch((error) => {
+    console.error(error instanceof Error ? error.message : error);
+    process.exit(1);
+  });
+}

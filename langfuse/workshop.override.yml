@@ -1,6 +1,15 @@
+# Lesson 12: code evaluators run in our own sandbox, not inside the Langfuse worker.
+# `npm run langfuse:code-eval` writes the signing secret to this folder's settings file and starts it all.
+x-code-eval: &code-eval
+  LANGFUSE_CODE_EVAL_DISPATCHER: external
+  LANGFUSE_CODE_EVAL_EXTERNAL_ENDPOINT: http://code-eval-executor:8080/evaluate
+  LANGFUSE_CODE_EVAL_EXTERNAL_SIGNING_SECRET: ${LANGFUSE_CODE_EVAL_EXTERNAL_SIGNING_SECRET:?run npm run langfuse:code-eval first}
+  LANGFUSE_CODE_EVAL_EXTERNAL_LANGUAGES: TYPESCRIPT
+
 services:
   langfuse-web:
     environment:
+      <<: *code-eval
       LANGFUSE_INIT_ORG_ID: workshop
       LANGFUSE_INIT_ORG_NAME: Workshop
       LANGFUSE_INIT_PROJECT_ID: hcp-medinfo
@@ -10,14 +19,37 @@ services:
       LANGFUSE_INIT_USER_EMAIL: learner@workshop.local
       LANGFUSE_INIT_USER_NAME: Learner
       LANGFUSE_INIT_USER_PASSWORD: workshop-password
-      # Lesson 04 creates a code evaluator. Locally it runs unsandboxed inside the worker,
-      # so Langfuse listens on this machine only and nobody else can sign up.
-      LANGFUSE_CODE_EVAL_DISPATCHER: insecure-local
       AUTH_DISABLE_SIGNUP: "true"
       # Port 3000 is often taken by another dev server, so Langfuse uses 5174 on the host.
       NEXTAUTH_URL: http://localhost:5174
+      # On two networks the container name can resolve to the code-eval address, and the web
+      # server would listen only there. Listen on every interface so the published port answers.
+      HOSTNAME: 0.0.0.0
     ports: !override
       - 127.0.0.1:5174:3000
+    networks: [default, code-eval]
   langfuse-worker:
     environment:
-      LANGFUSE_CODE_EVAL_DISPATCHER: insecure-local
+      <<: *code-eval
+      QUEUE_CONSUMER_CODE_EVAL_EXECUTION_QUEUE_IS_ENABLED: "true"
+    networks: [default, code-eval]
+
+  # Runs each evaluator in QuickJS (src/executor). It sits only on the code-eval network, which
+  # has no route out: no internet, no Postgres, no Redis, only Langfuse calling in.
+  code-eval-executor:
+    build: ../src/executor
+    image: code-eval-executor:workshop
+    restart: always
+    environment:
+      LANGFUSE_CODE_EVAL_EXTERNAL_SIGNING_SECRET: ${LANGFUSE_CODE_EVAL_EXTERNAL_SIGNING_SECRET:?run npm run langfuse:code-eval first}
+    networks: [code-eval]
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 512m
+    pids_limit: 64
+    cpus: 1
+
+networks:
+  code-eval:
+    internal: true
