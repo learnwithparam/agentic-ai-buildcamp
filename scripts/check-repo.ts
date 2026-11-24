@@ -1,5 +1,5 @@
-// Fails when the repo ships a file or an npm script that nothing uses, or when code names a
-// repo path that does not exist.
+// Fails when the repo ships a file or an npm script that nothing uses, when code names a
+// repo path that does not exist, or when a dependency has no exact version.
 //
 // Used means reachable. Every tracked text file outside the watched folders is a root. A watched
 // file becomes used when a used file of the right kind names it as a whole path token:
@@ -8,7 +8,8 @@
 //   scripts/       called by code, package.json, a workflow or a shell script
 //   case-studies/  linked from a doc
 // Comments in code do not count. An npm script is used when a doc shows `npm run <name>` as code,
-// or another npm script calls it.
+// or another npm script calls it. Every dependency is pinned to an exact version, so every
+// checkout installs the same packages.
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { basename, posix } from "node:path";
@@ -90,7 +91,22 @@ export function findProblems(files: Map<string, string>, tracked: string[]): str
     }
   }
 
-  const scripts: Record<string, string> = JSON.parse(files.get("package.json") ?? "{}").scripts ?? {};
+  const manifest = JSON.parse(files.get("package.json") ?? "{}");
+  for (const field of ["dependencies", "devDependencies"]) {
+    for (const [name, version] of Object.entries<string>(manifest[field] ?? {})) {
+      if (!/^\d+\.\d+\.\d+$/.test(version)) problems.push(`package.json ${field} "${name}" is "${version}". Pin an exact version.`);
+    }
+  }
+  // The Node version lives in package.json engines. CI reads it from there, and these docs
+  // must quote it as it is.
+  const node = manifest.engines?.node;
+  for (const doc of ["README.md", "docs/learner/00-setup.md"]) {
+    const body = files.get(doc);
+    if (body !== undefined && !body.includes(`Node${doc === "README.md" ? "" : ".js"} \`${node}\``)) {
+      problems.push(`${doc}: does not name the Node version from package.json engines (${node}).`);
+    }
+  }
+  const scripts: Record<string, string> = manifest.scripts ?? {};
   const shown = [...files].filter(([path]) => path.endsWith(".md")).map(([, body]) => codeIn(body)).join("\n");
   const calls = Object.values(scripts).join("\n");
   for (const name of Object.keys(scripts)) {
@@ -113,7 +129,7 @@ function main() {
     console.error(problems.join("\n"));
     process.exit(1);
   }
-  console.log("check-unused: every watched file and npm script is in use, and every named path exists");
+  console.log("check-repo: every watched file and npm script is in use, every named path exists, every dependency is pinned");
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) main();

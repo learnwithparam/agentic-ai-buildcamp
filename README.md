@@ -10,7 +10,7 @@ The agent is the HCP Medical Information Agent. Doctors and pharmacists ask a me
 
 ## Run it
 
-You need Docker with about 6 GB of memory, Node `^20.19.0 || >=22.12.0`, and an OpenRouter key with a few dollars of credit.
+You need Docker with about 6 GB of memory, Node `>=22.18.0`, and an OpenRouter key with a few dollars of credit.
 
 ```bash
 docker compose -f langfuse/docker-compose.yml -f langfuse/workshop.override.yml up -d
