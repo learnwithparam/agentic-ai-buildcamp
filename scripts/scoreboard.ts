@@ -1,18 +1,25 @@
 /**
- * docs/scoreboard.md: one row per scored chapter, one column per slice of the dataset.
+ * The scoreboard: one row per scored chapter, one column per slice of the dataset.
+ *
+ * Two files, so a learner's rows never mix with ours:
+ *   - docs/scoreboard.md holds the reference rows the lessons quote. Only --reference writes it.
+ *   - my-scoreboard.md, at the repo root and git-ignored, holds the learner's own rows. Being
+ *     untracked, it stays put when the learner checks out the next checkpoint tag.
  *
  * A case passes when behavior_match and label_checks are both 1. The correctness judge is
  * left out of the pass, because an LLM judge can change its mind between two runs.
  *
- * npm run dataset:run -- --chapter 06 --change "..." appends a row from the run it just made.
- * check-repo calls checkScoreboard(), so a hand-typed row with the wrong shape fails CI.
+ * npm run dataset:run -- --chapter 06 --change "..." appends a row to my-scoreboard.md.
+ * check-repo calls checkScoreboard() on docs/scoreboard.md, so a row with the wrong shape fails CI.
  */
-import { appendFileSync, readFileSync } from "node:fs";
+import { appendFileSync, existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { loadMedinfoCases } from "./hcp-cases";
 
-export const SCOREBOARD_FILE = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../docs/scoreboard.md");
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+export const SCOREBOARD_FILE = path.join(ROOT, "docs/scoreboard.md");
+export const LEARNER_SCOREBOARD_FILE = path.join(ROOT, "my-scoreboard.md");
 
 export function slices(): string[] {
   return [...new Set(loadMedinfoCases().map((item) => item.metadata.slice))];
@@ -30,8 +37,13 @@ export function scoreboardRow(chapter: string, change: string, cases: ScoredCase
   return `| ${chapter} | ${change} | ${cell(cases)} | ${perSlice.join(" | ")} | [run](${runUrl}) |`;
 }
 
-export function appendScoreboardRow(row: string) {
-  appendFileSync(SCOREBOARD_FILE, `${row}\n`);
+// The learner file starts with the same header as the reference file, so the two compare column by column.
+export function appendScoreboardRow(row: string, file = LEARNER_SCOREBOARD_FILE) {
+  if (!existsSync(file)) {
+    const separator = `|${" --- |".repeat(headerRow().split("|").length - 2)}`;
+    writeFileSync(file, `# My scoreboard\n\nYour runs, one row each. Compare them with docs/scoreboard.md.\n\n${headerRow()}\n${separator}\n`);
+  }
+  appendFileSync(file, `${row}\n`);
 }
 
 // The table header names every slice in the dataset, and every row has one cell per column.
