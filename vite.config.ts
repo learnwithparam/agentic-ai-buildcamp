@@ -10,6 +10,11 @@ export default defineConfig({
       "/api": {
         target: "http://127.0.0.1:8787",
         changeOrigin: true
+      },
+      // Lesson 12: an MCP client reads where to sign in from here.
+      "/.well-known/oauth-protected-resource": {
+        target: "http://127.0.0.1:8787",
+        changeOrigin: true
       }
     }
   },
