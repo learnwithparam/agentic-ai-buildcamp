@@ -12,7 +12,8 @@
 // checkout installs the same packages.
 //
 // The chat app: no name from the upstream app it was cut from survives in src/, colours are written
-// only in tokens.css, and every CSS class is used by a component. The data/hcp copy matches its lock.
+// only in tokens.css, and every CSS class is used by a component. The data/hcp copy matches its lock,
+// and docs/coverage.md maps every case in it to a promise.
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { basename, posix } from "node:path";
@@ -32,7 +33,8 @@ const ENTRY_SCRIPTS = new Set(["dev", "build", "start", "typecheck", "check"]);
 // Names from the upstream support app. The HCP agent replaced all of them.
 const UPSTREAM_NAMES = ["PhonePanel", "deviceSummary", "notableApps", "search_help_library", "support-agent", "runSupportConversation", "Northvale", "CardioZ"];
 const DATASET_COPY = "data/hcp/";
-const TOKENS_FILE ="src/client/styles/tokens.css";
+const TOKENS_FILE = "src/client/styles/tokens.css";
+const COVERAGE_FILE = "docs/coverage.md";
 const COLOUR = /#[0-9a-f]{3,8}\b|\b(?:rgba?|hsla?|oklch)\(/i;
 const withoutBlockComments = (body: string) => body.replace(/\/\*[\s\S]*?\*\//g, "");
 const TEXT = /\.(ts|tsx|mjs|js|md|json|ya?ml|sh|html|css)$/;
@@ -150,6 +152,35 @@ export function findProblems(files: Map<string, string>, tracked: string[]): str
     for (const className of new Set([...selectors.matchAll(/\.([a-zA-Z][\w-]*)/g)].map((match) => match[1]))) {
       if (!names(components, className)) problems.push(path + ": class ." + className + " is not used by any component.");
     }
+  }
+  problems.push(...coverageProblems(files));
+  return problems;
+}
+
+// docs/coverage.md maps every case in data/hcp/evals to a promise. A row with no case, an
+// unknown case id, or a case in no row fails.
+function coverageProblems(files: Map<string, string>): string[] {
+  const coverage = files.get(COVERAGE_FILE);
+  if (coverage === undefined) return [];
+  const caseIds = new Set(
+    [...files]
+      .filter(([path]) => path.startsWith(DATASET_COPY + "evals/") && path.endsWith(".yaml"))
+      .flatMap(([, body]) => [...body.matchAll(/^ {2}- description: "\[([A-Z0-9-]+)\]/gm)].map((match) => match[1])),
+  );
+  const problems: string[] = [];
+  const covered = new Set<string>();
+  const rows = coverage.split("\n").filter((line) => /^\|/.test(line) && !/^\|\s*(Promise|-)/.test(line));
+  for (const row of rows) {
+    const [promise, , cases = ""] = row.split("|").slice(1).map((cell) => cell.trim());
+    const ids = cases.split(",").map((id) => id.trim()).filter(Boolean);
+    if (ids.length === 0) problems.push(COVERAGE_FILE + ': "' + promise + '" has no case.');
+    for (const id of ids) {
+      if (!caseIds.has(id)) problems.push(COVERAGE_FILE + ": " + id + " is not a case in " + DATASET_COPY + "evals.");
+      covered.add(id);
+    }
+  }
+  for (const id of caseIds) {
+    if (!covered.has(id)) problems.push(COVERAGE_FILE + ": case " + id + " is in no row.");
   }
   return problems;
 }

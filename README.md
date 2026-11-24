@@ -2,11 +2,11 @@
 
 You build one small agent and run the whole loop on it: tracing, prompt management, monitoring, datasets, experiments and evaluation. Every step runs on your own laptop. Langfuse runs locally in Docker, and the model runs on OpenRouter.
 
-The agent is the HCP Medical Information Agent. Doctors and pharmacists ask a medical information desk about five invented medicines. The agent answers from a label library and names the label it used. Under the hood it is a plain OpenAI SDK tool-calling loop with two local tools.
+The agent is the HCP Medical Information Agent. Doctors ask a medical information desk about two medicines, CardioNex and NeuroVex, from two drug companies. The agent answers only from approved label text and names the label it used. A drafted reply to a doctor waits for a human reviewer. Under the hood it is a LangGraph agent graph with two tools, streamed into an assistant-ui chat.
 
-![The AI engineering loop](./docs/images/AI-engineering-loop.png)
+![The AI engineering loop](./docs/images/diagrams/ai-engineering-loop.svg)
 
-![The HCP Medical Information Agent: the greeting, suggestion chips and the label library side panel.](./docs/images/sample_app.png)
+![The HCP Medical Information Agent: the desk badges, the heading and three suggested questions.](./docs/images/sample_app.png)
 
 ## Run it
 
@@ -29,7 +29,7 @@ Each lesson names the checkpoint tag to check out, what to change, and how to ch
 | --- | --- | --- | --- |
 | 00 | [Setup](./docs/learner/00-setup.md) | `checkpoint/00-setup` | Start Langfuse, add your keys, run the app. |
 | 01 | [Base app](./docs/learner/01-base-app.md) | `checkpoint/01-base-app` | Tour the running app. Nothing to build. |
-| 02 | [Tracing](./docs/learner/02-tracing.md) | `checkpoint/02-tracing` | Trace every agent step: generations, the agent root and tool calls. |
+| 02 | [Tracing](./docs/learner/02-tracing.md) | `checkpoint/02-tracing` | One chat turn becomes one trace: model calls, graph nodes, tool calls and the session. |
 | 03 | [Prompt management](./docs/learner/03-prompt-management.md) | `checkpoint/03-prompt-management` | Move the system prompt into Langfuse and link it to every generation. |
 | 04 | [Monitoring](./docs/learner/04-monitoring.md) | `checkpoint/04-monitoring` | Read production traces: error analysis and live signals. |
 | 05 | [Build eval datasets](./docs/learner/05-dataset.md) | `checkpoint/05-dataset` | Turn the failures from error analysis into a dataset. |
@@ -42,7 +42,7 @@ Helper commands used by the lessons:
 ```bash
 npm run prompt:publish                  # lesson 03: publish the agent prompt
 npm run langfuse:seed:error-analysis    # lesson 04: 20 traces for error analysis
-npm run dataset:seed                    # lesson 05: the 27-item eval dataset
+npm run dataset:seed                    # lesson 05: the eval dataset, one case per promise
 npm run dataset:run                     # lessons 06 and 07: one scored experiment run
 ```
 
@@ -61,7 +61,7 @@ The server and the npm scripts read the repository `.env` first, so a stray shel
 - [`langfuse/`](./langfuse/) holds the local Langfuse stack.
 - [`src/`](./src/) holds the sample app.
 - [`scripts/`](./scripts/) holds the prompt, seed and dataset scripts.
-- [`data/`](./data/) holds the eval dataset.
+- [`data/hcp/`](./data/hcp/) is a pinned copy of the dataset repo: the labels, desk rules and eval cases. [`docs/coverage.md`](./docs/coverage.md) maps each case to the promise it tests.
 
 ## Where to go next
 
