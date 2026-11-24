@@ -60,16 +60,26 @@ const STOPWORDS = new Set(
 const words = (text: string) =>
   (text.toLowerCase().match(/[a-z0-9]+/g) ?? []).filter((word) => word.length > 2 && !STOPWORDS.has(word));
 
-// Naive on purpose: it scores every section by shared words and never looks at
-// status, date, company or country. Later chapters fix each of those gaps.
-export function searchLabels(query: string, limit = 4): LabelSection[] {
+// Scores every section by shared words, among the documents the asker may read. That set comes
+// from OpenFGA (src/server/permissions.ts), never from the question. It still ignores status and
+// date; later chapters fix those.
+export function searchLabels(query: string, readable: ReadonlySet<string>, limit = 4): LabelSection[] {
   const asked = new Set(words(query));
-  return LABEL_SECTIONS.map((section) => ({
-    section,
-    score: words(`${section.title} ${section.text}`).filter((word) => asked.has(word)).length
-  }))
+  return LABEL_SECTIONS.filter((section) => readable.has(section.docId))
+    .map((section) => ({
+      section,
+      score: words(`${section.title} ${section.text}`).filter((word) => asked.has(word)).length
+    }))
     .filter((hit) => hit.score > 0)
     .sort((a, b) => b.score - a.score)
     .slice(0, limit)
     .map((hit) => hit.section);
+}
+
+// The countries where a company has label text in force, for the desk rules.
+export function approvedCountries(tenantId: string): string[] {
+  const countries = LABEL_SECTIONS.filter((section) => section.tenantId === tenantId && section.status === "active").map(
+    (section) => section.country
+  );
+  return [...new Set(countries)].sort();
 }

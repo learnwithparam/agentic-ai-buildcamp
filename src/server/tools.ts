@@ -1,23 +1,20 @@
 import type OpenAI from "openai";
-import { observe } from "@langfuse/tracing";
-import { searchLabels } from "./labels";
+import { observe, updateActiveObservation } from "@langfuse/tracing";
+import { approvedCountries, searchLabels } from "./labels";
+import { readableDocuments } from "./permissions";
+import { TENANTS, type Identity } from "./users";
 
 type ToolResult = Record<string, unknown>;
 
-// The desk the agent answers for. The dataset fixes "today" so every run sees the same labels in force.
-export const DESK = {
-  company: "pharma_a",
-  brands: ["CardioNex"],
-  countries: ["US", "DE", "JP"],
-  today: "2026-11-23"
-};
+// The dataset fixes "today" so every run sees the same labels in force.
+export const TODAY = "2026-11-23";
 
 export const TOOL_DEFINITIONS: OpenAI.Chat.Completions.ChatCompletionTool[] = [
   {
     type: "function",
     function: {
       name: "get_desk_rules",
-      description: "Read the desk rules: today's date, the medicines and countries this desk covers, and how to cite.",
+      description: "Read the desk rules: today's date, the company and medicines this desk covers, the asker's country, and how to cite.",
       parameters: { type: "object", properties: {}, additionalProperties: false }
     }
   },
@@ -38,11 +35,17 @@ export const TOOL_DEFINITIONS: OpenAI.Chat.Completions.ChatCompletionTool[] = [
   }
 ];
 
-// checkpoint-sync:begin tool-bodies
-function deskRules(): ToolResult {
+// Lesson 11: both tools answer for the signed-in user. The company, its medicines and the
+// country come from the token, so no question and no prompt can change them.
+function deskRules(user: Identity): ToolResult {
+  const countries = approvedCountries(user.tenantId);
   return {
     ok: true,
-    ...DESK,
+    company: user.tenantId,
+    medicines: TENANTS[user.tenantId]?.medicines ?? [],
+    asker_country: user.country,
+    approved_in_asker_country: countries.includes(user.country),
+    today: TODAY,
     rules: [
       "Answer only from label text returned by search_labels.",
       "Cite every fact as [doc_id, section], for example [cardionex-uspi-v2, 2.2]."
@@ -50,10 +53,11 @@ function deskRules(): ToolResult {
   };
 }
 
-function labelSearch(input: { query: string }): ToolResult {
+async function labelSearch(input: { query: string }, user: Identity): Promise<ToolResult> {
+  const readable = await readableDocuments(user);
   return {
     ok: true,
-    results: searchLabels(input.query).map((hit) => ({
+    results: searchLabels(input.query, readable).map((hit) => ({
       doc_id: hit.docId,
       section: hit.section,
       title: hit.title,
@@ -64,17 +68,31 @@ function labelSearch(input: { query: string }): ToolResult {
     }))
   };
 }
-// checkpoint-sync:end tool-bodies
 
-const getDeskRulesTool = observe(deskRules, { name: "get_desk_rules", asType: "tool" });
-const searchLabelsTool = observe(labelSearch, { name: "search_labels", asType: "tool" });
+// The tool spans record what the model asked for and which company and country it was answered
+// for. The doctor's name and email are not in the trace (src/server/trace-identity.test.ts).
+const asker = (user: Identity) => ({ tenantId: user.tenantId, country: user.country });
+const getDeskRulesTool = observe(
+  (user: Identity) => {
+    updateActiveObservation({ input: { asker: asker(user) } }, { asType: "tool" });
+    return deskRules(user);
+  },
+  { name: "get_desk_rules", asType: "tool", captureInput: false }
+);
+const searchLabelsTool = observe(
+  (input: { query: string }, user: Identity) => {
+    updateActiveObservation({ input: { ...input, asker: asker(user) } }, { asType: "tool" });
+    return labelSearch(input, user);
+  },
+  { name: "search_labels", asType: "tool", captureInput: false }
+);
 
-export async function executeTool(name: string, input: Record<string, unknown>): Promise<ToolResult> {
+export async function executeTool(name: string, input: Record<string, unknown>, user: Identity): Promise<ToolResult> {
   switch (name) {
     case "get_desk_rules":
-      return getDeskRulesTool();
+      return getDeskRulesTool(user);
     case "search_labels":
-      return searchLabelsTool({ query: String(input.query ?? "") });
+      return searchLabelsTool({ query: String(input.query ?? "") }, user);
     default:
       return { ok: false, error: `Unsupported tool: ${name}` };
   }

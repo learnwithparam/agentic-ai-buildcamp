@@ -14,6 +14,7 @@ import {
 } from "../shared/messages";
 import { env } from "./env";
 import { streamModelTurn, toOpenAIMessages } from "./stream-model";
+import type { Identity } from "./users";
 import { TOOL_DEFINITIONS } from "./tools";
 
 // The agent graph: agent -> tools -> agent ... -> review -> end.
@@ -70,6 +71,12 @@ export async function agentStep(
     (partial) => config.writer?.(partial)
   );
   return { messages: [reply] };
+}
+
+export function userOf(config: LangGraphRunnableConfig): Identity {
+  const user = config.configurable?.user as Identity | undefined;
+  if (!user) throw new Error("A graph run needs the signed-in user in its config.");
+  return user;
 }
 
 export async function toolsStep(
@@ -143,6 +150,8 @@ type Graph = ReturnType<typeof buildGraph>;
 
 export type Turn = {
   threadId: string;
+  // Lesson 11: who is asking, from the signed-in user's token. Tools read it from the run config.
+  user: Identity;
   messages?: ChatMessage[];
   resume?: ApprovalDecision;
 };
@@ -157,7 +166,7 @@ export async function runGraph(graph: Graph, turn: Turn, emit: (event: StreamEve
     ? (new Command({ resume: turn.resume }) as unknown as Parameters<Graph["stream"]>[0])
     : { messages: turn.messages ?? [] };
   const stream = await graph.stream(input, {
-    configurable: { thread_id: turn.threadId },
+    configurable: { thread_id: turn.threadId, user: turn.user },
     streamMode: ["custom", "updates", "values"]
   });
   let messages: ChatMessage[] = [];

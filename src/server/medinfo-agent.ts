@@ -1,12 +1,13 @@
 import { randomUUID } from "node:crypto";
 import { observeOpenAI } from "@langfuse/openai";
-import { observe, propagateAttributes } from "@langfuse/tracing";
+import { observe, propagateAttributes, updateActiveObservation } from "@langfuse/tracing";
 import { LangfuseClient } from "@langfuse/client";
 import { aiText, type AiMessage, type ChatMessage, type StreamEvent } from "../shared/messages";
 import { env } from "./env";
 import { checkInput, modelClient } from "./gateway";
-import { agentStep, buildGraph, readThread, reviewStep, runGraph, toolsStep, type Turn } from "./graph";
+import { agentStep, buildGraph, readThread, reviewStep, runGraph, toolsStep, userOf, type Turn } from "./graph";
 import { executeTool } from "./tools";
+import { scriptUser, type Identity } from "./users";
 
 // Local fallback used when Langfuse isn't reachable or the prompt
 // isn't published yet. scripts/publish-prompt.ts pushes this same
@@ -38,6 +39,8 @@ function latestQuestion(messages: ChatMessage[]) {
 const graph = buildGraph({
   agent: observe(
     async (state, config) => {
+      // Lesson 11: record the conversation, not the run config, which carries the signed-in doctor.
+      updateActiveObservation({ input: state });
       // Lesson 10: a request the desk never answers gets its reply here, with no model call.
       const refusal = checkInput(latestQuestion(state.messages));
       if (refusal) return { messages: [{ id: `out-of-scope-${randomUUID()}`, type: "ai", content: [{ type: "text", text: refusal }], tool_calls: [] }] };
@@ -45,23 +48,36 @@ const graph = buildGraph({
       const openai = observeOpenAI(modelClient(), langfusePrompt ? { langfusePrompt } : undefined);
       return agentStep(openai, langfusePrompt?.prompt ?? SYSTEM_PROMPT, state, config);
     },
-    { name: "agent", asType: "span" }
+    { name: "agent", asType: "span", captureInput: false }
   ),
-  tools: observe((state) => toolsStep(state, executeTool), { name: "tools", asType: "span" }),
+  tools: observe(
+    (state, config) => {
+      updateActiveObservation({ input: state });
+      return toolsStep(state, (name, args) => executeTool(name, args, userOf(config)));
+    },
+    { name: "tools", asType: "span", captureInput: false }
+  ),
   review: reviewStep
 });
 
 export const runMedinfoTurn = observe(
-  (turn: Turn, emit: (event: StreamEvent) => void) =>
-    propagateAttributes(
+  (turn: Turn, emit: (event: StreamEvent) => void) => {
+    // Lesson 11: the trace records who asked by id, company and country only. The doctor's
+    // name and email stay in Keycloak; the trace input is the thread and the new messages.
+    updateActiveObservation({ input: { threadId: turn.threadId, messages: turn.messages, resume: turn.resume } });
+    return propagateAttributes(
       {
         sessionId: turn.threadId,
+        // Lesson 11: filter Langfuse by user, company or country to see one desk's traffic.
+        userId: turn.user.userId,
+        metadata: { tenantId: turn.user.tenantId, country: turn.user.country },
         traceName: "hcp-medinfo-chat-turn",
         tags: ["langfuse-workshop", "hcp-medinfo"]
       },
       () => runGraph(graph, turn, emit)
-    ),
-  { name: "hcp-medinfo-chat-turn", asType: "agent" }
+    );
+  },
+  { name: "hcp-medinfo-chat-turn", asType: "agent", captureInput: false }
 );
 
 export const readMedinfoThread = (threadId: string) => readThread(graph, threadId);
@@ -70,20 +86,23 @@ export type ConversationLine = { role: "user" | "assistant"; content: string };
 
 // Scripts (the dataset run) ask one conversation without the chat UI. When the graph
 // pauses for a reviewer, the draft waiting for review is the answer.
-export async function answerConversation(lines: ConversationLine[]): Promise<string> {
-  return (await answerWithSources(lines)).answer;
+export async function answerConversation(lines: ConversationLine[], user: Identity = scriptUser()): Promise<string> {
+  return (await answerWithSources(lines, user)).answer;
 }
 
 // The same answer, plus the tool results the model read before it wrote it. The faithfulness
 // judge (lesson 09) checks the answer against these, the same text Langfuse shows as the
 // tool messages in the final generation's input.
-export async function answerWithSources(lines: ConversationLine[]): Promise<{ answer: string; sources: string[] }> {
+export async function answerWithSources(
+  lines: ConversationLine[],
+  user: Identity = scriptUser()
+): Promise<{ answer: string; sources: string[] }> {
   const messages: ChatMessage[] = lines.map((line, index) =>
     line.role === "user"
       ? { id: `line-${index}`, type: "human", content: line.content }
       : { id: `line-${index}`, type: "ai", content: [{ type: "text", text: line.content }], tool_calls: [] }
   );
-  const result = await runMedinfoTurn({ threadId: `script-${randomUUID()}`, messages }, () => {});
+  const result = await runMedinfoTurn({ threadId: `script-${randomUUID()}`, user, messages }, () => {});
   const answers = result.messages.filter((message): message is AiMessage => message.type === "ai" && aiText(message) !== "");
   const sources = result.messages.flatMap((message) => (message.type === "tool" ? [message.content] : []));
   return { answer: answers.length ? aiText(answers[answers.length - 1]) : "", sources };
