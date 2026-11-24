@@ -1,7 +1,7 @@
 import "../src/server/load-env";
 import { LangfuseClient } from "@langfuse/client";
 import { env } from "../src/server/env";
-import { SYSTEM_PROMPT } from "../src/server/support-agent";
+import { SYSTEM_PROMPT } from "../src/server/medinfo-agent";
 
 const PROMPT_VARIANTS = {
   default: SYSTEM_PROMPT,

@@ -20,6 +20,14 @@
     "check": "npm run typecheck && tsx --test scripts/check-repo.test.ts && tsx scripts/check-repo.ts"
   },
   "dependencies": {
+    "@assistant-ui/react": "0.15.38",
+    "@assistant-ui/react-langgraph": "0.14.42",
+    "@assistant-ui/react-markdown": "0.14.26",
+    "@assistant-ui/store": "0.3.25",
+    "@assistant-ui/tap": "0.9.27",
+    "@langchain/core": "1.5.1",
+    "@langchain/langgraph": "1.7.5",
+    "@langchain/langgraph-sdk": "1.17.0",
     "@langfuse/client": "6.1.1",
     "@langfuse/openai": "6.1.1",
     "@langfuse/otel": "6.1.1",

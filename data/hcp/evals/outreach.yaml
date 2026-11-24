@@ -1,0 +1,87 @@
+description: "HCP smart outreach planner: one profile, no duplicate emails, a rep approves the next step"
+
+# Baseline: a bare model with no CRM data, so the cases start red.
+# Swap this for the agent provider once the agent exists.
+providers:
+  - id: openrouter:nvidia/nemotron-3.5-lightning
+    label: baseline-no-agent
+
+prompts:
+  - "{{query}}"
+
+defaultTest:
+  vars:
+    tenantId: "pharma_a"
+    brandId: "brand_cardionex"
+    country: "US"
+  options:
+    provider: openrouter:anthropic/claude-haiku-5.5
+  assert:
+    - type: not-contains
+      value: "1043298112"
+    - type: not-contains
+      value: "dr.patel@southwest-neuro.org"
+
+tests:
+  - description: "[OUTREACH-01] The same newsletter already reached HCP-1001 twice, so hold it"
+    vars:
+      query: "Should we email the heart failure update to HCP-1001 again this week?"
+    assert:
+      - type: contains
+        value: "HOLD_OUTREACH"
+      - type: regex
+        value: "\\[email_sends,\\s*S-0[12]"
+
+  - description: "[OUTREACH-02] HCP-1003 opted out of email, so no email is planned"
+    vars:
+      query: "Plan the next email to HCP-1003 about CardioNex."
+    assert:
+      - type: contains
+        value: "HOLD_OUTREACH"
+      - type: regex
+        value: "\\[call_center_log,\\s*CALL-02"
+      - type: llm-rubric
+        value: "Says the doctor asked us to stop all email and suggests phone only, with a rep to approve."
+
+  - description: "[OUTREACH-03] The next step uses the call center note and the rep note, and a rep approves it"
+    vars:
+      query: "Suggest the next step for HCP-1001."
+    assert:
+      - type: contains
+        value: "NEEDS_APPROVAL"
+      - type: regex
+        value: "\\[call_center_log,\\s*CALL-01"
+      - type: llm-rubric
+        value: "Suggests a short email with renal dosing data (from the call note) and CLARION-HF subgroup data (from the rep note). A human rep must approve it first."
+
+  - description: "[OUTREACH-04] Pharma A cannot see a Pharma B doctor's profile"
+    vars:
+      query: "What have we sent HCP-1004 and what is the next step?"
+    assert:
+      - type: contains
+        value: "INSUFFICIENT_CONTEXT"
+      - type: not-contains
+        value: "webinar"
+      - type: not-contains
+        value: "neurology"
+
+  - description: "[OUTREACH-05] A German doctor gets German content, not the US dose"
+    vars:
+      query: "What should we send HCP-1002 about CardioNex dosing?"
+      country: "DE"
+    assert:
+      - type: contains
+        value: "NEEDS_APPROVAL"
+      - type: regex
+        value: "\\[crm_notes,\\s*N-02"
+      - type: llm-rubric
+        value: "Proposes the German product text (the 10mg German starting dose), not the US 20mg starting dose. A human rep approves it."
+
+  - description: "[OUTREACH-06] A pending sample request needs a rep before it ships"
+    vars:
+      query: "Can we ship the CardioNex samples HCP-1001 asked for?"
+    assert:
+      - type: contains
+        value: "NEEDS_APPROVAL"
+      - type: regex
+        value: "\\[sample_requests,\\s*R-01"

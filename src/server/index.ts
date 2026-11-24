@@ -4,56 +4,19 @@ import { LangfuseSpanProcessor } from "@langfuse/otel";
 import express from "express";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { z } from "zod";
-import type { ChatRequest } from "../shared/types";
-import { runSupportConversation } from "./support-agent";
 import { env, isLangfuseConfigured } from "./env";
-import { DEFAULT_SUPPORT_CONTEXT } from "./support-data";
+import { routes } from "./routes";
 
 const langfuseSpanProcessor = new LangfuseSpanProcessor();
 const sdk = new NodeSDK({ spanProcessors: [langfuseSpanProcessor] });
 sdk.start();
 
-const requestSchema = z.object({
-  sessionId: z.string().min(1),
-  userId: z.string().optional(),
-  messages: z
-    .array(
-      z.object({
-        id: z.string(),
-        role: z.union([z.literal("user"), z.literal("assistant")]),
-        content: z.string().min(1),
-        timestamp: z.string()
-      })
-    )
-    .min(1)
-});
-
 const app = express();
 app.use(express.json({ limit: "1mb" }));
-
 app.get("/api/health", (_request, response) => {
-  response.json({
-    ok: true,
-    provider: "openai",
-    tracingConfigured: isLangfuseConfigured()
-  });
+  response.json({ ok: true, tracingConfigured: isLangfuseConfigured() });
 });
-
-app.get("/api/support-context", (_request, response) => {
-  response.json(DEFAULT_SUPPORT_CONTEXT);
-});
-
-app.post("/api/chat", async (request, response) => {
-  try {
-    const payload = requestSchema.parse(request.body) as ChatRequest;
-    const result = await runSupportConversation(payload);
-    response.json(result);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown server error";
-    response.status(400).send(message);
-  }
-});
+app.use(routes);
 
 const currentDir = path.dirname(fileURLToPath(import.meta.url));
 const clientDist = path.resolve(currentDir, "../../dist");

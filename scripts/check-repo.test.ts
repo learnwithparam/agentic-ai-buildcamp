@@ -67,6 +67,30 @@ test("a dependency without an exact version fails", () => {
   assert.doesNotMatch(problems.join("\n"), /"c"/);
 });
 
+test("a component that still names the upstream app fails", () => {
+  const problems = run({ "src/client/App.tsx": "export const PhonePanel = () => null;\n" });
+  assert.match(problems.join("\n"), /App\.tsx: still names PhonePanel/);
+});
+
+test("a colour written outside tokens.css fails, and inside it passes", () => {
+  const problems = run({
+    "src/client/styles/tokens.css": ":root { --fg: #151515; }\n",
+    "src/client/styles/app.css": ".box { color: #ff0000; }\n",
+    "src/client/App.tsx": '<div className="box" />\n',
+  });
+  assert.match(problems.join("\n"), /app\.css: writes the colour #ff0000/);
+  assert.doesNotMatch(problems.join("\n"), /tokens\.css: writes/);
+});
+
+test("a CSS class no component uses fails", () => {
+  const problems = run({
+    "src/client/styles/app.css": ".card { padding: 0; }\n.card-head { gap: 0; }\n",
+    "src/client/App.tsx": '<div className="card" />\n',
+  });
+  assert.match(problems.join("\n"), /class \.card-head is not used/);
+  assert.doesNotMatch(problems.join("\n"), /class \.card is not used/);
+});
+
 test("a README that names a different Node version fails", () => {
   const problems = run({ "README.md": base["README.md"].replace(">=22.18.0", ">=20") });
   assert.match(problems.join("\n"), /README\.md: does not name the Node version/);
