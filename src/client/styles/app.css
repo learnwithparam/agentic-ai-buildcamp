@@ -77,8 +77,31 @@ pre {
   color: var(--on-accent);
 }
 
-.topbar .button {
+/* The user's name pushes the buttons to the right edge. */
+.topbar-user {
   margin-left: auto;
+  color: var(--fg2);
+  font-size: 14px;
+}
+
+/* Lesson 11: the signed-out page. */
+.signin {
+  max-width: 520px;
+  margin: 15vh auto 0;
+  padding: 0 20px;
+  display: grid;
+  gap: 16px;
+  justify-items: start;
+}
+
+.signin h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.signin p {
+  margin: 0;
+  color: var(--fg2);
 }
 
 /* Thread */

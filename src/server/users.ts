@@ -1,0 +1,27 @@
+// Who may ask, and which desk each one asks (lesson 11).
+
+// The signed-in doctor, read from a Keycloak access token the server verified.
+export type Identity = { userId: string; name: string; email: string; tenantId: string; country: string };
+
+// Each company's desk answers only for its own medicines. The key is the Keycloak organization alias.
+export const TENANTS: Record<string, { name: string; domain: string; medicines: string[] }> = {
+  pharma_a: { name: "Pharma A", domain: "pharma-a.example.com", medicines: ["CardioNex"] },
+  pharma_b: { name: "Pharma B", domain: "pharma-b.example.com", medicines: ["NeuroVex"] }
+};
+
+// The doctors npm run identity:setup creates in Keycloak: two companies, two countries in each,
+// so the lesson can put two desks side by side. The addresses use the reserved example.com domain.
+export const SEED_USERS = [
+  { email: "ana.rivera@pharma-a.example.com", firstName: "Ana", lastName: "Rivera", tenantId: "pharma_a", country: "US" },
+  { email: "lukas.weber@pharma-a.example.com", firstName: "Lukas", lastName: "Weber", tenantId: "pharma_a", country: "DE" },
+  { email: "chidi.okafor@pharma-b.example.com", firstName: "Chidi", lastName: "Okafor", tenantId: "pharma_b", country: "US" },
+  { email: "yui.tanaka@pharma-b.example.com", firstName: "Yui", lastName: "Tanaka", tenantId: "pharma_b", country: "JP" }
+] as const;
+
+// Scripts (the dataset run, the error-analysis replays) ask as a named desk too, never as "nobody".
+// They run inside the server's own code, so they pass an identity instead of signing in; the
+// permission check still runs on it.
+export function scriptUser(tenantId = "pharma_a", country = "US"): Identity {
+  const id = `script-${tenantId}-${country.toLowerCase()}`;
+  return { userId: id, name: "Script", email: `${id}@scripts.example.com`, tenantId, country };
+}

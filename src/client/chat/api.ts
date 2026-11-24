@@ -2,17 +2,53 @@ import type { LangChainMessage, LangGraphInterruptState } from "@assistant-ui/re
 
 // The browser side of the thread API in src/server/routes.ts.
 
+export type Me = {
+  user: { userId: string; name: string; email: string; tenantId: string; country: string };
+  company: { name: string; medicines: string[] };
+};
+
+// The session cookie goes with every request by itself. When it has ended, start a new sign-in
+// and come back to this page.
+export function signIn() {
+  window.location.assign(`/api/auth/sign-in?returnTo=${encodeURIComponent(window.location.pathname)}`);
+}
+
+async function api(path: string, init: RequestInit = {}): Promise<Response> {
+  const response = await fetch(path, init);
+  if (response.status === 401) {
+    signIn();
+    throw new Error("Signed out");
+  }
+  return response;
+}
+
+// Signed in, signed out, or signed in but not allowed (no company or no country on the account).
+export async function loadMe(): Promise<{ me: Me } | { signedOut: true } | { refused: string }> {
+  const response = await fetch("/api/me", { signal: AbortSignal.timeout(10_000) });
+  if (response.status === 401) return { signedOut: true };
+  if (response.status === 403) return { refused: ((await response.json()) as { error: string }).error };
+  if (!response.ok) throw new Error(`The server answered ${response.status}`);
+  return { me: (await response.json()) as Me };
+}
+
+// Ends the session here, then at Keycloak, so the next sign-in asks for the password again.
+export async function signOut() {
+  const response = await fetch("/api/auth/sign-out", { method: "POST" });
+  const { redirectTo } = (await response.json()) as { redirectTo: string };
+  window.location.assign(redirectTo);
+}
+
 type SendConfig = { command?: { resume?: unknown }; abortSignal: AbortSignal };
 type ServerEvent = { event: string; data: unknown };
 
 export async function createThread(): Promise<{ externalId: string }> {
-  const response = await fetch("/api/threads", { method: "POST", signal: AbortSignal.timeout(10_000) });
+  const response = await api("/api/threads", { method: "POST", signal: AbortSignal.timeout(10_000) });
   const body = (await response.json()) as { thread_id: string };
   return { externalId: body.thread_id };
 }
 
 export async function loadThread(threadId: string) {
-  const response = await fetch(`/api/threads/${threadId}/state`, { signal: AbortSignal.timeout(10_000) });
+  const response = await api(`/api/threads/${threadId}/state`, { signal: AbortSignal.timeout(10_000) });
   return (await response.json()) as { messages: LangChainMessage[]; interrupts: LangGraphInterruptState[] };
 }
 
@@ -34,7 +70,7 @@ export async function* streamRun(
           .filter((message) => message.type === "human")
           .map((message) => ({ id: message.id ?? crypto.randomUUID(), type: "human", content: textOf(message) }))
       };
-  const response = await fetch(`/api/threads/${threadId}/runs/stream`, {
+  const response = await api(`/api/threads/${threadId}/runs/stream`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),

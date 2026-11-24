@@ -1,13 +1,7 @@
 import { AuiIf, ComposerPrimitive, MessagePrimitive, ThreadPrimitive } from "@assistant-ui/react";
 import { useLangGraphInterruptState, useLangGraphSendCommand } from "@assistant-ui/react-langgraph";
+import { SUGGESTIONS } from "./suggestions";
 import { DeskRulesCard, MarkdownText, OtherToolCard, SearchLabelsCard, Thinking } from "./parts";
-
-// Questions a doctor might ask. Each one shows a different part of the agent.
-const SUGGESTIONS = [
-  "What is the CardioNex dose for a US patient with eGFR 24 who is not on dialysis?",
-  "Draft a reply to Dr. Lee in Germany: what CardioNex dose fits a patient with eGFR 24?",
-  "What is the approved use of CardioNex in Japan?"
-];
 
 function UserMessage() {
   return (
@@ -63,7 +57,7 @@ function ApprovalCard() {
   );
 }
 
-export function Thread() {
+export function Thread({ tenantId }: { tenantId: string }) {
   return (
     <ThreadPrimitive.Root className="thread">
       <ThreadPrimitive.Viewport className="viewport">
@@ -73,7 +67,7 @@ export function Thread() {
               <h1>Ask about CardioNex</h1>
               <p>Answers come from the approved labels, with a citation for every fact.</p>
               <div className="suggestions">
-                {SUGGESTIONS.map((prompt) => (
+                {(SUGGESTIONS[tenantId] ?? []).map((prompt) => (
                   <ThreadPrimitive.Suggestion key={prompt} prompt={prompt} send asChild>
                     <button type="button" className="suggestion">
                       {prompt}
