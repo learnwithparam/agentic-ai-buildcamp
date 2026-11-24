@@ -179,7 +179,7 @@ MSG
 )"
 
   git tag -f "$tag" HEAD >/dev/null
-  [[ " ${MOVED[*]} " == *" refs/tags/$tag "* ]] || MOVED+=("refs/tags/$tag")
+  [[ " ${MOVED[*]-} " == *" refs/tags/$tag "* ]] || MOVED+=("refs/tags/$tag")
   echo "    updated $(git rev-parse --short HEAD)"
 done
 
