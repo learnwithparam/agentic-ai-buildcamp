@@ -15,3 +15,4 @@ rows link to your runs.
 | 07 | The error-analysis prompt | 22/28 | 3/3 | 3/3 | 1/1 | 3/3 | 2/4 | 2/2 | 1/1 | 0/4 | 1/1 | 2/2 | 1/1 | 1/1 | 1/1 | 1/1 | - | [run](http://localhost:5174/project/hcp-medinfo/experiments/results?baseline=d1ab0d8d09b632a9) |
 | 09 | The calibrated faithfulness judge on the judged slices | 9/9 | 1/1 | 3/3 | 1/1 | 1/1 | - | - | - | - | - | 1/1 | 1/1 | - | - | 1/1 | - | [run](http://localhost:5174/project/hcp-medinfo/experiments/results?baseline=c77b940e27ecf32e) |
 | 10 | Every model call through the gateway, the input check at the door | 5/5 | 1/1 | - | - | 1/1 | - | - | 1/1 | - | - | 1/1 | 1/1 | - | - | - | - | [run](http://localhost:5174/project/hcp-medinfo/experiments/results?baseline=f39275a79a44d55b) |
+| 11 | Sign-in with Keycloak, permissions from OpenFGA | 12/12 | 1/1 | - | - | 1/1 | 4/4 | - | - | 4/4 | - | 1/1 | 1/1 | - | - | - | - | [run](http://localhost:5174/project/hcp-medinfo/experiments/results?baseline=8b7fdd68f041f6d2) |
