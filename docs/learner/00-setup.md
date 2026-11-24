@@ -13,7 +13,7 @@ Have the workshop app running locally with both OpenAI and Langfuse credentials 
 
 ## Prerequisites
 
-**Node.js `^20.19.0 || >=22.12.0`**: check with `node -v` and upgrade before installing if you are below it (`nvm install 22`, or the equivalent for `asdf`, `fnm`, or `volta`).
+**Node.js `>=22.18.0`**: check with `node -v` and upgrade before installing if you are below it (`nvm install 22`, or the equivalent for `asdf`, `fnm`, or `volta`).
 
 An older version fails in a way that is easy to misread. Vite's platform-specific binary is an optional dependency, so npm skips it **without reporting an error**: `npm install` looks like it succeeded, and the problem only appears later when `npm run dev` cannot start Vite. If you upgrade Node after installing, re-run `npm ci` so the skipped binary is fetched.
 
