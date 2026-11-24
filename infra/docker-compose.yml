@@ -1,0 +1,89 @@
+# The app's own platform (lesson 11 on): its Postgres, Keycloak for sign-in, OpenFGA for permissions.
+# Separate from langfuse/: observability and identity have different owners and different backups.
+# Every port listens on this machine only. npm run identity:setup writes the secrets this file reads
+# into .env and starts it; never put a secret in this file.
+name: medinfo-platform
+
+services:
+  postgres:
+    image: postgres:17.7
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?run npm run identity:setup}
+      # One database and one role per service, created on first start by init/01-databases.sh.
+      KEYCLOAK_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:?run npm run identity:setup}
+      OPENFGA_DB_PASSWORD: ${OPENFGA_DB_PASSWORD:?run npm run identity:setup}
+      MEDINFO_DB_PASSWORD: ${MEDINFO_DB_PASSWORD:?run npm run identity:setup}
+    volumes:
+      - medinfo_postgres_data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d:ro
+    ports:
+      - 127.0.0.1:5442:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.8.2
+    # Production mode (start, not start-dev): strict hostname, real database, no dev defaults.
+    # Plain HTTP is allowed only because it listens on 127.0.0.1; behind a proxy you terminate TLS there.
+    command: ["start", "--http-enabled=true", "--hostname=http://localhost:8180", "--health-enabled=true"]
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+      # Only for the first start. identity:setup signs in with it to create the realm.
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?run npm run identity:setup}
+    ports:
+      - 127.0.0.1:8180:8080
+    healthcheck:
+      # The image has no curl: ask the management port for readiness over bash's /dev/tcp.
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000 && printf 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && grep -q '\"UP\"' <&3"]
+      interval: 5s
+      timeout: 5s
+      retries: 40
+
+  openfga-migrate:
+    image: openfga/openfga:v1.22.1
+    command: migrate
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      OPENFGA_DATASTORE_ENGINE: postgres
+      OPENFGA_DATASTORE_URI: postgres://openfga:${OPENFGA_DB_PASSWORD}@postgres:5432/openfga?sslmode=disable
+
+  openfga:
+    image: openfga/openfga:v1.22.1
+    command: run
+    restart: unless-stopped
+    depends_on:
+      openfga-migrate:
+        condition: service_completed_successfully
+    environment:
+      OPENFGA_DATASTORE_ENGINE: postgres
+      OPENFGA_DATASTORE_URI: postgres://openfga:${OPENFGA_DB_PASSWORD}@postgres:5432/openfga?sslmode=disable
+      # Every call needs this key: the permission service is not open to whoever can reach the port.
+      OPENFGA_AUTHN_METHOD: preshared
+      OPENFGA_AUTHN_PRESHARED_KEYS: ${FGA_API_TOKEN:?run npm run identity:setup}
+      OPENFGA_PLAYGROUND_ENABLED: "false"
+      OPENFGA_LOG_FORMAT: json
+    ports:
+      - 127.0.0.1:8280:8080
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/grpc_health_probe", "-addr=127.0.0.1:8081"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+volumes:
+  medinfo_postgres_data:

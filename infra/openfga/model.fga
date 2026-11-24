@@ -1,0 +1,24 @@
+model
+  schema 1.1
+
+# Lesson 11. Who may read which label text.
+# Facts about a doctor (their company, their country) come from the signed Keycloak token and are
+# sent with each question as contextual tuples, so Keycloak stays the one place they are kept.
+# Facts about a document (whose it is, where it is approved) are stored here by npm run identity:setup.
+
+type user
+
+type company
+  relations
+    define member: [user]
+
+type country
+  relations
+    define doctor: [user]
+
+type document
+  relations
+    define owner: [company]
+    define approved_in: [country]
+    # Both must hold: your company owns it, and it is approved where you practise.
+    define can_read: member from owner and doctor from approved_in
