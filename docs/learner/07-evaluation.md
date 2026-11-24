@@ -140,4 +140,4 @@ The [Langfuse skill](https://github.com/langfuse/skills) (`/langfuse`) can publi
 
 ## End state
 
-This is the starting point for `08-wrap-up`.
+This is the starting point for `08-midpoint`.

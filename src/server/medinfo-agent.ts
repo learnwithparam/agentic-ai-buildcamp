@@ -66,6 +66,13 @@ export type ConversationLine = { role: "user" | "assistant"; content: string };
 // Scripts (the dataset run) ask one conversation without the chat UI. When the graph
 // pauses for a reviewer, the draft waiting for review is the answer.
 export async function answerConversation(lines: ConversationLine[]): Promise<string> {
+  return (await answerWithSources(lines)).answer;
+}
+
+// The same answer, plus the tool results the model read before it wrote it. The faithfulness
+// judge (lesson 09) checks the answer against these, the same text Langfuse shows as the
+// tool messages in the final generation's input.
+export async function answerWithSources(lines: ConversationLine[]): Promise<{ answer: string; sources: string[] }> {
   const messages: ChatMessage[] = lines.map((line, index) =>
     line.role === "user"
       ? { id: `line-${index}`, type: "human", content: line.content }
@@ -73,5 +80,6 @@ export async function answerConversation(lines: ConversationLine[]): Promise<str
   );
   const result = await runMedinfoTurn({ threadId: `script-${randomUUID()}`, messages }, () => {});
   const answers = result.messages.filter((message): message is AiMessage => message.type === "ai" && aiText(message) !== "");
-  return answers.length ? aiText(answers[answers.length - 1]) : "";
+  const sources = result.messages.flatMap((message) => (message.type === "tool" ? [message.content] : []));
+  return { answer: answers.length ? aiText(answers[answers.length - 1]) : "", sources };
 }

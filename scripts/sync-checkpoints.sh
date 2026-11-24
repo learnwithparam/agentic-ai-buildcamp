@@ -42,7 +42,8 @@ TAGS=(
   checkpoint/05-dataset
   checkpoint/06-experiments
   checkpoint/07-evaluation
-  checkpoint/08-wrap-up
+  checkpoint/08-midpoint
+  checkpoint/09-advanced-evals
 )
 
 # Files whose code is what the next lesson changes. Add a file here when a
@@ -50,10 +51,14 @@ TAGS=(
 milestone_files() {
   case "$1" in
     checkpoint/00-setup | checkpoint/01-base-app | checkpoint/02-tracing)
-      echo "src/server/index.ts src/server/medinfo-agent.ts src/server/tools.ts"
+      echo "src/server/index.ts src/server/medinfo-agent.ts src/server/tools.ts scripts/run-dataset.ts"
       ;;
     checkpoint/03-prompt-management)
-      echo "src/server/medinfo-agent.ts"
+      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts"
+      ;;
+    # Lessons 06 and 07 run the dataset with the correctness judge; lesson 09 replaces it.
+    checkpoint/04-* | checkpoint/05-* | checkpoint/06-* | checkpoint/07-* | checkpoint/08-*)
+      echo "scripts/run-dataset.ts"
       ;;
     *)
       echo ""
@@ -108,11 +113,16 @@ PY
 }
 
 MOVED=()
+PREVIOUS=""
 for tag in "${TAGS[@]}"; do
+  # A new lesson's tag starts from the tag before it, so it inherits that step's
+  # milestone files, then takes SOURCE_REF's tree like every other tag.
   if ! git rev-parse --verify "refs/tags/$tag" >/dev/null 2>&1; then
-    echo "Missing tag: $tag" >&2
-    exit 1
+    git tag "$tag" "${PREVIOUS:-$SOURCE_REF}^{commit}"
+    MOVED+=("refs/tags/$tag")
+    echo "    created $tag from ${PREVIOUS:-$SOURCE_REF}"
   fi
+  PREVIOUS="refs/tags/$tag"
 
   echo "==> $tag"
   git checkout -q -f --detach "refs/tags/$tag"
@@ -155,7 +165,7 @@ MSG
 )"
 
   git tag -f "$tag" HEAD >/dev/null
-  MOVED+=("refs/tags/$tag")
+  [[ " ${MOVED[*]} " == *" refs/tags/$tag "* ]] || MOVED+=("refs/tags/$tag")
   echo "    updated $(git rev-parse --short HEAD)"
 done
 
