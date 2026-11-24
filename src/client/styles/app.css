@@ -197,6 +197,17 @@ pre {
   display: none;
 }
 
+/* A folded card shows a chevron, so it reads as something you can open. */
+.thinking summary::before {
+  content: "\25B8";
+  color: var(--fg2);
+  transition: transform 0.15s;
+}
+
+.thinking[open] summary::before {
+  transform: rotate(90deg);
+}
+
 .thinking .card-body {
   color: var(--fg2);
   white-space: pre-wrap;

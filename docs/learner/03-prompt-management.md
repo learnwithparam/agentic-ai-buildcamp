@@ -134,13 +134,13 @@ Short on time? `WORKSHOP_PROMPT_VARIANT=ask-first npm run prompt:publish` publis
 
 ## After
 
-The agent reads the desk rules, then asks for the country, kidney function and other medicines. It gives no dose.
+The agent reads the desk rules, then asks for the country, kidney function and other medicines. It gives no dose. Open the **▸ Thinking** card to see why: the model read the new line and decided to ask first.
 
-![The agent asks for the patient's country, kidney function and other medicines before any dose.](../images/prompt-management/03-prompt-management-after.png)
+![The agent asks for the patient's country, kidney function and other medicines before any dose. The opened Thinking card shows it decided to ask first.](../images/prompt-management/03-prompt-management-after.png)
 
 Open the new trace and click its last `OpenAI.chat` call. The prompt chip now reads `v2`.
 
-![The new trace: the last model call links to hcp-medinfo-agent v2.](../images/prompt-management/03-prompt-management-prompt-badge.png)
+![The new trace with its last OpenAI.chat call selected. The +5 chip is open, and its last line reads prompt: hcp-medinfo-agent - v2.](../images/prompt-management/03-prompt-management-prompt-badge.png)
 
 Back on the prompt page, version 2's **Linked Generations** tab lists that call.
 
