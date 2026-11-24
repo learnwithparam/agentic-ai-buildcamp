@@ -10,7 +10,8 @@
  *
  * A case passes when behavior_match and label_checks are both 1, and, on the slices the
  * faithfulness judge covers (scripts/judge/faithfulness.ts), faithfulness too. That judge
- * joined the pass only after lesson 09 measured it against human labels.
+ * joined the pass only after lesson 09 measured it against human labels. On the routing slice
+ * (lesson 13) the router must also choose the case's riskTier: the risk_tier score.
  *
  * npm run dataset:run -- --chapter 06 --change "..." appends a row to my-scoreboard.md.
  * check-repo calls checkScoreboard() on docs/scoreboard.md, so a row with the wrong shape fails CI.
@@ -21,6 +22,9 @@ import { fileURLToPath } from "node:url";
 import { loadMedinfoCases } from "./hcp-cases";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+// The slices whose riskTier is the router's answer, so risk_tier joins their pass.
+export const TIERED_SLICES = ["routing"];
+
 export const SCOREBOARD_FILE = path.join(ROOT, "docs/scoreboard.md");
 export const LEARNER_SCOREBOARD_FILE = path.join(ROOT, "my-scoreboard.md");
 
