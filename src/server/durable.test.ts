@@ -47,7 +47,7 @@ async function pauseThenRestart(before: BaseCheckpointSaver, afterRestart: BaseC
   assert.equal(paused.waitingForApproval, true);
   const restarted = serverGraph(afterRestart);
   const waiting = await readThread(restarted, threadId);
-  const resumed = await runGraph(restarted, { ...turn, resume: "approve" }, () => {});
+  const resumed = await runGraph(restarted, { ...turn, resume: { itemId: (waiting.interrupts[0]?.value as { itemId?: string } | undefined)?.itemId ?? "none", decision: "approve" } }, () => {});
   return { waiting, resumed };
 }
 
