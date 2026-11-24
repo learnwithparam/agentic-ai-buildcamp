@@ -17,7 +17,7 @@
     "dataset:run": "tsx scripts/run-dataset.ts",
     "langfuse:seed:error-analysis": "tsx scripts/seed-error-analysis-traces.ts",
     "langfuse:seed:error-analysis:annotations": "tsx scripts/seed-error-analysis-annotations.ts",
-    "check": "npm run typecheck && tsx --test scripts/check-repo.test.ts && tsx scripts/check-repo.ts"
+    "check": "npm run typecheck && tsx --test scripts/check-repo.test.ts src/server/graph.test.ts && tsx scripts/check-repo.ts"
   },
   "dependencies": {
     "@assistant-ui/react": "0.15.38",
@@ -52,7 +52,8 @@
     "tsup": "9.0.0",
     "tsx": "4.23.15",
     "typescript": "7.0.2",
-    "vite": "8.3.8"
+    "vite": "8.3.8",
+    "yaml": "2.9.1"
   },
   "engines": {
     "node": ">=22.18.0"
