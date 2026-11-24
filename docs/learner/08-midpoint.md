@@ -1,9 +1,9 @@
 ---
-title: "Workshop: Wrap-up"
+title: "Workshop: Midpoint"
 description: "Review the complete AI engineering loop and how to apply tracing, monitoring, datasets, experiments, and evaluation to your own LLM app."
 ---
 
-# 08 Wrap-up
+# 08 Midpoint
 
 ## Why close the loop
 
@@ -32,7 +32,7 @@ Read the loop you have built as one system, and plan how to run it on your own a
 ## Starting point
 
 ```bash
-git checkout checkpoint/08-wrap-up
+git checkout checkpoint/08-midpoint
 ```
 
 ## Read your scoreboard
