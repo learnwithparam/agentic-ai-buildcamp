@@ -7,11 +7,14 @@ export function MarkdownText() {
   return <MarkdownTextPrimitive className="markdown" />;
 }
 
+// The model titles each thought as **Title**; the first title previews the folded block.
+const firstTitle = (text: string) => /^\s*\*\*(.+?)\*\*/m.exec(text)?.[1];
+
 export const Thinking: ReasoningMessagePartComponent = ({ text, status }) => (
   <details className="card thinking">
     <summary className="card-head">
       <span className="label">Thinking</span>
-      {status.type === "running" ? <span className="running">thinking...</span> : null}
+      {status.type === "running" ? <span className="running">thinking...</span> : <span>{firstTitle(text) ?? "show"}</span>}
     </summary>
     <div className="card-body">
       {text.split("\n").map((line, index) => {
