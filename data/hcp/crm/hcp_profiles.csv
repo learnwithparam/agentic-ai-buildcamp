@@ -1,0 +1,5 @@
+hcp_id,tenant_id,country,specialty,email_consent,preferred_channel
+HCP-1001,pharma_a,US,cardiology,yes,email
+HCP-1002,pharma_a,DE,cardiology,yes,email
+HCP-1003,pharma_a,US,general_practice,no,phone
+HCP-1004,pharma_b,US,neurology,yes,email
