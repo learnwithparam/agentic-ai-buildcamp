@@ -11,9 +11,11 @@
  *
  * Usage:
  *   npm run dataset:run
- *   npm run dataset:run -- --chapter 06 --change "Naive agent"   (also adds a row to docs/scoreboard.md)
+ *   npm run dataset:run -- --chapter 06 --change "Naive agent"   (also adds a row to my-scoreboard.md)
+ *   add --reference to write the row to docs/scoreboard.md instead (maintainers, for the rows the lessons quote)
  */
 import "../src/server/load-env";
+import path from "node:path";
 
 // --- 1. Boot the OpenTelemetry SDK so every observe(...) call inside
 //        the agent emits spans to Langfuse, exactly like the live server.
@@ -24,7 +26,7 @@ import OpenAI from "openai";
 import { env } from "../src/server/env";
 import { answerConversation } from "../src/server/medinfo-agent";
 import { BEHAVIORS, failedChecks, type Behavior, type CaseExpectation, type CaseInput } from "./hcp-cases";
-import { appendScoreboardRow, scoreboardRow } from "./scoreboard";
+import { appendScoreboardRow, LEARNER_SCOREBOARD_FILE, SCOREBOARD_FILE, scoreboardRow } from "./scoreboard";
 
 function flag(name: string) {
   const index = process.argv.indexOf(name);
@@ -298,7 +300,7 @@ async function main() {
   //        before the process exits.
   console.log(await result.format());
 
-  // --- 8. With --chapter, add this run as one row of docs/scoreboard.md.
+  // --- 8. With --chapter, add this run as one row of my-scoreboard.md (docs/scoreboard.md with --reference).
   const chapter = flag("--chapter");
   if (chapter) {
     const scored = result.itemResults.map((row) => {
@@ -314,8 +316,10 @@ async function main() {
       return { slice: meta.slice ?? "unknown", passed };
     });
     const row = scoreboardRow(chapter, flag("--change") ?? "", scored, result.datasetRunUrl ?? "");
-    appendScoreboardRow(row);
+    const file = process.argv.includes("--reference") ? SCOREBOARD_FILE : LEARNER_SCOREBOARD_FILE;
+    appendScoreboardRow(row, file);
     console.log(row);
+    console.log(`Row added to ${path.relative(process.cwd(), file)}.`);
   }
   await langfuse.flush();
   await langfuseSpanProcessor.forceFlush();

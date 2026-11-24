@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
+import { mkdtempSync, readFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
 import { test } from "node:test";
 import { failedChecks, loadMedinfoCases } from "./hcp-cases";
-import { checkScoreboard, headerRow, scoreboardRow, slices } from "./scoreboard";
+import { appendScoreboardRow, checkScoreboard, headerRow, LEARNER_SCOREBOARD_FILE, SCOREBOARD_FILE, scoreboardRow, slices } from "./scoreboard";
 
 test("text checks read bold doses and spaced units the way the dataset writes them", () => {
   const checks = [
@@ -32,4 +35,15 @@ test("a scoreboard row has one cell per slice and the check rejects a short row"
   const table = `${headerRow()}\n|---|\n${row}\n`;
   assert.deepEqual(checkScoreboard(table), []);
   assert.equal(checkScoreboard(`${table}| 07 | short | 1/1 |\n`).length, 1);
+});
+
+test("a learner's row goes to their own file, which starts with the reference header", () => {
+  assert.notEqual(LEARNER_SCOREBOARD_FILE, SCOREBOARD_FILE);
+  assert.match(readFileSync(path.resolve(".gitignore"), "utf8"), /^my-scoreboard\.md$/m);
+  const file = path.join(mkdtempSync(path.join(tmpdir(), "scoreboard-")), "my-scoreboard.md");
+  const row = scoreboardRow("06", "Naive agent", [{ slice: slices()[0], passed: true }], "http://run");
+  appendScoreboardRow(row, file);
+  appendScoreboardRow(row, file);
+  assert.deepEqual(checkScoreboard(readFileSync(file, "utf8")), []);
+  assert.equal(readFileSync(file, "utf8").split("\n").filter((line) => line === row).length, 2);
 });

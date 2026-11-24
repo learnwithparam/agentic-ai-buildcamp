@@ -24,7 +24,7 @@ Score the agent, as lesson 03 left it, on all 28 cases, and write the result as 
 
 - **Before:** you know from error analysis that some answers are wrong, but not how many, or in which slices.
 - **Build:** read the three evaluators, then run the dataset with `--chapter 06`.
-- **After:** one experiment run in Langfuse with three scores on every item, a list of failing cases with the reason for each, and the baseline row in `docs/scoreboard.md`.
+- **After:** one experiment run in Langfuse with three scores on every item, a list of failing cases with the reason for each, and the baseline row in `my-scoreboard.md`.
 
 ## Starting point
 
@@ -77,7 +77,7 @@ FAIL STALENESS-01: behavior_match: Expected reply, got ask_follow_up (confidence
      answer: Please provide the country (US, Germany, or Japan) and the patient's full medication list, including whether they take a strong CYP3A4 inhibitor. ...
 ```
 
-Then it appends one row to `docs/scoreboard.md`: cases passed per slice and overall, with a link to the run.
+Then it appends one row to `my-scoreboard.md` at the repo root, and creates the file on the first run: cases passed per slice and overall, with a link to your run. The file is git-ignored, so it stays when you check out the next tag. Our own run's row is in [docs/scoreboard.md](../scoreboard.md) to compare with.
 
 | Chapter | Change | Passed | staleness | footnote | multi-hop | off-label | tenancy | pv-phi | guardrail | country | future-label | injection | multi-turn | ambiguous | pushback | review |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -109,7 +109,7 @@ Open **Datasets → hcp-medinfo-workshop → Experiments** and click the run. If
 
 - One run appears under the dataset, with three scores on every item.
 - The console printed a FAIL pair for every failing case.
-- `docs/scoreboard.md` has your 06 row, and `npm run check` still passes.
+- `my-scoreboard.md` has your 06 row, and `npm run check` still passes.
 
 ## Wrap-up
 
