@@ -89,6 +89,8 @@ Open `src/server/tiers.ts`. The router reads the last few messages and the appro
 
 The order matters when more than one tier fits: safety, then stop, then review, then answer. "My patient's ankles swelled, can I raise the dose?" is a safety report first and a dose question second.
 
+Under the router sits a fixed floor in code, `withFloor`: a message that asks to draft or write a reply, email or letter goes to review even if the router said answer. The floor can only raise a tier, never lower one. There is no word-list floor for safety, because a question about the procedure itself ("how do I report a side effect?") would trip it; ROUTING-05 is that case. If the router fails, the turn stops with an error; it never falls back to answer.
+
 `src/server/graph.ts` wires the tiers:
 
 | Tier | Path | Model calls after the router |
@@ -157,7 +159,9 @@ Add a note and click **Approve and send**.
 
 ![The reviewer's note before the decision](../images/durable-review/04-reviewer-note.png)
 
-The server asks OpenFGA `can_decide` on `draft:<id>`. The rule is `medical_reviewer from company`: the role comes from Maya's Keycloak token as a contextual tuple, and the item's company was stored when it was made. A Pharma B reviewer, or Ana herself, gets 403. Then the server resumes the thread with `Command({ resume: "approve" })`, and the review node writes the outcome into the thread.
+The server asks OpenFGA `can_decide` on `draft:<id>`. The rule is `medical_reviewer from company`: the role comes from Maya's Keycloak token as a contextual tuple, and the item's company was stored when it was made. A Pharma B reviewer, or Ana herself, gets 403. So does a reviewer deciding an item their own question raised, and such an item is not in their inbox.
+
+Then the server resumes the thread with `Command({ resume: { itemId, decision: "approve" } })`. The decision names its draft, and the review node checks it is the draft it waits on, so an approval can never release a different one. While a thread waits, it takes no new question (409, "Start a new chat"), which keeps one waiting draft per thread.
 
 Sign in as Omar Haddad. His inbox holds the adverse event, with a 24 hour deadline, the doctor's scrubbed words and the reply the desk gave. He does not see Maya's drafts: OpenFGA gives `adverse_event` to the safety reviewer only.
 
@@ -229,6 +233,7 @@ The full row, with every column, is in [docs/scoreboard.md](../scoreboard.md).
 
 - As Ana, a draft request shows the waiting note and no approve button. `/inbox` as Maya shows it with a deadline.
 - As Sofia Rossi (Pharma B), Ana's draft is not in the inbox, and `POST /api/inbox/<id>/decision` returns 403.
+- A new question in a conversation that waits for a reviewer gets "Start a new chat to ask something else."
 - After a server restart, Maya's approval resumes the thread, and the doctor reads "A medical reviewer approved this draft."
 - The draft's trace in Langfuse has a `review_decision` score with the reviewer's id.
 - The 13 run shows `risk_tier` 1 on all seven routing cases.
