@@ -20,7 +20,7 @@ export type CaseInput = {
 };
 
 // The dataset repo's exact checks on the answer text. llm-rubric checks are left out:
-// the correctness judge in run-dataset.ts covers meaning.
+// the faithfulness judge (scripts/judge/faithfulness.ts) covers the slices that need one.
 export type TextCheck = { type: "contains" | "not-contains" | "regex" | "not-regex"; value: string };
 const TEXT_CHECKS = new Set<string>(["contains", "not-contains", "regex", "not-regex"]);
 

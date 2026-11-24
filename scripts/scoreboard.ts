@@ -6,8 +6,11 @@
  *   - my-scoreboard.md, at the repo root and git-ignored, holds the learner's own rows. Being
  *     untracked, it stays put when the learner checks out the next checkpoint tag.
  *
- * A case passes when behavior_match and label_checks are both 1. The correctness judge is
- * left out of the pass, because an LLM judge can change its mind between two runs.
+ * A slice the run did not include shows "-", so a subset run never reads as 0 passed.
+ *
+ * A case passes when behavior_match and label_checks are both 1, and, on the slices the
+ * faithfulness judge covers (scripts/judge/faithfulness.ts), faithfulness too. That judge
+ * joined the pass only after lesson 09 measured it against human labels.
  *
  * npm run dataset:run -- --chapter 06 --change "..." appends a row to my-scoreboard.md.
  * check-repo calls checkScoreboard() on docs/scoreboard.md, so a row with the wrong shape fails CI.
@@ -33,7 +36,10 @@ export type ScoredCase = { slice: string; passed: boolean };
 
 export function scoreboardRow(chapter: string, change: string, cases: ScoredCase[], runUrl: string) {
   const cell = (rows: ScoredCase[]) => `${rows.filter((row) => row.passed).length}/${rows.length}`;
-  const perSlice = slices().map((slice) => cell(cases.filter((row) => row.slice === slice)));
+  const perSlice = slices().map((slice) => {
+    const rows = cases.filter((row) => row.slice === slice);
+    return rows.length === 0 ? "-" : cell(rows);
+  });
   return `| ${chapter} | ${change} | ${cell(cases)} | ${perSlice.join(" | ")} | [run](${runUrl}) |`;
 }
 
