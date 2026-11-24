@@ -57,14 +57,14 @@ function ApprovalCard() {
   );
 }
 
-export function Thread({ tenantId }: { tenantId: string }) {
+export function Thread({ tenantId, medicines }: { tenantId: string; medicines: string[] }) {
   return (
     <ThreadPrimitive.Root className="thread">
       <ThreadPrimitive.Viewport className="viewport">
         <div className="column">
           <AuiIf condition={(state) => state.thread.isEmpty}>
             <div className="empty">
-              <h1>Ask about CardioNex</h1>
+              <h1>Ask about {medicines.join(" or ")}</h1>
               <p>Answers come from the approved labels, with a citation for every fact.</p>
               <div className="suggestions">
                 {(SUGGESTIONS[tenantId] ?? []).map((prompt) => (
