@@ -5,6 +5,7 @@ import { after, before, test } from "node:test";
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import { createLocalJWKSet, exportJWK, generateKeyPair, SignJWT, type JWTPayload } from "jose";
+import { createTestStore } from "../../scripts/fga-model";
 import { MCP_CALLBACK_PORT, MCP_CLIENT_ID } from "../../scripts/identity-setup";
 import { createApp } from "./app";
 import { createAuth } from "./auth";
@@ -14,9 +15,9 @@ import type { SessionStore } from "./sessions";
 
 // Lesson 12. The MCP door, called the way Claude Code calls it: the SDK's own client over
 // streamable HTTP with a Bearer token. The test signs its tokens with a key it made and hands the
-// app that key as Keycloak's. search_labels asks the app's real OpenFGA store (read only).
+// app that key as Keycloak's. search_labels asks a real OpenFGA server, in a store made for the test.
 
-if (!env.fgaApiToken || !env.fgaStoreId) throw new Error("OpenFGA is not set up. Run npm run identity:setup (lesson 11).");
+if (!env.fgaApiToken) throw new Error("FGA_API_TOKEN is not set. Run npm run identity:setup (lesson 11).");
 
 const ISSUER = "https://keycloak.test/realms/medinfo";
 const APP = "http://127.0.0.1:3333";
@@ -50,13 +51,22 @@ const token = (claims: JWTPayload, audience = "medinfo-api") =>
 
 let base = "";
 let close = () => {};
+let dropStore = async () => {};
 before(async () => {
+  // The app reads its store from env when it first checks a permission, so point it at the test store.
+  const store = await createTestStore(env.fgaApiUrl, env.fgaApiToken);
+  env.fgaStoreId = store.storeId;
+  env.fgaModelId = store.modelId;
+  dropStore = async () => void (await store.client.deleteStore());
   const server = createApp(auth).listen(0, "127.0.0.1");
   await new Promise((resolve) => server.once("listening", resolve));
   base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
   close = () => server.close();
 });
-after(() => close());
+after(async () => {
+  close();
+  await dropStore();
+});
 
 async function connect(claims: JWTPayload) {
   const client = new Client({ name: "mcp-test", version: "1.0.0" });
