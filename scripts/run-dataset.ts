@@ -2,7 +2,7 @@
  * Run the hosted Langfuse dataset against the live agent.
  *
  * For each item in the dataset:
- *   1. Call the same runSupportConversation(...) the web app uses.
+ *   1. Call the same graph the web app uses, through answerConversation(...).
  *   2. Roll the per-item traces into one experiment run row.
  *   3. Attach callback evaluators from runExperiment:
  *      - behavior_match (decision model + deterministic match)
@@ -17,12 +17,10 @@ import "../src/server/load-env";
 //        the agent emits spans to Langfuse, exactly like the live server.
 import { NodeSDK } from "@opentelemetry/sdk-node";
 import { LangfuseSpanProcessor } from "@langfuse/otel";
-import { randomUUID } from "node:crypto";
 import { LangfuseClient } from "@langfuse/client";
 import OpenAI from "openai";
-import type { ChatMessage } from "../src/shared/types";
 import { env } from "../src/server/env";
-import { runSupportConversation } from "../src/server/support-agent";
+import { answerConversation, type ConversationLine } from "../src/server/medinfo-agent";
 
 const langfuseSpanProcessor = new LangfuseSpanProcessor();
 const sdk = new NodeSDK({ spanProcessors: [langfuseSpanProcessor] });
@@ -30,10 +28,7 @@ sdk.start();
 
 // --- 2. Dataset item shape (must match data/seed-dataset.json).
 type DatasetInput = {
-  messages: Array<{
-    role: ChatMessage["role"];
-    content: string;
-  }>;
+  messages: ConversationLine[];
 };
 
 const BEHAVIORS = ["defer_question", "reply", "ask_follow_up"] as const;
@@ -200,17 +195,6 @@ async function scoreCorrectness(answer: string, idealAnswer: string) {
   return { score, reasoning };
 }
 
-// Convert a dataset item's messages array into the ChatMessage shape
-// the live server uses (adds id + timestamp on each message).
-function toRuntimeMessages(input: DatasetInput) {
-  return input.messages.map((message, index) => ({
-    id: `dataset-message-${index + 1}`,
-    role: message.role,
-    content: message.content,
-    timestamp: new Date().toISOString()
-  }));
-}
-
 async function main() {
   if (!env.langfusePublicKey || !env.langfuseSecretKey) {
     throw new Error("Langfuse credentials are required to run dataset experiments.");
@@ -248,13 +232,7 @@ async function main() {
     // evaluators below score.
     task: async (item) => {
       const input = item.input as DatasetInput;
-      const response = await runSupportConversation({
-        sessionId: `dataset-${randomUUID()}`,
-        userId: "dataset-runner",
-        messages: toRuntimeMessages(input)
-      });
-
-      return response.answer;
+      return answerConversation(input.messages);
     },
     // Callback evaluators run in this process after `task` returns.
     // Each one returns a Langfuse score attached to the item's trace.
