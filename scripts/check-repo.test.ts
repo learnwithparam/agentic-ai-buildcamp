@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { findProblems } from "./check-unused";
+import { findProblems } from "./check-repo";
 
 const base: Record<string, string> = {
-  "README.md": "![app](docs/images/sample_app.png)\n\nRead [the brief](case-studies/brief.md).\n\n```bash\nnpm run seed\n```\n",
-  "package.json": JSON.stringify({ scripts: { dev: "vite", seed: "tsx scripts/seed.ts" } }),
+  "README.md": "You need Node `>=22.18.0`.\n\n![app](docs/images/sample_app.png)\n\nRead [the brief](case-studies/brief.md).\n\n```bash\nnpm run seed\n```\n",
+  "package.json": JSON.stringify({ engines: { node: ">=22.18.0" }, scripts: { dev: "vite", seed: "tsx scripts/seed.ts" } }),
   "scripts/seed.ts": "import { load } from './lib';\nconst file = resolve(\"../data/items.json\");\n",
   "scripts/lib.ts": "export const load = 1;\n",
   "data/items.json": "[]",
@@ -43,7 +43,7 @@ test("a file used only by an unused file is unused", () => {
 
 test("an npm script named only in a sentence is unused", () => {
   const problems = run({
-    "package.json": JSON.stringify({ scripts: { seed: "tsx scripts/seed.ts", foo: "echo" } }),
+    "package.json": JSON.stringify({ engines: { node: ">=22.18.0" }, scripts: { seed: "tsx scripts/seed.ts", foo: "echo" } }),
     "README.md": base["README.md"] + "\nDo not npm run foo ever.\n",
   });
   assert.match(problems.join("\n"), /"foo"/);
@@ -56,4 +56,18 @@ test("code that names a missing repo path fails", () => {
 
 test("a single quoted import counts as use", () => {
   assert.deepEqual(run({}).filter((problem) => problem.includes("lib.ts")), []);
+});
+
+test("a dependency without an exact version fails", () => {
+  const problems = run({
+    "package.json": JSON.stringify({ engines: { node: ">=22.18.0" }, scripts: { seed: "tsx scripts/seed.ts" }, dependencies: { a: "latest", b: "^1.2.3", c: "1.2.3" } }),
+  });
+  assert.match(problems.join("\n"), /"a" is "latest"/);
+  assert.match(problems.join("\n"), /"b" is "\^1\.2\.3"/);
+  assert.doesNotMatch(problems.join("\n"), /"c"/);
+});
+
+test("a README that names a different Node version fails", () => {
+  const problems = run({ "README.md": base["README.md"].replace(">=22.18.0", ">=20") });
+  assert.match(problems.join("\n"), /README\.md: does not name the Node version/);
 });
