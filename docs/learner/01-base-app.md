@@ -38,7 +38,7 @@ Look at the search results. The search found the active label (`v2`), a supersed
 
 **2. Ask for a draft.** Click **New chat**, then **Draft a reply to Dr. Lee in Germany: what CardioNex dose fits a patient with eGFR 24?**
 
-The agent searches and writes the draft, then the turn stops. A yellow **Waiting for a medical reviewer** card shows the draft with two buttons. A **Thinking** block may show above the answer. It holds a summary of the model's thinking, when the model sends one.
+The agent searches and writes the draft, then the turn stops. A yellow **Waiting for a medical reviewer** card shows the draft with two buttons. A **▸ Thinking** card may show above the answer, with the title of the model's first thought next to it. Click it to open a summary of the model's thinking. Cards with a ▸, like `get_desk_rules`, open the same way.
 
 ![The draft waits for a reviewer: the approval card with Approve and send, and Reject.](../images/base-app/approval.png)
 
