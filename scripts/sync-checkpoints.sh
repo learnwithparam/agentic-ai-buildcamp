@@ -45,6 +45,7 @@ TAGS=(
   checkpoint/08-midpoint
   checkpoint/09-advanced-evals
   checkpoint/10-ai-gateway
+  checkpoint/11-sign-in
 )
 
 # Files whose code is what the next lesson changes. Add a file here when a
@@ -53,17 +54,31 @@ TAGS=(
 # Lesson 10 moves every model call behind src/server/gateway.ts; the files it changes and
 # the gateway itself (GATEWAY_FILES) stay as they were on tags before it.
 GATEWAY_FILES="src/server/routes.ts scripts/judge/faithfulness.ts src/server/gateway.ts src/server/gateway.test.ts"
+# Lesson 11 signs doctors in through Keycloak and asks OpenFGA what each may read; the files it
+# changes and adds (AUTH_FILES) stay as they were on tags before it, so those still run with no
+# Keycloak, OpenFGA or Postgres.
+AUTH_FILES="src/server/app.ts src/server/auth.ts src/server/auth.test.ts src/server/db.ts src/server/env.ts
+  src/server/graph.ts src/server/graph.test.ts src/server/index.ts src/server/labels.ts src/server/labels.test.ts
+  src/server/medinfo-agent.ts src/server/migrations/001_sessions.sql src/server/permissions.ts
+  src/server/permissions.test.ts src/server/routes.ts src/server/sessions.ts src/server/sessions.test.ts
+  src/server/tools.ts src/server/trace-identity.test.ts src/server/users.ts
+  src/client/App.tsx src/client/chat/Thread.tsx src/client/chat/api.ts src/client/chat/suggestions.ts
+  src/client/chat/suggestions.test.ts src/client/styles/app.css
+  scripts/run-dataset.ts scripts/fga-model.ts scripts/fga-model.test.ts scripts/identity-setup.ts scripts/identity-smoke.ts"
 milestone_files() {
   case "$1" in
     checkpoint/00-setup | checkpoint/01-base-app | checkpoint/02-tracing)
-      echo "src/server/index.ts src/server/medinfo-agent.ts src/server/tools.ts scripts/run-dataset.ts $GATEWAY_FILES"
+      echo "src/server/index.ts src/server/medinfo-agent.ts src/server/tools.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES"
       ;;
     checkpoint/03-prompt-management)
-      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES"
+      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES"
       ;;
     # Lessons 06 and 07 run the dataset with the correctness judge; lesson 09 replaces it.
     checkpoint/04-* | checkpoint/05-* | checkpoint/06-* | checkpoint/07-* | checkpoint/08-* | checkpoint/09-*)
-      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES"
+      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES"
+      ;;
+    checkpoint/10-*)
+      echo "$AUTH_FILES"
       ;;
     *)
       echo ""

@@ -1,0 +1,57 @@
+# Run by npm run check (scripts/fga-model-test.ts) with the OpenFGA CLI. No server needed.
+name: medinfo label permissions
+model_file: ./model.fga
+
+tuples:
+  - { user: "company:pharma_a", relation: owner, object: "document:cardionex-uspi-v3" }
+  - { user: "country:US", relation: approved_in, object: "document:cardionex-uspi-v3" }
+  - { user: "company:pharma_a", relation: owner, object: "document:cardionex-de-smpc" }
+  - { user: "country:DE", relation: approved_in, object: "document:cardionex-de-smpc" }
+  - { user: "company:pharma_b", relation: owner, object: "document:neurovex-trial-summary" }
+  - { user: "country:US", relation: approved_in, object: "document:neurovex-trial-summary" }
+
+tests:
+  - name: a US doctor at pharma_a reads only pharma_a's US text
+    tuples:
+      - { user: "user:rivera", relation: member, object: "company:pharma_a" }
+      - { user: "user:rivera", relation: doctor, object: "country:US" }
+    check:
+      - user: "user:rivera"
+        object: "document:cardionex-uspi-v3"
+        assertions: { can_read: true }
+      - user: "user:rivera"
+        object: "document:cardionex-de-smpc"
+        assertions: { can_read: false }
+      - user: "user:rivera"
+        object: "document:neurovex-trial-summary"
+        assertions: { can_read: false }
+    list_objects:
+      - user: "user:rivera"
+        type: document
+        assertions: { can_read: ["document:cardionex-uspi-v3"] }
+
+  - name: a German doctor at pharma_a reads the German text, not the US one
+    tuples:
+      - { user: "user:weber", relation: member, object: "company:pharma_a" }
+      - { user: "user:weber", relation: doctor, object: "country:DE" }
+    list_objects:
+      - user: "user:weber"
+        type: document
+        assertions: { can_read: ["document:cardionex-de-smpc"] }
+
+  - name: a US doctor at pharma_b reads pharma_b's trial and nothing of pharma_a
+    tuples:
+      - { user: "user:okafor", relation: member, object: "company:pharma_b" }
+      - { user: "user:okafor", relation: doctor, object: "country:US" }
+    list_objects:
+      - user: "user:okafor"
+        type: document
+        assertions: { can_read: ["document:neurovex-trial-summary"] }
+
+  - name: a doctor with no company or no country reads nothing
+    tuples:
+      - { user: "user:nobody", relation: doctor, object: "country:US" }
+    list_objects:
+      - user: "user:nobody"
+        type: document
+        assertions: { can_read: [] }

@@ -2,7 +2,8 @@
  * Run the hosted Langfuse dataset against the live agent.
  *
  * For each item in the dataset:
- *   1. Call the same graph the web app uses, through answerWithSources(...).
+ *   1. Call the same graph the web app uses, through answerWithSources(...), signed in as
+ *      the case's company and country (lesson 11).
  *   2. Roll the per-item traces into one experiment run row.
  *   3. Attach callback evaluators from runExperiment:
  *      - behavior_match (decision model + deterministic match)
@@ -26,6 +27,7 @@ import { LangfuseSpanProcessor } from "@langfuse/otel";
 import { LangfuseClient } from "@langfuse/client";
 import { env } from "../src/server/env";
 import { answerWithSources } from "../src/server/medinfo-agent";
+import { scriptUser } from "../src/server/users";
 import { decide, useService } from "../src/server/gateway";
 import { JUDGED_SLICES, judgeFaithfulness, SCORE_NAME } from "./judge/faithfulness";
 import { BEHAVIORS, failedChecks, type Behavior, type CaseExpectation, type CaseInput } from "./hcp-cases";
@@ -149,7 +151,7 @@ async function main() {
     // evaluators below score.
     task: async (item) => {
       const input = item.input as DatasetInput;
-      const { answer, sources } = await answerWithSources(input.messages);
+      const { answer, sources } = await answerWithSources(input.messages, scriptUser(input.tenantId, input.country));
       sourcesByInput.set(JSON.stringify(input), sources);
       return answer;
     },
