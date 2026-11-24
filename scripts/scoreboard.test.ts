@@ -1,0 +1,35 @@
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import { failedChecks, loadMedinfoCases } from "./hcp-cases";
+import { checkScoreboard, headerRow, scoreboardRow, slices } from "./scoreboard";
+
+test("text checks read bold doses and spaced units the way the dataset writes them", () => {
+  const checks = [
+    { type: "contains" as const, value: "2.5mg" },
+    { type: "not-regex" as const, value: "(^|[^\\d.])5mg once" },
+    { type: "regex" as const, value: "\\[cardionex-de-smpc,\\s*2\\.2" }
+  ];
+  assert.deepEqual(failedChecks("Give **2.5 mg** once daily [cardionex-de-smpc, 2.2].", checks), []);
+  assert.deepEqual(failedChecks("Give 5 mg once daily [cardionex-uspi-v2, 2.2].", checks).length, 3);
+});
+
+test("every ideal answer passes its own checks, tokens aside", () => {
+  const token = /^[A-Z][A-Z_]+$/;
+  for (const item of loadMedinfoCases()) {
+    const checks = item.expectedOutput.checks.filter((check) => !token.test(check.value));
+    assert.deepEqual(failedChecks(item.expectedOutput.idealAnswer, checks), [], item.id);
+  }
+});
+
+test("every case carries the dataset's text checks, including the global leak checks", () => {
+  for (const item of loadMedinfoCases()) {
+    assert.ok(item.expectedOutput.checks.some((check) => check.value === "1043298112"), item.id);
+  }
+});
+
+test("a scoreboard row has one cell per slice and the check rejects a short row", () => {
+  const row = scoreboardRow("06", "Naive agent", [{ slice: slices()[0], passed: true }], "http://run");
+  const table = `${headerRow()}\n|---|\n${row}\n`;
+  assert.deepEqual(checkScoreboard(table), []);
+  assert.equal(checkScoreboard(`${table}| 07 | short | 1/1 |\n`).length, 1);
+});
