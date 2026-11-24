@@ -22,6 +22,7 @@ Canonical checkpoint tags:
 - `checkpoint/09-advanced-evals`
 - `checkpoint/10-ai-gateway`
 - `checkpoint/11-sign-in`
+- `checkpoint/12-mcp-sandbox`
 
 What to propagate:
 
@@ -69,6 +70,7 @@ Canonical progression:
 - `09-advanced-evals`: labels 21 answers (eleven of the agent's own, ten edited copies) in a `faithfulness calibration` annotation queue, runs the hosted faithfulness evaluator on them by batch evaluation, and measures agreement with `npm run judge:calibrate` (Cohen's kappa, bar 0.6). `data/calibration/faithfulness.json` holds the reference labels and verdicts; `scripts/judge/faithfulness.test.ts` fails below the bar or when the rubric changed since. The judge joins the pass only for the multi-hop, footnote and review slices.
 - `10-ai-gateway`: turns on the Langfuse AI gateway (`npm run langfuse:gateway-keys`), connects OpenRouter, and gives `medinfo-app` and `eval-runner` their own service keys with one model and a $1 daily budget each. `src/server/gateway.ts` is the only file that creates a model client; `src/server/gateway.test.ts` walks the tracked sources to keep it so, and proves the input check blocks GUARDRAIL-01 and no other case, with no model call. The behavior decision cannot go through the gateway (`404 no_route`), so it runs inside a traced `behavior-decision` generation.
 - `11-sign-in`: `npm run identity:setup` starts `infra/docker-compose.yml` (Postgres, Keycloak, OpenFGA), generates every secret without printing it, and seeds four doctors. `src/server/auth.ts` signs them in on Keycloak (code flow with PKCE, tokens kept in Postgres, an HttpOnly cookie in the browser), and `identityOf` is the one place that reads the company and country, from the verified token. `search_labels` scores only the documents OpenFGA says the doctor may read (`infra/openfga/model.fga`). Traces carry the user id, company and country, never the name or email (`src/server/trace-identity.test.ts`).
+- `12-mcp-sandbox`: `src/server/mcp.ts` serves two read-only MCP tools at `/api/mcp` that take only a Keycloak Bearer token (the public `medinfo-mcp` client with PKCE, from `identity:setup`) and reuse lesson 11's OpenFGA filter; `.mcp.json` points Claude Code at it and `.claude/skills/hcp-labels/SKILL.md` is the lookup procedure. `npm run langfuse:code-eval` moves Langfuse code evaluators from `insecure-local` to `src/executor`, a QuickJS executor on an internal-only network (signed jobs, 2 s, 64 MB inside a 96 MB WebAssembly memory). `src/executor/executor.test.ts` and `src/server/mcp.test.ts` hold the proofs; no dataset run, no scoreboard row.
 
 What makes the checkpoints stitchable:
 
@@ -90,13 +92,14 @@ Every `checkpoint/*` tag is `main`'s tree except for its milestone files: the fi
 
 | Tags | Milestone files (kept from the tag) |
 | --- | --- |
-| `00-setup`, `01-base-app`, `02-tracing` | the untraced app (`index.ts`, `medinfo-agent.ts`, `tools.ts`), the runner, and the lesson 10 and 11 files |
-| `03-prompt-management` | `medinfo-agent.ts` with no Langfuse prompt fetch, the runner, and the lesson 10 and 11 files |
-| `04-monitoring` to `09-advanced-evals` | `medinfo-agent.ts`, the runner, and the lesson 10 and 11 files |
-| `10-ai-gateway` | the lesson 11 files |
-| `11-sign-in` | none (equal to `main`) |
+| `00-setup`, `01-base-app`, `02-tracing` | the untraced app (`index.ts`, `medinfo-agent.ts`, `tools.ts`), the runner, and the lesson 10, 11 and 12 files |
+| `03-prompt-management` | `medinfo-agent.ts` with no Langfuse prompt fetch, the runner, and the lesson 10, 11 and 12 files |
+| `04-monitoring` to `09-advanced-evals` | `medinfo-agent.ts`, the runner, and the lesson 10, 11 and 12 files |
+| `10-ai-gateway` | the lesson 11 and 12 files |
+| `11-sign-in` | the lesson 12 files |
+| `12-mcp-sandbox` | none (equal to `main`) |
 
-The lesson 10 files are `GATEWAY_FILES` in the script, and the lesson 11 files are `AUTH_FILES`. A milestone file a tag does not have stays absent on it, which is why `npm run check` finds its tests by glob, not by name.
+The lesson 10 files are `GATEWAY_FILES` in the script, the lesson 11 files are `AUTH_FILES`, and the lesson 12 files are `MCP_FILES`. A milestone file a tag does not have stays absent on it, which is why `npm run check` finds its tests by glob, not by name.
 
 Inside a milestone file, regions marked `// checkpoint-sync:begin <name>` / `// checkpoint-sync:end <name>` still come from `main`. The sync fails if `main` has a region that a tag's milestone file lacks. When a new lesson starts editing a file, add it to `milestone_files()` for the earlier tags.
 
