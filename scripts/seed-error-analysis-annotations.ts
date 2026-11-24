@@ -6,10 +6,9 @@
  * on each: open coding (text) and pass or fail. Those items are then marked
  * completed. Other items already in the queue are left alone.
  *
- * The notes describe what the reply did. They do not name the clusters, so the
- * learner still has to find them. A pass is a short numbered list from the label.
- * A fail answers something other than our medicines, speaks as a human doctor,
- * or runs on as one long paragraph.
+ * The notes come from scripts/error-analysis-traffic.ts. Each one was written by
+ * reading the recorded answer, and none of them names a failure mode, so the
+ * learner still has to find the patterns.
  *
  * Idempotent. Each score uses a stable id, so a second run updates the same
  * scores instead of adding another pair. The score time is the time of the
@@ -23,21 +22,14 @@ import { createHash } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { env } from "../src/server/env";
-import { hasFlag, readStringFlag } from "./langfuse-trace-seed-lib";
-import { SCENARIOS, type ErrorAnalysisScenario } from "./seed-error-analysis-traces";
+import { TRAFFIC, type TrafficTurn } from "./error-analysis-traffic";
 
 const SEED_TAG = "error-analysis-seed";
 const DEFAULT_QUEUE_NAME = "error analysis";
 const OPEN_CODING_NAME = "open coding";
 const PASS_FAIL_NAME = "pass or fail";
-
-type PassFail = "pass" | "fail";
-
-type Annotation = {
-  key: string;
-  passFail: PassFail;
-  note: string;
-};
+// The failure modes lesson 04 asks the learner to name. A note that names one gives the answer away.
+const MODE_WORDS = /over-ask|off-label|wrong country|country leak|future label|failure mode/i;
 
 type QueueItem = {
   id: string;
@@ -62,67 +54,29 @@ type RootObservation = {
   output: unknown;
 };
 
-export function annotationFor(scenario: ErrorAnalysisScenario): Annotation {
-  const ask = lastUserContent(scenario.turns.map((turn) => ({ role: turn.role, content: turn.content })));
-  const quoted = `The clinician asked "${ask}".`;
-  if (scenario.mode === "good") {
-    return {
-      key: annotationKey(ask, scenario.finalAnswer),
-      passFail: "pass",
-      note: `${quoted} The reply is a short numbered list from the label.`
-    };
-  }
-  if (scenario.mode === "out-of-scope") {
-    return {
-      key: annotationKey(ask, scenario.finalAnswer),
-      passFail: "fail",
-      note: `${quoted} The reply answers it anyway, and the answer is not about our medicines.`
-    };
-  }
-  if (scenario.mode === "impersonation") {
-    const detail = scenario.obviousIdentity
-      ? `${quoted} The reply is "I'm a doctor."`
-      : scenario.finalAnswer.includes("congress")
-        ? `${quoted} The label facts are right, but it calls itself a fellow doctor and mentions a congress as if it was there.`
-        : `${quoted} The label facts are right, but it calls itself a fellow doctor and talks about its own patients.`;
-    return {
-      key: annotationKey(ask, scenario.finalAnswer),
-      passFail: "fail",
-      note: `${detail} The reply speaks as if it were a human doctor.`
-    };
-  }
-  return {
-    key: annotationKey(ask, scenario.finalAnswer),
-    passFail: "fail",
-    note: `${quoted} The reply is one long paragraph, not a short list from the label.`
-  };
+const hasFlag = (flag: string) => process.argv.includes(flag);
+function readStringFlag(flag: string) {
+  const index = process.argv.indexOf(flag);
+  return index >= 0 ? process.argv[index + 1] : undefined;
 }
 
 export function assertAnnotationTemplates() {
-  const annotations = SCENARIOS.map(annotationFor);
-  const keys = new Set(annotations.map((annotation) => annotation.key));
-  if (keys.size !== SCENARIOS.length) {
-    throw new Error(`Expected ${SCENARIOS.length} distinct annotation keys, got ${keys.size}.`);
+  if (new Set(TRAFFIC.map((turn) => turn.question)).size !== TRAFFIC.length) {
+    throw new Error("Two error-analysis turns ask the same question, so their notes cannot be told apart.");
   }
-  const passes = annotations.filter((annotation) => annotation.passFail === "pass").length;
-  if (passes !== 7) throw new Error(`Expected 7 pass annotations, got ${passes}.`);
-  for (const annotation of annotations) {
-    if (annotation.note.length < 1 || annotation.note.length > 500) {
-      throw new Error(`Open coding note has length ${annotation.note.length}.`);
-    }
-    if (/out of scope|impersonat|lengthy/i.test(annotation.note)) {
-      throw new Error(`Open coding note names a cluster: ${annotation.note}`);
-    }
+  for (const turn of TRAFFIC) {
+    if (turn.note.length < 1 || turn.note.length > 500) throw new Error(`Note for ${turn.id} has length ${turn.note.length}.`);
+    if (MODE_WORDS.test(turn.note)) throw new Error(`Note for ${turn.id} names a failure mode: ${turn.note}`);
   }
 }
 
-function annotationKey(question: string, answer: string) {
-  return `${question.trim()}\n${answer.trim()}`;
-}
-
-function lastUserContent(messages: Array<{ role?: string; content?: unknown }>) {
-  const message = [...messages].reverse().find((entry) => entry.role === "user" && typeof entry.content === "string");
-  return typeof message?.content === "string" ? message.content.trim() : "";
+// The last question the doctor asked, from the root observation input.
+function lastQuestion(input: unknown) {
+  let parsed = parseJson(input);
+  if (Array.isArray(parsed)) parsed = parsed[0];
+  const messages = (parsed as { messages?: Array<{ type?: string; role?: string; content?: unknown }> } | null)?.messages ?? [];
+  const asked = messages.filter((message) => (message.type === "human" || message.role === "user") && typeof message.content === "string");
+  return String(asked.at(-1)?.content ?? "").trim();
 }
 
 function parseJson(value: unknown) {
@@ -132,21 +86,6 @@ function parseJson(value: unknown) {
   } catch {
     return value;
   }
-}
-
-function messagesFromInput(input: unknown) {
-  const parsed = parseJson(input);
-  if (!parsed || typeof parsed !== "object") return [];
-  const messages = (parsed as { messages?: unknown }).messages;
-  return Array.isArray(messages) ? messages : [];
-}
-
-function answerFromOutput(output: unknown) {
-  const parsed = parseJson(output);
-  if (parsed && typeof parsed === "object" && typeof (parsed as { answer?: unknown }).answer === "string") {
-    return (parsed as { answer: string }).answer.trim();
-  }
-  return "";
 }
 
 function scoreId(observationId: string, name: string) {
@@ -237,14 +176,15 @@ function queueConfigs(configs: ScoreConfig[]) {
 async function main() {
   if (hasFlag("--check")) {
     assertAnnotationTemplates();
-    console.log(`Error-analysis annotations OK: ${SCENARIOS.length} notes, 7 pass and 13 fail.`);
+    const passes = TRAFFIC.filter((turn) => turn.pass).length;
+    console.log(`Error-analysis annotations OK: ${TRAFFIC.length} notes, ${passes} pass and ${TRAFFIC.length - passes} fail.`);
     return;
   }
 
   requireCredentials();
   const queueName = readStringFlag("--queue") ?? DEFAULT_QUEUE_NAME;
   const dryRun = hasFlag("--dry-run");
-  const templates = new Map(SCENARIOS.map(annotationFor).map((annotation) => [annotation.key, annotation]));
+  const byQuestion = new Map<string, TrafficTurn>(TRAFFIC.map((turn) => [turn.question, turn]));
 
   const queues = await listPages<{ id: string; name: string; scoreConfigIds: string[] }>("/api/public/annotation-queues");
   const queue = queues.find((entry) => entry.name === queueName);
@@ -261,13 +201,12 @@ async function main() {
   }
 
   const planned = observations.map((observation) => {
-    const ask = lastUserContent(messagesFromInput(observation.input) as Array<{ role?: string; content?: unknown }>);
-    const answer = answerFromOutput(observation.output);
-    const annotation = templates.get(annotationKey(ask, answer));
-    if (!annotation) {
-      throw new Error(`Observation ${observation.id} does not match an error-analysis scenario. Last question: ${ask.slice(0, 80)}`);
+    const ask = lastQuestion(observation.input);
+    const turn = byQuestion.get(ask);
+    if (!turn) {
+      throw new Error(`Observation ${observation.id} does not match an error-analysis turn. Last question: ${ask.slice(0, 80)}`);
     }
-    return { observation, annotation };
+    return { observation, annotation: { passFail: turn.pass ? ("pass" as const) : ("fail" as const), note: turn.note } };
   });
 
   const counts = { pass: 0, fail: 0 };

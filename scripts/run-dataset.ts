@@ -10,6 +10,7 @@
  *
  * Usage:
  *   npm run dataset:run
+ *   npm run dataset:run -- --chapter 06 --change "Naive agent"   (also adds a row to docs/scoreboard.md)
  */
 import "../src/server/load-env";
 
@@ -21,7 +22,13 @@ import { LangfuseClient } from "@langfuse/client";
 import OpenAI from "openai";
 import { env } from "../src/server/env";
 import { answerConversation } from "../src/server/medinfo-agent";
-import { BEHAVIORS, type Behavior, type CaseExpectation, type CaseInput } from "./hcp-cases";
+import { BEHAVIORS, failedChecks, type Behavior, type CaseExpectation, type CaseInput } from "./hcp-cases";
+import { appendScoreboardRow, scoreboardRow } from "./scoreboard";
+
+function flag(name: string) {
+  const index = process.argv.indexOf(name);
+  return index === -1 ? undefined : process.argv[index + 1];
+}
 
 const langfuseSpanProcessor = new LangfuseSpanProcessor();
 const sdk = new NodeSDK({ spanProcessors: [langfuseSpanProcessor] });
@@ -244,6 +251,15 @@ async function main() {
           }.`
         };
       },
+      // The dataset repo's exact text checks: a dose, a citation, a phrase that must not appear.
+      async ({ output, expectedOutput }) => {
+        const failed = failedChecks(output as string, (expectedOutput as DatasetExpectation).checks);
+        return {
+          name: "label_checks",
+          value: failed.length === 0 ? 1 : 0,
+          comment: failed.length === 0 ? "Every text check passed." : `Failed: ${failed.join("; ")}`
+        };
+      },
       async ({ output, expectedOutput }) => {
         const expected = expectedOutput as DatasetExpectation;
         const { score, reasoning } = await scoreCorrectness(
@@ -263,6 +279,21 @@ async function main() {
   // --- 7. Pretty-print the summary table and flush any pending spans
   //        before the process exits.
   console.log(await result.format());
+
+  // --- 8. With --chapter, add this run as one row of docs/scoreboard.md.
+  const chapter = flag("--chapter");
+  if (chapter) {
+    const scored = result.itemResults.map((row) => {
+      const value = (name: string) => row.evaluations.find((evaluation) => evaluation.name === name)?.value;
+      const meta = (row.item as { metadata?: { slice?: string; caseId?: string } }).metadata ?? {};
+      const passed = value("behavior_match") === 1 && value("label_checks") === 1;
+      if (!passed) console.log(`FAIL ${meta.caseId}`);
+      return { slice: meta.slice ?? "unknown", passed };
+    });
+    const row = scoreboardRow(chapter, flag("--change") ?? "", scored, result.datasetRunUrl ?? "");
+    appendScoreboardRow(row);
+    console.log(row);
+  }
   await langfuse.flush();
   await langfuseSpanProcessor.forceFlush();
   await sdk.shutdown();
