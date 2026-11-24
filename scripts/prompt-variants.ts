@@ -32,9 +32,22 @@ const SIGNED_IN_EDITS: [string, string][] = [
   ]
 ];
 
-function signedIn(prompt: string): string {
-  return SIGNED_IN_EDITS.reduce((text, [from, to]) => {
-    if (!text.includes(from)) throw new Error(`The error-analysis prompt no longer has: ${from}`);
+const signedIn = (prompt: string) => edited(prompt, SIGNED_IN_EDITS);
+
+// Lesson 13: the router and the graph now do what two prompt lines asked for. A safety report
+// never reaches the agent, and the review node stamps REVIEW_REQUIRED on a draft itself. A rule
+// that code keeps leaves the prompt, so the prompt cannot disagree with the code.
+const TIERED_EDITS: [string, string][] = [
+  ["- If the message mentions a side effect, write PV_ESCALATION, then say it goes to the drug safety team within 24 hours.\n", ""],
+  [
+    "- When asked to draft a reply to a doctor, write REVIEW_REQUIRED, then the full draft. A medical reviewer approves it before it is sent.",
+    "- When asked to draft a reply to a doctor, write the full draft and nothing else. A medical reviewer approves it before it is sent."
+  ]
+];
+
+function edited(prompt: string, edits: [string, string][]): string {
+  return edits.reduce((text, [from, to]) => {
+    if (!text.includes(from)) throw new Error(`The prompt no longer has: ${from}`);
     return text.replace(from, to);
   }, prompt);
 }
@@ -71,5 +84,7 @@ export const PROMPT_VARIANTS = {
   // that docs/learner/04-monitoring/error-analysis.md and docs/learner/07-evaluation.md show it.
   "error-analysis": ERROR_ANALYSIS_PROMPT,
   // Lesson 11 publishes it; docs/learner/11-sign-in-and-permissions.md shows it.
-  "signed-in": signedIn(ERROR_ANALYSIS_PROMPT)
+  "signed-in": signedIn(ERROR_ANALYSIS_PROMPT),
+  // Lesson 13 publishes it; docs/learner/13-durable-state-and-review.md shows it.
+  tiered: edited(signedIn(ERROR_ANALYSIS_PROMPT), TIERED_EDITS)
 } as const;

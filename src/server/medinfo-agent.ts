@@ -1,12 +1,30 @@
 import { randomUUID } from "node:crypto";
+import { MemorySaver, type BaseCheckpointSaver } from "@langchain/langgraph";
 import { observeOpenAI } from "@langfuse/openai";
-import { observe, propagateAttributes, updateActiveObservation } from "@langfuse/tracing";
+import { getActiveTraceId, observe, propagateAttributes, updateActiveObservation } from "@langfuse/tracing";
 import { LangfuseClient } from "@langfuse/client";
 import { aiText, type AiMessage, type ChatMessage, type StreamEvent } from "../shared/messages";
 import { env } from "./env";
 import { checkInput, modelClient } from "./gateway";
-import { agentStep, buildGraph, readThread, reviewStep, runGraph, toolsStep, userOf, type Turn } from "./graph";
+import {
+  agentStep,
+  buildGraph,
+  fixedReply,
+  readThread,
+  reviewStep,
+  runGraph,
+  submitAdverseEvent,
+  submitDraftStep,
+  toolsStep,
+  userOf,
+  type Turn
+} from "./graph";
+import { LABEL_SECTIONS } from "./labels";
+import { readableDocuments } from "./permissions";
+import { scrubPhi } from "./phi";
+import { approvedUses, reportingProcedure, routeRequest, safetyReply, stopReply } from "./tiers";
 import { executeTool } from "./tools";
+import type { ReviewItem } from "./reviews";
 import { scriptUser, type Identity } from "./users";
 
 // Local fallback used when Langfuse isn't reachable or the prompt
@@ -36,51 +54,101 @@ function latestQuestion(messages: ChatMessage[]) {
   return [...messages].reverse().find((message) => message.type === "human")?.content ?? "";
 }
 
-const graph = buildGraph({
-  agent: observe(
-    async (state, config) => {
-      // Lesson 11: record the conversation, not the run config, which carries the signed-in doctor.
-      updateActiveObservation({ input: state });
-      // Lesson 10: a request the desk never answers gets its reply here, with no model call.
-      const refusal = checkInput(latestQuestion(state.messages));
-      if (refusal) return { messages: [{ id: `out-of-scope-${randomUUID()}`, type: "ai", content: [{ type: "text", text: refusal }], tool_calls: [] }] };
-      const langfusePrompt = await getPrompt();
-      const openai = observeOpenAI(modelClient(), langfusePrompt ? { langfusePrompt } : undefined);
-      return agentStep(openai, langfusePrompt?.prompt ?? SYSTEM_PROMPT, state, config);
-    },
-    { name: "agent", asType: "span", captureInput: false }
-  ),
-  tools: observe(
-    (state, config) => {
-      updateActiveObservation({ input: state });
-      return toolsStep(state, (name, args) => executeTool(name, args, userOf(config)));
-    },
-    { name: "tools", asType: "span", captureInput: false }
-  ),
-  review: reviewStep
-});
+const outOfScope = (text: string): AiMessage => ({ id: `out-of-scope-${randomUUID()}`, type: "ai", content: [{ type: "text", text }], tool_calls: [] });
 
-export const runMedinfoTurn = observe(
-  (turn: Turn, emit: (event: StreamEvent) => void) => {
-    // Lesson 11: the trace records who asked by id, company and country only. The doctor's
-    // name and email stay in Keycloak; the trace input is the thread and the new messages.
-    updateActiveObservation({ input: { threadId: turn.threadId, messages: turn.messages, resume: turn.resume } });
-    return propagateAttributes(
-      {
-        sessionId: turn.threadId,
-        // Lesson 11: filter Langfuse by user, company or country to see one desk's traffic.
-        userId: turn.user.userId,
-        metadata: { tenantId: turn.user.tenantId, country: turn.user.country },
-        traceName: "hcp-medinfo-chat-turn",
-        tags: ["langfuse-workshop", "hcp-medinfo"]
-      },
-      () => runGraph(graph, turn, emit)
-    );
-  },
-  { name: "hcp-medinfo-chat-turn", asType: "agent", captureInput: false }
-);
+// Lesson 13. Identifiers leave the doctor's words before the trace, the model or the checkpoint
+// sees them. Only the newest human messages arrive here; older ones were scrubbed on their turn.
+function scrubbed(messages: ChatMessage[] | undefined): ChatMessage[] | undefined {
+  return messages?.map((message) => (message.type === "human" ? { ...message, content: scrubPhi(message.content).text } : message));
+}
+const REMOVED = /\[(?:record number|email|ID number|phone number) removed\]/;
 
-export const readMedinfoThread = (threadId: string) => readThread(graph, threadId);
+// One agent, two homes for its threads. The web app passes PostgresSaver, so a paused draft
+// survives a restart; scripts pass MemorySaver, because their threads are thrown away after one answer.
+export function createMedinfoAgent(checkpointer: BaseCheckpointSaver) {
+  const graph = buildGraph(
+    {
+      router: observe(
+        async (state, config) => {
+          updateActiveObservation({ input: state.messages.at(-1) });
+          // Lesson 10: a request the desk never answers gets its reply here, with no model call.
+          const refusal = checkInput(latestQuestion(state.messages));
+          if (refusal) return { messages: [outOfScope(refusal)] };
+          const readable = await readableDocuments(userOf(config));
+          const openai = observeOpenAI(modelClient(), { generationName: "route" });
+          const route = await routeRequest(openai, env.openaiModel, state.messages, approvedUses(readable, LABEL_SECTIONS));
+          updateActiveObservation({ output: route });
+          return { route };
+        },
+        { name: "router", asType: "chain", captureInput: false }
+      ),
+      agent: observe(
+        async (state, config) => {
+          // Lesson 11: record the conversation, not the run config, which carries the signed-in doctor.
+          updateActiveObservation({ input: state });
+          const langfusePrompt = await getPrompt();
+          const openai = observeOpenAI(modelClient(), langfusePrompt ? { langfusePrompt } : undefined);
+          return agentStep(openai, langfusePrompt?.prompt ?? SYSTEM_PROMPT, state, config);
+        },
+        { name: "agent", asType: "span", captureInput: false }
+      ),
+      tools: observe(
+        (state, config) => {
+          updateActiveObservation({ input: state });
+          return toolsStep(state, (name, args) => executeTool(name, args, userOf(config)));
+        },
+        { name: "tools", asType: "span", captureInput: false }
+      ),
+      submit: (state, config) => submitDraftStep(state, config, getActiveTraceId()),
+      review: reviewStep,
+      safety: observe(
+        async (state, config) => {
+          updateActiveObservation({ input: state.messages.at(-1) });
+          const readable = await readableDocuments(userOf(config));
+          const reply = safetyReply({
+            asksForAdvice: state.route?.asksForAdvice ?? false,
+            removedIdentifiers: REMOVED.test(latestQuestion(state.messages)) ? 1 : 0,
+            procedure: reportingProcedure(readable, LABEL_SECTIONS)
+          });
+          await submitAdverseEvent(state, config, reply, getActiveTraceId());
+          return fixedReply(state, reply);
+        },
+        { name: "safety", asType: "span", captureInput: false }
+      ),
+      stop: (state) => fixedReply(state, stopReply(state.route?.basis))
+    },
+    checkpointer
+  );
+
+  const runTurn = observe(
+    (turn: Turn, emit: (event: StreamEvent) => void) => {
+      const cleaned = { ...turn, messages: scrubbed(turn.messages) };
+      // Lesson 11: the trace records who asked by id, company and country only. The doctor's
+      // name and email stay in Keycloak; the trace input is the thread and the new messages.
+      updateActiveObservation({ input: { threadId: turn.threadId, messages: cleaned.messages, resume: turn.resume } });
+      return propagateAttributes(
+        {
+          sessionId: turn.threadId,
+          // Lesson 11: filter Langfuse by user, company or country to see one desk's traffic.
+          userId: turn.user.userId,
+          metadata: { tenantId: turn.user.tenantId, country: turn.user.country },
+          traceName: turn.resume ? "hcp-medinfo-review-decision" : "hcp-medinfo-chat-turn",
+          tags: ["langfuse-workshop", "hcp-medinfo"]
+        },
+        () => runGraph(graph, cleaned, emit)
+      );
+    },
+    { name: "hcp-medinfo-chat-turn", asType: "agent", captureInput: false }
+  );
+
+  return { runTurn, readThread: (threadId: string) => readThread(graph, threadId) };
+}
+
+export type MedinfoAgent = ReturnType<typeof createMedinfoAgent>;
+
+// Scripts (the dataset run, the error-analysis replays): one answer per throwaway thread.
+const scripted = createMedinfoAgent(new MemorySaver());
+export const runMedinfoTurn = scripted.runTurn;
 
 export type ConversationLine = { role: "user" | "assistant"; content: string };
 
@@ -96,7 +164,7 @@ export async function answerConversation(lines: ConversationLine[], user: Identi
 export async function answerWithSources(
   lines: ConversationLine[],
   user: Identity = scriptUser()
-): Promise<{ answer: string; sources: string[] }> {
+): Promise<{ answer: string; sources: string[]; tier: string | null }> {
   const messages: ChatMessage[] = lines.map((line, index) =>
     line.role === "user"
       ? { id: `line-${index}`, type: "human", content: line.content }
@@ -105,5 +173,20 @@ export async function answerWithSources(
   const result = await runMedinfoTurn({ threadId: `script-${randomUUID()}`, user, messages }, () => {});
   const answers = result.messages.filter((message): message is AiMessage => message.type === "ai" && aiText(message) !== "");
   const sources = result.messages.flatMap((message) => (message.type === "tool" ? [message.content] : []));
-  return { answer: answers.length ? aiText(answers[answers.length - 1]) : "", sources };
+  return { answer: answers.length ? aiText(answers[answers.length - 1]) : "", sources, tier: result.route?.tier ?? null };
+}
+
+// Lesson 13. The audit trail: every decision is a Langfuse score on the trace that raised the
+// item, saying what was decided and by whom (the reviewer's id, never their name).
+export async function recordDecision(item: ReviewItem) {
+  if (!item.traceId) return;
+  langfuse.score.create({
+    traceId: item.traceId,
+    name: "review_decision",
+    value: item.status,
+    dataType: "CATEGORICAL",
+    comment: item.note ?? undefined,
+    metadata: { itemId: item.id, kind: item.kind, decidedBy: item.decidedBy, decidedAt: item.decidedAt }
+  });
+  await langfuse.score.flush();
 }

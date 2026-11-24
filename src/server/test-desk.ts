@@ -1,0 +1,12 @@
+import { MemorySaver } from "@langchain/langgraph";
+import pg from "pg";
+import { createMedinfoAgent } from "./medinfo-agent";
+import { ReviewStore } from "./reviews";
+import type { Desk } from "./routes";
+
+// Test-only: a desk with checkpoints in memory and no scores. Threads and the inbox live in the
+// pool's database, so a test that opens a thread passes the test database's pool. A test that
+// stops at sign-in or at MCP passes none: the default pool connects only on its first query.
+export function testDesk(pool: pg.Pool = new pg.Pool({ max: 1 })): Desk {
+  return { agent: createMedinfoAgent(new MemorySaver()), reviews: new ReviewStore(pool), recordDecision: async () => {} };
+}

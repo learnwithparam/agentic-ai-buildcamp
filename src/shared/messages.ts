@@ -19,7 +19,8 @@ export type ToolMessage = {
 export type ChatMessage = HumanMessage | AiMessage | ToolMessage;
 
 // What the graph sends when it pauses for a reviewer.
-export type ApprovalRequest = { kind: "approval"; draft: string; question: string };
+// Lesson 13: the doctor's page only shows it; the reviewer decides it from the inbox.
+export type ApprovalRequest = { kind: "approval"; itemId: string; draft: string; question: string; dueAt: string };
 export type ApprovalDecision = "approve" | "reject";
 
 export type StreamEvent = { event: string; data: unknown };

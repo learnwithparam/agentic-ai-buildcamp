@@ -47,6 +47,7 @@ TAGS=(
   checkpoint/10-ai-gateway
   checkpoint/11-sign-in
   checkpoint/12-mcp-sandbox
+  checkpoint/13-durable-review
 )
 
 # Files whose code is what the next lesson changes. Add a file here when a
@@ -74,23 +75,38 @@ MCP_FILES="src/server/mcp.ts src/server/mcp.test.ts src/server/app.ts src/server
   src/executor/sandbox.ts src/executor/server.ts src/executor/worker.ts src/executor/planted.ts
   src/executor/executor.test.ts src/executor/package.json src/executor/package-lock.json
   src/executor/Dockerfile src/executor/.dockerignore"
+# Lesson 13 sorts every message into a risk tier, keeps threads in Postgres and sends drafts and
+# adverse events to a reviewer inbox; the files it changes and adds (TIER_FILES) stay as they
+# were on tags before it, so lesson 12 still approves a draft in the chat, from memory.
+TIER_FILES="src/server/tiers.ts src/server/tiers.test.ts src/server/phi.ts src/server/reviews.ts
+  src/server/inbox.test.ts src/server/durable.test.ts src/server/test-desk.ts src/server/migrations/002_reviews.sql
+  src/server/graph.ts src/server/graph.test.ts src/server/medinfo-agent.ts src/server/app.ts src/server/index.ts
+  src/server/routes.ts src/server/auth.ts src/server/auth.test.ts src/server/mcp.test.ts src/server/users.ts
+  src/server/permissions.ts src/server/permissions.test.ts src/server/trace-identity.test.ts src/shared/messages.ts
+  src/client/App.tsx src/client/chat/Thread.tsx src/client/chat/api.ts src/client/styles/app.css
+  src/client/inbox/Inbox.tsx src/client/inbox/format.ts
+  infra/openfga/model.fga infra/openfga/model.fga.yaml scripts/fga-model.ts scripts/identity-setup.ts
+  scripts/prompt-variants.ts scripts/prompt-variants.test.ts scripts/run-dataset.ts"
 milestone_files() {
   case "$1" in
     checkpoint/00-setup | checkpoint/01-base-app | checkpoint/02-tracing)
-      echo "src/server/index.ts src/server/medinfo-agent.ts src/server/tools.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES"
+      echo "src/server/index.ts src/server/medinfo-agent.ts src/server/tools.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES"
       ;;
     checkpoint/03-prompt-management)
-      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES"
+      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES"
       ;;
     # Lessons 06 and 07 run the dataset with the correctness judge; lesson 09 replaces it.
     checkpoint/04-* | checkpoint/05-* | checkpoint/06-* | checkpoint/07-* | checkpoint/08-* | checkpoint/09-*)
-      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES"
+      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES"
       ;;
     checkpoint/10-*)
-      echo "$AUTH_FILES $MCP_FILES"
+      echo "$AUTH_FILES $MCP_FILES $TIER_FILES"
       ;;
     checkpoint/11-*)
-      echo "$MCP_FILES"
+      echo "$MCP_FILES $TIER_FILES"
+      ;;
+    checkpoint/12-*)
+      echo "$TIER_FILES"
       ;;
     *)
       echo ""

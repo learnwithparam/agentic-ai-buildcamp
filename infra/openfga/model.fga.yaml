@@ -9,6 +9,10 @@ tuples:
   - { user: "country:DE", relation: approved_in, object: "document:cardionex-de-smpc" }
   - { user: "company:pharma_b", relation: owner, object: "document:neurovex-trial-summary" }
   - { user: "country:US", relation: approved_in, object: "document:neurovex-trial-summary" }
+  # Lesson 13: waiting items, each stored with its company when it is made.
+  - { user: "company:pharma_a", relation: company, object: "draft:a-lee" }
+  - { user: "company:pharma_a", relation: company, object: "adverse_event:a-mrn" }
+  - { user: "company:pharma_b", relation: company, object: "draft:b-ito" }
 
 tests:
   - name: a US doctor at pharma_a reads only pharma_a's US text
@@ -55,3 +59,45 @@ tests:
       - user: "user:nobody"
         type: document
         assertions: { can_read: [] }
+
+  - name: a medical reviewer decides their own company's drafts, never a safety report
+    tuples:
+      - { user: "user:chen", relation: member, object: "company:pharma_a" }
+      - { user: "user:chen", relation: medical_reviewer, object: "company:pharma_a" }
+    check:
+      - user: "user:chen"
+        object: "draft:a-lee"
+        assertions: { can_decide: true }
+      - user: "user:chen"
+        object: "draft:b-ito"
+        assertions: { can_decide: false }
+      - user: "user:chen"
+        object: "adverse_event:a-mrn"
+        assertions: { can_decide: false }
+    list_objects:
+      - user: "user:chen"
+        type: draft
+        assertions: { can_decide: ["draft:a-lee"] }
+
+  - name: a safety reviewer decides their own company's adverse events, never a draft
+    tuples:
+      - { user: "user:haddad", relation: safety_reviewer, object: "company:pharma_a" }
+    list_objects:
+      - user: "user:haddad"
+        type: adverse_event
+        assertions: { can_decide: ["adverse_event:a-mrn"] }
+      - user: "user:haddad"
+        type: draft
+        assertions: { can_decide: [] }
+
+  - name: a doctor decides nothing, not even the draft they asked for
+    tuples:
+      - { user: "user:rivera", relation: member, object: "company:pharma_a" }
+      - { user: "user:rivera", relation: doctor, object: "country:US" }
+    list_objects:
+      - user: "user:rivera"
+        type: draft
+        assertions: { can_decide: [] }
+      - user: "user:rivera"
+        type: adverse_event
+        assertions: { can_decide: [] }

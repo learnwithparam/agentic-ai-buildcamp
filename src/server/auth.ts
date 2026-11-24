@@ -3,7 +3,7 @@ import { Router } from "express";
 import { createRemoteJWKSet, jwtVerify, type JWTPayload, type JWTVerifyGetKey } from "jose";
 import * as oidc from "openid-client";
 import type { SessionStore } from "./sessions";
-import { TENANTS, type Identity } from "./users";
+import { REVIEWER_ROLES, TENANTS, type Identity } from "./users";
 
 // Lesson 11. Who is asking comes from Keycloak, never from the request body or the prompt.
 //
@@ -45,6 +45,11 @@ const SCOPES = "openid profile email organization";
 const REFRESH_EARLY_MS = 30_000;
 
 // The doctor in a verified token, or an error saying which part is missing.
+function realmRoles(claims: JWTPayload): string[] {
+  const access = claims.realm_access as { roles?: unknown } | undefined;
+  return Array.isArray(access?.roles) ? access.roles.map(String) : [];
+}
+
 export function identityFromClaims(claims: JWTPayload): Identity {
   // Keycloak's organization mapper sends the aliases as a list, or as an object keyed by alias
   // when organization attributes are switched on. Only companies this desk serves count.
@@ -62,7 +67,9 @@ export function identityFromClaims(claims: JWTPayload): Identity {
     name: typeof claims.name === "string" ? claims.name : "",
     email: typeof claims.email === "string" ? claims.email : "",
     tenantId: companies[0],
-    country
+    country,
+    // Lesson 13: Keycloak puts realm roles in realm_access.roles. Only the reviewer roles count.
+    roles: REVIEWER_ROLES.filter((role) => realmRoles(claims).includes(role))
   };
 }
 

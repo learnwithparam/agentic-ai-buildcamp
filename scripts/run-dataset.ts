@@ -9,6 +9,7 @@
  *      - behavior_match (decision model + deterministic match)
  *      - label_checks (the dataset's exact text checks and reason codes)
  *      - faithfulness (the judge lesson 09 calibrated), only on the slices in JUDGED_SLICES
+ *      - risk_tier (lesson 13), the router's tier against the case's, only on TIERED_SLICES
  *   A case passes when every score it got is 1.
  *
  * Usage:
@@ -31,7 +32,7 @@ import { scriptUser } from "../src/server/users";
 import { decide, useService } from "../src/server/gateway";
 import { JUDGED_SLICES, judgeFaithfulness, SCORE_NAME } from "./judge/faithfulness";
 import { BEHAVIORS, failedChecks, type Behavior, type CaseExpectation, type CaseInput } from "./hcp-cases";
-import { appendScoreboardRow, LEARNER_SCOREBOARD_FILE, SCOREBOARD_FILE, scoreboardRow } from "./scoreboard";
+import { appendScoreboardRow, LEARNER_SCOREBOARD_FILE, SCOREBOARD_FILE, scoreboardRow, TIERED_SLICES } from "./scoreboard";
 
 function caseIdOf(item: { metadata?: unknown }) {
   return (item.metadata as { caseId?: string } | undefined)?.caseId ?? "";
@@ -133,6 +134,8 @@ async function main() {
   // The judge needs the tool results the agent read. The task keeps them here, by input,
   // because the experiment's output stays the answer text the other evaluators score.
   const sourcesByInput = new Map<string, string[]>();
+  // Lesson 13: the tier the router chose, by input, for the risk_tier score.
+  const tierByInput = new Map<string, string | null>();
 
   // --- 6. runExperiment iterates the dataset, calls `task` for each
   //        item, and records every per-item trace + score under a
@@ -151,8 +154,9 @@ async function main() {
     // evaluators below score.
     task: async (item) => {
       const input = item.input as DatasetInput;
-      const { answer, sources } = await answerWithSources(input.messages, scriptUser(input.tenantId, input.country));
+      const { answer, sources, tier } = await answerWithSources(input.messages, scriptUser(input.tenantId, input.country));
       sourcesByInput.set(JSON.stringify(input), sources);
+      tierByInput.set(JSON.stringify(input), tier);
       return answer;
     },
     // Callback evaluators run in this process after `task` returns.
@@ -182,6 +186,14 @@ async function main() {
           comment: failed.length === 0 ? "Every text check passed." : `Failed: ${failed.join("; ")}`
         };
       },
+      // Lesson 13. The routing slice was written for the router: its riskTier is the tier the
+      // router must choose. Elsewhere riskTier means the kind of outcome, so it is not scored.
+      async ({ input, metadata }) => {
+        const meta = (metadata ?? {}) as { slice?: string; riskTier?: string };
+        if (!TIERED_SLICES.includes(meta.slice ?? "")) return [];
+        const tier = tierByInput.get(JSON.stringify(input)) ?? null;
+        return { name: "risk_tier", value: tier === meta.riskTier ? 1 : 0, comment: `Expected ${meta.riskTier}, the router chose ${tier ?? "nothing"}.` };
+      },
       // Only the slices whose text checks cannot see faithfulness. The rest get no score.
       async ({ input, output, metadata }) => {
         if (!JUDGED_SLICES.includes((metadata as { slice?: string } | undefined)?.slice ?? "")) return [];
@@ -204,7 +216,8 @@ async function main() {
       const score = (name: string) => row.evaluations.find((evaluation) => evaluation.name === name);
       const meta = (row.item as { metadata?: { slice?: string; caseId?: string } }).metadata ?? {};
       const judged = JUDGED_SLICES.includes(meta.slice ?? "");
-      const failed = ["behavior_match", "label_checks", ...(judged ? [SCORE_NAME] : [])].filter((name) => score(name)?.value !== 1);
+      const tiered = TIERED_SLICES.includes(meta.slice ?? "");
+      const failed = ["behavior_match", "label_checks", ...(judged ? [SCORE_NAME] : []), ...(tiered ? ["risk_tier"] : [])].filter((name) => score(name)?.value !== 1);
       const passed = failed.length === 0;
       if (!passed) {
         const why = failed.map((name) => `${name}: ${score(name)?.comment ?? "no score, the evaluator failed"}`);

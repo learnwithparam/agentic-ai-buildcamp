@@ -39,8 +39,9 @@ export async function syncDocumentTuples(client: OpenFgaClient) {
   const stored = new Map<string, TupleKey>();
   let continuationToken: string | undefined;
   do {
-    // OpenFGA reads a whole type only together with a user, so read every tuple: the store holds
-    // document facts alone, because doctor facts arrive with each question.
+    // OpenFGA reads a whole type only together with a user, so read every tuple and keep the
+    // document ones. Doctor and reviewer facts arrive with each question; the inbox writes its own
+    // draft and adverse_event tuples (lesson 13), and this leaves them alone.
     const page = await client.read({}, { continuationToken });
     for (const { key: tuple } of page.tuples) if (tuple.object.startsWith("document:")) stored.set(key(tuple), { user: tuple.user, relation: tuple.relation, object: tuple.object });
     continuationToken = page.continuation_token || undefined;

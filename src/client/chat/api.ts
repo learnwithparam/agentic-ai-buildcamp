@@ -3,7 +3,7 @@ import type { LangChainMessage, LangGraphInterruptState } from "@assistant-ui/re
 // The browser side of the thread API in src/server/routes.ts.
 
 export type Me = {
-  user: { userId: string; name: string; email: string; tenantId: string; country: string };
+  user: { userId: string; name: string; email: string; tenantId: string; country: string; roles: string[] };
   company: { name: string; medicines: string[] };
 };
 
@@ -38,7 +38,8 @@ export async function signOut() {
   window.location.assign(redirectTo);
 }
 
-type SendConfig = { command?: { resume?: unknown }; abortSignal: AbortSignal };
+// Lesson 13: the chat sends questions only. A paused draft is decided in the inbox.
+type SendConfig = { abortSignal: AbortSignal };
 type ServerEvent = { event: string; data: unknown };
 
 export async function createThread(): Promise<{ externalId: string }> {
@@ -63,13 +64,11 @@ export async function* streamRun(
   messages: LangChainMessage[],
   config: SendConfig
 ): AsyncGenerator<ServerEvent> {
-  const body = config.command?.resume
-    ? { command: { resume: config.command.resume } }
-    : {
-        messages: messages
-          .filter((message) => message.type === "human")
-          .map((message) => ({ id: message.id ?? crypto.randomUUID(), type: "human", content: textOf(message) }))
-      };
+  const body = {
+    messages: messages
+      .filter((message) => message.type === "human")
+      .map((message) => ({ id: message.id ?? crypto.randomUUID(), type: "human", content: textOf(message) }))
+  };
   const response = await api(`/api/threads/${threadId}/runs/stream`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -96,4 +95,36 @@ export async function* streamRun(
       end = buffer.indexOf("\n\n");
     }
   }
+}
+
+// ---------- Lesson 13: the review inbox (src/server/routes.ts) ----------
+
+export type ReviewItem = {
+  id: string;
+  kind: "draft" | "adverse_event";
+  question: string;
+  body: string;
+  createdAt: string;
+  dueAt: string;
+  status: "waiting" | "approved" | "rejected" | "filed" | "dismissed";
+  decidedAt: string | null;
+  note: string | null;
+};
+
+export async function loadInbox(): Promise<{ reviewer: boolean; items: ReviewItem[] }> {
+  const response = await api("/api/inbox", { signal: AbortSignal.timeout(10_000) });
+  if (!response.ok) throw new Error(`The server answered ${response.status}`);
+  return (await response.json()) as { reviewer: boolean; items: ReviewItem[] };
+}
+
+export async function decide(itemId: string, decision: ReviewItem["status"], note: string): Promise<ReviewItem> {
+  const response = await api(`/api/inbox/${encodeURIComponent(itemId)}/decision`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ decision, note: note || undefined }),
+    signal: AbortSignal.timeout(60_000)
+  });
+  const body = (await response.json()) as ReviewItem & { error?: string };
+  if (!response.ok) throw new Error(body.error ?? `The server answered ${response.status}`);
+  return body;
 }

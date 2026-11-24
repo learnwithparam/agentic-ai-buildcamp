@@ -35,3 +35,12 @@ test("lesson 11 shows the signed-in prompt the script publishes", () => {
   const page = readFileSync(new URL("../docs/learner/11-sign-in-and-permissions.md", import.meta.url), "utf8");
   assert.ok(page.includes(PROMPT_VARIANTS["signed-in"].trim()), "docs/learner/11-sign-in-and-permissions.md does not show the signed-in prompt");
 });
+
+// Lesson 13 takes out the two lines the graph now keeps, and the page shows the result.
+test("the tiered prompt is the signed-in prompt without the rules the graph keeps", () => {
+  const tiered = PROMPT_VARIANTS.tiered;
+  assert.doesNotMatch(tiered, /PV_ESCALATION|REVIEW_REQUIRED/);
+  assert.equal(tiered.split("\n").length, PROMPT_VARIANTS["signed-in"].split("\n").length - 1);
+  const page = readFileSync(new URL("../docs/learner/13-durable-state-and-review.md", import.meta.url), "utf8");
+  assert.ok(page.includes(tiered.trim()), "docs/learner/13-durable-state-and-review.md does not show the tiered prompt");
+});

@@ -3,6 +3,7 @@ import { AssistantRuntimeProvider } from "@assistant-ui/react";
 import { useLangGraphRuntime } from "@assistant-ui/react-langgraph";
 import { createThread, loadMe, loadThread, signIn, signOut, streamRun, type Me } from "./chat/api";
 import { Thread } from "./chat/Thread";
+import { Inbox } from "./inbox/Inbox";
 
 function Chat({ tenantId, medicines }: { tenantId: string; medicines: string[] }) {
   const runtime = useLangGraphRuntime({
@@ -62,8 +63,10 @@ export function App() {
   );
 }
 
+// Two pages, chosen by the address: the chat at /, the review inbox at /inbox (lesson 13).
 function SignedIn({ me }: { me: Me }) {
   const [chat, setChat] = useState(0);
+  const onInbox = window.location.pathname === "/inbox";
   return (
     <div className="app">
       <header className="topbar">
@@ -74,14 +77,19 @@ function SignedIn({ me }: { me: Me }) {
           <span className="chip">{me.user.country}</span>
         </span>
         <span className="topbar-user">{me.user.name}</span>
-        <button type="button" className="button" onClick={() => setChat((count) => count + 1)}>
-          New chat
-        </button>
+        <a className="button" href={onInbox ? "/" : "/inbox"} aria-current={onInbox ? "page" : undefined}>
+          {onInbox ? "Chat" : "Inbox"}
+        </a>
+        {!onInbox && (
+          <button type="button" className="button" onClick={() => setChat((count) => count + 1)}>
+            New chat
+          </button>
+        )}
         <button type="button" className="button" onClick={() => void signOut()}>
           Sign out
         </button>
       </header>
-      <Chat key={chat} tenantId={me.user.tenantId} medicines={me.company.medicines} />
+      {onInbox ? <Inbox /> : <Chat key={chat} tenantId={me.user.tenantId} medicines={me.company.medicines} />}
     </div>
   );
 }

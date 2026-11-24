@@ -13,8 +13,9 @@ sdk.start();
 after(() => sdk.shutdown());
 const { runMedinfoTurn } = await import("./medinfo-agent");
 const { executeTool } = await import("./tools");
+type Identity = import("./users").Identity;
 
-const user = { userId: "kc-okafor", name: "Chidi Okafor", email: "chidi.okafor@pharma-b.example.com", tenantId: "pharma_b", country: "US" };
+const user: Identity = { userId: "kc-okafor", name: "Chidi Okafor", email: "chidi.okafor@pharma-b.example.com", tenantId: "pharma_b", country: "US", roles: [] };
 
 async function recorded() {
   // The SDK finishes reading its resource attributes before it hands spans over.
