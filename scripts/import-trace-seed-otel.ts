@@ -77,7 +77,7 @@ import {
 } from "./langfuse-trace-seed-lib";
 
 type SpanCtx = ReturnType<LangfuseObservation["otelSpan"]["spanContext"]>;
-type ScoreEvent = Parameters<LangfuseClient["api"]["ingestion"]["batch"]>[0]["batch"][number];
+type ScoreEvent = Parameters<LangfuseClient["api"]["scores"]["create"]>[0][number];
 
 // startObservation has per-asType overloads; we drive asType dynamically from the
 // snapshot, so wrap it in a single loose signature to keep the call site simple.
@@ -652,8 +652,9 @@ async function replayTrace(bundle: TraceSeedTraceBundle, offsetMs: number) {
 
         if (!rootCtx) {
           rootCtx = spanContext;
+          // The trace shows its root observation's input and output, which the
+          // snapshot already carries.
           realTraceId = created.traceId;
-          created.setTraceIO({ input: trace.input, output: trace.output });
         }
 
         created.end(endTime);
@@ -704,26 +705,21 @@ function buildScoreEvent(
   const observationId = score.observationId ? realObservationIds.get(score.observationId) : undefined;
 
   return {
-    type: "score-create",
+    // Fresh id, not the snapshot's score id: OTel replay generates new trace ids
+    // each run, and scores are upserted by id. Reusing a snapshot score id that a
+    // previous import already created would upsert the OLD score (leaving it pointed
+    // at the old trace) instead of attaching a score to this run's new trace.
     id: randomUUID(),
-    timestamp,
-    body: {
-      // Fresh id, not the snapshot's score id: OTel replay generates new trace ids
-      // each run, and scores are upserted by id. Reusing a snapshot score id that a
-      // previous import already created would upsert the OLD score (leaving it pointed
-      // at the old trace) instead of attaching a score to this run's new trace.
-      id: randomUUID(),
-      traceId: realTraceId,
-      observationId: observationId ?? undefined,
-      name: score.name,
-      // value is number for NUMERIC/BOOLEAN, string for CATEGORICAL/TEXT/CORRECTION.
-      value: score.value as never,
-      comment: score.comment ?? undefined,
-      metadata: score.metadata,
-      dataType: score.dataType,
-      environment: SEED_ENVIRONMENT,
-      timestamp
-    }
+    traceId: realTraceId,
+    observationId: observationId ?? undefined,
+    name: score.name,
+    // value is number for NUMERIC/BOOLEAN, string for CATEGORICAL/TEXT/CORRECTION.
+    value: score.value as never,
+    comment: score.comment ?? undefined,
+    metadata: score.metadata,
+    dataType: score.dataType,
+    environment: SEED_ENVIRONMENT,
+    timestamp
   } as ScoreEvent;
 }
 
@@ -739,12 +735,10 @@ async function sendScores(scoreEvents: ScoreEvent[]) {
   const batches = chunkIngestionBatch(scoreEvents);
   for (const [index, batch] of batches.entries()) {
     console.log(`Sending score batch ${index + 1}/${batches.length} (${batch.length} scores)...`);
-    const response = await client.api.ingestion.batch({ batch });
-    if (response.errors.length > 0) {
-      const details = response.errors
-        .map((error) => `- ${error.id}: ${error.message ?? JSON.stringify(error.error ?? null)}`)
-        .join("\n");
-      throw new Error(`Score import failed with ${response.errors.length} ingestion errors:\n${details}`);
+    const response = await client.api.scores.create(batch);
+    if ("rejected" in response && response.rejected > 0) {
+      const details = response.errors.map((error) => `- ${JSON.stringify(error)}`).join("\n");
+      throw new Error(`Score import failed: Langfuse rejected ${response.rejected} scores:\n${details}`);
     }
   }
 }
