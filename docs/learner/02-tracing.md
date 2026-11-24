@@ -21,7 +21,7 @@ When a clinician asks "What is the CardioZ dose in the US?", the agent doesn't j
 
 The goal of this chapter is to make every one of those steps visible in Langfuse: one chat turn becomes one nested trace with the agent run, the OpenAI generations, and the two tool calls all logged in order.
 
-![Spec's step by step process](../images/tracing/process_illustration.png)
+![One question becomes seven steps: plan, get_support_context, decide, search_help_library, write, answer.](../images/tracing/process_illustration.png)
 
 We will build up the trace in three steps that mirror the agent's structure:
 

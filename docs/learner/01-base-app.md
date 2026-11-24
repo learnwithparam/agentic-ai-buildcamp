@@ -13,6 +13,7 @@ description: "Tour the TypeScript medical information agent before instrumentati
 - One OpenAI tool-calling loop. Two local tools (`get_support_context`, `search_help_library`).
 - The system prompt is rendered locally from `src/server/support-agent.ts`. No Langfuse yet.
 
+![How MedInfo answers: the chat UI calls the agent loop, which talks to the model and runs two local tools.](../images/base-app-architecture.png)
 
 ## Where to look in the code
 
