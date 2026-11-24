@@ -173,7 +173,8 @@ export async function runGraph(graph: Graph, turn: Turn, emit: (event: StreamEve
         data: pause ? { __interrupt__: pause.map((item) => ({ id: item.id, value: item.value, resumable: true })) } : chunk
       });
     } else if (mode === "values") {
-      messages = (chunk as GraphState).messages;
+      // When the graph pauses, LangGraph sends a values chunk that holds only __interrupt__.
+      messages = (chunk as Partial<GraphState>).messages ?? messages;
       emit({ event: "values", data: chunk });
     }
   }

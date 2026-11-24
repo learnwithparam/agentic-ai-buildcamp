@@ -28,7 +28,7 @@ Create a first eval dataset that captures the kinds of requests the agent has to
 git checkout checkpoint/05-dataset
 ```
 
-You have a traced, attributed, monitored app. `data/seed-dataset.json` and `scripts/seed-dataset.ts` are already in the repo at this checkpoint.
+You have a traced, attributed, monitored app. The cases live in `data/hcp/evals/medinfo.yaml`, a pinned copy of the dataset repo, and `scripts/seed-dataset.ts` loads them into Langfuse.
 
 Make sure `.env` has:
 
@@ -47,37 +47,38 @@ For the agent, two things matter most:
 
 On top of that, the dataset should cover the shapes of input we expect the agent to handle in production, at least the ones we have seen so far. It mixes cases that already work well, for example traces that passed error analysis, with cases that caused problems in the past and cases that must be handled correctly.
 
-The starter dataset has 27 items. Each one names the label articles its ideal answer is copied from in `metadata.source`, and a `metadata.skill` tag says what it tests:
+The dataset has 28 cases, one per promise the agent must keep. Each case says what it tests in its `metadata`:
 
-- **simple-llm**: one label answers it ("What is CardioZ used for?")
-- **rag**: the right label must win over a superseded one, a future one or an expired draft ("What is the approved CardioZ dose in Brazil?")
-- **agent**: the answer needs both tools and more than one article ("Which of our medicines have an approved label in Germany?")
-- **classification**: the agent must defer (off-label use, another company's medicine, trivia, a sick note) or ask a follow-up ("What's the dose?")
-- **agentic**: harder turns, such as a side effect hidden in a friendly message, a follow-up that changes the country, a prompt injection, and a study summary with a planted instruction
+- **`slice`**: the failure family, such as `staleness` (a superseded label must lose), `country` (Germany gets the German text), `off-label` or `injection`.
+- **`chapter`**: the chapter whose build makes the case pass. Early chapters leave many cases red on purpose.
+- **`riskTier`**: `answer`, `review`, `safety` or `stop`.
+- **`split`**: `train` or `holdout`. Tune prompts on train cases only.
 
-In our case, the conceptual shape of one item is:
+One item, as `scripts/hcp-cases.ts` builds it from the YAML:
 
 ```json
 {
-  "input": { "messages": [{ "role": "user", "content": "What is the CardioZ dose in the US?" }] },
+  "id": "hcp-country-01",
+  "input": {
+    "messages": [{ "role": "user", "content": "What is the CardioNex dose for a patient with eGFR 24 mL/min who is not on dialysis?" }],
+    "tenantId": "pharma_a",
+    "brandId": "brand_cardionex",
+    "country": "DE"
+  },
   "expectedOutput": {
-    "idealAnswer": "Take 20 mg each morning. Do not use in pregnancy. Source: CardioZ US label, version 3.",
+    "idealAnswer": "In Germany, for eGFR below 30 mL/min without dialysis, CardioNex is 2.5mg once daily [cardionex-de-smpc, 2.2].",
     "expectedBehavior": "reply"
   },
-  "metadata": { "category": "dose-by-country", "difficulty": "medium", "skill": "rag", "source": ["cardioz-us-label-v3"] }
+  "metadata": { "caseId": "COUNTRY-01", "slice": "country", "chapter": "11", "riskTier": "answer", "split": "train", "showcase": "04" }
 }
 ```
 
 The two fields inside `expectedOutput` match the two evaluation questions from Step 1:
 
-- **`idealAnswer`**: is the answer correct? This is the reply we want, written the way the prompt asks for it, with only the steps that matter.
+- **`idealAnswer`**: is the answer correct? This is the reply we want, with its source.
 - **`expectedBehavior`**: did the agent behave appropriately? One of `reply`, `defer_question`, or `ask_follow_up`.
 
-In chapter 06 you will see how each of these is evaluated.
-
-`metadata` lets us slice runs by category, difficulty, or source later when comparing experiment runs side by side.
-
-If you look at the actual JSON in `data/seed-dataset.json`, the `input` is the full `{ messages: [...] }` shape that `/api/chat` accepts, plus an `id` field for the dataset row. Multi-turn items carry the earlier user and assistant turns in that array, and the expectations apply to the last reply. We've simplified the example above to show *what an item is*; the on-disk format is what the experiment script (step 06) can feed straight into `runSupportConversation(...)` without rewriting inputs.
+In chapter 06 you will see how each of these is evaluated. `metadata` lets you slice runs by slice, chapter or split when you compare experiment runs side by side. [docs/coverage.md](../coverage.md) lists which cases test each promise.
 
 ## Step 3: Seed the dataset
 
