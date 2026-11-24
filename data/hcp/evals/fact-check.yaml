@@ -1,0 +1,86 @@
+description: "HCP content fact-checker: every sentence matches an approved claim for that country"
+
+# Baseline: a bare model with no approved claims, so the cases start red.
+# Swap this for the agent provider once the agent exists.
+providers:
+  - id: openrouter:nvidia/nemotron-3.5-lightning
+    label: baseline-no-agent
+
+prompts:
+  - "{{query}}"
+
+defaultTest:
+  vars:
+    tenantId: "pharma_a"
+    brandId: "brand_cardionex"
+    country: "US"
+  options:
+    provider: openrouter:anthropic/claude-haiku-5.5
+  assert:
+    - type: not-contains
+      value: "1043298112"
+    - type: not-contains
+      value: "dr.patel@southwest-neuro.org"
+
+tests:
+  - description: "[FACT-01] An approved sentence passes and cites its claim"
+    vars:
+      query: "Check this sentence for a US email: CardioNex lowered the risk of cardiovascular death or heart failure hospital stays versus placebo (HR 0.74)."
+    assert:
+      - type: not-contains
+        value: "UNAPPROVED_CLAIM"
+      - type: regex
+        value: "\\[approved-claims,\\s*C-01"
+
+  - description: "[FACT-02] A superlative with no approved claim is flagged for a human"
+    vars:
+      query: "Check this sentence for a US email: CardioNex is the best heart failure medicine available today."
+    assert:
+      - type: contains
+        value: "UNAPPROVED_CLAIM"
+      - type: contains
+        value: "REVIEW_REQUIRED"
+
+  - description: "[FACT-03] A US dose in a German email is flagged as not approved for Germany"
+    vars:
+      query: "Check this sentence for a German email: Start CardioNex at 20mg once daily in adults with HFrEF."
+      country: "DE"
+    assert:
+      - type: contains
+        value: "NOT_APPROVED_IN_COUNTRY"
+      - type: regex
+        value: "\\[approved-claims,\\s*C-0[23]"
+
+  - description: "[FACT-04] The US draft email: sentences 1 and 2 pass, sentence 3 is flagged"
+    vars:
+      query: "Fact-check the draft email draft-email-us."
+    assert:
+      - type: contains
+        value: "UNAPPROVED_CLAIM"
+      - type: regex
+        value: "\\[approved-claims,\\s*C-01"
+      - type: llm-rubric
+        value: "Flags only the third sentence (best heart failure medicine) and passes the first two with their approved claims."
+
+  - description: "[FACT-05] The German draft email: sentence 1 passes, sentence 2 is not approved for Germany"
+    vars:
+      query: "Fact-check the draft email draft-email-de."
+      country: "DE"
+    assert:
+      - type: contains
+        value: "NOT_APPROVED_IN_COUNTRY"
+      - type: regex
+        value: "\\[approved-claims,\\s*C-03"
+      - type: llm-rubric
+        value: "Passes the first sentence (10mg German starting dose) and flags the second (20mg is the US dose)."
+
+  - description: "[FACT-06] Pharma B has no approved CardioNex claims"
+    vars:
+      query: "Check this sentence: Start CardioNex at 20mg once daily in adults with HFrEF."
+      tenantId: "pharma_b"
+      brandId: "brand_neurovex"
+    assert:
+      - type: contains
+        value: "INSUFFICIENT_CONTEXT"
+      - type: not-contains
+        value: "C-02"
