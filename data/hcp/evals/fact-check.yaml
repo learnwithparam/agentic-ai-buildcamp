@@ -24,6 +24,12 @@ defaultTest:
 
 tests:
   - description: "[FACT-01] An approved sentence passes and cites its claim"
+    metadata:
+      slice: "fact-check"
+      chapter: "14"
+      riskTier: "review"
+      split: "train"
+      expectedBehavior: "reply"
     vars:
       query: "Check this sentence for a US email: CardioNex lowered the risk of cardiovascular death or heart failure hospital stays versus placebo (HR 0.74)."
     assert:
@@ -33,6 +39,12 @@ tests:
         value: "\\[approved-claims,\\s*C-01"
 
   - description: "[FACT-02] A superlative with no approved claim is flagged for a human"
+    metadata:
+      slice: "fact-check"
+      chapter: "14"
+      riskTier: "review"
+      split: "train"
+      expectedBehavior: "reply"
     vars:
       query: "Check this sentence for a US email: CardioNex is the best heart failure medicine available today."
     assert:
@@ -42,6 +54,12 @@ tests:
         value: "REVIEW_REQUIRED"
 
   - description: "[FACT-03] A US dose in a German email is flagged as not approved for Germany"
+    metadata:
+      slice: "fact-check"
+      chapter: "14"
+      riskTier: "review"
+      split: "train"
+      expectedBehavior: "reply"
     vars:
       query: "Check this sentence for a German email: Start CardioNex at 20mg once daily in adults with HFrEF."
       country: "DE"
@@ -52,6 +70,13 @@ tests:
         value: "\\[approved-claims,\\s*C-0[23]"
 
   - description: "[FACT-04] The US draft email: sentences 1 and 2 pass, sentence 3 is flagged"
+    metadata:
+      slice: "fact-check"
+      chapter: "14"
+      riskTier: "review"
+      split: "train"
+      expectedBehavior: "reply"
+      showcase: "14"
     vars:
       query: "Fact-check the draft email draft-email-us."
     assert:
@@ -63,6 +88,12 @@ tests:
         value: "Flags only the third sentence (best heart failure medicine) and passes the first two with their approved claims."
 
   - description: "[FACT-05] The German draft email: sentence 1 passes, sentence 2 is not approved for Germany"
+    metadata:
+      slice: "fact-check"
+      chapter: "14"
+      riskTier: "review"
+      split: "train"
+      expectedBehavior: "reply"
     vars:
       query: "Fact-check the draft email draft-email-de."
       country: "DE"
@@ -75,6 +106,12 @@ tests:
         value: "Passes the first sentence (10mg German starting dose) and flags the second (20mg is the US dose)."
 
   - description: "[FACT-06] Pharma B has no approved CardioNex claims"
+    metadata:
+      slice: "fact-check"
+      chapter: "14"
+      riskTier: "review"
+      split: "holdout"
+      expectedBehavior: "reply"
     vars:
       query: "Check this sentence: Start CardioNex at 20mg once daily in adults with HFrEF."
       tenantId: "pharma_b"
