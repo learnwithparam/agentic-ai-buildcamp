@@ -18,6 +18,7 @@ import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { basename, posix } from "node:path";
 import { fileURLToPath } from "node:url";
+import { checkScoreboard } from "./scoreboard";
 import { verifyDatasetCopy } from "./sync-dataset";
 
 const CODE = /\.(ts|tsx|mjs|js|sh|ya?ml)$|^package\.json$/;
@@ -190,12 +191,12 @@ function main() {
   const files = new Map(
     tracked.filter((path) => TEXT.test(path) && path !== "package-lock.json").map((path) => [path, readFileSync(path, "utf8")]),
   );
-  const problems = [...findProblems(files, tracked), ...verifyDatasetCopy()];
+  const problems = [...findProblems(files, tracked), ...verifyDatasetCopy(), ...checkScoreboard()];
   if (problems.length > 0) {
     console.error(problems.join("\n"));
     process.exit(1);
   }
-  console.log("check-repo: every watched file and npm script is in use, every named path exists, every dependency is pinned, the chat app is clean, data/hcp matches its lock");
+  console.log("check-repo: every watched file and npm script is in use, every named path exists, every dependency is pinned, the chat app is clean, data/hcp matches its lock, docs/scoreboard.md has one cell per slice");
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) main();
