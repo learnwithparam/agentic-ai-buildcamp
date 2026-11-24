@@ -53,6 +53,17 @@ Set asks_for_advice to true when the message asks what to do for a patient (give
 Set basis to the approved use you compared with, for stop; leave it out otherwise.`;
 // checkpoint-sync:end router-prompt
 
+// A fixed floor under the router: a message that asks for something written to send always goes
+// to a reviewer, whatever the router said. It can only raise answer to review, never lower a tier.
+// There is no such floor for safety: a word list misreads questions about the procedure itself
+// ("how do I report a side effect?"), so every safety call stays with the router and the dataset.
+export const DRAFT_REQUEST = /\b(draft|write)\b[\s\S]*\b(reply|email|letter|response|message)\b/i;
+
+export function withFloor(route: Route, question: string): Route {
+  if (route.tier !== "answer" || !DRAFT_REQUEST.test(question)) return route;
+  return { ...route, tier: "review", reason: `${route.reason} (raised to review: the message asks for a draft)` };
+}
+
 const RouteArgs = z.object({
   tier: z.enum(TIERS),
   reason: z.string(),

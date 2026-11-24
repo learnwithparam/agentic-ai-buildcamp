@@ -155,13 +155,16 @@ export async function submitDraftStep(state: GraphState, config: LangGraphRunnab
 export function reviewStep(state: GraphState, config: LangGraphRunnableConfig): Partial<GraphState> {
   const answer = last(state, "ai");
   if (!answer) return {};
+  const itemId = `draft-${threadIdOf(config)}-${answer.id}`;
   const decision = interrupt<ApprovalRequest, ApprovalDecision>({
     kind: "approval",
-    itemId: `draft-${threadIdOf(config)}-${answer.id}`,
+    itemId,
     question: lastHuman(state)?.content ?? "",
     draft: aiText(answer),
     dueAt: state.dueAt ?? ""
   });
+  // A decision made for another draft never releases this one.
+  if (decision.itemId !== itemId) throw new Error(`The decision is for ${decision.itemId}, not for ${itemId}.`);
   const note: AiMessage = {
     id: `review-${answer.id}`,
     type: "ai",
@@ -169,7 +172,7 @@ export function reviewStep(state: GraphState, config: LangGraphRunnableConfig): 
       {
         type: "text",
         text:
-          decision === "approve"
+          decision.decision === "approve"
             ? "A medical reviewer approved this draft. It is ready to send."
             : "A medical reviewer rejected this draft. Nothing was sent."
       }
@@ -221,7 +224,9 @@ export function buildGraph(nodes: Nodes, checkpointer: BaseCheckpointSaver) {
       "router",
       (state) => {
         if (last(state, "ai")) return END;
-        const tier = state.route?.tier ?? "answer";
+        // No tier means the router failed: stop the turn rather than guess the safest-looking path.
+        if (!state.route) throw new Error("The router chose no tier.");
+        const { tier } = state.route;
         return tier === "safety" ? "safety" : tier === "stop" ? "stop" : "agent";
       },
       ["agent", "safety", "stop", END]

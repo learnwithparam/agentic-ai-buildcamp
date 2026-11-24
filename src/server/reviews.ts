@@ -107,7 +107,12 @@ export class ReviewStore implements ReviewInbox {
   async waitingFor(reviewer: Identity): Promise<ReviewItem[]> {
     const ids = await this.decidable(reviewer);
     if (!ids.length) return [];
-    const { rows } = await this.pool.query<Row>("SELECT * FROM review_items WHERE id = ANY($1) AND status = 'waiting' ORDER BY due_at", [ids]);
+    // An item the reviewer's own question raised is not theirs to decide, so it is not listed.
+    const { rows } = await this.pool.query<Row>(
+      `SELECT r.* FROM review_items r JOIN threads t ON t.thread_id = r.thread_id
+       WHERE r.id = ANY($1) AND r.status = 'waiting' AND t.owner_id <> $2 ORDER BY r.due_at`,
+      [ids, reviewer.userId]
+    );
     return rows.map(toItem);
   }
 
@@ -128,6 +133,9 @@ export class ReviewStore implements ReviewInbox {
 
   async canDecide(reviewer: Identity, item: ReviewItem): Promise<boolean> {
     if (!reviewer.roles.length) return false;
+    // Nobody decides an item their own question raised, even when they hold the reviewer role.
+    const { rows } = await this.pool.query<{ owner_id: string }>("SELECT owner_id FROM threads WHERE thread_id = $1", [item.threadId]);
+    if (rows[0]?.owner_id === reviewer.userId) return false;
     const { allowed } = await this.client().check({
       user: `user:${reviewer.userId}`,
       relation: "can_decide",

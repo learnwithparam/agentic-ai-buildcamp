@@ -22,7 +22,7 @@ import {
 import { LABEL_SECTIONS } from "./labels";
 import { readableDocuments } from "./permissions";
 import { scrubPhi } from "./phi";
-import { approvedUses, reportingProcedure, routeRequest, safetyReply, stopReply } from "./tiers";
+import { approvedUses, reportingProcedure, routeRequest, safetyReply, stopReply, withFloor } from "./tiers";
 import { executeTool } from "./tools";
 import type { ReviewItem } from "./reviews";
 import { scriptUser, type Identity } from "./users";
@@ -76,7 +76,8 @@ export function createMedinfoAgent(checkpointer: BaseCheckpointSaver) {
           if (refusal) return { messages: [outOfScope(refusal)] };
           const readable = await readableDocuments(userOf(config));
           const openai = observeOpenAI(modelClient(), { generationName: "route" });
-          const route = await routeRequest(openai, env.openaiModel, state.messages, approvedUses(readable, LABEL_SECTIONS));
+          const chosen = await routeRequest(openai, env.openaiModel, state.messages, approvedUses(readable, LABEL_SECTIONS));
+          const route = withFloor(chosen, latestQuestion(state.messages));
           updateActiveObservation({ output: route });
           return { route };
         },

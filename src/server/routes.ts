@@ -65,6 +65,13 @@ export function createRoutes(auth: Auth, desk: Desk) {
       response.status(400).json({ error: "Send at least one message." });
       return;
     }
+    // A thread that waits for a reviewer takes no new question: a new turn would leave the
+    // waiting draft behind, and its approval would then release whatever waits next.
+    const { interrupts } = await desk.agent.readThread(request.params.threadId);
+    if (interrupts.length) {
+      response.status(409).json({ error: "This conversation waits for a reviewer. Start a new chat to ask something else." });
+      return;
+    }
     response.writeHead(200, {
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-cache",
@@ -110,6 +117,14 @@ export function createRoutes(auth: Auth, desk: Desk) {
       response.status(400).json({ error: `Decide with one of: ${DECISIONS[item.kind].join(", ")}.` });
       return;
     }
+    // The decision must be for the draft its thread waits on now, not one the thread has left.
+    if (item.kind === "draft") {
+      const { interrupts } = await desk.agent.readThread(item.threadId);
+      if (!interrupts.some((pause) => (pause.value as { itemId?: string } | undefined)?.itemId === item.id)) {
+        response.status(409).json({ error: "This draft no longer waits in its conversation." });
+        return;
+      }
+    }
     const decided = await desk.reviews.decide(item.id, reviewer, parsed.data.decision, parsed.data.note ?? "");
     if (!decided) {
       response.status(409).json({ error: "Someone already decided this item." });
@@ -118,7 +133,7 @@ export function createRoutes(auth: Auth, desk: Desk) {
     if (decided.kind === "draft") {
       try {
         // The paused thread picks up where it stopped, in this process or any other.
-        await desk.agent.runTurn({ threadId: decided.threadId, user: reviewer, resume: decided.status === "approved" ? "approve" : "reject" }, () => {});
+        await desk.agent.runTurn({ threadId: decided.threadId, user: reviewer, resume: { itemId: decided.id, decision: decided.status === "approved" ? "approve" : "reject" } }, () => {});
       } catch (error) {
         console.error(error);
         await desk.reviews.reopen(decided.id);
