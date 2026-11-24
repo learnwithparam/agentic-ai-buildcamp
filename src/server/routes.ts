@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { Router } from "express";
 import { z } from "zod";
+import { BUDGET_SPENT_MESSAGE, isBudgetSpent } from "./gateway";
 import { readMedinfoThread, runMedinfoTurn } from "./medinfo-agent";
 
 // The chat UI talks to these routes. They follow the LangGraph server's thread API,
@@ -46,7 +47,10 @@ routes.post("/api/threads/:threadId/runs/stream", async (request, response) => {
     );
   } catch (error) {
     console.error(error);
-    send("error", { message: "The agent could not finish this answer. Please try again." });
+    // The chat shows replies, not error events, so the doctor reads the reason as the assistant's reply.
+    const content = isBudgetSpent(error) ? BUDGET_SPENT_MESSAGE : "The agent could not finish this answer. Please try again.";
+    const { messages } = await readMedinfoThread(request.params.threadId).catch(() => ({ messages: [] }));
+    send("values", { messages: [...messages, { id: `error-${randomUUID()}`, type: "ai", content, tool_calls: [] }] });
   }
   response.end();
 });

@@ -14,3 +14,4 @@ rows link to your runs.
 | 06 | The agent as lesson 03 left it | 5/28 | 0/3 | 1/3 | 1/1 | 0/3 | 1/4 | 0/2 | 0/1 | 0/4 | 1/1 | 1/2 | 0/1 | 0/1 | 0/1 | 0/1 | - | [run](http://localhost:5174/project/hcp-medinfo/experiments/results?baseline=b5acf60835ec0295) |
 | 07 | The error-analysis prompt | 22/28 | 3/3 | 3/3 | 1/1 | 3/3 | 2/4 | 2/2 | 1/1 | 0/4 | 1/1 | 2/2 | 1/1 | 1/1 | 1/1 | 1/1 | - | [run](http://localhost:5174/project/hcp-medinfo/experiments/results?baseline=d1ab0d8d09b632a9) |
 | 09 | The calibrated faithfulness judge on the judged slices | 9/9 | 1/1 | 3/3 | 1/1 | 1/1 | - | - | - | - | - | 1/1 | 1/1 | - | - | 1/1 | - | [run](http://localhost:5174/project/hcp-medinfo/experiments/results?baseline=c77b940e27ecf32e) |
+| 10 | Every model call through the gateway, the input check at the door | 5/5 | 1/1 | - | - | 1/1 | - | - | 1/1 | - | - | 1/1 | 1/1 | - | - | - | - | [run](http://localhost:5174/project/hcp-medinfo/experiments/results?baseline=f39275a79a44d55b) |
