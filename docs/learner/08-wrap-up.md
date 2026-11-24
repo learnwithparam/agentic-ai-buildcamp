@@ -21,11 +21,27 @@ Complementary materials:
   - [Experiments](https://langfuse.com/academy/experiments)
   - [Evaluate](https://langfuse.com/academy/evaluate)
 
+## Goal
+
+Read the loop you have built as one system, and plan how to run it on your own app.
+
+- **Before:** five lessons, each with its own screen in Langfuse.
+- **Build:** read your scoreboard rows from 06 and 07 next to each other, then write the first three cases of your own dataset.
+- **After:** you can say which cases the error-analysis prompt fixed, which ones still fail, and which lesson fixes each one.
+
 ## Starting point
 
 ```bash
 git checkout checkpoint/08-wrap-up
 ```
+
+## Read your scoreboard
+
+Open `docs/scoreboard.md`. It has two rows: the baseline from lesson 06 and the error-analysis prompt from lesson 07. Read them slice by slice:
+
+- A slice that went up is a failure category from error analysis that the new prompt answers.
+- A slice that stayed at zero needs more than a prompt. The `chapter` field of each case in `data/hcp/evals/medinfo.yaml` names the lesson that makes it pass. The `tenancy` cases, for example, need the signed-in user from lesson 11.
+- A slice that went down is a regression. Open both runs in the Langfuse compare view and read the item before you trust the new prompt.
 
 ## What you should be able to do now
 
@@ -70,3 +86,7 @@ When you go back to your own codebase, do this in order:
 4. **Build your first eval dataset.** Decide what you want to evaluate, then fill it with traces from error analysis and the cases your application must handle.
 
 5. **Measure and iterate** on the quality of your system. Change one thing, rerun, and compare.
+
+## Homework
+
+Write the first three cases of a dataset for your own app, in the same shape as `data/hcp/evals/medinfo.yaml`: one case that must be answered, one that must be refused, and one that needs a follow-up question. Give each an `expectedBehavior` and at least one text check, and run it once before you change anything. That run is your baseline.

@@ -41,7 +41,7 @@ tests:
       split: "train"
       expectedBehavior: "reply"
       showcase: "02"
-      idealAnswer: "For eGFR below 30 mL/min without dialysis, the current US label gives CardioNex 5mg once daily [cardionex-uspi-v2, 2.2]. The 10mg dose was in the superseded label."
+      idealAnswer: "For eGFR below 30 mL/min without dialysis, the current US label gives CardioNex 5mg once daily [cardionex-uspi-v2, 2.2]."
     vars:
       query: "What is the CardioNex dose for a patient with eGFR of 24 mL/min who is not on dialysis?"
     assert:
@@ -139,8 +139,8 @@ tests:
     vars:
       query: "How long must a patient wait after stopping lisinopril (an ACE inhibitor) before starting CardioNex?"
     assert:
-      - type: contains
-        value: "36-hour"
+      - type: regex
+        value: "36[- ]hours?"
       - type: regex
         value: "\\[cardionex-uspi-v2,\\s*0\\.0"
 
@@ -305,8 +305,9 @@ tests:
     assert:
       - type: contains
         value: "2.5mg"
-      - type: not-contains
-        value: "5mg once daily"
+      # A plain not-contains would also match the right answer, "2.5mg once daily".
+      - type: not-regex
+        value: "(^|[^\\d.])5mg once daily"
       - type: regex
         value: "\\[cardionex-de-smpc,\\s*2\\.2"
 
@@ -343,8 +344,8 @@ tests:
     assert:
       - type: contains
         value: "48"
-      - type: not-contains
-        value: "36-hour"
+      - type: not-regex
+        value: "36[- ]hours?"
       - type: regex
         value: "\\[cardionex-de-smpc,\\s*4\\.3"
 

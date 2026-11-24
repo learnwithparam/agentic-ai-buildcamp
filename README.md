@@ -44,6 +44,7 @@ npm run prompt:publish                  # lesson 03: publish the agent prompt
 npm run langfuse:seed:error-analysis    # lesson 04: 20 traces for error analysis
 npm run dataset:seed                    # lesson 05: the eval dataset, one case per promise
 npm run dataset:run                     # lessons 06 and 07: one scored experiment run
+npm run dataset:run -- --chapter 07 --change "..."  # the same run, plus one row in docs/scoreboard.md
 ```
 
 ## How the checkpoints work
