@@ -1,71 +1,76 @@
-import OpenAI from "openai";
-import { getSupportContext, searchGuides } from "./support-data";
+import type OpenAI from "openai";
+import { searchLabels } from "./labels";
 
 type ToolResult = Record<string, unknown>;
+
+// The desk the agent answers for. The dataset fixes "today" so every run sees the same labels in force.
+export const DESK = {
+  company: "pharma_a",
+  brands: ["CardioNex"],
+  countries: ["US", "DE", "JP"],
+  today: "2026-11-23"
+};
 
 export const TOOL_DEFINITIONS: OpenAI.Chat.Completions.ChatCompletionTool[] = [
   {
     type: "function",
     function: {
-      name: "get_support_context",
-      description: "Look up Dad's known device setup so the answer stays grounded.",
-      parameters: {
-        type: "object",
-        properties: {},
-        additionalProperties: false
-      }
+      name: "get_desk_rules",
+      description: "Read the desk rules: today's date, the medicines and countries this desk covers, and how to cite.",
+      parameters: { type: "object", properties: {}, additionalProperties: false }
     }
   },
   {
     type: "function",
     function: {
-      name: "search_help_library",
-      description: "Search the local help library for practical step-by-step device instructions.",
+      name: "search_labels",
+      description: "Search the label library: prescribing information, trial summaries, the FAQ and the safety procedure.",
       parameters: {
         type: "object",
         properties: {
-          question: {
-            type: "string",
-            description: "Dad's practical device question."
-          }
+          query: { type: "string", description: "What to look up, with the medicine and country when known." }
         },
-        required: ["question"],
+        required: ["query"],
         additionalProperties: false
       }
     }
   }
 ];
 
+// checkpoint-sync:begin tool-bodies
+function deskRules(): ToolResult {
+  return {
+    ok: true,
+    ...DESK,
+    rules: [
+      "Answer only from label text returned by search_labels.",
+      "Cite every fact as [doc_id, section], for example [cardionex-uspi-v2, 2.2]."
+    ]
+  };
+}
+
+function labelSearch(input: { query: string }): ToolResult {
+  return {
+    ok: true,
+    results: searchLabels(input.query).map((hit) => ({
+      doc_id: hit.docId,
+      section: hit.section,
+      title: hit.title,
+      status: hit.status,
+      effective_date: hit.effectiveDate,
+      country: hit.country,
+      text: hit.text
+    }))
+  };
+}
+// checkpoint-sync:end tool-bodies
+
 export async function executeTool(name: string, input: Record<string, unknown>): Promise<ToolResult> {
   switch (name) {
-    case "get_support_context": {
-      const context = getSupportContext();
-      return {
-        ok: true,
-        context: {
-          id: context.id,
-          label: context.label,
-          devices: context.devices,
-          deviceSummary: context.deviceSummary,
-          responseStyle: context.responseStyle,
-          scopeHighlights: context.scopeHighlights,
-          notableApps: context.notableApps
-        }
-      };
-    }
-    case "search_help_library": {
-      const guides = searchGuides(String(input.question ?? ""));
-      return {
-        ok: true,
-        results: guides.map((guide) => ({
-          id: guide.id,
-          title: guide.title,
-          summary: guide.summary,
-          steps: guide.steps,
-          caution: guide.caution ?? null
-        }))
-      };
-    }
+    case "get_desk_rules":
+      return deskRules();
+    case "search_labels":
+      return labelSearch({ query: String(input.query ?? "") });
     default:
       return { ok: false, error: `Unsupported tool: ${name}` };
   }
