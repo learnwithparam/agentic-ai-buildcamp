@@ -19,7 +19,8 @@
     "langfuse:seed:error-analysis": "tsx scripts/seed-error-analysis-traces.ts",
     "langfuse:seed:error-analysis:annotations": "tsx scripts/seed-error-analysis-annotations.ts",
     "langfuse:seed:calibration": "tsx scripts/seed-faithfulness-calibration.ts",
-    "check": "npm run typecheck && tsx --test scripts/check-repo.test.ts src/server/graph.test.ts scripts/prompt-variants.test.ts scripts/error-analysis.test.ts scripts/scoreboard.test.ts scripts/judge/faithfulness.test.ts && tsx scripts/check-repo.ts"
+    "check": "npm run typecheck && tsx --test 'scripts/**/*.test.ts' 'src/**/*.test.ts' && tsx scripts/check-repo.ts",
+    "langfuse:gateway-keys": "tsx scripts/langfuse-gateway-keys.ts"
   },
   "dependencies": {
     "@assistant-ui/react": "0.15.38",
