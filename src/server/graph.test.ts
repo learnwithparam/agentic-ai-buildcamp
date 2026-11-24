@@ -66,7 +66,7 @@ test("a draft is stamped in code and goes to the inbox once, however often its n
   assert.equal(inbox.items[0].body, "REVIEW_REQUIRED\n\nGive 5mg once daily.");
   assert.equal(inbox.items[0].traceId, "trace-1");
 
-  const resumed = await runGraph(graph, { ...turn, resume: "approve" }, () => {});
+  const resumed = await runGraph(graph, { ...turn, resume: { itemId: inbox.items[0].id, decision: "approve" } }, () => {});
   assert.equal(resumed.waitingForApproval, false);
   assert.equal(lastText(resumed.messages), "A medical reviewer approved this draft. It is ready to send.");
   // The submit node does not run again on resume; the review node does, and writes nothing.
@@ -77,4 +77,30 @@ test("a script run with no inbox still pauses and returns the stamped draft", as
   const result = await runGraph(routedGraph("review", []), { threadId: "t-script", user: scriptUser(), messages: ask("Draft a reply") }, () => {});
   assert.equal(result.waitingForApproval, true);
   assert.match(lastText(result.messages), /^REVIEW_REQUIRED/);
+});
+
+test("a decision for another draft does not release the one that waits", async () => {
+  const inbox = fakeInbox();
+  const graph = routedGraph("review", []);
+  const turn = { threadId: "t-other", user: scriptUser(), inbox };
+  await runGraph(graph, { ...turn, messages: ask("Draft a reply to Dr. Lee") }, () => {});
+  await assert.rejects(runGraph(graph, { ...turn, resume: { itemId: "draft-t-other-an-older-draft", decision: "approve" } }, () => {}), /not for draft-t-other-draft/);
+  const state = await graph.getState({ configurable: { thread_id: "t-other" } });
+  assert.equal(state.tasks.flatMap((task) => task.interrupts).length, 1);
+});
+
+test("a turn with no tier stops instead of answering", async () => {
+  const graph = buildGraph(
+    {
+      router: () => ({}),
+      agent: () => ({ messages: [draft] }),
+      tools: () => ({}),
+      submit: () => ({}),
+      review: () => ({}),
+      safety: () => ({}),
+      stop: () => ({})
+    },
+    new MemorySaver()
+  );
+  await assert.rejects(runGraph(graph, { threadId: "t-none", user: scriptUser(), messages: ask("A question") }, () => {}), /no tier/);
 });

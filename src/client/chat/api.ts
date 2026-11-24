@@ -75,6 +75,10 @@ export async function* streamRun(
     body: JSON.stringify(body),
     signal: config.abortSignal
   });
+  if (response.status === 409) {
+    yield { event: "error", data: { message: ((await response.json()) as { error: string }).error } };
+    return;
+  }
   if (!response.ok || !response.body) {
     yield { event: "error", data: { message: "The agent is not reachable. Is the server running?" } };
     return;

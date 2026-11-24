@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { LABEL_SECTIONS } from "./labels";
 import { scrubPhi } from "./phi";
-import { approvedUses, reportingProcedure, routeTool, safetyReply, stopReply, SAFETY_HOURS } from "./tiers";
+import { approvedUses, reportingProcedure, routeTool, safetyReply, stopReply, SAFETY_HOURS, withFloor, type Route } from "./tiers";
 
 // Lesson 13. The parts of the tiers that are code, not a model: no model calls.
 
@@ -55,4 +55,13 @@ test("the stop reply refuses with no dose", () => {
   assert.match(reply, /^OFF_LABEL_REFUSAL/);
   assert.ok(reply.includes("[neurovex-uspi-v1, 1.1]"));
   assert.doesNotMatch(reply, /\d+\s?mg/);
+});
+
+test("a request for something to send goes to review even when the router says answer", () => {
+  const answer: Route = { tier: "answer", reason: "a dose question", asksForAdvice: false };
+  assert.equal(withFloor(answer, "Write a short email to Dr. Lee with the starting dose.").tier, "review");
+  assert.equal(withFloor(answer, "Draft a reply to the pharmacist about storage.").tier, "review");
+  assert.equal(withFloor(answer, "What is the starting dose of NeuroVex?").tier, "answer");
+  // The floor only raises answer; it never lowers safety or stop to review.
+  for (const tier of ["safety", "stop"] as const) assert.equal(withFloor({ ...answer, tier }, "Write an email about her rash").tier, tier);
 });

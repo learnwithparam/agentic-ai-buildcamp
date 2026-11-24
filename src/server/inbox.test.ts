@@ -54,14 +54,19 @@ const token = (claims: JWTPayload) =>
 const pool = createPool(env.testDatabaseUrl);
 const resumed: Turn[] = [];
 const scored: ReviewItem[] = [];
-const agent = { runTurn: async (turn: Turn) => (resumed.push(turn), { messages: [], waitingForApproval: false }), readThread: async () => ({ messages: [], interrupts: [] }) };
+// Each stand-in thread waits on one draft, as a real one does: draftA2 is an older draft thread a left behind.
+const waitsOn = new Map<string, string>();
+const agent = {
+  runTurn: async (turn: Turn) => (resumed.push(turn), { messages: [], waitingForApproval: false }),
+  readThread: async (threadId: string) => ({ messages: [], interrupts: waitsOn.has(threadId) ? [{ value: { kind: "approval", itemId: waitsOn.get(threadId) } }] : [] })
+};
 let reviews: ReviewStore;
 let base = "";
 let close = () => {};
 let dropStore = async () => {};
 const run = crypto.randomUUID().slice(0, 8);
-const ids = { draftA: `draft-${run}-a`, draftA2: `draft-${run}-a2`, eventA: `ae-${run}-a`, draftB: `draft-${run}-b` };
-const threads = { a: `thread-${run}-a`, b: `thread-${run}-b` };
+const ids = { draftA: `draft-${run}-a`, draftA2: `draft-${run}-a2`, eventA: `ae-${run}-a`, draftB: `draft-${run}-b`, draftC: `draft-${run}-c` };
+const threads = { a: `thread-${run}-a`, b: `thread-${run}-b`, c: `thread-${run}-c` };
 
 before(async () => {
   await migrate(pool);
@@ -77,11 +82,15 @@ before(async () => {
   const doctor = { userId: "kc-rivera", name: "", email: "", tenantId: "pharma_a", country: "US", roles: [] };
   await reviews.createThread(threads.a, doctor);
   await reviews.createThread(threads.b, { ...doctor, userId: "kc-okafor", tenantId: "pharma_b" });
+  // Maya Chen asks a question of her own: she holds the reviewer role, but this item is hers.
+  await reviews.createThread(threads.c, { ...doctor, userId: "kc-chen" });
   const item = { question: "Draft a reply", body: "REVIEW_REQUIRED\n\nDraft", traceId: "trace-1" };
   await reviews.submit({ ...item, id: ids.draftA, kind: "draft", threadId: threads.a, tenantId: "pharma_a" });
   await reviews.submit({ ...item, id: ids.draftA2, kind: "draft", threadId: threads.a, tenantId: "pharma_a" });
   await reviews.submit({ ...item, id: ids.eventA, kind: "adverse_event", threadId: threads.a, tenantId: "pharma_a" });
   await reviews.submit({ ...item, id: ids.draftB, kind: "draft", threadId: threads.b, tenantId: "pharma_b" });
+  await reviews.submit({ ...item, id: ids.draftC, kind: "draft", threadId: threads.c, tenantId: "pharma_a" });
+  waitsOn.set(threads.a, ids.draftA).set(threads.b, ids.draftB).set(threads.c, ids.draftC);
 });
 after(async () => {
   close();
@@ -127,11 +136,33 @@ test("the approver is the signed-in reviewer, whatever the body says, and the th
   assert.equal(response.json.decidedBy, "kc-chen");
   assert.deepEqual(
     resumed.map((turn) => [turn.threadId, turn.resume, turn.user.userId]),
-    [[threads.a, "approve", "kc-chen"]]
+    [[threads.a, { itemId: ids.draftA, decision: "approve" }, "kc-chen"]]
   );
   assert.deepEqual(scored.map((item) => [item.id, item.status, item.decidedBy, item.traceId]), [[ids.draftA, "approved", "kc-chen", "trace-1"]]);
   assert.equal((await call(chen, `/api/inbox/${ids.draftA}/decision`, { decision: "rejected" })).status, 409);
   assert.deepEqual(await inboxIds(chen), [ids.draftA2]);
+});
+
+test("nobody approves a draft their own question raised, and it is not in their inbox", async () => {
+  assert.ok(!(await inboxIds(chen)).includes(ids.draftC));
+  assert.equal((await call(chen, `/api/inbox/${ids.draftC}/decision`, { decision: "approved" })).status, 403);
+});
+
+test("a draft its conversation no longer waits on cannot be decided, and stays waiting", async () => {
+  const response = await call(chen, `/api/inbox/${ids.draftA2}/decision`, { decision: "approved" });
+  assert.equal(response.status, 409);
+  assert.equal((await reviews.get(ids.draftA2))?.status, "waiting");
+});
+
+test("a conversation that waits for a reviewer takes no new question", async () => {
+  waitsOn.set(threads.a, ids.draftA2);
+  const response = await fetch(`${base}/api/threads/${threads.a}/runs/stream`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${await token(rivera)}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ messages: [{ id: "q2", type: "human", content: "And the maximum dose?" }] })
+  });
+  assert.equal(response.status, 409);
+  waitsOn.set(threads.a, ids.draftA);
 });
 
 test("a safety reviewer files a report without resuming any thread", async () => {
