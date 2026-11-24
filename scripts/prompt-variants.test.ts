@@ -29,3 +29,9 @@ test("lessons 04 and 07 show the error-analysis prompt the script publishes", ()
     assert.ok(unquoted.includes(prompt), `docs/learner/${file} does not show the error-analysis prompt`);
   }
 });
+
+// Lesson 11 tells learners to publish the signed-in prompt and shows it, so the page must match.
+test("lesson 11 shows the signed-in prompt the script publishes", () => {
+  const page = readFileSync(new URL("../docs/learner/11-sign-in-and-permissions.md", import.meta.url), "utf8");
+  assert.ok(page.includes(PROMPT_VARIANTS["signed-in"].trim()), "docs/learner/11-sign-in-and-permissions.md does not show the signed-in prompt");
+});
