@@ -1,0 +1,5 @@
+send_id,hcp_id,team,campaign,sent_at
+S-01,HCP-1001,marketing,heart-failure-update-nov,2026-11-17
+S-02,HCP-1001,medical-affairs,heart-failure-update-nov,2026-11-18
+S-03,HCP-1002,marketing,renal-dosing-guide,2026-11-12
+S-04,HCP-1004,marketing,neuropathy-pain-webinar,2026-11-10

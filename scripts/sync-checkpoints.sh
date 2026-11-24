@@ -50,10 +50,10 @@ TAGS=(
 milestone_files() {
   case "$1" in
     checkpoint/00-setup | checkpoint/01-base-app | checkpoint/02-tracing)
-      echo "src/server/index.ts src/server/support-agent.ts src/server/tools.ts"
+      echo "src/server/index.ts src/server/medinfo-agent.ts src/server/tools.ts"
       ;;
     checkpoint/03-prompt-management)
-      echo "src/server/support-agent.ts src/server/tools.ts"
+      echo "src/server/medinfo-agent.ts"
       ;;
     *)
       echo ""
