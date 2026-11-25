@@ -1,0 +1,5 @@
+#!/bin/sh
+# Lesson 18: the release gate runs before a push that changes an agent, the runner or the dataset.
+# `npm install` turns this folder on (the prepare script sets core.hooksPath to .githooks).
+# git passes the pushed refs on stdin; the gate reads them to see what the push changes.
+exec npx tsx scripts/release-gate.ts --pre-push

@@ -52,6 +52,7 @@ TAGS=(
   checkpoint/15-a2a
   checkpoint/16-events
   checkpoint/17-autonomy
+  checkpoint/18-release-gate
 )
 
 # Files whose code is what the next lesson changes. Add a file here when a
@@ -131,38 +132,45 @@ AUTO_FILES="docs/scoreboard.md infra/openfga/model.fga infra/openfga/model.fga.y
   src/server/auto/queue.ts src/server/auto/sweep.test.ts src/server/auto/sweep.ts src/server/events/handlers.ts
   src/server/events/store.ts src/server/inbox.test.ts src/server/index.ts src/server/migrations/007_sweep.sql
   src/server/permissions.ts src/server/routes.ts src/server/test-desk.ts src/server/users.ts"
+# Lesson 18 adds the release gate and its pre-push hook, and moves the case runner into
+# scripts/experiment.ts; the files it changes and adds (GATE_FILES) stay as they were on tags before it.
+GATE_FILES=".githooks/pre-push docs/scoreboard.md package.json scripts/experiment.ts scripts/release-gate.test.ts
+  scripts/release-gate.ts scripts/run-dataset.ts src/server/medinfo-agent.ts"
 milestone_files() {
   case "$1" in
     checkpoint/00-setup | checkpoint/01-base-app | checkpoint/02-tracing)
-      echo "src/server/index.ts src/server/medinfo-agent.ts src/server/tools.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES"
+      echo "src/server/index.ts src/server/medinfo-agent.ts src/server/tools.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES"
       ;;
     checkpoint/03-prompt-management)
-      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES"
+      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES"
       ;;
     # Lessons 06 and 07 run the dataset with the correctness judge; lesson 09 replaces it.
     checkpoint/04-* | checkpoint/05-* | checkpoint/06-* | checkpoint/07-* | checkpoint/08-* | checkpoint/09-*)
-      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES"
+      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES"
       ;;
     checkpoint/10-*)
-      echo "$AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES"
+      echo "$AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES"
       ;;
     checkpoint/11-*)
-      echo "$MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES"
+      echo "$MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES"
       ;;
     checkpoint/12-*)
-      echo "$TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES"
+      echo "$TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES"
       ;;
     checkpoint/13-*)
-      echo "$CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES"
+      echo "$CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES"
       ;;
     checkpoint/14-*)
-      echo "$A2A_FILES $EVENT_FILES $AUTO_FILES"
+      echo "$A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES"
       ;;
     checkpoint/15-*)
-      echo "$EVENT_FILES $AUTO_FILES"
+      echo "$EVENT_FILES $AUTO_FILES $GATE_FILES"
       ;;
     checkpoint/16-*)
-      echo "$AUTO_FILES"
+      echo "$AUTO_FILES $GATE_FILES"
+      ;;
+    checkpoint/17-*)
+      echo "$GATE_FILES"
       ;;
     *)
       echo ""

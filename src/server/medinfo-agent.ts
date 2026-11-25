@@ -45,8 +45,18 @@ Keep it short and clear.
 
 const langfuse = new LangfuseClient();
 
+// Lesson 18. The release gate pins the agent to the one prompt version it tests. A pinned prompt
+// that cannot be read is an error, never the built-in fallback, so a gate cannot pass on a prompt
+// it did not test. Unpinned, the app reads the label it is deployed with, and falls back if
+// Langfuse is down so a doctor still gets an answer.
+let pinnedVersion: number | undefined;
+export function usePromptVersion(version: number) {
+  pinnedVersion = version;
+}
+
 async function getPrompt() {
-  try { return await langfuse.prompt.get(env.langfusePromptName); }
+  if (pinnedVersion !== undefined) return langfuse.prompt.get(env.langfusePromptName, { version: pinnedVersion });
+  try { return await langfuse.prompt.get(env.langfusePromptName, { label: env.langfusePromptLabel }); }
   catch { return null; }
 }
 
