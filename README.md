@@ -48,6 +48,7 @@ Each lesson names the checkpoint tag to check out, what to change, and how to ch
 | 18 | [Block a bad change before it ships](./docs/learner/18-release-gate.md) | `checkpoint/18-release-gate` | A release gate runs the cases every lesson keeps green on a prompt before it is promoted and on every push that changes an agent, and a failed case stops the change. |
 | 19 | [Ask and review from the terminal](./docs/learner/19-cli.md) | `checkpoint/19-cli` | A doctor signs in from the terminal through the same Keycloak, asks with citations, and a reviewer approves a draft from an inbox in the terminal, with the same permissions as the web app. |
 | 20 | [Answer from the label PDFs with pgvector](./docs/learner/20-rag.md) | `checkpoint/20-rag` | The company's label PDFs go through Docling into pgvector, a check proves no word was lost on the way, and search_labels finds a section by meaning, so a doctor's own words reach the right part of the full label. |
+| 21 | [Check every citation before the answer is sent](./docs/learner/21-citations.md) | `checkpoint/21-citations` | Code checks each answer against the sections the search returned: every citation was found and is in force, and every dose is in the section it cites. A failing answer is rewritten once, then withheld. |
 
 Helper commands used by the lessons:
 
