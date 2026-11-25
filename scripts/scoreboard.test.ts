@@ -57,8 +57,16 @@ test("a slice the run left out shows a dash, not 0 passed", () => {
 
 // The runner refuses an id that is not in the dataset, so a lesson that names one gives the
 // learner a command that fails. Every --cases list in every lesson page must name real cases.
+// The ids come from every file in the dataset copy, not from this tag's loader: every tag carries
+// main's lesson pages and data, but an earlier tag's loader does not read a later lesson's file.
 test("every --cases id a lesson page names is a case in the dataset", () => {
-  const ids = new Set(loadAllCases().map((item) => item.metadata.caseId));
+  const evals = path.resolve(path.dirname(new URL(import.meta.url).pathname), "../data/hcp/evals");
+  const ids = new Set(
+    readdirSync(evals)
+      .filter((name) => name.endsWith(".yaml"))
+      .flatMap((name) => [...readFileSync(path.join(evals, name), "utf8").matchAll(/^\s*- description: "\[([A-Z0-9-]+)\]/gm)].map((match) => match[1]))
+  );
+  for (const item of loadAllCases()) assert.ok(ids.has(item.metadata.caseId), `the loader has ${item.metadata.caseId}, which the id pattern missed`);
   const learner = path.resolve(path.dirname(new URL(import.meta.url).pathname), "../docs/learner");
   const pages = readdirSync(learner).filter((name) => name.endsWith(".md"));
   let lists = 0;
