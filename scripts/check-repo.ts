@@ -30,7 +30,8 @@ const RULES: Array<{ folder: string; usedBy: RegExp }> = [
   { folder: "case-studies/", usedBy: /\.md$/ },
 ];
 // Scripts people run by habit, never named in a lesson.
-const ENTRY_SCRIPTS = new Set(["dev", "build", "start", "typecheck", "check"]);
+// `prepare` is an npm lifecycle script: `npm install` runs it, so no doc needs to.
+const ENTRY_SCRIPTS = new Set(["dev", "build", "start", "typecheck", "check", "prepare"]);
 // Names from the upstream support app. The HCP agent replaced all of them.
 const UPSTREAM_NAMES = ["PhonePanel", "deviceSummary", "notableApps", "search_help_library", "support-agent", "runSupportConversation", "Northvale", "CardioZ"];
 const DATASET_COPY = "data/hcp/";
