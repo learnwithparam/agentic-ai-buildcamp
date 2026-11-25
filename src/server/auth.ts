@@ -165,6 +165,17 @@ export function createAuth(config: AuthConfig) {
     return verify(await freshAccessToken(sessionId));
   }
 
+  // Lesson 15. The signed-in user's own access token, for an agent that calls another agent as
+  // that user. The token never reaches the browser; it goes only in the Authorization header of
+  // the A2A call, and the agent at the other end checks it as this file does.
+  async function accessTokenOf(request: Request): Promise<string> {
+    const header = request.headers.authorization;
+    if (header?.startsWith("Bearer ")) return header.slice("Bearer ".length);
+    const sessionId = readCookie(request, SESSION_COOKIE);
+    if (!sessionId) throw new AuthError(401, "Sign in first.");
+    return freshAccessToken(sessionId);
+  }
+
   const requireUser: RequestHandler = async (request, response, next) => {
     try {
       response.locals.user = await identityOf(request);
@@ -283,7 +294,7 @@ export function createAuth(config: AuthConfig) {
     }
   });
 
-  return { router, requireUser, sameOrigin, identityOf, verifyToken: verify, issuer: config.issuer, appUrl: config.appUrl, cookieName: SESSION_COOKIE };
+  return { router, requireUser, sameOrigin, identityOf, accessTokenOf, verifyToken: verify, issuer: config.issuer, appUrl: config.appUrl, cookieName: SESSION_COOKIE };
 }
 
 export type Auth = ReturnType<typeof createAuth>;

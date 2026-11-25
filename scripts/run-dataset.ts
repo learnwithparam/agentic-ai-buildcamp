@@ -3,7 +3,8 @@
  *
  * For each item in the dataset:
  *   1. Call the agent the case is for (its metadata.agent): the medinfo desk through
- *      answerWithSources(...), or, from lesson 14, the fact-checker or the outreach planner.
+ *      answerWithSources(...), or, from lesson 14, the fact-checker or the outreach planner, or,
+ *      from lesson 15, the hand-off agent, which reaches those two over A2A.
  *      Each runs signed in as the case's company and country (lesson 11).
  *   2. Roll the per-item traces into one experiment run row.
  *   3. Attach callback evaluators from runExperiment:
@@ -32,6 +33,7 @@ import { answerWithSources } from "../src/server/medinfo-agent";
 import { createFactChecker, readRequest } from "../src/server/content/fact-check";
 import { createOutreachPlanner } from "../src/server/content/outreach";
 import { scriptUser } from "../src/server/users";
+import { startA2a } from "./a2a-runner";
 import { decide, useService } from "../src/server/gateway";
 import { JUDGED_SLICES, judgeFaithfulness, SCORE_NAME } from "./judge/faithfulness";
 import { BEHAVIORS, failedChecks, type AgentName, type Behavior, type CaseExpectation, type CaseInput } from "./hcp-cases";
@@ -121,6 +123,8 @@ async function main() {
   useService("eval-runner");
   const factChecker = createFactChecker();
   const outreachPlanner = createOutreachPlanner();
+  // Lesson 15: the two agents as A2A servers on a port of this process, for the a2a cases.
+  const a2a = await startA2a({ factChecker, outreachPlanner });
 
   // --- 5. Pull the hosted dataset by DATASET_NAME from .env.
   const langfuse = new LangfuseClient({
@@ -167,6 +171,7 @@ async function main() {
       const rep = scriptUser(input.tenantId, input.country, ["sales-rep"]);
       if (agent === "fact-check") return (await factChecker({ request: readRequest(input.messages.at(-1)!.content), user: rep })).report;
       if (agent === "outreach") return (await outreachPlanner({ query: input.messages.at(-1)!.content, user: rep })).report;
+      if (agent === "a2a") return a2a.handOff(input.messages.at(-1)!.content, rep);
       const { answer, sources, tier } = await answerWithSources(input.messages, user);
       sourcesByInput.set(JSON.stringify(input), sources);
       tierByInput.set(JSON.stringify(input), tier);
@@ -245,6 +250,7 @@ async function main() {
     console.log(row);
     console.log(`Row added to ${path.relative(process.cwd(), file)}.`);
   }
+  await a2a.close();
   await langfuse.flush();
   await langfuseSpanProcessor.forceFlush();
   await sdk.shutdown();

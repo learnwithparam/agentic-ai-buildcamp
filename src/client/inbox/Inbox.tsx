@@ -6,7 +6,7 @@ import { formatDue, timeLeft } from "./format";
 // soonest deadline first, and decides it here. A doctor sees what their own questions raised and
 // what became of it. The server decides who may see and decide what; this page only shows it.
 
-const KIND = { draft: "Draft for review", adverse_event: "Adverse event report", email: "Email with flagged sentences", outreach: "Outreach step" } as const;
+const KIND = { draft: "Draft for review", adverse_event: "Adverse event report", email: "Email for medical review", outreach: "Outreach step" } as const;
 const ACTIONS: Record<ReviewItem["kind"], Array<{ decision: ReviewItem["status"]; label: string; primary?: boolean }>> = {
   draft: [
     { decision: "approved", label: "Approve and send", primary: true },

@@ -20,7 +20,7 @@ async function main() {
       name: env.datasetName,
       description: "HCP medinfo cases from the pinned dataset repo copy in data/hcp",
       metadata: {
-        source: "data/hcp/evals/medinfo.yaml, fact-check.yaml, outreach.yaml",
+        source: "data/hcp/evals/medinfo.yaml, fact-check.yaml, outreach.yaml, a2a.yaml",
         workshop: "langfuse-hcp-medinfo"
       }
     });

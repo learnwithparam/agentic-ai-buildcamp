@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, readFileSync } from "node:fs";
+import { mkdtempSync, readdirSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { test } from "node:test";
@@ -53,4 +53,20 @@ test("a slice the run left out shows a dash, not 0 passed", () => {
   const cells = scoreboardRow("09", "Subset", [{ slice: first, passed: true }], "http://run").split("|").map((cell) => cell.trim());
   assert.equal(cells[4], "1/1");
   assert.equal(cells[3 + slices().indexOf(second) + 1], "-");
+});
+
+// The runner refuses an id that is not in the dataset, so a lesson that names one gives the
+// learner a command that fails. Every --cases list in every lesson page must name real cases.
+test("every --cases id a lesson page names is a case in the dataset", () => {
+  const ids = new Set(loadAllCases().map((item) => item.metadata.caseId));
+  const learner = path.resolve(path.dirname(new URL(import.meta.url).pathname), "../docs/learner");
+  const pages = readdirSync(learner).filter((name) => name.endsWith(".md"));
+  let lists = 0;
+  for (const page of pages) {
+    for (const [, list] of readFileSync(path.join(learner, page), "utf8").matchAll(/--cases\s+([A-Z0-9,-]+)/g)) {
+      lists += 1;
+      for (const id of list.split(",")) assert.ok(ids.has(id), `${page} names ${id}, which is not in the dataset`);
+    }
+  }
+  assert.ok(lists > 0, "no lesson page names a --cases list; the pattern no longer matches");
 });
