@@ -182,6 +182,32 @@ Sign in as Ana Rivera and ask "Can a mother who is nursing her newborn take Card
 
 ![The Langfuse trace of that turn: search_labels with an embed child, then the agent's answer.](../images/rag/03-trace.png)
 
+## Step 8: Let the agent read the whole library
+
+Search now returns trial summaries too, and the prompt still reads like a label is the only source. For example, ask "Can I initiate CardioNex 20mg in an adult HFrEF patient whose baseline serum potassium is 5.3 mEq/L?" (POSITIVE-02). Search returns the US label's 5.1 first. It says to hold the dose above 5.5 mEq/L. The CLARION-HF summary comes second, and its 3.2 says not to start above 5.0 mEq/L. The agent weighed the label alone and said the label does not answer. It failed in 2 of 2 runs.
+
+Two documents give two limits for one decision. So the prompt says which one wins:
+
+```text
+- If two documents give different limits for the same decision, give the stricter limit and cite the document that sets it.
+```
+
+The citation line also asks for one bracket per section. One answer had written `[cardionex-uspi-v2, 0.0; cardionex-uspi-v2, 8.1]`, and a check that reads `[doc_id, section]` missed the second one.
+
+Publish it to staging, try it on the cases it touches, then let the lesson 18 gate move production:
+
+```bash
+WORKSHOP_PROMPT_VARIANT=library npm run prompt:publish -- --label staging
+npm run dataset:run -- --label staging --cases POSITIVE-02,POSITIVE-04,FUTURE-01,RAG-02
+npm run release:gate -- --label staging --promote
+```
+
+`--label` pins the run to the version that label names, so nobody is served the new prompt until the gate is green.
+
+We measured 15 cases, run twice on each version. The old version failed 3 case runs: POSITIVE-02 twice and POSITIVE-04 once. The new one failed 1, AUTO-01, where the router picked the tier, not the prompt. POSITIVE-02 then passed 3 more runs.
+
+The first fix we tried was worse. It changed "the label text you found" to "the documents you found". POSITIVE-02 passed, but the 2027 question (FUTURE-01) failed 4 of 4. Search returns only sections in force there, and the agent began to say "I can't verify the 2027 label". A prompt line that fixes one case can break another, so run the cases around it every time.
+
 ## Results
 
 ```bash
