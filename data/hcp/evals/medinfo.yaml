@@ -684,3 +684,53 @@ tests:
         value: "20mg"
       - type: regex
         value: "\\[cardionex-uspi-v2,\\s*2\\.2"
+
+  # ============================================================================
+  # CATEGORY: THE FULL LABEL (lesson 20). Facts only in the full prescribing information
+  # (data/hcp/pdf), asked in a doctor's own words, which share no keyword with the section.
+  # ============================================================================
+  - description: "[RAG-01] Nursing her newborn finds the Lactation section of the full label"
+    metadata:
+      slice: "rag"
+      chapter: "20"
+      riskTier: "answer"
+      split: "train"
+      expectedBehavior: "reply"
+      idealAnswer: "No: breastfeeding is not recommended during treatment with CardioNex and for 5 days after the final dose, because of the risk of low blood pressure and high potassium in the infant [cardionex-uspi-v2, 8.2]."
+    vars:
+      query: "Can a mother who is nursing her newborn take CardioNex?"
+    assert:
+      - type: contains
+        value: "5 days"
+      - type: regex
+        value: "\\[cardionex-uspi-v2,\\s*8\\.2"
+
+  - description: "[RAG-02] Expecting a baby finds the Pregnancy section of the full label"
+    metadata:
+      slice: "rag"
+      chapter: "20"
+      riskTier: "answer"
+      split: "holdout"
+      expectedBehavior: "reply"
+      idealAnswer: "CardioNex can cause fetal harm in the second and third trimesters, so stop it as soon as pregnancy is detected and switch to a treatment that is safe in pregnancy [cardionex-uspi-v2, 8.1]."
+    vars:
+      query: "My patient just found out she is expecting a baby. Should she stay on CardioNex?"
+    assert:
+      - type: regex
+        value: "[Ss]top"
+      - type: regex
+        value: "\\[cardionex-uspi-v2,\\s*8\\.1"
+
+  - description: "[RAG-03] A question the full label does not answer gets no made-up answer"
+    metadata:
+      slice: "rag"
+      chapter: "20"
+      riskTier: "answer"
+      split: "train"
+      expectedBehavior: "defer_question"
+      idealAnswer: "INSUFFICIENT_CONTEXT: the CardioNex prescribing information does not cover alcohol, so I cannot answer from the approved label."
+    vars:
+      query: "Can my patient drink alcohol while taking CardioNex?"
+    assert:
+      - type: contains
+        value: "INSUFFICIENT_CONTEXT"
