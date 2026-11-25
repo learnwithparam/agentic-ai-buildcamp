@@ -43,6 +43,7 @@ The checkpoint adds:
 - `src/server/content/outreach.ts`: the outreach planner graph.
 - `src/client/content/Editor.tsx` and `Outreach.tsx`: the email editor and the rep board.
 - `src/server/migrations/003_content_reviews.sql`: two more kinds of waiting item, `email` and `outreach`.
+- `src/server/migrations/004_review_requests.sql`: every request that raised an item, so nobody who asked decides it.
 - `infra/openfga/model.fga`: the `sales_rep` role, the `hcp` type, and who may decide an email or a step.
 - `scripts/identity-setup.ts`: four sales reps, two per company.
 - `scripts/hcp-cases.ts`: the dataset now loads `fact-check.yaml` and `outreach.yaml` beside `medinfo.yaml`.
@@ -57,7 +58,7 @@ npm run dataset:seed
 npm run dev
 ```
 
-`identity:setup` adds the `sales-rep` role in Keycloak, the four reps below, and the new OpenFGA model with one `hcp` fact per doctor in the CRM. The server runs migration 003 when it starts. `dataset:seed` adds the twelve new cases to the Langfuse dataset; each item's metadata says which agent answers it.
+`identity:setup` adds the `sales-rep` role in Keycloak, the four reps below, and the new OpenFGA model with one `hcp` fact per doctor in the CRM. The server runs migrations 003 and 004 when it starts. `dataset:seed` adds the twelve new cases to the Langfuse dataset; each item's metadata says which agent answers it.
 
 | Person | Company | Role |
 | --- | --- | --- |
@@ -124,6 +125,8 @@ If Pharma B checks the same CardioNex email, it gets `INSUFFICIENT_CONTEXT`: Pha
 Press **Check this draft** again. The note under the result says the email is already in the inbox. It does not add a second item.
 
 A flagged email's item id is a hash of the company, the country and the sentences, not of the request that checked it (`contentKey` in `src/server/reviews.ts`). Two reps who check the same text raise one item, and a medical reviewer decides it once. Once a reviewer has decided it, checking the same text again shows that decision instead of asking again.
+
+One item can now have more than one requester, so lesson 13's rule needs one more table. Migration 004 adds `review_requests`, one row per request that raised an item. A medical reviewer who checks an email a rep already flagged becomes a requester of that item too, and may not decide it. The test "nobody decides an item any of their requests raised" in `inbox.test.ts` fails if only the first requester is kept off.
 
 The test "a flagged email waits for a medical reviewer once, however often it is checked" in `content.test.ts` checks the same draft from two threads and expects one item. Change the id back to one per thread and it fails.
 
