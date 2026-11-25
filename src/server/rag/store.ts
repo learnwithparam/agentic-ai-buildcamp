@@ -64,6 +64,21 @@ export class LabelChunkStore {
   // The sections nearest the question, among the documents the asker may read. The filter is in
   // the query, so a section the asker may not read is never a candidate. strict_order makes the
   // HNSW index keep scanning until it has enough rows that pass the filter, still in order.
+  // Every section of the given documents that are short in total, in section order. A short
+  // procedure or FAQ is read whole: its sections answer one question together.
+  async shortDocuments(docIds: string[], maxWords: number, model: string): Promise<LabelSection[]> {
+    if (!docIds.length) return [];
+    const { rows } = await this.pool.query<LabelSection>(
+      `SELECT ${COLUMNS} FROM label_chunks
+       WHERE embedding_model = $3 AND doc_id IN (
+         SELECT doc_id FROM label_chunks WHERE embedding_model = $3 AND doc_id = ANY($1)
+         GROUP BY doc_id HAVING sum(array_length(regexp_split_to_array(trim(text), '\\s+'), 1)) <= $2)
+       ORDER BY doc_id, string_to_array(section, '.')::int[]`,
+      [docIds, maxWords, model]
+    );
+    return rows;
+  }
+
   async nearest(query: number[], readable: string[], limit: number, model: string): Promise<ScoredSection[]> {
     if (!readable.length) return [];
     const client = await this.pool.connect();
