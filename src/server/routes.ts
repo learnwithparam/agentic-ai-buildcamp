@@ -8,12 +8,13 @@ import type { OutreachPlanner } from "./content/outreach";
 import type { HandoffAgent } from "./a2a/handoff";
 import type { TaskReviews } from "./a2a/tasks";
 import type { TaskStore } from "@a2a-js/sdk/server";
+import type { EventQueue, EventRow, EventStore } from "./events/store";
 import { BUDGET_SPENT_MESSAGE, isBudgetSpent } from "./gateway";
 import { visibleHcps } from "./permissions";
 import { scrubPhi } from "./phi";
 import type { MedinfoAgent } from "./medinfo-agent";
 import { DECISIONS, type ReviewItem, type ReviewStore } from "./reviews";
-import { STAFF_ROLES, TENANTS } from "./users";
+import { REVIEWER_ROLES, STAFF_ROLES, TENANTS } from "./users";
 
 // The chat UI talks to these routes. They follow the LangGraph server's thread API,
 // so assistant-ui's LangGraph runtime can stream from them.
@@ -46,7 +47,25 @@ export type Desk = {
   recordDecision: (item: ReviewItem) => Promise<void>;
   // Lesson 15: the two agents as A2A servers, the tasks they keep, and the agent that hands work to them.
   a2a: { store: TaskStore; links: TaskReviews; handoff: HandoffAgent };
+  // Lesson 16: the event inbox, the queue its first deliveries go to, and each company's signing secret.
+  events: { store: EventStore; queue: EventQueue; secrets: Record<string, string> };
 };
+
+// Lesson 16. What the event inbox page shows of one event: never the payload itself, which for
+// an email holds the sender's words before they were scrubbed.
+const eventView = (row: EventRow) => ({
+  eventId: row.eventId,
+  type: row.type,
+  occurredAt: row.payload.occurred_at,
+  deliveries: row.deliveries,
+  status: row.status,
+  outcome: row.result?.outcome ?? null,
+  report: row.result?.report ?? null,
+  itemIds: row.result?.itemIds ?? [],
+  error: row.error,
+  receivedAt: row.receivedAt,
+  handledAt: row.handledAt
+});
 
 // Lesson 11. Sign-in, sign-out and the callback live in src/server/auth.ts. Everything here needs
 // a signed-in user. A thread you did not start does not exist for you.
@@ -112,6 +131,17 @@ export function createRoutes(auth: Auth, desk: Desk) {
       send("values", { messages: [...messages, { id: `error-${randomUUID()}`, type: "ai", content, tool_calls: [] }] });
     }
     response.end();
+  });
+
+  // Lesson 16. The event inbox: what came in for the company, and what each event started. For
+  // the people who decide what events raise (reviewers and reps), not for the doctors.
+  routes.get("/api/events", async (_request, response) => {
+    const user = currentUser(response);
+    if (!user.roles.some((role) => REVIEWER_ROLES.includes(role))) {
+      response.status(403).json({ error: "The event inbox is for your company's reviewers and sales reps." });
+      return;
+    }
+    response.json({ events: (await desk.events.store.list(user.tenantId)).map(eventView) });
   });
 
   // Lesson 14. The editor and the rep board are for the company's staff, not the doctors who use
