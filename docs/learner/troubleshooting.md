@@ -10,6 +10,8 @@ It checks your machine, Docker, the `.env` file, every container, the services a
 
 Fix the first problem it names, then run it again. One fix often clears the problems after it.
 
+On a checkpoint tag before lesson 22, `npm run doctor` is not there yet. Read the sections below in order and check each one by hand.
+
 The end of this page covers problems the doctor cannot see. One is a lesson that does not match your code.
 
 ## What the doctor checks
