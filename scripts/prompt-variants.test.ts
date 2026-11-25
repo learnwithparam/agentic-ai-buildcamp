@@ -5,7 +5,8 @@ import { test } from "node:test";
 // medinfo-agent.ts builds its OpenAI client on import. CI has no key, and this test calls no model.
 process.env.OPENAI_API_KEY ||= "not-used-by-this-test";
 const { SYSTEM_PROMPT } = await import("../src/server/medinfo-agent");
-const { ASK_FIRST_RULE, PROMPT_VARIANTS } = await import("./prompt-variants");
+const PROMPT_VARIANTS_MODULE = await import("./prompt-variants");
+const { ASK_FIRST_RULE, PROMPT_VARIANTS } = PROMPT_VARIANTS_MODULE;
 
 test("the ask-first variant is the system prompt plus one line", () => {
   const before = SYSTEM_PROMPT.split("\n");
@@ -43,4 +44,17 @@ test("the tiered prompt is the signed-in prompt without the rules the graph keep
   assert.equal(tiered.split("\n").length, PROMPT_VARIANTS["signed-in"].split("\n").length - 1);
   const page = readFileSync(new URL("../docs/learner/13-durable-state-and-review.md", import.meta.url), "utf8");
   assert.ok(page.includes(tiered.trim()), "docs/learner/13-durable-state-and-review.md does not show the tiered prompt");
+});
+
+// Lesson 20 adds one rule and asks for one bracket per section; the page shows both.
+test("the library prompt is the tiered prompt plus the stricter-limit rule", () => {
+  const { STRICTER_LIMIT_RULE } = PROMPT_VARIANTS_MODULE;
+  const tiered = PROMPT_VARIANTS.tiered.split("\n");
+  const library = PROMPT_VARIANTS.library.split("\n");
+  assert.equal(library.length, tiered.length + 1);
+  assert.ok(library.includes(STRICTER_LIMIT_RULE));
+  assert.match(PROMPT_VARIANTS.library, /cite each fact as \[doc_id, section\], one bracket per section\./);
+  const page = readFileSync(new URL("../docs/learner/20-rag.md", import.meta.url), "utf8");
+  assert.ok(page.includes(STRICTER_LIMIT_RULE), "docs/learner/20-rag.md does not show the stricter-limit rule");
+  assert.ok(page.includes("WORKSHOP_PROMPT_VARIANT=library npm run prompt:publish -- --label staging"), "docs/learner/20-rag.md does not show how to publish it");
 });
