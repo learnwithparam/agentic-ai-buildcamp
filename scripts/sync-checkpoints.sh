@@ -98,7 +98,7 @@ TIER_FILES="src/server/tiers.ts src/server/tiers.test.ts src/server/phi.ts src/s
 # Lesson 14 adds a fact-checker and an outreach planner on the same base; the files it changes and
 # adds (CONTENT_FILES) stay as they were on tags before it, so lesson 13's inbox has two kinds of item.
 CONTENT_FILES="src/server/content/records.ts src/server/content/fact-check.ts src/server/content/outreach.ts
-  src/server/content/content.test.ts src/server/content/content.live.ts scripts/live-spans.ts
+  src/server/content/content.test.ts src/server/content/content.live.ts scripts/live-spans.ts scripts/no-model-call.ts
   src/server/migrations/003_content_reviews.sql src/server/migrations/004_review_requests.sql
   src/client/content/Editor.tsx src/client/content/Outreach.tsx
   src/server/graph.ts src/server/graph.test.ts src/server/inbox.test.ts src/server/index.ts src/server/permissions.ts
