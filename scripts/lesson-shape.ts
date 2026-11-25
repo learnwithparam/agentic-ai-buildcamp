@@ -95,12 +95,26 @@ export function shapeProblems(file: string, page: string): string[] {
   return problems;
 }
 
+// The README's lesson table is the one list of lessons. Each lesson is linked once, by its title
+// as the page's own first heading gives it, so a renamed page cannot leave an old title behind.
+export function readmeProblems(readme: string, pages: Array<{ file: string; page: string }>): string[] {
+  const problems: string[] = [];
+  for (const { file, page } of pages) {
+    const title = headingsOf(withoutFrontMatter(page))[0]?.replace(/^# \d\d /, "") ?? "";
+    const links = [...readme.matchAll(new RegExp(`\\[([^\\]]+)\\]\\(\\./${file.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\)`, "g"))];
+    if (links.length !== 1) problems.push(`README.md: links ${file} ${links.length} times; link it once in the lesson table`);
+    else if (links[0][1] !== title) problems.push(`README.md: ${file} is linked as "${links[0][1]}", but its title is "${title}"`);
+  }
+  return problems;
+}
+
 export function lessonFiles(): string[] {
   return readdirSync(LESSONS).filter((name) => /^\d\d-.*\.md$/.test(name)).sort().map((name) => `${LESSONS}/${name}`);
 }
 
 if (import.meta.main) {
-  const problems = lessonFiles().flatMap((file) => shapeProblems(file, readFileSync(file, "utf8")));
+  const pages = lessonFiles().map((file) => ({ file, page: readFileSync(file, "utf8") }));
+  const problems = [...pages.flatMap(({ file, page }) => shapeProblems(file, page)), ...readmeProblems(readFileSync("README.md", "utf8"), pages)];
   for (const problem of problems) console.error(problem);
   if (problems.length) {
     console.error(`${problems.length} lesson shape problems.`);

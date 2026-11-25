@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import { glossaryProblems } from "./glossary";
-import { shapeProblems } from "./lesson-shape";
+import { readmeProblems, shapeProblems } from "./lesson-shape";
 import { declaredStates, diagramProblems } from "./mermaid";
 import { problemsIn } from "./plain-english";
 
@@ -41,6 +41,13 @@ test("the shape check fails a missing heading, a wrong order and a product in Th
   assert.match(shapeProblems(FILE, swapped).join("\n"), /out of order/);
   assert.match(shapeProblems(FILE, lesson({ problem: "Langfuse shows the trace." })).join("\n"), /"The problem" names Langfuse/);
   assert.match(shapeProblems(FILE, lesson().replace("# 21 Check every citation", "# 21 Check citations in Langfuse")).join("\n"), /names Langfuse/);
+});
+
+test("the README links each lesson once, by the page's own title", () => {
+  const pages = [{ file: FILE, page: lesson() }];
+  assert.deepEqual(readmeProblems("| 21 | [Check every citation](./docs/learner/21-citations.md) |", pages), []);
+  assert.match(readmeProblems("| 21 | [Citations](./docs/learner/21-citations.md) |", pages).join("\n"), /its title is "Check every citation"/);
+  assert.match(readmeProblems("No table.", pages).join("\n"), /links docs\/learner\/21-citations.md 0 times/);
 });
 
 test("the diagram check fails a happy-path sequence and a missing flow diagram", () => {

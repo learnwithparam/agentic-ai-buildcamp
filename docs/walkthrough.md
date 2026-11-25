@@ -343,32 +343,7 @@ Each word below has one short meaning. The lessons link here.
 
 ## The lessons
 
-Each lesson answers one question and starts from its own checkpoint.
-
-| Lesson | The question it answers |
-| --- | --- |
-| [00](learner/00-setup.md) | Can I run the whole system on my laptop? |
-| [01](learner/01-base-app.md) | What does the desk do before we measure it? |
-| [02](learner/02-tracing.md) | What did the agent read and do for one answer? |
-| [03](learner/03-prompt-management.md) | How do we change the instructions without a deploy? |
-| [04](learner/04-monitoring.md) | Which failures happen most in real answers? |
-| [05](learner/05-dataset.md) | Which questions prove the desk works? |
-| [06](learner/06-experiments.md) | How good is the desk today, in numbers? |
-| [07](learner/07-evaluation.md) | Did the fix help, and did it break anything? |
-| [08](learner/08-midpoint.md) | How do the first parts fit together? |
-| [09](learner/09-advanced-evals.md) | Can a model grade what code cannot check? |
-| [10](learner/10-ai-gateway.md) | How do we keep model calls safe and paid for? |
-| [11](learner/11-sign-in-and-permissions.md) | How does each person see only their own company's data? |
-| [12](learner/12-mcp-and-sandbox.md) | How do outside tools use the desk safely? |
-| [13](learner/13-durable-state-and-review.md) | Which answers need a person, and how do they wait? |
-| [14](learner/14-fact-checker-and-outreach.md) | How do staff agents stay inside the rules? |
-| [15](learner/15-agents-hand-off-over-a2a.md) | How do agents hand work to each other? |
-| [16](learner/16-event-driven-agents.md) | How do agents start from events without double work? |
-| [17](learner/17-autonomous-agent.md) | How does an agent run with nobody watching? |
-| [18](learner/18-release-gate.md) | How do we stop a bad prompt before it ships? |
-| [19](learner/19-cli.md) | How does a terminal client sign in and stream? |
-| [20](learner/20-rag.md) | How does the desk search the real label PDFs? |
-| [21](learner/21-citations.md) | How do we check every citation before it is sent? |
+The [lesson list](../README.md#lessons) gives each lesson's checkpoint and the question it answers.
 
 ## What to watch for
 
