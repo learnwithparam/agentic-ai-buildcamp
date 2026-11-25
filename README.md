@@ -36,27 +36,27 @@ Each lesson starts from a checkpoint tag. It shows the problem, how the part wor
 
 | Step | Lesson | Checkpoint | The question it answers |
 | --- | --- | --- | --- |
-| 00 | [Setup](./docs/learner/00-setup.md) | `checkpoint/00-setup` | Can I run the whole system on my laptop? |
-| 01 | [Base app](./docs/learner/01-base-app.md) | `checkpoint/01-base-app` | What does the desk do before we measure it? |
-| 02 | [Tracing](./docs/learner/02-tracing.md) | `checkpoint/02-tracing` | What did the agent read and do for one answer? |
-| 03 | [Prompt management](./docs/learner/03-prompt-management.md) | `checkpoint/03-prompt-management` | How do we change the instructions without a deploy? |
-| 04 | [Monitoring](./docs/learner/04-monitoring.md) | `checkpoint/04-monitoring` | Which failures happen most in real answers? |
-| 05 | [Build eval datasets](./docs/learner/05-dataset.md) | `checkpoint/05-dataset` | Which questions prove the desk works? |
-| 06 | [Experiments](./docs/learner/06-experiments.md) | `checkpoint/06-experiments` | How good is the desk today, in numbers? |
-| 07 | [Evaluate a change](./docs/learner/07-evaluation.md) | `checkpoint/07-evaluation` | Did the fix help, and did it break anything? |
-| 08 | [Midpoint](./docs/learner/08-midpoint.md) | `checkpoint/08-midpoint` | How do the first parts fit together? |
-| 09 | [Calibrate a judge](./docs/learner/09-advanced-evals.md) | `checkpoint/09-advanced-evals` | Can a model grade what code cannot check? |
-| 10 | [Route every model call through an AI gateway](./docs/learner/10-ai-gateway.md) | `checkpoint/10-ai-gateway` | How do we keep model calls safe and paid for? |
-| 11 | [Sign doctors in with Keycloak and check permissions with OpenFGA](./docs/learner/11-sign-in-and-permissions.md) | `checkpoint/11-sign-in` | How does each person see only their own company's data? |
-| 12 | [Expose the desk over MCP with a sandbox for untrusted code](./docs/learner/12-mcp-and-sandbox.md) | `checkpoint/12-mcp-sandbox` | How do outside tools use the desk safely? |
-| 13 | [Route each request by risk and keep approvals in Postgres](./docs/learner/13-durable-state-and-review.md) | `checkpoint/13-durable-review` | Which answers need a person, and how do they wait? |
-| 14 | [Build a fact-checker and an outreach planner on one agent base](./docs/learner/14-fact-checker-and-outreach.md) | `checkpoint/14-content-agents` | How do staff agents stay inside the rules? |
-| 15 | [Hand work between agents over A2A](./docs/learner/15-agents-hand-off-over-a2a.md) | `checkpoint/15-a2a` | How do agents hand work to each other? |
-| 16 | [Start agents from events](./docs/learner/16-event-driven-agents.md) | `checkpoint/16-events` | How do agents start from events without double work? |
-| 17 | [Let an agent work alone within limits](./docs/learner/17-autonomous-agent.md) | `checkpoint/17-autonomy` | How does an agent run with nobody watching? |
+| 00 | [Run the whole course on your own laptop](./docs/learner/00-setup.md) | `checkpoint/00-setup` | Can I run the whole system on my laptop? |
+| 01 | [Follow one chat turn through an agent](./docs/learner/01-base-app.md) | `checkpoint/01-base-app` | What does the desk do before we measure it? |
+| 02 | [See every step an agent takes](./docs/learner/02-tracing.md) | `checkpoint/02-tracing` | What did the agent read and do for one answer? |
+| 03 | [Change an agent's behavior without a deploy](./docs/learner/03-prompt-management.md) | `checkpoint/03-prompt-management` | How do we change the instructions without a deploy? |
+| 04 | [Find what goes wrong in production](./docs/learner/04-monitoring.md) | `checkpoint/04-monitoring` | Which failures happen most in real answers? |
+| 05 | [Write down what your agent must get right](./docs/learner/05-dataset.md) | `checkpoint/05-dataset` | Which questions prove the desk works? |
+| 06 | [Score your agent on every case](./docs/learner/06-experiments.md) | `checkpoint/06-experiments` | How good is the desk today, in numbers? |
+| 07 | [Compare two runs to see if a change helped](./docs/learner/07-evaluation.md) | `checkpoint/07-evaluation` | Did the fix help, and did it break anything? |
+| 08 | [Read your scoreboard as one improvement loop](./docs/learner/08-midpoint.md) | `checkpoint/08-midpoint` | How do the first parts fit together? |
+| 09 | [Check a judge against people before you trust it](./docs/learner/09-advanced-evals.md) | `checkpoint/09-advanced-evals` | Can a model grade what code cannot check? |
+| 10 | [Put every model call behind one door with a daily budget](./docs/learner/10-ai-gateway.md) | `checkpoint/10-ai-gateway` | How do we keep model calls safe and paid for? |
+| 11 | [Check who is asking and what they may read before the model sees anything](./docs/learner/11-sign-in-and-permissions.md) | `checkpoint/11-sign-in` | How does each person see only their own company's data? |
+| 12 | [Open a second door with the same walls and run untrusted code in a sandbox](./docs/learner/12-mcp-and-sandbox.md) | `checkpoint/12-mcp-sandbox` | How do outside tools use the desk safely? |
+| 13 | [Route each request by risk and keep approvals when the server restarts](./docs/learner/13-durable-state-and-review.md) | `checkpoint/13-durable-review` | Which answers need a person, and how do they wait? |
+| 14 | [Check every sales email against approved claims](./docs/learner/14-fact-checker-and-outreach.md) | `checkpoint/14-content-agents` | How do staff agents stay inside the rules? |
+| 15 | [Hand work between agents without losing who asked](./docs/learner/15-agents-hand-off-over-a2a.md) | `checkpoint/15-a2a` | How do agents hand work to each other? |
+| 16 | [Start agents from events and handle each one once](./docs/learner/16-event-driven-agents.md) | `checkpoint/16-events` | How do agents start from events without double work? |
+| 17 | [Let an agent work alone inside limits code enforces](./docs/learner/17-autonomous-agent.md) | `checkpoint/17-autonomy` | How does an agent run with nobody watching? |
 | 18 | [Block a bad change before it ships](./docs/learner/18-release-gate.md) | `checkpoint/18-release-gate` | How do we stop a bad prompt before it ships? |
-| 19 | [Ask and review from the terminal](./docs/learner/19-cli.md) | `checkpoint/19-cli` | How does a terminal client sign in and stream? |
-| 20 | [Answer from the label PDFs with pgvector](./docs/learner/20-rag.md) | `checkpoint/20-rag` | How does the desk search the real label PDFs? |
+| 19 | [Ask and review from the terminal with the same permissions](./docs/learner/19-cli.md) | `checkpoint/19-cli` | How does a terminal client sign in and stream? |
+| 20 | [Find the right label section by meaning from the PDFs](./docs/learner/20-rag.md) | `checkpoint/20-rag` | How does the desk search the real label PDFs? |
 | 21 | [Check every citation before the answer is sent](./docs/learner/21-citations.md) | `checkpoint/21-citations` | How do we check every citation before it is sent? |
 
 The commands the lessons use:
