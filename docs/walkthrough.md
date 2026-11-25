@@ -341,6 +341,18 @@ Each word below has one short meaning. The lessons link here.
 <a id="c-held-answer"></a>
 **Held answer.** A fixed reply sent when an answer fails its check twice. It tells the doctor to ask a person.
 
+<a id="c-query-check"></a>
+**Query check.** Code that reads the model's SQL before it runs. It lets through one SELECT on one table, with a short list of functions.
+
+<a id="c-database-login"></a>
+**Database login.** A separate user name for each company that the agent's queries run as. It can read one table and nothing else.
+
+<a id="c-row-rule"></a>
+**Row rule.** A rule inside the database that hides every row not owned by the login. It holds even if the SQL asks for those rows.
+
+<a id="c-small-group"></a>
+**Small group.** A total built from fewer than 11 prescribers. It is left out, so no number points at one doctor.
+
 ## The lessons
 
 The [lesson list](../README.md#lessons) gives each lesson's checkpoint and the question it answers.
