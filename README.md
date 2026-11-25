@@ -41,6 +41,7 @@ Each lesson names the checkpoint tag to check out, what to change, and how to ch
 | 11 | [Sign doctors in with Keycloak and check permissions with OpenFGA](./docs/learner/11-sign-in-and-permissions.md) | `checkpoint/11-sign-in` | Take the company and country from a signed token, let OpenFGA decide which label text each doctor reads, and keep names and emails out of the trace. |
 | 12 | [Expose the desk over MCP with a sandbox for untrusted code](./docs/learner/12-mcp-and-sandbox.md) | `checkpoint/12-mcp-sandbox` | Let Claude Code search the labels with the doctor's own token, teach it the procedure with a skill, and run code evaluators in a QuickJS sandbox. |
 | 13 | [Route each request by risk and keep approvals in Postgres](./docs/learner/13-durable-state-and-review.md) | `checkpoint/13-durable-review` | Sort every message into a risk tier in code, send drafts and adverse events to a reviewer inbox, and resume a paused thread after a restart. |
+| 14 | [Build a fact-checker and an outreach planner on one agent base](./docs/learner/14-fact-checker-and-outreach.md) | `checkpoint/14-content-agents` | Two more agents on the same gateway, sign-in and inbox: flag every unapproved sentence in an email, and hold duplicate outreach until a sales rep approves. |
 
 Helper commands used by the lessons:
 
