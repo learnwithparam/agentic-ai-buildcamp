@@ -13,6 +13,8 @@ type company
     define member: [user]
     define medical_reviewer: [user]
     define safety_reviewer: [user]
+    # Lesson 14: a sales rep approves each outreach step before it reaches a doctor.
+    define sales_rep: [user]
 
 type country
   relations
@@ -24,6 +26,17 @@ type document
     define approved_in: [country]
     # Both must hold: your company owns it, and it is approved where you practise.
     define can_read: member from owner and doctor from approved_in
+    # Lesson 14. The fact-checker reads every country's claims of its own company, so it can say
+    # "approved in the US, not in Germany". Only the staff who send and approve emails use it;
+    # a doctor does not, and another company's claims stay out.
+    define can_check_against: sales_rep from owner or medical_reviewer from owner
+
+# Lesson 14. A doctor's profile in the CRM belongs to the company whose reps call on them.
+type hcp
+  relations
+    define owner: [company]
+    # Only the company's sales reps: a doctor signed in to the desk never sees another doctor's record.
+    define can_view: sales_rep from owner
 
 # Lesson 13. Who may decide a waiting item. The reviewer roles come from the Keycloak token as
 # contextual tuples, like the doctor facts above. Each item's company is stored when it is made.
@@ -36,3 +49,15 @@ type adverse_event
   relations
     define company: [company]
     define can_decide: safety_reviewer from company
+
+# Lesson 14. An email the fact-checker flagged waits for a medical reviewer; an outreach step
+# waits for a sales rep.
+type email
+  relations
+    define company: [company]
+    define can_decide: medical_reviewer from company
+
+type outreach
+  relations
+    define company: [company]
+    define can_decide: sales_rep from company

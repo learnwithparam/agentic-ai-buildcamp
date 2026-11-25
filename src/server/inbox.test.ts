@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import type { AddressInfo } from "node:net";
+import { createFactChecker } from "./content/fact-check";
+import { createOutreachPlanner } from "./content/outreach";
 import { after, before, test } from "node:test";
 import { createLocalJWKSet, exportJWK, generateKeyPair, SignJWT, type JWTPayload } from "jose";
 import { createTestStore } from "../../scripts/fga-model";
@@ -47,6 +49,8 @@ const rivera = person("kc-rivera", "pharma_a");
 const chen = person("kc-chen", "pharma_a", ["medical-reviewer"]);
 const haddad = person("kc-haddad", "pharma_a", ["safety-reviewer"]);
 const rossi = person("kc-rossi", "pharma_b", ["medical-reviewer"]);
+const nair = person("kc-nair", "pharma_a", ["sales-rep"]);
+const fischer = person("kc-fischer", "pharma_a", ["sales-rep"]);
 
 const token = (claims: JWTPayload) =>
   new SignJWT(claims).setProtectedHeader({ alg: "RS256", kid: "kc-1" }).setIssuer(ISSUER).setAudience("medinfo-api").setIssuedAt().setExpirationTime("5m").sign(privateKey);
@@ -65,15 +69,15 @@ let base = "";
 let close = () => {};
 let dropStore = async () => {};
 const run = crypto.randomUUID().slice(0, 8);
-const ids = { draftA: `draft-${run}-a`, draftA2: `draft-${run}-a2`, eventA: `ae-${run}-a`, draftB: `draft-${run}-b`, draftC: `draft-${run}-c` };
-const threads = { a: `thread-${run}-a`, b: `thread-${run}-b`, c: `thread-${run}-c` };
+const ids = { draftA: `draft-${run}-a`, draftA2: `draft-${run}-a2`, eventA: `ae-${run}-a`, draftB: `draft-${run}-b`, draftC: `draft-${run}-c`, stepA: `outreach-${run}-a`, emailA: `email-${run}-a` };
+const threads = { a: `thread-${run}-a`, b: `thread-${run}-b`, c: `thread-${run}-c`, rep: `thread-${run}-rep`, lena: `thread-${run}-lena`, maya: `thread-${run}-maya` };
 
 before(async () => {
   await migrate(pool);
   const store = await createTestStore(env.fgaApiUrl, env.fgaApiToken);
   dropStore = async () => void (await store.client.deleteStore());
   reviews = new ReviewStore(pool, () => store.client);
-  const desk = { agent: agent as unknown as MedinfoAgent, reviews, recordDecision: async (item: ReviewItem) => void scored.push(item) };
+  const desk = { agent: agent as unknown as MedinfoAgent, factChecker: createFactChecker({ client: () => store.client }), outreachPlanner: createOutreachPlanner({ client: () => store.client }), reviews, recordDecision: async (item: ReviewItem) => void scored.push(item) };
   const server = createApp(auth, desk).listen(0, "127.0.0.1");
   await new Promise((resolve) => server.once("listening", resolve));
   base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
@@ -90,6 +94,15 @@ before(async () => {
   await reviews.submit({ ...item, id: ids.eventA, kind: "adverse_event", threadId: threads.a, tenantId: "pharma_a" });
   await reviews.submit({ ...item, id: ids.draftB, kind: "draft", threadId: threads.b, tenantId: "pharma_b" });
   await reviews.submit({ ...item, id: ids.draftC, kind: "draft", threadId: threads.c, tenantId: "pharma_a" });
+  // Lesson 14: Priya Nair asks the planner for a step; it waits for a sales rep.
+  await reviews.createThread(threads.rep, { ...doctor, userId: "kc-nair", roles: ["sales-rep"] });
+  await reviews.submit({ ...item, id: ids.stepA, kind: "outreach", threadId: threads.rep, tenantId: "pharma_a" });
+  // Lena Fischer checks an email and it is flagged; then Maya Chen checks the same text. One item,
+  // two requests: Maya asked for it too, so she may not decide it.
+  await reviews.createThread(threads.lena, { ...doctor, userId: "kc-fischer", roles: ["sales-rep"] });
+  await reviews.createThread(threads.maya, { ...doctor, userId: "kc-chen", roles: ["medical-reviewer"] });
+  await reviews.submit({ ...item, id: ids.emailA, kind: "email", threadId: threads.lena, tenantId: "pharma_a" });
+  await reviews.submit({ ...item, id: ids.emailA, kind: "email", threadId: threads.maya, tenantId: "pharma_a" });
   waitsOn.set(threads.a, ids.draftA).set(threads.b, ids.draftB).set(threads.c, ids.draftC);
 });
 after(async () => {
@@ -180,4 +193,22 @@ test("an item submitted twice is one row with one deadline", async () => {
   assert.equal(again.dueAt.getTime(), new Date(rows[0].due).getTime());
   const hours = (again.dueAt.getTime() - Date.now()) / 3_600_000;
   assert.ok(hours > 47 && hours <= 48, `a draft is due in 48 hours, got ${hours.toFixed(1)}`);
+});
+
+test("an outreach step waits for another sales rep: not the rep who asked, not a medical reviewer", async () => {
+  assert.ok(!(await inboxIds(nair)).includes(ids.stepA));
+  assert.ok(!(await inboxIds(chen)).includes(ids.stepA));
+  assert.equal((await call(nair, `/api/inbox/${ids.stepA}/decision`, { decision: "approved" })).status, 403);
+  assert.equal((await call(chen, `/api/inbox/${ids.stepA}/decision`, { decision: "approved" })).status, 403);
+  assert.deepEqual(await inboxIds(fischer), [ids.stepA]);
+  const response = await call(fischer, `/api/inbox/${ids.stepA}/decision`, { decision: "approved" });
+  assert.equal(response.status, 200);
+  assert.equal(response.json.decidedBy, "kc-fischer");
+});
+
+test("nobody decides an item any of their requests raised, not only the first request", async () => {
+  assert.ok(!(await inboxIds(chen)).includes(ids.emailA));
+  assert.equal((await call(chen, `/api/inbox/${ids.emailA}/decision`, { decision: "approved" })).status, 403);
+  const { rows } = await pool.query("SELECT thread_id FROM review_requests WHERE item_id = $1 ORDER BY thread_id", [ids.emailA]);
+  assert.deepEqual(rows.map((row) => row.thread_id), [threads.lena, threads.maya]);
 });

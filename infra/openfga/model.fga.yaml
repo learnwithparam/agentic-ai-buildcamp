@@ -13,6 +13,11 @@ tuples:
   - { user: "company:pharma_a", relation: company, object: "draft:a-lee" }
   - { user: "company:pharma_a", relation: company, object: "adverse_event:a-mrn" }
   - { user: "company:pharma_b", relation: company, object: "draft:b-ito" }
+  # Lesson 14: doctor profiles and the two new waiting items.
+  - { user: "company:pharma_a", relation: owner, object: "hcp:HCP-1001" }
+  - { user: "company:pharma_b", relation: owner, object: "hcp:HCP-1004" }
+  - { user: "company:pharma_a", relation: company, object: "email:a-check" }
+  - { user: "company:pharma_a", relation: company, object: "outreach:a-step" }
 
 tests:
   - name: a US doctor at pharma_a reads only pharma_a's US text
@@ -101,3 +106,57 @@ tests:
       - user: "user:rivera"
         type: adverse_event
         assertions: { can_decide: [] }
+
+  - name: the fact-checker sees every country's claims of its own company, and none of another's
+    tuples:
+      - { user: "user:nair", relation: sales_rep, object: "company:pharma_a" }
+      - { user: "user:chen", relation: medical_reviewer, object: "company:pharma_a" }
+      - { user: "user:weber", relation: member, object: "company:pharma_a" }
+      - { user: "user:weber", relation: doctor, object: "country:DE" }
+    check:
+      - user: "user:nair"
+        object: "document:cardionex-uspi-v3"
+        assertions: { can_check_against: true, can_read: false }
+      - user: "user:chen"
+        object: "document:cardionex-uspi-v3"
+        assertions: { can_check_against: true }
+      - user: "user:nair"
+        object: "document:neurovex-trial-summary"
+        assertions: { can_check_against: false }
+      - user: "user:weber"
+        object: "document:cardionex-uspi-v3"
+        assertions: { can_check_against: false }
+
+  - name: a company's sales reps see its own doctors' profiles only, and a doctor sees none
+    tuples:
+      - { user: "user:nair", relation: sales_rep, object: "company:pharma_a" }
+      - { user: "user:rivera", relation: member, object: "company:pharma_a" }
+    list_objects:
+      - user: "user:nair"
+        type: hcp
+        assertions: { can_view: ["hcp:HCP-1001"] }
+      - user: "user:rivera"
+        type: hcp
+        assertions: { can_view: [] }
+
+  - name: a sales rep decides outreach steps, a medical reviewer decides flagged emails, not the other way
+    tuples:
+      - { user: "user:nair", relation: sales_rep, object: "company:pharma_a" }
+      - { user: "user:chen", relation: medical_reviewer, object: "company:pharma_a" }
+      - { user: "user:okafor-rep", relation: sales_rep, object: "company:pharma_b" }
+    check:
+      - user: "user:nair"
+        object: "outreach:a-step"
+        assertions: { can_decide: true }
+      - user: "user:nair"
+        object: "email:a-check"
+        assertions: { can_decide: false }
+      - user: "user:chen"
+        object: "email:a-check"
+        assertions: { can_decide: true }
+      - user: "user:chen"
+        object: "outreach:a-step"
+        assertions: { can_decide: false }
+      - user: "user:okafor-rep"
+        object: "outreach:a-step"
+        assertions: { can_decide: false }

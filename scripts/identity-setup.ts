@@ -277,11 +277,12 @@ function setupMcpClient() {
 type Person = { email: string; firstName: string; lastName: string; tenantId: string; country: string; role?: ReviewerRole };
 
 // Lesson 13. A reviewer is a realm role, so it is in the token's realm_access claim. The app reads
-// only these two; OpenFGA then asks whether the role holds for the item's company.
+// only these; OpenFGA then asks whether the role holds for the item's company.
 async function setupReviewerRoles(): Promise<Record<ReviewerRole, { id: string; name: string }>> {
   const descriptions: Record<ReviewerRole, string> = {
     "medical-reviewer": "Approves drafts before they are sent (lesson 13)",
-    "safety-reviewer": "Files or dismisses adverse event reports (lesson 13)"
+    "safety-reviewer": "Files or dismisses adverse event reports (lesson 13)",
+    "sales-rep": "Approves each outreach step before it reaches a doctor (lesson 14)"
   };
   const roles = {} as Record<ReviewerRole, { id: string; name: string }>;
   for (const name of REVIEWER_ROLES) {

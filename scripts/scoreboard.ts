@@ -19,7 +19,7 @@
 import { appendFileSync, existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { loadMedinfoCases } from "./hcp-cases";
+import { loadAllCases } from "./hcp-cases";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 // The slices whose riskTier is the router's answer, so risk_tier joins their pass.
@@ -29,7 +29,7 @@ export const SCOREBOARD_FILE = path.join(ROOT, "docs/scoreboard.md");
 export const LEARNER_SCOREBOARD_FILE = path.join(ROOT, "my-scoreboard.md");
 
 export function slices(): string[] {
-  return [...new Set(loadMedinfoCases().map((item) => item.metadata.slice))];
+  return [...new Set(loadAllCases().map((item) => item.metadata.slice))];
 }
 
 export function headerRow() {

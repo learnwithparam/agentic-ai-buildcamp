@@ -3,7 +3,7 @@ import { mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { test } from "node:test";
-import { failedChecks, loadMedinfoCases } from "./hcp-cases";
+import { failedChecks, loadAllCases, loadMedinfoCases } from "./hcp-cases";
 import { appendScoreboardRow, checkScoreboard, headerRow, LEARNER_SCOREBOARD_FILE, SCOREBOARD_FILE, scoreboardRow, slices } from "./scoreboard";
 
 test("text checks read bold doses and spaced units the way the dataset writes them", () => {
@@ -25,7 +25,7 @@ test("every ideal answer passes its own checks, tokens aside", () => {
 });
 
 test("every case carries the dataset's text checks, including the global leak checks", () => {
-  for (const item of loadMedinfoCases()) {
+  for (const item of loadAllCases()) {
     assert.ok(item.expectedOutput.checks.some((check) => check.value === "1043298112"), item.id);
   }
 });

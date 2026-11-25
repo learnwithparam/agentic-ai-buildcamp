@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { ClientWriteRequestOnDuplicateWrites, type OpenFgaClient } from "@openfga/sdk";
 import type pg from "pg";
 import type { ReviewInbox, ReviewSubmission } from "./graph";
@@ -34,10 +35,12 @@ export type ReviewItem = {
 // filed with the safety database or dismissed as not one.
 export const DECISIONS: Record<ReviewKind, ReviewStatus[]> = {
   draft: ["approved", "rejected"],
-  adverse_event: ["filed", "dismissed"]
+  adverse_event: ["filed", "dismissed"],
+  email: ["approved", "rejected"],
+  outreach: ["approved", "rejected"]
 };
 
-const HOURS: Record<ReviewKind, number> = { draft: REVIEW_HOURS, adverse_event: SAFETY_HOURS };
+const HOURS: Record<ReviewKind, number> = { draft: REVIEW_HOURS, adverse_event: SAFETY_HOURS, email: REVIEW_HOURS, outreach: REVIEW_HOURS };
 
 type Row = {
   id: string;
@@ -72,6 +75,13 @@ const toItem = (row: Row): ReviewItem => ({
 });
 
 
+// Lesson 14. An id made from what is reviewed, so the same email or step checked twice is one
+// item in the inbox, not two. Once decided, the same content stays decided.
+export const contentKey = (...parts: string[]) => createHash("sha256").update(parts.join("\u0000")).digest("hex").slice(0, 24);
+
+// True for an item r that one of user $2's threads asked for.
+const ASKED_BY = "SELECT 1 FROM review_requests q JOIN threads t ON t.thread_id = q.thread_id WHERE q.item_id = r.id AND t.owner_id = $2";
+
 export class ReviewStore implements ReviewInbox {
   constructor(
     private pool: pg.Pool,
@@ -93,24 +103,30 @@ export class ReviewStore implements ReviewInbox {
       { writes: [{ user: `company:${item.tenantId}`, relation: "company", object: `${item.kind}:${item.id}` }] },
       { conflict: { onDuplicateWrites: ClientWriteRequestOnDuplicateWrites.Ignore } }
     );
-    const { rows } = await this.pool.query<{ due_at: Date }>(
-      `INSERT INTO review_items (id, kind, thread_id, tenant_id, trace_id, question, body, due_at)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, now() + make_interval(hours => $8))
-       ON CONFLICT (id) DO UPDATE SET id = EXCLUDED.id
-       RETURNING due_at`,
+    const { rows } = await this.pool.query<{ due_at: Date; status: ReviewStatus }>(
+      // The item once, and this request every time: whoever asked is kept off deciding it.
+      `WITH item AS (
+         INSERT INTO review_items (id, kind, thread_id, tenant_id, trace_id, question, body, due_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, now() + make_interval(hours => $8))
+         ON CONFLICT (id) DO UPDATE SET id = EXCLUDED.id
+         RETURNING id, due_at, status
+       ), request AS (
+         INSERT INTO review_requests (item_id, thread_id) SELECT id, $3 FROM item ON CONFLICT DO NOTHING
+       )
+       SELECT due_at, status FROM item`,
       [item.id, item.kind, item.threadId, item.tenantId, item.traceId ?? null, item.question, item.body, HOURS[item.kind]]
     );
-    return { dueAt: rows[0].due_at };
+    return { dueAt: rows[0].due_at, status: rows[0].status };
   }
 
   // A reviewer's inbox: every waiting item OpenFGA says they may decide, the soonest due first.
   async waitingFor(reviewer: Identity): Promise<ReviewItem[]> {
     const ids = await this.decidable(reviewer);
     if (!ids.length) return [];
-    // An item the reviewer's own question raised is not theirs to decide, so it is not listed.
+    // An item any of the reviewer's own requests raised is not theirs to decide, so it is not listed.
     const { rows } = await this.pool.query<Row>(
-      `SELECT r.* FROM review_items r JOIN threads t ON t.thread_id = r.thread_id
-       WHERE r.id = ANY($1) AND r.status = 'waiting' AND t.owner_id <> $2 ORDER BY r.due_at`,
+      `SELECT r.* FROM review_items r
+       WHERE r.id = ANY($1) AND r.status = 'waiting' AND NOT EXISTS (${ASKED_BY}) ORDER BY r.due_at`,
       [ids, reviewer.userId]
     );
     return rows.map(toItem);
@@ -119,8 +135,7 @@ export class ReviewStore implements ReviewInbox {
   // A doctor's view: what happened to the items their own threads raised.
   async raisedBy(doctor: Identity): Promise<ReviewItem[]> {
     const { rows } = await this.pool.query<Row>(
-      `SELECT r.* FROM review_items r JOIN threads t ON t.thread_id = r.thread_id
-       WHERE t.owner_id = $1 ORDER BY r.created_at DESC LIMIT 50`,
+      `SELECT r.* FROM review_items r WHERE EXISTS (${ASKED_BY.replace("$2", "$1")}) ORDER BY r.created_at DESC LIMIT 50`,
       [doctor.userId]
     );
     return rows.map(toItem);
@@ -133,9 +148,9 @@ export class ReviewStore implements ReviewInbox {
 
   async canDecide(reviewer: Identity, item: ReviewItem): Promise<boolean> {
     if (!reviewer.roles.length) return false;
-    // Nobody decides an item their own question raised, even when they hold the reviewer role.
-    const { rows } = await this.pool.query<{ owner_id: string }>("SELECT owner_id FROM threads WHERE thread_id = $1", [item.threadId]);
-    if (rows[0]?.owner_id === reviewer.userId) return false;
+    // Nobody decides an item their own request raised, even when they hold the reviewer role.
+    const { rowCount } = await this.pool.query(`SELECT 1 FROM review_items r WHERE r.id = $1 AND EXISTS (${ASKED_BY})`, [item.id, reviewer.userId]);
+    if (rowCount) return false;
     const { allowed } = await this.client().check({
       user: `user:${reviewer.userId}`,
       relation: "can_decide",
@@ -162,7 +177,7 @@ export class ReviewStore implements ReviewInbox {
 
   private async decidable(reviewer: Identity): Promise<string[]> {
     if (!reviewer.roles.length) return [];
-    const kinds: ReviewKind[] = ["draft", "adverse_event"];
+    const kinds = Object.keys(DECISIONS) as ReviewKind[];
     const lists = await Promise.all(
       kinds.map((kind) =>
         this.client().listObjects({

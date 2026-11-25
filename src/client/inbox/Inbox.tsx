@@ -6,7 +6,7 @@ import { formatDue, timeLeft } from "./format";
 // soonest deadline first, and decides it here. A doctor sees what their own questions raised and
 // what became of it. The server decides who may see and decide what; this page only shows it.
 
-const KIND = { draft: "Draft for review", adverse_event: "Adverse event report" } as const;
+const KIND = { draft: "Draft for review", adverse_event: "Adverse event report", email: "Email with flagged sentences", outreach: "Outreach step" } as const;
 const ACTIONS: Record<ReviewItem["kind"], Array<{ decision: ReviewItem["status"]; label: string; primary?: boolean }>> = {
   draft: [
     { decision: "approved", label: "Approve and send", primary: true },
@@ -15,7 +15,23 @@ const ACTIONS: Record<ReviewItem["kind"], Array<{ decision: ReviewItem["status"]
   adverse_event: [
     { decision: "filed", label: "Filed in the safety database", primary: true },
     { decision: "dismissed", label: "Not an adverse event" }
+  ],
+  // Lesson 14.
+  email: [
+    { decision: "approved", label: "Approve the email", primary: true },
+    { decision: "rejected", label: "Send it back" }
+  ],
+  outreach: [
+    { decision: "approved", label: "Approve the step", primary: true },
+    { decision: "rejected", label: "Reject" }
   ]
+};
+// What each kind shows above its two texts.
+const PARTS: Record<ReviewItem["kind"], [string, string]> = {
+  draft: ["The doctor asked", "The draft"],
+  adverse_event: ["The doctor asked", "What the desk replied"],
+  email: ["What was checked", "The fact-check"],
+  outreach: ["The step", "The plan"]
 };
 const STATUS: Record<ReviewItem["status"], string> = {
   waiting: "Waiting",
@@ -54,9 +70,9 @@ function Item({ item, reviewer, onDecided }: { item: ReviewItem; reviewer: boole
         )}
       </div>
       <div className="card-body">
-        <div className="label">The doctor asked</div>
+        <div className="label">{PARTS[item.kind][0]}</div>
         <p className="inbox-question">{item.question}</p>
-        <div className="label">{item.kind === "draft" ? "The draft" : "What the desk replied"}</div>
+        <div className="label">{PARTS[item.kind][1]}</div>
         <div className="approval-draft">{plain(item.body)}</div>
         {item.note && (
           <>
@@ -114,7 +130,7 @@ export function Inbox() {
       <h1>{state.reviewer ? "Waiting for your review" : "What your questions sent for review"}</h1>
       <p className="inbox-lead">
         {state.reviewer
-          ? "Soonest deadline first. Each decision is recorded with your name and the time. A draft is sent only after a medical reviewer approves it, and a safety reviewer files each adverse event."
+          ? "Soonest deadline first. Each decision is recorded with your name and the time. Nothing here reaches a doctor until it is decided, and you never decide an item your own request raised."
           : "A draft waits for a medical reviewer before it is sent. A report of something that happened to a patient goes to the drug safety team."}
       </p>
       {state.items.length === 0 ? (

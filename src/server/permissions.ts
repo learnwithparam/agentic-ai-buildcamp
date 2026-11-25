@@ -1,7 +1,8 @@
 import { CredentialsMethod, OpenFgaClient, type TupleKey } from "@openfga/sdk";
 import { env } from "./env";
+import type { HcpProfile } from "./content/records";
 import type { LabelSection } from "./labels";
-import type { Identity } from "./users";
+import type { Identity, ReviewerRole } from "./users";
 
 // Lesson 11. Which label text a doctor may read is decided by OpenFGA, from the rules in
 // infra/openfga/model.fga. The search asks here first and never scores text outside the answer,
@@ -32,14 +33,16 @@ export function doctorTuples(user: Identity): TupleKey[] {
   ];
 }
 
+const ROLE_RELATION: Record<ReviewerRole, string> = {
+  "medical-reviewer": "medical_reviewer",
+  "safety-reviewer": "safety_reviewer",
+  "sales-rep": "sales_rep"
+};
+
 // Lesson 13. A reviewer's role, from the same verified token: the Keycloak realm role says what
 // they review, the organization says for which company.
 export function reviewerTuples(user: Identity): TupleKey[] {
-  return user.roles.map((role) => ({
-    user: `user:${user.userId}`,
-    relation: role === "medical-reviewer" ? "medical_reviewer" : "safety_reviewer",
-    object: `company:${user.tenantId}`
-  }));
+  return user.roles.map((role) => ({ user: `user:${user.userId}`, relation: ROLE_RELATION[role], object: `company:${user.tenantId}` }));
 }
 
 // The document facts OpenFGA stores: whose it is, and where it is approved. Derived from the
@@ -63,4 +66,27 @@ export async function readableDocuments(user: Identity, client: OpenFgaClient = 
     contextualTuples: doctorTuples(user)
   });
   return new Set(objects.map((object) => object.replace(/^document:/, "")));
+}
+
+// Lesson 14. Which company's reps call on each doctor, from the CRM's own profiles.
+export function hcpTuples(profiles: HcpProfile[]): TupleKey[] {
+  return profiles.map((profile) => ({ user: `company:${profile.tenantId}`, relation: "owner", object: `hcp:${profile.hcpId}` }));
+}
+
+async function objectIds(user: Identity, relation: string, type: string, client: OpenFgaClient) {
+  // The staff roles come from the token too, so a sales rep's or reviewer's reach is checked here.
+  const contextualTuples = [...doctorTuples(user), ...reviewerTuples(user)];
+  const { objects } = await client.listObjects({ user: `user:${user.userId}`, relation, type, contextualTuples });
+  return new Set(objects.map((object) => object.slice(type.length + 1)));
+}
+
+// Lesson 14. The documents whose claims this user's fact-check compares against: their own
+// company's, in every country.
+export function checkableDocuments(user: Identity, client: OpenFgaClient = fga()) {
+  return objectIds(user, "can_check_against", "document", client);
+}
+
+// Lesson 14. The doctors whose profile this user may plan outreach for.
+export function visibleHcps(user: Identity, client: OpenFgaClient = fga()) {
+  return objectIds(user, "can_view", "hcp", client);
 }
