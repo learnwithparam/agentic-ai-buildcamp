@@ -137,3 +137,26 @@ test("a section in force comes before closer versions that are no longer in forc
   const hits = await search(query, new Set(docs), 1, TODAY);
   assert.deepEqual(hits.map((hit) => `${hit.docId} ${hit.status}`), ["test-rag-new active"]);
 });
+
+test("a hit in a short document brings the rest of that document right after it", async () => {
+  // As in the reporting procedure (ROUTING-05): 1.2 shares few words with the question, so on its own it ranks below label text.
+  const sop = [
+    { section: "1.1", title: "Who reports and when", text: "Every adverse event goes to the drug safety team within 24 hours. A human reviewer files the report." },
+    { section: "1.2", title: "Record keeping", text: "Keep the paper copies in the locked archive room for ten years." }
+  ];
+  const vectors = await embed(sop.map((s) => embeddingText({ docId: "test-rag-sop", ...s })));
+  const of = (i: number): LabelChunk => ({ docId: "test-rag-sop", tenantId: "pharma_a", brandId: "brand_test", ...sop[i], status: "active", effectiveDate: "2026-01-01", country: "US", embedding: vectors[i] });
+  await store.replaceDocument("test-rag-sop", [of(0), of(1)], "sha-sop", EMBEDDING_MODEL);
+  // A label section that shares the question's words, so it is nearer than 1.2.
+  const label = { docId: "test-rag-label", tenantId: "pharma_a", brandId: "brand_test", section: "6.1", title: "Adverse reactions", text: "Report adverse reactions to the drug safety team. The most common adverse reactions were dizziness and cough." };
+  const [labelVector] = await embed([embeddingText(label)]);
+  await store.replaceDocument("test-rag-label", [{ ...label, status: "active", effectiveDate: "2026-01-01", country: "US", embedding: labelVector }], "sha-label", EMBEDDING_MODEL);
+  const docs = ["test-rag-sop", "test-rag-label"];
+  const query = "Who files an adverse event report, and within how many hours?";
+  const nearest = await store.nearest((await embed([query]))[0], docs, 2, EMBEDDING_MODEL);
+  assert.deepEqual(nearest.map((hit) => `${hit.docId} ${hit.section}`), ["test-rag-sop 1.1", "test-rag-label 6.1"], "the setup needs 1.1 first and 1.2 behind a label section");
+  // One hit asked for: 1.2 comes as an extra after it, and pushes nothing out.
+  const hits = await search(query, new Set(docs), 1, TODAY);
+  assert.deepEqual(hits.map((hit) => `${hit.docId} ${hit.section}`), ["test-rag-sop 1.1", "test-rag-sop 1.2"]);
+  assert.ok(await store.shortDocuments(["test-rag-sop"], 5, EMBEDDING_MODEL).then((rows) => !rows.length), "a document over the word budget stays one section per hit");
+});

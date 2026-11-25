@@ -26,10 +26,13 @@ async function main() {
     // Pretty-print the summary table.
     console.log(await result.format());
 
+    // Every run names the cases that failed, and why: the summary above gives only averages.
+    const cases = reportCases(result.itemResults);
+
     // With --chapter, add this run as one row of my-scoreboard.md (docs/scoreboard.md with --reference).
     const chapter = flag("--chapter");
     if (chapter) {
-      const row = scoreboardRow(chapter, flag("--change") ?? "", reportCases(result.itemResults), result.datasetRunUrl ?? "");
+      const row = scoreboardRow(chapter, flag("--change") ?? "", cases, result.datasetRunUrl ?? "");
       const file = process.argv.includes("--reference") ? SCOREBOARD_FILE : LEARNER_SCOREBOARD_FILE;
       appendScoreboardRow(row, file);
       console.log(row);
