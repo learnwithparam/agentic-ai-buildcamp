@@ -152,6 +152,7 @@ This is not an error. The doctor says if `npm run dev` is running. Then you know
 | The sign-in page says the password is wrong | Each demo user's password is in your own `.env` | Use the value of `SEED_USER_PASSWORD` |
 | You are signed in as the wrong person | The browser keeps one sign-in at a time | Use a private window, or one browser profile per person |
 | The chat says "The agent could not finish this answer" | The model call failed | Run `npm run doctor`. The model check names the reason. |
+| The app stops with "password authentication failed" | Another copy of this repo on your laptop started the containers, with its own passwords | Stop that copy's containers with `docker compose down`, then run `npm run setup` here |
 | The first `npm run setup` is slow | Docker downloads every image once | Wait. A second run is fast. |
 | The answer differs from the lesson's example | The model words things a bit differently each time | Check that the facts and the citation match, not the wording |
 
