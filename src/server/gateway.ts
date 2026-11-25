@@ -45,9 +45,11 @@ export function modelClient(): OpenAI {
 }
 
 // Lesson 20. The label search turns text into vectors through the same door and the same key,
-// so the gateway records and caps it like any chat call. The model is fixed: every stored vector
-// and every question must come from the same one, or their distances mean nothing.
-export const EMBEDDING_MODEL = "openai/text-embedding-3-small";
+// so the gateway records and caps it like any chat call. Every stored vector and every question
+// must come from the same model, or their distances mean nothing: rows are keyed by model, so a new
+// EMBEDDING_MODEL finds an empty index and the server stops until npm run rag:ingest has run.
+// Read here, not in env.ts: this file reaches lesson 10, whose env.ts does not know it.
+export const EMBEDDING_MODEL = process.env.EMBEDDING_MODEL ?? "openai/text-embedding-3-small";
 export const EMBEDDING_DIMENSIONS = 1536;
 
 export async function embed(texts: string[]): Promise<number[][]> {

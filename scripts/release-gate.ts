@@ -85,6 +85,15 @@ function changedFiles(stdin: string) {
   return [...new Set(ranges.flatMap(({ from, to }) => git("diff", "--name-only", from, to).split("\n").filter(Boolean)))];
 }
 
+function liveProofsPass(): boolean {
+  try {
+    execFileSync("npm", ["run", "--if-present", "check:live"], { stdio: "inherit" });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 async function main() {
   if (process.argv.includes("--pre-push")) {
     const gated = gatedFiles(changedFiles(readFileSync(0, "utf8")));
@@ -129,6 +138,13 @@ async function main() {
     }
 
     assertReleasable(result);
+    // The cases prove the agent's answers. The real-model proofs prove what the code around the
+    // model does with them (npm run check:live), so a release needs both.
+    if (!liveProofsPass()) {
+      console.error(`Release gate: red: a real-model proof failed (npm run check:live). ${promote ? "production was not moved." : "Fix it before you push."}`);
+      process.exitCode = 1;
+      return;
+    }
     console.log("Release gate: green.");
     if (promote) {
       // A version keeps its other labels; `latest` is Langfuse's own and is never set by hand.
