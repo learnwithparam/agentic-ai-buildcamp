@@ -716,8 +716,9 @@ tests:
     vars:
       query: "My patient just found out she is expecting a baby. Should she stay on CardioNex?"
     assert:
+      # "Discontinue" is the label's own word in 8.1, so an answer that uses it is right.
       - type: regex
-        value: "[Ss]top"
+        value: "[Ss]top|[Dd]iscontinu"
       - type: regex
         value: "\\[cardionex-uspi-v2,\\s*8\\.1"
 
