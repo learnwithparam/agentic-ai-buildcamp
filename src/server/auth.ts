@@ -2,6 +2,7 @@ import type { NextFunction, Request, RequestHandler, Response } from "express";
 import { Router } from "express";
 import { createRemoteJWKSet, jwtVerify, type JWTPayload, type JWTVerifyGetKey } from "jose";
 import * as oidc from "openid-client";
+import { API_METADATA_PATH, SIGN_IN_SCOPES } from "../shared/messages";
 import type { SessionStore } from "./sessions";
 import { REVIEWER_ROLES, TENANTS, type Identity } from "./users";
 
@@ -40,7 +41,6 @@ export class AuthError extends Error {
 
 const SESSION_HOURS = 8;
 const PENDING_MINUTES = 10;
-const SCOPES = "openid profile email organization";
 // Refresh a little early, so a token never expires between this check and the model call.
 const REFRESH_EARLY_MS = 30_000;
 
@@ -210,6 +210,17 @@ export function createAuth(config: AuthConfig) {
 
   const router = Router();
 
+  // Lesson 19. A program that knows only this app's address (the medinfo CLI) reads here where to
+  // sign in (RFC 9728), so it needs no Keycloak address of its own.
+  router.get(API_METADATA_PATH, (_request, response) => {
+    response.json({
+      resource: new URL("/api", config.appUrl).href,
+      authorization_servers: [config.issuer],
+      bearer_methods_supported: ["header"],
+      resource_name: "HCP Medical Information"
+    });
+  });
+
   router.get("/api/auth/sign-in", async (request, response, next) => {
     try {
       const returnTo = pathOnThisApp(request.query.returnTo);
@@ -225,7 +236,7 @@ export function createAuth(config: AuthConfig) {
       });
       const url = oidc.buildAuthorizationUrl(await client(), {
         redirect_uri: `${config.appUrl}/api/auth/callback`,
-        scope: SCOPES,
+        scope: SIGN_IN_SCOPES,
         code_challenge: await oidc.calculatePKCECodeChallenge(codeVerifier),
         code_challenge_method: "S256",
         state,
@@ -300,7 +311,7 @@ export function createAuth(config: AuthConfig) {
 export type Auth = ReturnType<typeof createAuth>;
 
 // The routes open without signing in. src/server/auth.test.ts holds the auth router to this list.
-export const PUBLIC_ROUTES = ["GET /api/auth/sign-in", "GET /api/auth/callback", "POST /api/auth/sign-out"];
+export const PUBLIC_ROUTES = ["GET /api/auth/sign-in", "GET /api/auth/callback", "POST /api/auth/sign-out", `GET ${API_METADATA_PATH}`];
 
 export function currentUser(response: Response): Identity {
   return response.locals.user as Identity;

@@ -5,6 +5,7 @@ import { createLocalJWKSet, exportJWK, generateKeyPair, SignJWT, type JWTPayload
 import * as oidc from "openid-client";
 import { createApp } from "./app";
 import { testDesk } from "./test-desk";
+import { API_METADATA_PATH } from "../shared/messages";
 import { createAuth, PUBLIC_ROUTES } from "./auth";
 import { createPool, migrate } from "./db";
 import { env } from "./env";
@@ -128,8 +129,20 @@ const asCookie = (sessionId: string) => ({ Cookie: `${auth.cookieName}=${session
 const asBearer = (value: string) => ({ Authorization: `Bearer ${value}` });
 const me = (headers: Record<string, string>) => fetch(`${base}/api/me`, { headers });
 
-test("only sign-in, the callback and sign-out are open without signing in", () => {
+test("only sign-in, the callback, sign-out and where to sign in are open without signing in", () => {
   assert.deepEqual(listRoutes(auth.router).sort(), [...PUBLIC_ROUTES].sort());
+});
+
+// Lesson 19: the CLI knows only the app's address, and reads the sign-in server from here.
+test("the API names the sign-in server a program should use", async () => {
+  const response = await fetch(`${base}${API_METADATA_PATH}`);
+  assert.equal(response.status, 200);
+  assert.deepEqual(await response.json(), {
+    resource: `${APP}/api`,
+    authorization_servers: [ISSUER],
+    bearer_methods_supported: ["header"],
+    resource_name: "HCP Medical Information"
+  });
 });
 
 test("every other route refuses a request that is not signed in", async () => {
