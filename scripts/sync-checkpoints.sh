@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Bring every canonical checkpoint tag in line with main (or SOURCE_REF).
+# Bring every canonical checkpoint tag in line with origin/main (or SOURCE_REF).
 #
 # Each tag gets SOURCE_REF's tree, except the milestone files listed in
 # milestone_files(). Those keep the tag's own code, so each step still starts
@@ -12,7 +12,7 @@
 #
 # Usage (from repo root, clean working tree):
 #   ./scripts/sync-checkpoints.sh                    # update tags locally
-#   ./scripts/sync-checkpoints.sh --verify           # also run npm run check on each tag
+#   ./scripts/sync-checkpoints.sh --verify           # also run npm run check on every tag
 #   ./scripts/sync-checkpoints.sh --verify --push    # then force-push moved tags
 set -euo pipefail
 
@@ -183,7 +183,12 @@ if ! git diff --quiet || ! git diff --cached --quiet; then
   exit 1
 fi
 
-SOURCE_REF="${SOURCE_REF:-main}"
+# The default is the merged main on GitHub, fetched now. A local main can be weeks behind, and
+# syncing from it would rebuild every tag from an old tree.
+if [[ -z "${SOURCE_REF:-}" ]]; then
+  git fetch -q origin main
+  SOURCE_REF=origin/main
+fi
 if ! git rev-parse --verify "$SOURCE_REF^{commit}" >/dev/null 2>&1; then
   echo "Missing source ref: $SOURCE_REF" >&2
   exit 1
@@ -266,14 +271,14 @@ for tag in "${TAGS[@]}"; do
   done
 
   git add -A
-  if git diff --cached --quiet; then
-    echo "    already in sync with $SOURCE_REF"
-    continue
-  fi
-
+  # --verify checks every tag, moved or not: a tag already in sync is still what a learner checks out.
   if [[ "$VERIFY" -eq 1 ]]; then
     echo "    npm run check"
     npm run -s check
+  fi
+  if git diff --cached --quiet; then
+    echo "    already in sync with $SOURCE_REF"
+    continue
   fi
 
   git commit -q -m "$(cat <<MSG
