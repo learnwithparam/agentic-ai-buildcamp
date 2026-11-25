@@ -7,7 +7,9 @@ import express, { Router, type NextFunction, type Request, type Response } from 
 import { decodeJwt } from "jose";
 import { z } from "zod";
 import { AuthError, type Auth } from "./auth";
+import { PUBLISHED_TABLE, runQuery } from "./bi/query";
 import { executeTool } from "./tools";
+import { canQuerySales } from "./permissions";
 import type { Identity } from "./users";
 
 // Lesson 12. The same two tools the chat agent uses, behind the Model Context Protocol, so Claude
@@ -27,7 +29,7 @@ export const MCP_PUBLIC_ROUTES = [`GET ${METADATA_PATH}`];
 
 type Verified = { identity: Identity };
 
-function mcpServerFor(user: Identity) {
+function mcpServerFor(user: Identity, canQuery: boolean) {
   const server = new McpServer({ name: "medinfo", version: "1.0.0" });
   const run = (name: string, input: Record<string, unknown>) =>
     traced(name, input, user).then((result) => ({ content: [{ type: "text" as const, text: JSON.stringify(result) }] }));
@@ -52,8 +54,31 @@ function mcpServerFor(user: Identity) {
     },
     ({ query }) => run("search_labels", { query })
   );
+  // Lesson 22. Only an analyst's server lists the sales tool, and it runs as the login of the
+  // company in the token, through the same parser and row rule as the insights page.
+  if (canQuery) {
+    server.registerTool(
+      "query_sales",
+      {
+        title: "Query your company's sales",
+        description: `Run one PostgreSQL SELECT on bi.${PUBLISHED_TABLE}: tenant_id, period_start, grain, territory, brand, trx, nbrx, units, prescribers. Your company's rows only; groups of fewer than 11 prescribers are left out.`,
+        inputSchema: { sql: z.string().min(1).max(4000).describe("One SELECT statement.") },
+        annotations: { readOnlyHint: true, openWorldHint: false }
+      },
+      ({ sql }) => tracedSales(sql, user).then((result) => ({ content: [{ type: "text" as const, text: JSON.stringify(result) }], isError: !result.ok }))
+    );
+  }
   return server;
 }
+
+const tracedSales = observe(
+  (sql: string, user: Identity) =>
+    propagateAttributes(
+      { userId: user.userId, metadata: { tenantId: user.tenantId, country: user.country }, traceName: "mcp-query_sales", tags: ["hcp-insights", "mcp"] },
+      () => runQuery(sql, user.tenantId)
+    ),
+  { name: "bi-query", asType: "tool", captureInput: true, captureOutput: false }
+);
 
 // Each tool call is its own Langfuse trace, tagged mcp, with the user id, company and country
 // (never the name or email, the same rule as src/server/trace-identity.test.ts).
@@ -124,7 +149,7 @@ export function createMcpRouter(auth: Auth) {
 
   router.post(MCP_PATH, requireToken, express.json({ limit: "1mb" }), async (request: Request, response: Response) => {
     const { identity } = request.auth!.extra as Verified;
-    const server = mcpServerFor(identity);
+    const server = mcpServerFor(identity, await canQuerySales(identity));
     const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true });
     response.on("close", () => {
       void transport.close();

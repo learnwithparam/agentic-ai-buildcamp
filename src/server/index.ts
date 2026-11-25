@@ -10,6 +10,7 @@ import { PostgresSaver } from "@langchain/langgraph-checkpoint-postgres";
 import { createFactChecker } from "./content/fact-check";
 import { createOutreachPlanner } from "./content/outreach";
 import { createMedinfoAgent, recordDecision } from "./medinfo-agent";
+import { createInsightsAgent } from "./bi/agent";
 import { createHandoffAgent } from "./a2a/handoff";
 import { createTaskStore, TaskReviews } from "./a2a/tasks";
 import { createEventHandler } from "./events/handlers";
@@ -66,7 +67,8 @@ const desk = {
   recordDecision,
   a2a: { store: a2aStore, links: new TaskReviews(pool, a2aStore), handoff: createHandoffAgent() },
   events: { store: eventStore, queue: eventQueue.queue, secrets: eventSecrets() },
-  sweep: { controls: sweepControls, runs: sweepRuns, queue: sweepQueue, spend }
+  sweep: { controls: sweepControls, runs: sweepRuns, queue: sweepQueue, spend },
+  insights: createInsightsAgent(checkpointer)
 };
 
 const auth = createAuth({

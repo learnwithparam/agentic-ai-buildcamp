@@ -4,11 +4,16 @@
 // Lesson 13: roles are the Keycloak realm roles that let someone decide a review item.
 // Lesson 14: a sales rep approves outreach steps.
 export const REVIEWER_ROLES = ["medical-reviewer", "safety-reviewer", "sales-rep"] as const;
-export type ReviewerRole = (typeof REVIEWER_ROLES)[number];
+// Lesson 22: an analyst asks the insights agent about the company's sales. An analyst decides no
+// review item and opens no event or sweep page, so the role is kept apart from the reviewers'.
+export const ANALYST_ROLE = "analyst" as const;
+// The realm roles auth.ts keeps from a token. Any other realm role is dropped.
+export const SIGN_IN_ROLES = [...REVIEWER_ROLES, ANALYST_ROLE] as const;
+export type ReviewerRole = (typeof SIGN_IN_ROLES)[number];
 // Lesson 14. The roles that use the email editor and the rep board.
 export const STAFF_ROLES: ReviewerRole[] = ["sales-rep", "medical-reviewer"];
 // Lesson 17. A role only code gives: the nightly sweep's. No Keycloak token carries it (auth.ts
-// keeps only the reviewer roles), and in OpenFGA it views and plans but decides nothing.
+// keeps only SIGN_IN_ROLES), and in OpenFGA it views and plans but decides nothing.
 export const AGENT_ROLES = ["sweep-agent"] as const;
 export type Role = ReviewerRole | (typeof AGENT_ROLES)[number];
 export type Identity = { userId: string; name: string; email: string; tenantId: string; country: string; roles: Role[] };
@@ -41,7 +46,10 @@ export const SEED_REVIEWERS = [
   { email: "priya.nair@pharma-a.example.com", firstName: "Priya", lastName: "Nair", tenantId: "pharma_a", country: "US", role: "sales-rep" },
   { email: "lena.fischer@pharma-a.example.com", firstName: "Lena", lastName: "Fischer", tenantId: "pharma_a", country: "US", role: "sales-rep" },
   { email: "daniel.cho@pharma-b.example.com", firstName: "Daniel", lastName: "Cho", tenantId: "pharma_b", country: "US", role: "sales-rep" },
-  { email: "arjun.mehta@pharma-b.example.com", firstName: "Arjun", lastName: "Mehta", tenantId: "pharma_b", country: "US", role: "sales-rep" }
+  { email: "arjun.mehta@pharma-b.example.com", firstName: "Arjun", lastName: "Mehta", tenantId: "pharma_b", country: "US", role: "sales-rep" },
+  // Lesson 22: one sales analyst per company. They ask the insights agent; they review nothing.
+  { email: "rosa.diaz@pharma-a.example.com", firstName: "Rosa", lastName: "Diaz", tenantId: "pharma_a", country: "US", role: "analyst" },
+  { email: "tomas.silva@pharma-b.example.com", firstName: "Tomás", lastName: "Silva", tenantId: "pharma_b", country: "US", role: "analyst" }
 ] as const;
 
 // Scripts (the dataset run, the error-analysis replays) ask as a named desk too, never as "nobody".

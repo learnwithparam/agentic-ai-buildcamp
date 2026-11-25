@@ -4,7 +4,8 @@ import { fileURLToPath } from "node:url";
 import { CredentialsMethod, OpenFgaClient, type TupleKey, type WriteAuthorizationModelRequest } from "@openfga/sdk";
 import { LABEL_SECTIONS } from "../src/server/labels";
 import { PROFILES } from "../src/server/content/records";
-import { documentTuples, hcpTuples } from "../src/server/permissions";
+import { datasetTuples, documentTuples, hcpTuples } from "../src/server/permissions";
+import { TENANTS } from "../src/server/users";
 
 // Lesson 11. The permission rules are written once, in infra/openfga/model.fga. The OpenFGA CLI
 // (pinned below) turns them into the JSON the server takes; setup and the tests both use this.
@@ -36,11 +37,11 @@ const key = (tuple: TupleKey) => `${tuple.user}|${tuple.relation}|${tuple.object
 
 // The facts OpenFGA stores from the data itself: each document's company and country (lesson 11)
 // and each doctor profile's company (lesson 14).
-const STORED_TYPES = ["document:", "hcp:"];
+const STORED_TYPES = ["document:", "hcp:", "dataset:"];
 
 // Makes the stored document and profile tuples equal to the data: adds the missing, deletes the stale.
 export async function syncDocumentTuples(client: OpenFgaClient) {
-  const wanted = new Map([...documentTuples(LABEL_SECTIONS), ...hcpTuples(PROFILES)].map((tuple) => [key(tuple), tuple]));
+  const wanted = new Map([...documentTuples(LABEL_SECTIONS), ...hcpTuples(PROFILES), ...datasetTuples(Object.keys(TENANTS))].map((tuple) => [key(tuple), tuple]));
   const stored = new Map<string, TupleKey>();
   let continuationToken: string | undefined;
   do {

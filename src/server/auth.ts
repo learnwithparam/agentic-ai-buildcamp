@@ -4,7 +4,7 @@ import { createRemoteJWKSet, jwtVerify, type JWTPayload, type JWTVerifyGetKey } 
 import * as oidc from "openid-client";
 import { API_METADATA_PATH, SIGN_IN_SCOPES } from "../shared/messages";
 import type { SessionStore } from "./sessions";
-import { REVIEWER_ROLES, TENANTS, type Identity } from "./users";
+import { SIGN_IN_ROLES, TENANTS, type Identity } from "./users";
 
 // Lesson 11. Who is asking comes from Keycloak, never from the request body or the prompt.
 //
@@ -69,7 +69,7 @@ export function identityFromClaims(claims: JWTPayload): Identity {
     tenantId: companies[0],
     country,
     // Lesson 13: Keycloak puts realm roles in realm_access.roles. Only the reviewer roles count.
-    roles: REVIEWER_ROLES.filter((role) => realmRoles(claims).includes(role))
+    roles: SIGN_IN_ROLES.filter((role) => realmRoles(claims).includes(role))
   };
 }
 

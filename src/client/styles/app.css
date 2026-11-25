@@ -565,3 +565,9 @@ a.button[aria-current="page"] {
   margin: 24px 0 8px;
   font-size: 16px;
 }
+
+/* Lesson 22: the insights page. The SQL that ran, a refusal, and the chart. */
+.sql { margin: 0; padding: 8px; background: var(--bg); border: 1px solid var(--line); border-radius: var(--r); font-family: var(--mono); font-size: 13px; white-space: pre-wrap; overflow-x: auto; }
+.refusal { margin: 0 0 8px; color: var(--fail); }
+.chart { margin: 0; }
+.chart-body { padding: 12px 8px 4px 0; }

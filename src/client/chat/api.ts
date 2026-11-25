@@ -43,14 +43,15 @@ export async function signOut() {
 type SendConfig = { abortSignal: AbortSignal };
 type ServerEvent = { event: string; data: unknown };
 
-export async function createThread(): Promise<{ externalId: string }> {
-  const response = await api("/api/threads", { method: "POST", signal: AbortSignal.timeout(10_000) });
+// Lesson 22: the insights page keeps its threads under /api/insights, with the same shape.
+export async function createThread(base = "/api"): Promise<{ externalId: string }> {
+  const response = await api(`${base}/threads`, { method: "POST", signal: AbortSignal.timeout(10_000) });
   const body = (await response.json()) as { thread_id: string };
   return { externalId: body.thread_id };
 }
 
-export async function loadThread(threadId: string) {
-  const response = await api(`/api/threads/${threadId}/state`, { signal: AbortSignal.timeout(10_000) });
+export async function loadThread(threadId: string, base = "/api") {
+  const response = await api(`${base}/threads/${threadId}/state`, { signal: AbortSignal.timeout(10_000) });
   return (await response.json()) as { messages: LangChainMessage[]; interrupts: LangGraphInterruptState[] };
 }
 
@@ -63,14 +64,15 @@ function textOf(message: LangChainMessage): string {
 export async function* streamRun(
   threadId: string,
   messages: LangChainMessage[],
-  config: SendConfig
+  config: SendConfig,
+  base = "/api"
 ): AsyncGenerator<ServerEvent> {
   const body = {
     messages: messages
       .filter((message) => message.type === "human")
       .map((message) => ({ id: message.id ?? crypto.randomUUID(), type: "human", content: textOf(message) }))
   };
-  const response = await api(`/api/threads/${threadId}/runs/stream`, {
+  const response = await api(`${base}/threads/${threadId}/runs/stream`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),

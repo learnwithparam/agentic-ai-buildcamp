@@ -15,6 +15,9 @@ services:
       KEYCLOAK_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:?run npm run identity:setup}
       OPENFGA_DB_PASSWORD: ${OPENFGA_DB_PASSWORD:?run npm run identity:setup}
       MEDINFO_DB_PASSWORD: ${MEDINFO_DB_PASSWORD:?run npm run identity:setup}
+      # Lesson 22. The insights agent's two read-only logins, one per company (init/02-bi-roles.sh).
+      BI_DB_PASSWORD_PHARMA_A: ${BI_DB_PASSWORD_PHARMA_A:?run npm run identity:setup}
+      BI_DB_PASSWORD_PHARMA_B: ${BI_DB_PASSWORD_PHARMA_B:?run npm run identity:setup}
     volumes:
       - medinfo_postgres_data:/var/lib/postgresql/data
       - ./postgres/init:/docker-entrypoint-initdb.d:ro

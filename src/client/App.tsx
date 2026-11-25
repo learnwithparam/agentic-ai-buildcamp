@@ -9,12 +9,13 @@ import { Sweep } from "./content/Sweep";
 import { Handoffs } from "./content/Handoffs";
 import { Outreach } from "./content/Outreach";
 import { Inbox } from "./inbox/Inbox";
-import { REVIEWER_ROLES, STAFF_ROLES } from "../server/users";
+import { Insights } from "./insights/Insights";
+import { ANALYST_ROLE, REVIEWER_ROLES, STAFF_ROLES } from "../server/users";
 
 function Chat({ tenantId, medicines }: { tenantId: string; medicines: string[] }) {
   const runtime = useLangGraphRuntime({
-    create: createThread,
-    load: loadThread,
+    create: () => createThread(),
+    load: (threadId) => loadThread(threadId),
     stream: async function* (messages, config) {
       const { externalId } = await config.initialize();
       if (!externalId) throw new Error("No thread id");
@@ -80,6 +81,8 @@ const PAGES: Array<{ path: string; label: string; roles?: readonly string[] }> =
   { path: "/handoffs", label: "Hand-offs", roles: STAFF_ROLES },
   { path: "/events", label: "Events", roles: REVIEWER_ROLES },
   { path: "/sweep", label: "Sweep", roles: REVIEWER_ROLES },
+  // Lesson 22: the insights agent, for each company's analysts.
+  { path: "/insights", label: "Insights", roles: [ANALYST_ROLE] },
   { path: "/inbox", label: "Inbox" }
 ];
 
@@ -114,7 +117,7 @@ function SignedIn({ me }: { me: Me }) {
           Sign out
         </button>
       </header>
-      {path === "/inbox" ? <Inbox /> : path === "/editor" ? <Editor /> : path === "/outreach" ? <Outreach /> : path === "/handoffs" ? <Handoffs /> : path === "/events" ? <Events /> : path === "/sweep" ? <Sweep roles={me.user.roles} /> : <Chat key={chat} tenantId={me.user.tenantId} medicines={me.company.medicines} />}
+      {path === "/inbox" ? <Inbox /> : path === "/editor" ? <Editor /> : path === "/outreach" ? <Outreach /> : path === "/handoffs" ? <Handoffs /> : path === "/events" ? <Events /> : path === "/sweep" ? <Sweep roles={me.user.roles} /> : path === "/insights" ? <Insights company={me.company.name} /> : <Chat key={chat} tenantId={me.user.tenantId} medicines={me.company.medicines} />}
     </div>
   );
 }
