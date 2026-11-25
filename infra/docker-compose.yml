@@ -6,7 +6,7 @@ name: medinfo-platform
 
 services:
   postgres:
-    image: postgres:17.7
+    image: pgvector/pgvector:0.8.7-pg17-trixie
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
@@ -84,6 +84,20 @@ services:
       interval: 5s
       timeout: 5s
       retries: 20
+
+  # Lesson 20. Reads the label PDFs' layout for npm run rag:ingest. Only that step needs it, so it
+  # starts with the "ingest" profile (npm run rag:setup) and not with the rest of the platform.
+  docling:
+    image: quay.io/docling-project/docling-serve-cpu:v1.38.2
+    profiles: ["ingest"]
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:5001:5001
+    healthcheck:
+      test: ["CMD", "curl", "-fs", "http://127.0.0.1:5001/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 60
 
 volumes:
   medinfo_postgres_data:
