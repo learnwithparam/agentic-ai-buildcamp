@@ -28,6 +28,7 @@ Canonical checkpoint tags:
 - `checkpoint/15-a2a`
 - `checkpoint/16-events`
 - `checkpoint/17-autonomy`
+- `checkpoint/18-release-gate`
 
 What to propagate:
 
@@ -81,6 +82,7 @@ Canonical progression:
 - `15-a2a`: both lesson 14 agents behind A2A servers (`@a2a-js/sdk`, `src/server/a2a/`). Each card is public at `/api/a2a/<agent>/.well-known/agent-card.json`, served as `AgentCard.toJSON` (the spec JSON form), with Keycloak as its OpenID Connect scheme. Work takes only a Bearer token, refuses another site's `Origin` and any request tenant, and joins the caller's `traceparent`. `executors.ts` maps results to `COMPLETED`, `INPUT_REQUIRED` (one revision with the approved wording, else a reviewer) or `REJECTED`; tasks live in Postgres (`005_a2a_tasks.sql`, the SDK's `DatabaseTaskStore` table), and `TaskReviews.settle` completes or rejects a task when its inbox item is decided. `handoff.ts` picks a skill from the cards, drafts from the approved claims first, and always sends an email it drafted to a medical reviewer (`REVIEW_REQUIRED`). The A2A `contextId` is the Langfuse session id. `/handoffs` is a staff page. The dataset loads `a2a.yaml` and runs it through `scripts/a2a-runner.ts` (real servers, run-signed tokens, in-memory tasks, no inbox).
 - `16-events`: the agents start from signed events (`src/server/events/`). `POST /events/:tenant` checks a Standard Webhooks signature (`standardwebhooks`) with that company's `EVENT_SECRET_<TENANT>` (written by `identity:setup`), then the zod schema, that `webhook-id` equals `event_id`, and that the body's tenant is the sender; it answers 202 before any model runs. `PostgresEventStore` inserts with `ON CONFLICT ... deliveries + 1` and queues a pg-boss job (schema `pgboss`, queue `hcp-event`, dead letter `hcp-event-failed`) only on the first insert, in the same transaction. Handlers run the desk, fact-checker or planner as the company's event worker on a thread named after the event, so a second run reads that thread instead of asking again. `labels.ts` `statusOn(section, today)` works out which label is in force on a day; a graph turn carries `today`. A handled email keeps only its scrubbed text. `/events` is for `REVIEWER_ROLES` and never returns the payload. The dataset loads `events.yaml` and runs it through `scripts/events-runner.ts` (a real webhook, run-made secrets, an in-memory store and inline queue).
 - `17-autonomy`: a nightly sweep (`src/server/auto/`) that works with nobody watching inside three limits code enforces. Scope: it runs as `sweepWorker` (role `sweep-agent`, which no Keycloak token carries; OpenFGA `sweep_agent` may view doctors and check claims and decides nothing), and hands each piece to the desk or the outreach planner, so every draft and step waits in the inbox. Budget: before every step `langfuseSpend` asks the Langfuse metrics API for today's `totalCost` of observations whose user id starts with `sweep-<tenant>-`, and an unreadable spend stops the sweep. Off switch: the `agent_controls` row (migration 007) is read before every step, so a pause stops a run at its next step; any reviewer or rep may pause, only a sales rep or medical reviewer may resume or run. pg-boss schedules `hcp-sweep` at `0 2 * * *` UTC, one job per company; `sweep_runs` is the run log with each trace id. `/sweep` is the staff page. The dataset loads `autonomy.yaml` and runs it through `scripts/sweep-runner.ts` (the case fixes the limits and the spend so far).
+- `18-release-gate`: the scoreboard becomes a gate (`scripts/release-gate.ts`). It runs the 8 `RELEASE_CASES` through the experiment runner in `scripts/experiment.ts` (shared with `run-dataset.ts`) with the run evaluator `release_pass_rate`, and raises Langfuse's `RegressionError` unless every case ran and passed, so a case the SDK skipped on a provider error is red. `--label staging --promote` resolves the label to one version, pins the agent to it (`usePromptVersion`; a pinned prompt never falls back to `SYSTEM_PROMPT`) and moves `production` onto that version only when green. `.githooks/pre-push` (turned on by the `prepare` script) runs it on the production prompt when a push changes a `GATED_PATHS` file; tags, deletes, docs and the web client skip it. Unpinned, the app reads `LANGFUSE_PROMPT_LABEL`.
 
 What makes the checkpoints stitchable:
 
@@ -102,19 +104,20 @@ Every `checkpoint/*` tag is `main`'s tree except for its milestone files: the fi
 
 | Tags | Milestone files (kept from the tag) |
 | --- | --- |
-| `00-setup`, `01-base-app`, `02-tracing` | the untraced app (`index.ts`, `medinfo-agent.ts`, `tools.ts`), the runner, and the lesson 10 to 17 files |
-| `03-prompt-management` | `medinfo-agent.ts` with no Langfuse prompt fetch, the runner, and the lesson 10 to 17 files |
-| `04-monitoring` to `09-advanced-evals` | `medinfo-agent.ts`, the runner, and the lesson 10 to 17 files |
-| `10-ai-gateway` | the lesson 11 to 17 files |
-| `11-sign-in` | the lesson 12 to 17 files |
-| `12-mcp-sandbox` | the lesson 13 to 17 files |
-| `13-durable-review` | the lesson 14 to 17 files |
-| `14-content-agents` | the lesson 15, 16 and 17 files |
-| `15-a2a` | the lesson 16 and 17 files |
-| `16-events` | the lesson 17 files |
-| `17-autonomy` | none (equal to `main`) |
+| `00-setup`, `01-base-app`, `02-tracing` | the untraced app (`index.ts`, `medinfo-agent.ts`, `tools.ts`), the runner, and the lesson 10 to 18 files |
+| `03-prompt-management` | `medinfo-agent.ts` with no Langfuse prompt fetch, the runner, and the lesson 10 to 18 files |
+| `04-monitoring` to `09-advanced-evals` | `medinfo-agent.ts`, the runner, and the lesson 10 to 18 files |
+| `10-ai-gateway` | the lesson 11 to 18 files |
+| `11-sign-in` | the lesson 12 to 18 files |
+| `12-mcp-sandbox` | the lesson 13 to 18 files |
+| `13-durable-review` | the lesson 14 to 18 files |
+| `14-content-agents` | the lesson 15 to 18 files |
+| `15-a2a` | the lesson 16, 17 and 18 files |
+| `16-events` | the lesson 17 and 18 files |
+| `17-autonomy` | the lesson 18 files |
+| `18-release-gate` | none (equal to `main`) |
 
-The lesson 10 files are `GATEWAY_FILES` in the script, the lesson 11 files are `AUTH_FILES`, the lesson 12 files are `MCP_FILES`, the lesson 13 files are `TIER_FILES`, the lesson 14 files are `CONTENT_FILES`, the lesson 15 files are `A2A_FILES`, the lesson 16 files are `EVENT_FILES`, and the lesson 17 files are `AUTO_FILES`. A milestone file a tag does not have stays absent on it, which is why `npm run check` finds its tests by glob, not by name.
+The lesson 10 files are `GATEWAY_FILES` in the script, the lesson 11 files are `AUTH_FILES`, the lesson 12 files are `MCP_FILES`, the lesson 13 files are `TIER_FILES`, the lesson 14 files are `CONTENT_FILES`, the lesson 15 files are `A2A_FILES`, the lesson 16 files are `EVENT_FILES`, the lesson 17 files are `AUTO_FILES`, and the lesson 18 files are `GATE_FILES`. A milestone file a tag does not have stays absent on it, which is why `npm run check` finds its tests by glob, not by name.
 
 Inside a milestone file, regions marked `// checkpoint-sync:begin <name>` / `// checkpoint-sync:end <name>` still come from `main`. The sync fails if `main` has a region that a tag's milestone file lacks. When a new lesson starts editing a file, add it to `milestone_files()` for the earlier tags.
 
