@@ -17,11 +17,16 @@ You need three things:
 - An OpenRouter key with a few dollars of credit.
 
 ```bash
-docker compose -f langfuse/docker-compose.yml -f langfuse/workshop.override.yml up -d
-cp .env.example .env      # then set OPENAI_API_KEY to your OpenRouter key
 npm ci
+npm run setup    # the first run makes .env; put your OpenRouter key in OPENAI_API_KEY and run it again
 npm run dev
 ```
+
+`npm run setup` checks Node and Docker, then starts Langfuse, Postgres, Keycloak, OpenFGA and Docling. It adds the demo users and reads the label PDFs. It loads the sales data, publishes the prompt and seeds the dataset. Last, it sends one model call through the gateway to prove it all works.
+
+Run it again at any time. Each step skips what is already done, and it never prints a key or a password.
+
+The two gateway keys are made by hand in Langfuse. So the first run stops once with a short list of clicks. Lesson 10 shows each screen. Lesson 00 walks the same setup one step at a time. On a checkpoint tag before lesson 22, follow that lesson's page instead, because `npm run setup` is not there yet.
 
 The app runs at [http://localhost:3333](http://localhost:3333). Langfuse, which keeps the traces, runs at [http://localhost:5174](http://localhost:5174). Sign in to it with the details below.
 
