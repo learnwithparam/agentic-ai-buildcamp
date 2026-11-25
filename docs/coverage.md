@@ -24,3 +24,4 @@ Each row is a promise from [case study 1](../case-studies/enterprise-agentic-hcp
 | The system works alone only on plain answers, inside a budget, with an off switch | 17 | AUTO-01, AUTO-02, AUTO-03, AUTO-04, AUTO-05 |
 | A doctor's own words find the right section of the full label PDF, with no word lost from the PDF | 20 | RAG-01, RAG-02, RAG-03 |
 | An answer never cites a section the search did not return or one not in force, and every dose it gives is in the section it cites | 21 | STALENESS-03, RAG-01, POSITIVE-01 |
+| An analyst's question reads only their own company's sales totals, never one prescriber, and never writes | 22 | INSIGHTS-01, INSIGHTS-02, INSIGHTS-03, INSIGHTS-04, INSIGHTS-05, INSIGHTS-06, INSIGHTS-07 |
