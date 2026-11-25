@@ -31,13 +31,13 @@ export const REQUIRED_KEYS = [
   "SEED_USER_PASSWORD"
 ];
 
-// The port each service publishes on 127.0.0.1, written as stack/service.
+// The port each service publishes on 127.0.0.1, written as stack:service.
 export const PORTS: Array<[port: number, owner: string, service: string]> = [
-  [5174, "Langfuse", "langfuse/langfuse-web"],
-  [5442, "Postgres for the app", "infra/postgres"],
-  [8180, "Keycloak", "infra/keycloak"],
-  [8280, "OpenFGA", "infra/openfga"],
-  [5001, "Docling", "infra/docling"]
+  [5174, "Langfuse", "langfuse:langfuse-web"],
+  [5442, "Postgres for the app", "infra:postgres"],
+  [8180, "Keycloak", "infra:keycloak"],
+  [8280, "OpenFGA", "infra:openfga"],
+  [5001, "Docling", "infra:docling"]
 ];
 
 // The services each compose file must keep running. openfga-migrate runs once and exits, so it is left out.
@@ -144,10 +144,10 @@ function checkStack(name: keyof typeof SERVICES, args: string[]): Result & { dow
   try {
     states = parseComposePs(docker([...args, "ps", "--all", "--format", "json"]));
   } catch {
-    return { ...fail(id, `could not read the ${name} containers`, "Start Docker first, then run this again."), down: SERVICES[name].map((s) => `${name}/${s}`) };
+    return { ...fail(id, `could not read the ${name} containers`, "Start Docker first, then run this again."), down: SERVICES[name].map((s) => `${name}:${s}`) };
   }
   const bad = unhealthy(states, SERVICES[name]);
-  const down = bad.map((entry) => `${name}/${entry.split(" ")[0]}`);
+  const down = bad.map((entry) => `${name}:${entry.split(" ")[0]}`);
   if (bad.length === 0) return { ...pass(id, `${name} containers run and are healthy`), down };
   const logs = `docker ${args.join(" ").replace(envFile, ".env")} logs ${bad[0].split(" ")[0]}`;
   return { ...fail(id, `${name} containers not ready: ${bad.join(", ")}`, `Run npm run setup to start them. If one keeps stopping, read its log: ${logs}`), down };
@@ -234,7 +234,7 @@ export async function diagnose(): Promise<Result[]> {
   // The infra file reads its passwords from .env, so compose gets the file path, never the values.
   const infra = values
     ? checkStack("infra", ["compose", "--env-file", envFile, "-f", "infra/docker-compose.yml"])
-    : { ...fail("infra-stack", "skipped, .env is missing", "Run npm run setup first."), down: SERVICES.infra.map((s) => `infra/${s}`) };
+    : { ...fail("infra-stack", "skipped, .env is missing", "Run npm run setup first."), down: SERVICES.infra.map((s) => `infra:${s}`) };
   const { down: langfuseDown, ...langfuseResult } = langfuse;
   const { down: infraDown, ...infraResult } = infra;
   results.push(langfuseResult, infraResult, await checkPorts([...langfuseDown, ...infraDown]));

@@ -33,5 +33,5 @@ test("compose v1 is too old, v2 and later pass", () => {
 
 test("only a down service's port is tried, so a running stack never blames itself", () => {
   assert.deepEqual(portsToTry([]), []);
-  assert.deepEqual(portsToTry(["infra/docling", "langfuse/redis"]), [[5001, "Docling"]]);
+  assert.deepEqual(portsToTry(["infra:docling", "langfuse:redis"]), [[5001, "Docling"]]);
 });
