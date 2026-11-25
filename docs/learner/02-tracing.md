@@ -1,51 +1,111 @@
 ---
-title: "Workshop: Tracing an LLM Agent with Langfuse"
-description: "Instrument the medical information agent so one chat turn becomes one nested Langfuse trace with the model calls, the graph nodes, the tool calls and the chat session."
+title: "Workshop: See Every Step an Agent Takes"
+description: "Turn each chat turn into one trace with every model call, graph node and tool call inside it, plus the chat session, so a wrong answer can be traced to the step that caused it."
 ---
 
-# 02 Tracing
+# 02 See every step an agent takes
 
-## Why we trace
+## The problem
 
-Tracing logs every step your agent takes: every model call, every tool call, what went in and what came back, in order. When an answer is wrong, you open the trace and point at the step where it went wrong.
+A doctor asks the desk, "What is the approved use of CardioNex in Japan?" The answer looks fine. Behind it, the agent called the model three times and ran two tools. You can see none of it.
 
-Complementary materials:
+Now take the US dose question. The label library holds three US labels for that drug. One is in force, one is replaced and one is not in force yet. Say the agent cites the replaced label. The chat shows the answer and a search card.
 
-- Docs: [AI Observability and application tracing](https://langfuse.com/docs/observability/overview). SDK options, OpenTelemetry setup, and span attributes.
-- Docs: [What does a good trace look like?](https://langfuse.com/docs/observability/best-practices)
-- Academy: [Tracing](https://langfuse.com/academy/tracing). Why tracing sits at the start of the AI engineering loop.
+It does not show what the model was sent. It does not show the cost or the time of each step.
 
-## Goal
+When an answer is wrong, you cannot point at the step that went wrong. And the chat forgets everything when you close the tab. You cannot fix what you cannot see.
 
-One chat turn becomes one trace in Langfuse, with every model call, every graph node and every tool call inside it.
+## What you build
 
-## Before
+- **A span processor,** which sends every step to Langfuse, the store that keeps every trace.
+- **A wrapped model client,** which logs each model call with its prompt, reply, tokens, cost and time.
+- **A wrapped turn and wrapped nodes,** so all the calls of one question land in one trace.
+- **Wrapped tools,** so each tool call shows its input and its output.
+- **A session id and two tags,** so every turn of one chat is grouped.
 
-Ask **What is the approved use of CardioNex in Japan?** The answer looks fine. Behind it, the agent called the model three times and ran two tools, and you can see none of it. The `search_labels` card in the chat shows what was found, but not what the model was sent, what it cost, or how long each step took. And the chat forgets all of it when you close the tab.
+| Case | What breaks | How the system holds |
+| --- | --- | --- |
+| The Japan question | One question makes three loose model calls | The turn is wrapped, so all of them nest in one trace |
+| The US dose question | You cannot see which labels the search found | The `search_labels` step holds the query and every section it found |
+| A tool the model invents | The failure hides inside the answer | `executeTool` returns an error result, and the tool step shows it |
+| A server restart | The last trace is lost | `shutdown` flushes the processor before the process exits |
+| A long chat | Each turn stands alone | The thread id becomes the session id |
 
-![One traced chat turn: the chat turn holds the agent and tools steps, each agent step holds a model call, each tools step holds the tool it ran, and the session groups every turn of one chat.](../images/diagrams/traced-chat-turn.svg)
+## How it works
 
-You build that trace in three steps:
+A trace is the record of one request. A span is one step inside it. You wrap each function once with `observe(...)`. After that, every call writes a span with its input, output and time.
 
-1. **Log each model call.**
-2. **Nest the calls in one turn.**
-3. **Log the tools and the session.**
+Spans nest, so the trace has the shape of the code. A turn holds agent and tools steps. Each agent step holds its model call.
 
-## Starting point
+![One traced chat turn: the turn holds agent steps, tools steps and model calls.](../images/diagrams/traced-chat-turn.svg)
+
+### The flow
+
+This follows the Japan question. One branch shows an unknown tool.
+
+```mermaid
+sequenceDiagram
+    participant D as Doctor
+    participant T as Turn span
+    participant A as Agent step
+    participant X as Tools step
+    participant L as Langfuse
+    D->>T: What is the approved use in Japan?
+    T->>A: Messages
+    A->>L: Model call, prompt, tokens, cost
+    A-->>X: Call search_labels
+    alt Tool exists
+        X->>L: search_labels, query and sections found
+    else Unknown tool
+        X->>L: Error result, Unsupported tool
+    end
+    X-->>A: Tool result
+    A->>L: Model call with tools off
+    A-->>T: Answer
+    T->>L: Trace with session id and tags
+```
+
+The step people doubt is the model wrap. In Step 1 you wrap the client once. In Step 2 you move the wrap inside the agent node. It then runs on every call, which suits lesson 03.
+
+The wrap also nests the model call under the agent step.
+
+### Where it sits
+
+Langfuse is the only new part. Three kinds of spans flow to it, and the app answers the same as before.
+
+```mermaid
+flowchart LR
+    U["Doctor in the chat page"] -->|"question and thread id"| API["API server"]
+    API -->|"turn"| AG["Agent node"]
+    AG -->|"prompt and tool definitions"| M["Model through OpenRouter"]
+    AG -->|"tool calls"| TL["Tools node"]
+    TL -->|"search query"| LB["Label files"]
+    AG -->|"model call spans"| LF[("Langfuse")]
+    AG -->|"agent spans"| LF
+    TL -->|"tool spans with input and output"| LF
+    API -->|"turn span with session id"| LF
+    classDef new fill:#fde68a,stroke:#b45309,color:#1c1917
+    class LF new
+```
+
+### Concepts
+
+- [Trace](../walkthrough.md#c-trace)
+- [Span](../walkthrough.md#c-span)
+
+## Build it
 
 ```bash
 git checkout checkpoint/02-tracing
 ```
 
-This is the same code as `checkpoint/01-base-app`, with no Langfuse wiring yet. The Langfuse packages are already in `package.json`. Run `npm install` if you haven't. Make sure `.env` has your `OPENAI_API_KEY` and the Langfuse keys from `00-setup`.
+This is the same code as `checkpoint/01-base-app`, with no Langfuse wiring yet. The Langfuse packages are already in `package.json`. Run `npm install` if you have not. Make sure `.env` has your `OPENAI_API_KEY` and the Langfuse keys from lesson 00.
 
-You edit three files: `src/server/index.ts`, `src/server/medinfo-agent.ts` and `src/server/tools.ts`. Keep `npm run dev` running; the server restarts on each save.
+You edit three files: `src/server/index.ts`, `src/server/medinfo-agent.ts` and `src/server/tools.ts`. Keep `npm run dev` running. The server restarts on each save.
 
-## Step 1: Log each model call
+### Step 1: Log each model call
 
-### `src/server/index.ts`
-
-Start the Langfuse span processor at the top of the file, after the imports:
+In `src/server/index.ts`, start the Langfuse span processor at the top of the file, after the imports:
 
 ```ts
 import { NodeSDK } from "@opentelemetry/sdk-node";
@@ -68,7 +128,7 @@ import { env, isLangfuseConfigured } from "./env";
 response.json({ ok: true, tracingConfigured: isLangfuseConfigured() });
 ```
 
-At the bottom, the existing `shutdown` function closes the server. Make it send the last traces before the process exits:
+At the bottom, the `shutdown` function closes the server. Make it send the last traces before the process exits:
 
 ```ts
 async function shutdown() {
@@ -80,9 +140,7 @@ async function shutdown() {
 
 Without this, the last trace before a restart can go missing.
 
-### `src/server/medinfo-agent.ts`
-
-Add the import:
+In `src/server/medinfo-agent.ts`, add the import:
 
 ```ts
 import { observeOpenAI } from "@langfuse/openai";
@@ -96,17 +154,17 @@ const openai = observeOpenAI(new OpenAI({ apiKey: env.openaiApiKey }));
 
 That is the whole step. `observeOpenAI` logs every call made through the client.
 
-**Verify:** run `curl -s http://127.0.0.1:8787/api/health` and see `"tracingConfigured":true`. Ask the Japan question, then open **Tracing** in Langfuse. Each model call is its own `OpenAI.chat` trace, with the prompt, the reply, the tokens, the cost and the time. One question made three separate traces. Nothing says they belong together.
+**Verify:** run `curl -s http://127.0.0.1:8787/api/health` and see `"tracingConfigured":true`. Ask the Japan question, then open **Tracing** in Langfuse. Each model call is its own `OpenAI.chat` trace. It shows the prompt, reply, tokens, cost and time. One question made three separate traces.
+
+Nothing says they belong together.
 
 ![Langfuse Tracing after Step 1: one question made three separate OpenAI.chat traces.](../images/tracing/02-tracing-step-1.png)
 
-## Step 2: Nest the calls in one turn
+### Step 2: Nest the calls in one turn
 
-Three loose calls do not show which question they answered. Wrap the turn, so everything inside it lands in one trace, and wrap each graph node, so you see the agent and tools steps.
+Three loose calls do not show which question they answered. Wrap the turn, so everything inside it lands in one trace. Wrap each graph node, so you see the agent and tools steps.
 
-### `src/server/medinfo-agent.ts`
-
-Add the import:
+In `src/server/medinfo-agent.ts`, add the import:
 
 ```ts
 import { observe } from "@langfuse/tracing";
@@ -127,7 +185,7 @@ const graph = buildGraph({
 });
 ```
 
-The client is now wrapped inside the agent node. In `03-prompt-management`, each call passes the prompt it fetched from Langfuse, so the wrap has to happen per call.
+The client is now wrapped inside the agent node. So the wrap runs on every call.
 
 Then wrap the turn. Replace the `runMedinfoTurn` line with:
 
@@ -140,17 +198,15 @@ export const runMedinfoTurn = observe(
 
 `observe(...)` logs the function's argument as the input and its return value as the output. `routes.ts` still calls `runMedinfoTurn` the same way.
 
-**Verify:** ask the Japan question again. Langfuse shows one new `hcp-medinfo-chat-turn` trace. Open it: the turn holds `agent`, `tools`, `agent`, `tools`, `agent`, and each `agent` holds its `OpenAI.chat` call. The input is the chat thread and the question.
+**Verify:** ask the Japan question again. Langfuse shows one new `hcp-medinfo-chat-turn` trace. Open it. The turn holds `agent`, `tools`, `agent`, `tools`, `agent`. Each `agent` holds its `OpenAI.chat` call.
 
-The `tools` steps are empty. You can see that a tool ran, but not which one, what it was given, or what it found.
+The `tools` steps are empty. You see that a tool ran. You do not see which one or what it found.
 
-![The trace after Step 2: one hcp-medinfo-chat-turn holding the agent and tools steps, each agent step holding its model call.](../images/tracing/02-tracing-step-2.png)
+![The trace after Step 2: one turn holding agent and tools steps.](../images/tracing/02-tracing-step-2.png)
 
-## Step 3: Log the tools and the session
+### Step 3: Log the tools and the session
 
-### `src/server/tools.ts`
-
-Add the import, wrap the two tool functions above `executeTool`, and call the wrapped ones:
+In `src/server/tools.ts`, add the import, wrap the two tool functions above `executeTool`, and call the wrapped ones:
 
 ```ts
 import { observe } from "@langfuse/tracing";
@@ -172,15 +228,13 @@ export async function executeTool(name: string, input: Record<string, unknown>):
 }
 ```
 
-### `src/server/medinfo-agent.ts`
-
-Each chat has a thread id. Pass it to Langfuse as the session id, so every turn of one chat is grouped. Change the import:
+Each chat has a thread id. Pass it to Langfuse as the session id, so every turn of one chat is grouped. In `src/server/medinfo-agent.ts`, change the import:
 
 ```ts
 import { observe, propagateAttributes } from "@langfuse/tracing";
 ```
 
-and run the graph inside `propagateAttributes`:
+Then run the graph inside `propagateAttributes`:
 
 ```ts
 export const runMedinfoTurn = observe(
@@ -199,21 +253,17 @@ export const runMedinfoTurn = observe(
 
 Everything inside the block, the model calls and tool calls included, gets the session id and the tags.
 
-**Verify:** ask the Japan question again and open the new trace. `get_desk_rules` and `search_labels` sit inside their `tools` steps. Click `search_labels`: the input is the query the model wrote, and the output is every label section it found. The top of the trace shows a **session** link and the two tags. Ask a second question in the same chat, and **Sessions** in Langfuse shows both turns under one session.
+**Verify:** ask the Japan question again and open the new trace. `get_desk_rules` and `search_labels` sit inside their `tools` steps. Click `search_labels`. The input is the query the model wrote. The output is every label section it found.
 
-![The trace after Step 3: get_desk_rules and search_labels inside their tools steps, with the search query and its results, and the session and tags on top.](../images/tracing/02-tracing-step-3.png)
+The top shows a **session** link and two tags. Ask a second question in the same chat. **Sessions** in Langfuse shows both turns together.
 
-## Use it
+![The trace after Step 3: both tools show their input and output.](../images/tracing/02-tracing-step-3.png)
 
-Ask the dose question from `01-base-app`: **What is the CardioNex dose for a US patient with eGFR 24 who is not on dialysis?** Open its trace and click `search_labels`. The results usually hold three US labels: `cardionex-uspi-v2` (active), `cardionex-uspi-v1` (superseded) and `cardionex-uspi-v3` (not in force until 2027). The right answer depends on the model picking `v2`. When it picks the wrong one, this is the step that shows why. Lesson 07 turns that into a test.
+### Step 4: Use it on the dose question
 
-## How to verify you are done
+Ask the dose question from lesson 01. Open its trace and click `search_labels`. The results usually hold three US labels: `cardionex-uspi-v2` (active), `cardionex-uspi-v1` (superseded) and `cardionex-uspi-v3` (not in force until 2027).
 
-- One chat turn creates one trace in Langfuse.
-- The root is `hcp-medinfo-chat-turn`, of type agent, with the chat thread as input.
-- Each `agent` step holds an `OpenAI.chat` generation with prompt, reply, tokens, cost and time.
-- Each `tools` step holds `get_desk_rules` or `search_labels`, with its input and output.
-- The trace has a session and the tags `langfuse-workshop` and `hcp-medinfo`.
+The right answer depends on the model picking `v2`. When it picks the wrong one, the trace shows why. Lesson 07 turns that into a test.
 
 Compare your code with the finished version:
 
@@ -223,14 +273,47 @@ git diff checkpoint/03-prompt-management -- src/server
 
 Only comments and the order of imports should differ.
 
-## Wrap-up
+## Prove it
 
-One pattern does all of it: `observe(fn, { name, asType })` wraps a function and logs a step with that name and type. `observeOpenAI(client)` is the same idea, built for the OpenAI SDK.
+| Case | Why it matters | Before | After |
+| --- | --- | --- | --- |
+| The Japan question | One question must be one record | Three loose `OpenAI.chat` traces | One `hcp-medinfo-chat-turn` trace |
+| The US dose question | You must see which labels the model had | Only a search card | `search_labels` shows the query and all three labels |
+| Two questions in one chat | A chat is one story | Separate traces | One session with both turns |
+| A restart | The last trace must survive | Could go missing | `shutdown` flushes first |
 
-The [**Langfuse skill**](https://github.com/langfuse/skills) (`/langfuse`) applies these patterns to a codebase for you. This walkthrough shows what it does under the hood.
+No unit test covers this lesson. Two checks hold it. The health route says `"tracingConfigured":true`, and the trace has the shape above.
 
-`observeOpenAI` is the Langfuse [auto-instrumentation for OpenAI JS](https://langfuse.com/integrations/model-providers/openai-js). For another SDK, the [integrations catalogue](https://langfuse.com/integrations) has the matching wrapper. See [Sessions](https://langfuse.com/docs/observability/features/sessions) and [Users](https://langfuse.com/docs/observability/features/users) for more ways to group traces.
+Break it on purpose. Comment out `sdk.start()` in `src/server/index.ts`. The health route still says `true`, because it only checks that the keys are set. But no new trace shows up in Langfuse. Put the line back.
 
-## End state
+## Stuck points
 
-The traced app is the starting point for `03-prompt-management` and `04-monitoring`.
+A correct run gives one trace per chat turn, named `hcp-medinfo-chat-turn`. Each `agent` step holds a model call, and each `tools` step holds its tool.
+
+| What you see | Why | What to do |
+| --- | --- | --- |
+| The health route says `true` but no trace shows | The keys are set, but `sdk.start()` did not run | Check `index.ts`, then restart `npm run dev` |
+| Three loose `OpenAI.chat` traces | Step 2 is not in yet | Wrap the turn and the nodes |
+| `tools` steps are empty | The tool functions are not wrapped | Do Step 3 |
+| The last trace is missing after a restart | The processor was not flushed | Add `forceFlush()` to `shutdown` |
+| Turns of one chat are not grouped | `propagateAttributes` is missing | Pass `turn.threadId` as the session id |
+
+## What to watch for
+
+- **Missing traces.** A trace that never arrives looks like a quiet system. Our hold is the flush on shutdown. In production, also watch the count of traces per hour.
+- **Private data in a trace.** A trace holds the full prompt and the full answer. Treat the trace store like the data it copies. Later lessons add sign-in and permissions.
+- **Cost of the record.** Every span adds data. Our hold is that we wrap only the turn, the nodes, the tools and the model calls. We do not wrap each helper.
+
+## Results
+
+This lesson has no scoreboard row, because no test case runs yet. The proof is a trace you can open. It has one root and the agent and tools steps. It also shows the model calls, the tool inputs and outputs, and a session.
+
+The traced app is the starting point for lessons 03 and 04. The first scoreboard row comes in lesson 06.
+
+## Where to go next
+
+- Read `src/server/medinfo-agent.ts` to see each `observe` call, then `src/server/tools.ts` for the tool wraps.
+- The [Langfuse skill](https://github.com/langfuse/skills) (`/langfuse`) applies these patterns to a codebase for you. This lesson shows what it does.
+- Read [AI observability and application tracing](https://langfuse.com/docs/observability/overview) and [what a good trace looks like](https://langfuse.com/docs/observability/best-practices).
+- See [Sessions](https://langfuse.com/docs/observability/features/sessions) and [Users](https://langfuse.com/docs/observability/features/users) for more ways to group traces.
+- The [integrations catalogue](https://langfuse.com/integrations) lists a wrapper for each other SDK.
