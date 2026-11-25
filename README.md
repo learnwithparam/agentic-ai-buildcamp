@@ -58,6 +58,7 @@ Each lesson starts from a checkpoint tag. It shows the problem, how the part wor
 | 19 | [Ask and review from the terminal with the same permissions](./docs/learner/19-cli.md) | `checkpoint/19-cli` | How does a terminal client sign in and stream? |
 | 20 | [Find the right label section by meaning from the PDFs](./docs/learner/20-rag.md) | `checkpoint/20-rag` | How does the desk search the real label PDFs? |
 | 21 | [Check every citation before the answer is sent](./docs/learner/21-citations.md) | `checkpoint/21-citations` | How do we check every citation before it is sent? |
+| 22 | [Let an agent write SQL without reading other companies' data](./docs/learner/22-insights.md) | `checkpoint/22-insights` | How can an agent write SQL without reading another company's rows? |
 
 The commands the lessons use:
 
