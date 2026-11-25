@@ -84,7 +84,8 @@ export async function startA2aApp(model: () => OpenAI) {
     recordDecision: async () => {},
     a2a: { store: tasks, links: new TaskReviews(pool, tasks), handoff: createHandoffAgent({ model }) },
     events: { store: new MemoryEventStore(), queue: new InlineQueue(), secrets: {} },
-    sweep: testSweep()
+    sweep: testSweep(),
+    insights: {} as never
   };
   server.on("request", createApp(auth, desk));
 

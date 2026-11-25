@@ -35,7 +35,10 @@ export const env = {
   testDatabaseUrl: process.env.TEST_DATABASE_URL ?? "",
   // Lesson 20. docling-serve, which reads the label PDFs' layout (npm run rag:setup starts it).
   doclingUrl: process.env.DOCLING_URL ?? "http://127.0.0.1:5001",
-  datasetName: process.env.DATASET_NAME ?? "hcp-medinfo-workshop"
+  datasetName: process.env.DATASET_NAME ?? "hcp-medinfo-workshop",
+  // Lesson 22. The insights agent's login per company (npm run identity:setup writes them). The
+  // host and database are the app's own; only the login differs.
+  biDbPassword: (tenantId: string) => process.env[`BI_DB_PASSWORD_${tenantId.toUpperCase()}`] ?? ""
 };
 
 export function isLangfuseConfigured() {

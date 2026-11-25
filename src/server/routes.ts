@@ -12,9 +12,10 @@ import type { EventQueue, EventRow, EventStore } from "./events/store";
 import { startOfDay, type AgentControls, type SpendReader } from "./auto/limits";
 import type { SweepQueue, SweepRuns } from "./auto/queue";
 import { BUDGET_SPENT_MESSAGE, isBudgetSpent } from "./gateway";
-import { visibleHcps } from "./permissions";
+import { canQuerySales, visibleHcps } from "./permissions";
 import { scrubPhi } from "./phi";
 import type { MedinfoAgent } from "./medinfo-agent";
+import type { InsightsAgent } from "./bi/agent";
 import { DECISIONS, type ReviewItem, type ReviewStore } from "./reviews";
 import { hasRole, REVIEWER_ROLES, STAFF_ROLES, TENANTS } from "./users";
 
@@ -58,6 +59,8 @@ export type Desk = {
   events: { store: EventStore; queue: EventQueue; secrets: Record<string, string> };
   // Lesson 17: the nightly sweep's limits, its run log, its queue and its spend meter.
   sweep: { controls: AgentControls; runs: SweepRuns; queue: SweepQueue; spend: SpendReader };
+  // Lesson 22: the insights agent, for analysts. Its threads live in the same checkpointer.
+  insights: InsightsAgent;
 };
 
 // Lesson 16. What the event inbox page shows of one event: never the payload itself, which for
@@ -137,6 +140,55 @@ export function createRoutes(auth: Auth, desk: Desk) {
       // The chat shows replies, not error events, so the doctor reads the reason as the assistant's reply.
       const content = isBudgetSpent(error) ? BUDGET_SPENT_MESSAGE : "The agent could not finish this answer. Please try again.";
       const { messages } = await desk.agent.readThread(request.params.threadId).catch(() => ({ messages: [] }));
+      send("values", { messages: [...messages, { id: `error-${randomUUID()}`, type: "ai", content, tool_calls: [] }] });
+    }
+    response.end();
+  });
+
+  // Lesson 22. Insights threads, for each company's analysts. OpenFGA decides here, before any
+  // model call, and the agent's own access node decides again for scripts that skip these routes.
+  const analyst = async (response: Parameters<typeof currentUser>[0]) => {
+    if (await canQuerySales(currentUser(response))) return true;
+    response.status(403).json({ error: "Sales insights are for your company's analysts." });
+    return false;
+  };
+
+  routes.post("/api/insights/threads", async (_request, response) => {
+    if (!(await analyst(response))) return;
+    const threadId = randomUUID();
+    await desk.reviews.createThread(threadId, currentUser(response));
+    response.json({ thread_id: threadId });
+  });
+
+  routes.get("/api/insights/threads/:threadId/state", async (request, response) => {
+    if (!(await analyst(response))) return;
+    if (!(await desk.reviews.ownsThread(request.params.threadId, currentUser(response).userId))) {
+      response.status(404).json({ error: "No such thread." });
+      return;
+    }
+    response.json(await desk.insights.readThread(request.params.threadId));
+  });
+
+  routes.post("/api/insights/threads/:threadId/runs/stream", async (request, response) => {
+    if (!(await analyst(response))) return;
+    const user = currentUser(response);
+    if (!(await desk.reviews.ownsThread(request.params.threadId, user.userId))) {
+      response.status(404).json({ error: "No such thread." });
+      return;
+    }
+    const parsed = runSchema.safeParse(request.body);
+    if (!parsed.success) {
+      response.status(400).json({ error: "Send at least one message." });
+      return;
+    }
+    response.writeHead(200, { "Content-Type": "text/event-stream", "Cache-Control": "no-cache", Connection: "keep-alive" });
+    const send = (event: string, data: unknown) => response.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+    try {
+      await desk.insights.runTurn({ threadId: request.params.threadId, user, messages: parsed.data.messages }, ({ event, data }) => send(event, data));
+    } catch (error) {
+      console.error(error);
+      const content = isBudgetSpent(error) ? BUDGET_SPENT_MESSAGE : "The agent could not finish this answer. Please try again.";
+      const { messages } = await desk.insights.readThread(request.params.threadId).catch(() => ({ messages: [] }));
       send("values", { messages: [...messages, { id: `error-${randomUUID()}`, type: "ai", content, tool_calls: [] }] });
     }
     response.end();

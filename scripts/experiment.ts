@@ -29,7 +29,8 @@ import { env } from "../src/server/env";
 import { answerWithSources } from "../src/server/medinfo-agent";
 import { createFactChecker, readRequest } from "../src/server/content/fact-check";
 import { createOutreachPlanner } from "../src/server/content/outreach";
-import { scriptUser } from "../src/server/users";
+import { answerInsights } from "../src/server/bi/agent";
+import { ANALYST_ROLE, scriptUser } from "../src/server/users";
 import { startA2a } from "./a2a-runner";
 import { startEvents } from "./events-runner";
 import { runCaseSweep } from "./sweep-runner";
@@ -205,6 +206,8 @@ export async function startExperiment() {
         if (agent === "events" && input.event) return events.send(input.event.eventId, input.tenantId, input.event.delivery);
         // Lesson 17: the sweep, with the case's day, budget, spend so far and switch.
         if (agent === "autonomy" && input.sweep) return runCaseSweep({ factChecker, outreachPlanner }, input, caseIdOf(item));
+        // Lesson 22: the insights agent, as an analyst of the case's company or as a doctor.
+        if (agent === "insights") return (await answerInsights(input.messages.at(-1)!.content, scriptUser(input.tenantId, input.country, input.role === "analyst" ? [ANALYST_ROLE] : []))).answer;
         const { answer, sources, tier } = await answerWithSources(input.messages, user);
         sourcesByInput.set(JSON.stringify(input), sources);
         tierByInput.set(JSON.stringify(input), tier);
