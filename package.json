@@ -16,6 +16,7 @@
     "dataset:seed": "tsx scripts/seed-dataset.ts",
     "judge:calibrate": "tsx scripts/judge-calibrate.ts",
     "dataset:run": "tsx scripts/run-dataset.ts",
+    "release:gate": "tsx scripts/release-gate.ts",
     "langfuse:seed:error-analysis": "tsx scripts/seed-error-analysis-traces.ts",
     "langfuse:seed:error-analysis:annotations": "tsx scripts/seed-error-analysis-annotations.ts",
     "langfuse:seed:calibration": "tsx scripts/seed-faithfulness-calibration.ts",
@@ -25,7 +26,8 @@
     "identity:setup": "tsx scripts/identity-setup.ts",
     "infra:up": "docker compose --env-file .env -f infra/docker-compose.yml up -d --wait",
     "identity:smoke": "tsx scripts/identity-smoke.ts",
-    "events:send": "tsx scripts/events-send.ts"
+    "events:send": "tsx scripts/events-send.ts",
+    "prepare": "git config core.hooksPath .githooks || true"
   },
   "dependencies": {
     "@a2a-js/sdk": "1.3.0",
