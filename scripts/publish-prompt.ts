@@ -36,7 +36,10 @@ async function main() {
   });
 
   const name = env.langfusePromptName || "hcp-medinfo-agent";
-  const label = env.langfusePromptLabel || "production";
+  // .env wins over the shell (load-env overrides), so a label for one publish is a flag:
+  // `npm run prompt:publish -- --label staging` leaves production where it is.
+  const flag = process.argv.indexOf("--label");
+  const label = (flag >= 0 ? process.argv[flag + 1] : "") || env.langfusePromptLabel || "production";
 
   await langfuse.prompt.create({
     name,
