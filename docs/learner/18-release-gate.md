@@ -1,35 +1,90 @@
 ---
-title: "Workshop: A Release Gate"
-description: "Turn the scoreboard into a gate: a prompt version is promoted to production only when every release case passes, and a push that changes an agent runs the same cases first, with Langfuse's RegressionError as the verdict."
+title: "Workshop: Block a Bad Prompt or Code Change Before It Ships"
+description: "Turn the scoreboard into a release gate. A prompt version reaches production only when every release case passes, and a push that changes an agent runs the same cases first."
 ---
 
 # 18 Block a bad change before it ships
 
-## Why a scoreboard is not enough
+## The problem
 
-Since lesson 06 the scoreboard has told you what a change did. It tells you after the change is live:
+Since lesson 06 the scoreboard has told you what a change did. It tells you after the change is live. Three things slip through:
 
-- **A prompt edit ships the moment you label it.** In Langfuse, moving the `production` label onto a new version changes every doctor's next answer. Nothing runs first.
-- **A code change ships on push.** A push can change the agent, the tools or the cases, and nobody has to run the dataset before it goes out.
-- **A fixed failure comes back quietly.** Lesson 07 fixed the superseded dose. A later edit can undo it, and the first to notice is a doctor.
+- **A prompt edit ships at once.** Move the `production` label to a new version. Every doctor's next answer changes, and nothing runs first.
+- **A code change ships on push.** A push can change the agent, the tools or the cases. Nobody has to run the dataset before it goes out.
+- **A fixed failure comes back quietly.** Lesson 07 fixed the superseded dose. A later edit can undo it, and a doctor is the first to notice.
 
-So the scoreboard becomes a gate. A small set of cases, one for each thing a change can break, must all pass before a prompt version reaches `production` and before a push that changes an agent leaves your laptop. One failing case stops the change.
+For example, a colleague removes the bracket citations from the prompt because they look ugly. Every answer ships without a source, and the reviewer cannot check a fact.
 
-Complementary materials:
+## What you build
 
-- Docs: [Langfuse experiments in CI/CD](https://langfuse.com/docs/evaluation/experiments/experiments-ci-cd)
-- Docs: [Langfuse prompt version control and labels](https://langfuse.com/docs/prompt-management/features/prompt-version-control)
-- Docs: [git hooks: pre-push](https://git-scm.com/docs/githooks#_pre_push)
+- **A gate.** `npm run release:gate` runs 8 release cases on one prompt version.
+- **A verdict.** The gate raises Langfuse's `RegressionError` unless all 8 ran and passed.
+- **A promotion.** `--label staging --promote` moves `production` only on green.
+- **A push hook.** It runs the gate when a push changes an agent, the runner or the dataset.
 
-## Goal
+| Case | What breaks | How the system holds |
+| --- | --- | --- |
+| A prompt drops the citations | Doctors get unchecked facts | The gate is red and production stays put |
+| A fixed failure returns | A superseded dose reaches a doctor | A release case fails first |
+| A case does not run | A silent gap | A case that did not run is never a pass |
+| A push changes the agent | No case runs before it ships | The hook runs the gate and a red result stops the push |
 
-A prompt or code change that brings back a fixed failure cannot ship.
+## How it works
 
-- **Before:** labelling a version `production` ships it at once, and a push runs no cases.
-- **Build:** `npm run release:gate`, which runs the 8 release cases on one prompt version and raises Langfuse's `RegressionError` unless all 8 ran and passed; `--label staging --promote`, which moves `production` only on green; and a pre-push hook that runs the gate when a push changes an agent, the runner or the dataset.
-- **After:** a staging version that drops the citations is red and production stays where it was. The fixed version is green and is promoted. The 18 run passes 8/8.
+A gate turns the cases you already keep green into a rule. Nothing reaches production unless they all pass. For a prompt, the gate tests one pinned version and moves the label only on green. For code, the hook runs the same cases on push.
 
-## Starting point
+### The flow
+
+This follows one staging prompt version from edit to promotion.
+
+```mermaid
+sequenceDiagram
+    participant D as Developer
+    participant L as Prompt store
+    participant G as Release gate
+    participant A as Agent
+    participant E as Experiment record
+    D->>L: New version, label staging
+    D->>G: release:gate --label staging --promote
+    G->>L: Which version has staging?
+    L-->>G: Version 9
+    G->>A: Pin the agent to version 9
+    G->>A: Run the 8 release cases
+    A-->>G: Answers and scores
+    G->>E: Record the run
+    alt All 8 ran and passed
+        G->>L: Move production to version 9
+    else Any case failed or did not run
+        G-->>D: RegressionError, exit 1
+    end
+```
+
+The step people miss is the pin. If someone moves the label during the run, the run still tests the version it started with.
+
+### Where it sits
+
+The gate reuses the dataset run from lesson 06. It adds a verdict and a way to promote.
+
+```mermaid
+flowchart LR
+    dev["Developer"] -->|"push"| hook["Pre-push hook"]
+    hook -->|"changed files"| gate["Release gate"]
+    dev -->|"promote command"| gate
+    gate -->|"pinned version"| ag["Desk agent"]
+    ag -->|"model call"| gw["Gateway"]
+    gate -->|"run and scores"| lf[("Experiment record")]
+    gate -->|"move label on green"| pr[("Prompt store")]
+    pr -->|"production label"| ag
+    classDef new fill:#fde68a,stroke:#b45309,color:#1c1917
+    class gate,hook new
+```
+
+### Concepts
+
+- [Release gate](../walkthrough.md#c-release-gate)
+- [Promote](../walkthrough.md#c-promote)
+
+## Build it
 
 ```bash
 git checkout checkpoint/18-release-gate
@@ -38,14 +93,14 @@ git checkout checkpoint/18-release-gate
 The checkpoint adds:
 
 - `scripts/release-gate.ts`: the gate. It lists the release cases, scores the run with the run evaluator `release_pass_rate`, and decides the verdict.
-- `scripts/experiment.ts`: how one case runs and is scored, moved out of `scripts/run-dataset.ts` so the dataset run and the gate share it.
+- `scripts/experiment.ts`: how one case runs and is scored. It moved out of `scripts/run-dataset.ts`, so the dataset run and the gate share it.
 - `src/server/medinfo-agent.ts`: `usePromptVersion`, which pins the agent to one prompt version.
 - `.githooks/pre-push` and the `prepare` script in `package.json`, which turns the hook on at `npm install`.
 - `scripts/release-gate.test.ts`: tests that need no model.
 
 There is no new package. `RegressionError` comes with `@langfuse/client`.
 
-## Step 1: The release cases
+### Step 1: Read the release cases
 
 Open `scripts/release-gate.ts`. The gate does not run the whole dataset. It runs one case for each thing an earlier lesson fixed:
 
@@ -62,9 +117,9 @@ Open `scripts/release-gate.ts`. The gate does not run the whole dataset. It runs
 
 Eight cases keep the gate fast and cheap enough to run on every promotion. The full dataset still runs when you want the whole picture.
 
-The bar is 1. A case passes only when every score the dataset run asks for passes, the same rule as the scoreboard.
+The bar is 1. A case passes only when every score the dataset run asks for passes. That is the same rule as the scoreboard.
 
-## Step 2: Gate the production prompt
+### Step 2: Gate the production prompt
 
 ```bash
 npm install
@@ -86,14 +141,14 @@ Release gate: green.
 
 Your version number will differ. What happens:
 
-1. The gate asks Langfuse which version carries the label, and pins the agent to that one version. If someone moves the label during the run, the run still tests the version it started with.
-2. It runs the 8 cases as one Langfuse experiment, named `Release gate`, with the prompt version in the run's metadata.
-3. The run evaluator `release_pass_rate` scores the whole run: the share of cases that passed, and a comment naming the ones that did not.
-4. `assertReleasable` throws `RegressionError` when the rate is below 1. It also throws when fewer than 8 cases ran: a case that did not run is never a pass.
+1. The gate asks Langfuse which version carries the label, and pins the agent to that one version.
+2. It runs the 8 cases as one experiment named `Release gate`. The prompt version goes in the run's metadata.
+3. The run evaluator `release_pass_rate` scores the whole run. It gives the share of cases that passed, and a comment naming the ones that did not.
+4. `assertReleasable` throws `RegressionError` when the rate is below 1. It also throws when fewer than 8 cases ran.
 
-A pinned prompt that Langfuse cannot return is an error. The app's built-in fallback prompt is only for a doctor when Langfuse is down; a gate must never pass on a prompt it did not test.
+A pinned prompt that Langfuse cannot return is an error. The app's built-in fallback prompt is only for a doctor when Langfuse is down. A gate must never pass on a prompt it did not test.
 
-## Step 3: Write a staging version in Langfuse
+### Step 3: Write a staging version
 
 A colleague thinks the bracket citations are hard for doctors to read. They write a new version without them.
 
@@ -109,11 +164,11 @@ Replace it with:
 Answer from the label text you found. Doctors find bracketed references hard to read, so name the label in plain words at the end instead.
 ```
 
-Set the commit message to `Name the label in plain words, not brackets`, give the version the label `staging` and not `production`, and save.
+Set the commit message to "Name the label in plain words, not brackets". Give the version the label `staging` and not `production`, and save.
 
-The app still serves `production`, so no doctor sees this version yet. `staging` is just a name; any label works, and the gate takes it with `--label`.
+The app still serves `production`, so no doctor sees this version yet. The name `staging` is only a name. Any label works, and the gate takes it with `--label`.
 
-## Step 4: Try to promote it
+### Step 4: Try to promote it
 
 ```bash
 npm run release:gate -- --label staging --promote
@@ -121,24 +176,24 @@ npm run release:gate -- --label staging --promote
 
 ![The gate is red: three cases fail and production is not moved](../images/release-gate/02-gate-red.png)
 
-Three cases fail on `label_checks`. The answers are right; the doses are right. What is missing is the citation the checks look for:
+Three cases fail on `label_checks`. The answers and the doses are right. What is missing is the citation the checks look for:
 
-- **STALENESS-01** and **MULTITURN-01** answer 5 mg for an eGFR of 24 and name the label in words, with no `[cardionex-uspi-v2, 2.2]`.
-- **AUTO-01** redrafts the stale answer with no `[cardionex-uspi-v3, 2.2]`.
+- **STALENESS-01** and **MULTITURN-01** answer 5 mg for an eGFR of 24. They name the label in words, with no bracket citation to section 2.2 of `cardionex-uspi-v2`.
+- **AUTO-01** redrafts the stale answer with no bracket citation to section 2.2 of `cardionex-uspi-v3`.
 
-`release_pass_rate` is 0.625, the gate throws `RegressionError`, and the command exits 1. `--promote` runs only after a green verdict, so `production` still points at the version from step 2.
+`release_pass_rate` is 0.625, the gate throws `RegressionError`, and the command exits 1. Promotion runs only after green. So `production` still points at the version from step 2.
 
-Why a missing citation is a failed release, not a style choice: a reviewer checks each fact against the section it cites, and the sweep in lesson 17 finds stale answers by the label they cite. Without the citation, neither can do its job.
+A missing citation is a failed release, not a style choice. A reviewer checks each fact against the section it cites. The sweep in lesson 17 finds stale answers by the label they cite.
 
-## Step 5: Read the red run in Langfuse
+### Step 5: Read the red run
 
-Open the run link the gate printed. Each case of the run has its scores, and the run has `release_pass_rate` with the comment `Failed: AUTO-01, MULTITURN-01, STALENESS-01`.
+Open the run link the gate printed. Each case of the run has its scores. The run has `release_pass_rate`, with a comment that names the failed cases: AUTO-01, MULTITURN-01 and STALENESS-01.
 
-Every gate run stays in Langfuse, red or green, so you can compare two versions case by case later. The step after next does that.
+Every gate run stays in Langfuse, red or green. So you can compare two versions case by case later.
 
-## Step 6: Fix it and promote
+### Step 6: Fix it and promote
 
-Make another new version from the staging one, put the citation line back, label it `staging`, and set the commit message to `Bring back the bracket citations`. Then run the same command:
+Make another new version from the staging one. Put the citation line back and label it `staging`. Set the commit message to "Bring back the bracket citations". Then run the same command:
 
 ```bash
 npm run release:gate -- --label staging --promote
@@ -152,23 +207,23 @@ All 8 pass. The gate moves `production` onto that version and keeps its other la
 
 The app reads the `production` label, so its next answer uses the new version. Nothing restarts.
 
-## Step 7: Compare the red run and the green run
+### Step 7: Compare the red run and the green run
 
-In Langfuse, open **Experiments**, choose the red run as the baseline and add the green run to compare.
+In Langfuse, open **Experiments**. Choose the red run as the baseline and add the green run to compare.
 
 ![The red run against the green run: label_checks goes from 0.63 to 1.00, three cases better, none worse](../images/release-gate/04-red-vs-green.png)
 
-`behavior_match` is 1.00 on both: the agent did the right kind of thing each time. `label_checks` goes from 0.63 to 1.00, with three cases up and none down. That is the whole difference between the two versions.
+`behavior_match` is 1.00 on both, so the agent did the right kind of thing each time. `label_checks` goes from 0.63 to 1.00, with three cases up and none down. That is the whole difference between the two versions.
 
-## Step 8: See which generations used the version
+### Step 8: See which generations used the version
 
-Open the version in **Prompts** and click **Linked Generations**. Gate runs are recorded in the `sdk-experiment` environment, which the table hides at first, so tick it under **Environment**.
+Open the version in **Prompts** and click **Linked Generations**. Gate runs are recorded in the `sdk-experiment` environment, which the table hides at first. Tick it under **Environment**.
 
 ![The generations the gate made with the new version](../images/release-gate/05-linked-generations.png)
 
-Each row is a model call made with this exact version. Lesson 03 linked the prompt to its generations; now that link tells you which version a case was tested on.
+Each row is a model call made with this exact version. Lesson 03 linked the prompt to its generations. Now that link tells you which version a case was tested on.
 
-## Step 9: The gate on push
+### Step 9: Gate the push
 
 A prompt is one way a change ships. Code is the other. `npm install` ran the `prepare` script, which sets git's hooks folder to `.githooks/`. Its `pre-push` hook runs:
 
@@ -176,20 +231,20 @@ A prompt is one way a change ships. Code is the other. `npm install` ran the `pr
 npx tsx scripts/release-gate.ts --pre-push
 ```
 
-git hands the hook the refs being pushed. The gate lists the files that push changes and runs only when one matches `GATED_PATHS`:
+Git hands the hook the refs being pushed. The gate lists the files that push changes. It runs only when one matches `GATED_PATHS`:
 
-- the server code (`src/server/`, but not its tests);
-- the runner, the gate, the cases and the scoring (`scripts/experiment.ts`, `scripts/release-gate.ts`, `scripts/run-dataset.ts`, `scripts/hcp-cases.ts`, `scripts/scoreboard.ts`, `scripts/prompt-variants.ts`, `scripts/judge/`);
-- the dataset (`data/hcp/`);
+- the server code (`src/server/`), but not its tests
+- the runner, the gate, the cases and the scoring (`scripts/experiment.ts`, `scripts/release-gate.ts`, `scripts/run-dataset.ts`, `scripts/hcp-cases.ts`, `scripts/scoreboard.ts`, `scripts/prompt-variants.ts`, `scripts/judge/`)
+- the dataset (`data/hcp/`)
 - `package.json` and `package-lock.json`, because a new package version can change an answer.
 
-A push of docs or the web client prints `this push changes no agent, runner or dataset file, so it is skipped.` A tag and a branch delete ship nothing new, so they skip too. On a push that changes the agent, the gate runs on the `production` prompt, and a red result stops the push.
+A push of docs or the web client is skipped. The hook says no agent, runner or dataset file changed. A tag and a branch delete ship nothing new, so they skip too. On a push that changes the agent, the gate runs on the `production` prompt. A red result stops the push.
 
-`git push --no-verify` skips every hook. That is git's own escape, kept for when Langfuse is down; it is a decision someone makes and can be asked about, not something that happens by accident.
+`git push --no-verify` skips every hook. That is git's own escape, kept for when Langfuse is down. It is a decision someone makes and can be asked about. It does not happen by accident.
 
-GitHub's runners cannot reach the Langfuse on your laptop, so the gate runs at push, not in CI. With a Langfuse that CI can reach, the same command is the CI step, and the exit code is the check.
+GitHub's runners cannot reach the Langfuse on your laptop, so the gate runs at push, not in CI. If CI could reach Langfuse, the same command would be the CI step. The exit code is the check.
 
-## Step 10: The first idea that did not work
+### Step 10: Learn from the first idea that failed
 
 Before the citation change, we tried the obvious bad edit. We added one line to the prompt that gives the old dose:
 
@@ -197,15 +252,56 @@ Before the citation change, we tried the obvious bad edit. We added one line to 
 For severe renal impairment (eGFR below 30), the dose is 10mg once daily.
 ```
 
-The gate was green, and that version went to production. STALENESS-01 still answered 5 mg, because the agent searches the label and answers from the section it finds. A line in the prompt that contradicts the label lost to the label.
+The gate was green, and that version went to production. STALENESS-01 still answered 5 mg. The agent searches the label and answers from what it finds. So a prompt line that contradicts the label lost to the label.
 
-That is the agent working as lesson 07 meant it to, and it shows what the gate is for: not to catch every edit that looks bad, but to catch every edit that breaks something the cases check. We set production back and planted the citation change instead.
+That is the agent working as lesson 07 meant it to. It shows what the gate is for. It does not catch every edit that looks bad. It catches every edit that breaks something the cases check. We set production back and planted the citation change instead.
 
-## Results
+Now record your row:
 
 ```bash
 npm run release:gate -- --label staging --promote --chapter 18 --change "A release gate on every prompt promotion and agent push"
 ```
+
+## Prove it
+
+| Case | Why it matters | Before | After |
+| --- | --- | --- | --- |
+| Staging without citations | A bad prompt must not ship | `production` moved on a label | Red, `production` stays |
+| Staging with citations | A good prompt must ship | Hand-moved label | Green, promoted |
+| A push of docs | It must not slow a doc change | Not gated | Skipped |
+| A push of agent code | It must run the cases | Not gated | The gate runs first |
+
+The tests make no model call:
+
+```bash
+npx tsx --test scripts/release-gate.test.ts
+```
+
+- **8 of 8 passed** is green.
+- **7 of 8 passed, fewer than 8 ran, or a lost score** is red.
+- **The hook** reads branch pushes and skips tags.
+
+Break it on purpose. Remove one case from `RELEASE_CASES`. The test that every release case is in the dataset, and that 8 cases run, fails.
+
+## Stuck points
+
+In a correct run, `npm run release:gate` is green on your production prompt. The red and green runs are both under **Experiments**. A push that changes `src/server/medinfo-agent.ts` runs the gate.
+
+| What you see | Why | What to do |
+| --- | --- | --- |
+| Red, saying only 7 of 8 release cases ran | A provider error skipped one case | Run it again |
+| Green on a bad prompt | No case checks what changed | Add a case, as in Step 10 |
+| No Linked Generations rows | The environment filter hides gate runs | Tick `sdk-experiment` under **Environment** |
+| The hook does not run | `prepare` did not run | Run `npm install` again |
+
+## What to watch for
+
+- **A case that did not run.** It is never a pass. A gate that passes on fewer cases than it lists is no gate.
+- **A prompt the gate did not test.** The gate pins one version. It never falls back to the built-in prompt.
+- **The escape hatch.** `git push --no-verify` skips the hook, so use it on purpose and say so.
+- **A gate that checks too little.** It catches only what the cases check. Add a case when you fix a new failure.
+
+## Results
 
 | Chapter | Change | Passed | staleness | off-label | tenancy | pv-phi | injection | multi-turn | fact-check | auto |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -213,29 +309,15 @@ npm run release:gate -- --label staging --promote --chapter 18 --change "A relea
 
 How to read it:
 
-- **8/8, one case per column:** each column is one thing an earlier lesson fixed. The row is the green run of the fixed version, the one that was promoted.
-- **The red run has no row.** Its numbers are in step 4 and in Langfuse. A red run still writes a row when you pass `--chapter`, before the verdict, so a failure is on the scoreboard too.
-- **One run went red for a reason that was not the prompt.** A provider error skipped one case, so only 7 of 8 ran. Every case that ran passed, and the gate was still red: `only 7 of 8 release cases ran, and a case that did not run is never a pass`. Run it again; a gate that passes on fewer cases than it lists is no gate.
+- **8/8, one case per column.** Each column is one thing an earlier lesson fixed. The row is the green run of the fixed version, the one that was promoted.
+- **The red run has no row.** Its numbers are in step 4 and in Langfuse. With `--chapter`, a red run still writes a row before the verdict. So a failure is on the scoreboard too.
+- **One run went red for another reason.** A provider error skipped one case, so only 7 of 8 ran. Every case that ran passed, and the gate was still red. A case that did not run is never a pass. Run it again.
 
 The full row is in [docs/scoreboard.md](../scoreboard.md).
 
-## How to verify you are done
+## Where to go next
 
-- `npm run release:gate` is green on your production prompt.
-- A staging version without the citation line is red with `--promote`, and production keeps its version.
-- The fixed staging version is green, and production moves onto it.
-- The red and green runs are both under **Experiments** in Langfuse.
-- `git push` of a docs change prints that the gate is skipped; a push that changes `src/server/medinfo-agent.ts` runs it.
-- `npm run check` passes. It includes the gate tests: 8 of 8 passing is green; 7 of 8 passing, fewer than 8 run, or a lost score is red; the hook reads branch pushes and skips tags.
-
-## Wrap-up
-
-A gate turns the cases you already keep green into a rule: nothing reaches production unless they all pass. For a prompt, the gate tests one pinned version and moves the label only on green. For code, the hook runs the same cases on push. In both, the verdict is one `RegressionError` from Langfuse, every run stays in Langfuse to compare, and a case that did not run counts as a failure.
-
-## Homework
-
-Add a ninth release case for lesson 16: EVENT-06, the duplicate event handled once. Add it to `RELEASE_CASES`, update the test that every release case is in the dataset, and run the gate. Then decide: does `src/client/` belong in `GATED_PATHS`? Write down what could break in the web client that the cases would catch, and what they would not.
-
-## End state
-
-This is the starting point for lesson 19.
+- Try the homework. Add a ninth release case for lesson 16: EVENT-06, the duplicate event handled once. Add it to `RELEASE_CASES`. Update the test that every release case is in the dataset, then run the gate.
+- Decide whether `src/client/` belongs in `GATED_PATHS`. Write down what could break in the web client. Say which of those the cases would catch.
+- Read [Langfuse experiments in CI/CD](https://langfuse.com/docs/evaluation/experiments/experiments-ci-cd), [prompt version control and labels](https://langfuse.com/docs/prompt-management/features/prompt-version-control) and [git hooks: pre-push](https://git-scm.com/docs/githooks#_pre_push).
+- Lesson 19 starts from this checkpoint.
