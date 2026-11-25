@@ -32,3 +32,10 @@ export function aiText(message: AiMessage): string {
     .join("")
     .trim();
 }
+
+// Lesson 19. Where a program that knows only the app's address reads which server signs it in
+// (RFC 9728). The server answers it in src/server/auth.ts; the medinfo CLI reads it.
+export const API_METADATA_PATH = "/.well-known/oauth-protected-resource/api";
+
+// What the chat and the CLI ask Keycloak for. organization carries the company the server reads.
+export const SIGN_IN_SCOPES = "openid profile email organization";

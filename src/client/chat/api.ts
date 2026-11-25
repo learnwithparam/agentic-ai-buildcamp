@@ -1,4 +1,5 @@
 import type { LangChainMessage, LangGraphInterruptState } from "@assistant-ui/react-langgraph";
+import { readEvents } from "../../shared/sse";
 
 // The browser side of the thread API in src/server/routes.ts.
 
@@ -58,7 +59,7 @@ function textOf(message: LangChainMessage): string {
   return message.content.flatMap((part) => (part.type === "text" ? [part.text] : [])).join("");
 }
 
-// Reads the server-sent events one block at a time: "event: name", then "data: {json}", then a blank line.
+// The server-sent events of one turn, read by src/shared/sse.ts.
 export async function* streamRun(
   threadId: string,
   messages: LangChainMessage[],
@@ -83,22 +84,7 @@ export async function* streamRun(
     yield { event: "error", data: { message: "The agent is not reachable. Is the server running?" } };
     return;
   }
-  const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
-  let buffer = "";
-  for (;;) {
-    const { value, done } = await reader.read();
-    if (done) return;
-    buffer += value;
-    let end = buffer.indexOf("\n\n");
-    while (end !== -1) {
-      const block = buffer.slice(0, end);
-      buffer = buffer.slice(end + 2);
-      const name = /^event: (.*)$/m.exec(block)?.[1];
-      const data = /^data: (.*)$/m.exec(block)?.[1];
-      if (name && data) yield { event: name, data: JSON.parse(data) };
-      end = buffer.indexOf("\n\n");
-    }
-  }
+  yield* readEvents(response.body);
 }
 
 // ---------- Lesson 13: the review inbox (src/server/routes.ts) ----------
