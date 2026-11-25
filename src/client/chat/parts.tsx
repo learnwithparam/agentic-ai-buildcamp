@@ -72,28 +72,6 @@ export const SearchLabelsCard: ToolCallMessagePartComponent = ({ args, result, s
   );
 };
 
-export const DeskRulesCard: ToolCallMessagePartComponent = ({ result, status }) => {
-  const desk = parse<{ rules?: string[] }>(result);
-  return (
-    <details className="card thinking">
-      <summary className="card-head">
-        <span className="label">get_desk_rules</span>
-        <span>the desk's answering rules</span>
-        <StatusChip running={status.type === "running"} />
-      </summary>
-      {desk?.rules?.length ? (
-        <div className="card-body">
-          <ul className="rules">
-            {desk.rules.map((rule) => (
-              <li key={rule}>{rule}</li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
-    </details>
-  );
-};
-
 export const OtherToolCard: ToolCallMessagePartComponent = ({ toolName, status }) => (
   <div className="card">
     <div className="card-head">

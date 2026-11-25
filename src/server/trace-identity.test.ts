@@ -41,11 +41,16 @@ test("a chat turn's trace names the company and country, not the doctor's name o
 });
 
 test("a tool span names the company and country it answered for, not the doctor", async () => {
-  await executeTool("get_desk_rules", {}, user);
+  await executeTool("approval_status", { medicine: "NeuroVex", country: "US" }, user);
   const { spans } = await recorded();
-  const tool = spans.find((span) => span.name === "get_desk_rules")!;
+  const tool = spans.find((span) => span.name === "approval_status")!;
   // Lesson 16: the span also names the day the labels were read for, so a trace shows which label was in force.
-  assert.deepEqual(JSON.parse(String(tool.attributes["langfuse.observation.input"])), { asker: { tenantId: "pharma_b", country: "US" }, today: "2026-11-23" });
+  assert.deepEqual(JSON.parse(String(tool.attributes["langfuse.observation.input"])), {
+    medicine: "NeuroVex",
+    country: "US",
+    asker: { tenantId: "pharma_b", country: "US" },
+    today: "2026-11-23"
+  });
 });
 
 // Not every step runs above (the tools node, search_labels), so this holds every traced step to
@@ -54,7 +59,7 @@ test("every traced step that is handed the doctor turns off automatic input capt
   const { readFileSync } = await import("node:fs");
   for (const file of ["./medinfo-agent.ts", "./tools.ts"]) {
     const source = readFileSync(new URL(file, import.meta.url), "utf8");
-    const options = [...source.matchAll(/\{ name: "[^"]+", asType: "[^"]+"[^}]*\}/g)].map((match) => match[0]);
+    const options = [...source.matchAll(/\{ name(?:: "[^"]+")?, asType: "[^"]+"[^}]*\}/g)].map((match) => match[0]);
     assert.ok(options.length >= 2, `${file}: found ${options.length} traced steps`);
     for (const option of options) assert.match(option, /captureInput: false/, `${file}: ${option}`);
   }

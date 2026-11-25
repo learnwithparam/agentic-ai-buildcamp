@@ -15,8 +15,8 @@ const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const envFile = path.join(root, ".env");
 const LANGFUSE = ["compose", "-f", "langfuse/docker-compose.yml", "-f", "langfuse/workshop.override.yml"];
 const MIN_DOCKER_GB = 6;
-// The prompt the finished app serves as production: lesson 20 promotes it through the release gate.
-export const PRODUCTION_VARIANT = "lookups";
+// The prompt the finished app serves as production: fix 3's per-company prompt, filled in per doctor.
+export const PRODUCTION_VARIANT = "per-company";
 
 class Stop extends Error {}
 

@@ -1,3 +1,4 @@
+import { DESK_PROMPT } from "../src/server/desk-prompt";
 import { SYSTEM_PROMPT } from "../src/server/medinfo-agent";
 
 // Lesson 03, Step 3: the one line learners add to the prompt in the Langfuse UI.
@@ -119,5 +120,7 @@ export const PROMPT_VARIANTS = {
   tiered: edited(signedIn(ERROR_ANALYSIS_PROMPT), TIERED_EDITS),
   // Lesson 20 publishes it; docs/learner/20-rag.md shows it.
   library: edited(edited(signedIn(ERROR_ANALYSIS_PROMPT), TIERED_EDITS), LIBRARY_EDITS),
-  lookups: edited(edited(edited(signedIn(ERROR_ANALYSIS_PROMPT), TIERED_EDITS), LIBRARY_EDITS), LOOKUP_EDITS)
+  lookups: edited(edited(edited(signedIn(ERROR_ANALYSIS_PROMPT), TIERED_EDITS), LIBRARY_EDITS), LOOKUP_EDITS),
+  // Fix 3: one prompt for every company, filled in per doctor (src/server/desk-prompt.ts).
+  "per-company": DESK_PROMPT
 } as const;
