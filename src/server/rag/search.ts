@@ -14,6 +14,12 @@ import { LabelChunkStore } from "./store";
 // (RAG-03) scores 0.60 on the boxed warning. Saying the label is silent stays the agent's job.
 export const MIN_SIMILARITY = 0.35;
 
+// How many nearest sections to read for each one returned. Each version of a label has a section
+// with almost the same text, so the nearest few can all be versions no longer in force (AUTO-01:
+// v1, v2 and v2 again, with v3 2.2 just behind them). Reading more, then putting the sections in
+// force first, keeps the one the agent may cite in the results, and the old ones after it.
+export const CANDIDATES_PER_RESULT = 4;
+
 export function vectorSearch(
   store: Pick<LabelChunkStore, "nearest">,
   embedQuery: (text: string) => Promise<number[]> = async (text) => (await embed([text]))[0],
@@ -22,10 +28,13 @@ export function vectorSearch(
 ): LabelSearch {
   return async (query, readable, limit, today) => {
     if (!readable.size || !query.trim()) return [];
-    const hits = await store.nearest(await embedQuery(query), [...readable], limit, model);
-    return hits
+    const hits = await store.nearest(await embedQuery(query), [...readable], limit * CANDIDATES_PER_RESULT, model);
+    const sections = hits
       .filter((hit) => hit.similarity >= minSimilarity)
       .map(({ similarity: _similarity, ...section }): LabelSection => ({ ...section, status: statusOn(section, today) }));
+    // A stable sort: in force first, each group still nearest first.
+    const inForce = (section: LabelSection) => (section.status === "active" ? 0 : 1);
+    return sections.sort((a, b) => inForce(a) - inForce(b)).slice(0, limit);
   };
 }
 
@@ -34,7 +43,7 @@ export function vectorSearch(
 export async function connectLabelIndex(pool: pg.Pool): Promise<number> {
   const store = new LabelChunkStore(pool);
   const sections = await store.count(EMBEDDING_MODEL);
-  if (!sections) throw new Error("The label index is empty. Run npm run rag:ingest (lesson 20).");
+  if (!sections) throw new Error(`The label index has no sections from ${EMBEDDING_MODEL}. Run npm run rag:ingest (lesson 20).`);
   useLabelSearch(vectorSearch(store));
   return sections;
 }
