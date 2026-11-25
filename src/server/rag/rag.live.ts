@@ -119,3 +119,21 @@ test("re-ingesting a document replaces its sections, and a vector from another m
   const { rows } = await pool.query("SELECT section FROM label_chunks WHERE doc_id = 'test-rag-b'");
   assert.deepEqual(rows.map((row) => row.section), ["5.1"]);
 });
+
+test("a section in force comes before closer versions that are no longer in force", async () => {
+  const older = "Severe renal impairment: give 10mg once daily.";
+  // Three versions, as the CardioNex label has: v1 and v2 superseded, the new one in force.
+  const docs = ["test-rag-old1", "test-rag-old2", "test-rag-old3", "test-rag-new"];
+  const texts = [older, older, older, "Kidney disease, severe (eGFR under 30): 2.5mg once daily."];
+  const vectors = await embed(texts);
+  for (const [i, docId] of docs.entries()) {
+    const status = docId === "test-rag-new" ? "active" : "superseded";
+    const chunk: LabelChunk = { docId, tenantId: "pharma_a", brandId: "brand_test", section: "2.2", title: "Renal dosing", text: texts[i], status, effectiveDate: "2026-01-01", country: "US", embedding: vectors[i] };
+    await store.replaceDocument(docId, [chunk], `sha-${docId}`, EMBEDDING_MODEL);
+  }
+  const query = "Severe renal impairment: what dose once daily?";
+  const nearest = await store.nearest((await embed([query]))[0], docs, 1, EMBEDDING_MODEL);
+  assert.notEqual(nearest[0]?.docId, "test-rag-new", "the setup needs an older version to be nearest");
+  const hits = await search(query, new Set(docs), 1, TODAY);
+  assert.deepEqual(hits.map((hit) => `${hit.docId} ${hit.status}`), ["test-rag-new active"]);
+});
