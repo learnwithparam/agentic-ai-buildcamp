@@ -92,6 +92,16 @@ export class ReviewStore implements ReviewInbox {
     await this.pool.query("INSERT INTO threads (thread_id, owner_id, tenant_id) VALUES ($1, $2, $3)", [threadId, owner.userId, owner.tenantId]);
   }
 
+  // Lesson 16. An event opens a thread named after itself, so a second delivery finds the same one.
+  async ensureThread(threadId: string, owner: Identity) {
+    const { rows } = await this.pool.query<{ owner_id: string }>(
+      `INSERT INTO threads (thread_id, owner_id, tenant_id) VALUES ($1, $2, $3)
+       ON CONFLICT (thread_id) DO UPDATE SET thread_id = EXCLUDED.thread_id RETURNING owner_id`,
+      [threadId, owner.userId, owner.tenantId]
+    );
+    if (rows[0].owner_id !== owner.userId) throw new Error(`Thread ${threadId} belongs to someone else.`);
+  }
+
   async ownsThread(threadId: string, userId: string): Promise<boolean> {
     const { rowCount } = await this.pool.query("SELECT 1 FROM threads WHERE thread_id = $1 AND owner_id = $2", [threadId, userId]);
     return Boolean(rowCount);

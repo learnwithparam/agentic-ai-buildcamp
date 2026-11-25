@@ -5,6 +5,7 @@ import type { Auth } from "./auth";
 import { isLangfuseConfigured } from "./env";
 import { FactCheckExecutor, OutreachExecutor } from "./a2a/executors";
 import { createA2aRouter } from "./a2a/server";
+import { createEventRouter } from "./events/webhook";
 import { createMcpRouter } from "./mcp";
 import { createRoutes, type Desk } from "./routes";
 
@@ -23,6 +24,9 @@ export function createApp(auth: Auth, desk: Desk) {
       executors: { "fact-checker": new FactCheckExecutor(desk.factChecker, tasks), "outreach-planner": new OutreachExecutor(desk.outreachPlanner, tasks) }
     })
   );
+  // Lesson 16: events are signed by their sender, not signed in. The signature covers the raw
+  // body, so this sits before the JSON parser below.
+  app.use(createEventRouter({ secrets: desk.events.secrets, store: desk.events.store, queue: desk.events.queue }));
   app.use("/api", auth.sameOrigin);
   app.use(express.json({ limit: "1mb" }));
   app.use(auth.router);

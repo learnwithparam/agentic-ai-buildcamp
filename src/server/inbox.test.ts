@@ -11,6 +11,7 @@ import { createApp } from "./app";
 import { createAuth } from "./auth";
 import { createPool, migrate } from "./db";
 import { env } from "./env";
+import { InlineQueue, MemoryEventStore } from "./events/store";
 import type { Turn } from "./graph";
 import type { MedinfoAgent } from "./medinfo-agent";
 import { ReviewStore, type ReviewItem } from "./reviews";
@@ -80,7 +81,7 @@ before(async () => {
   dropStore = async () => void (await store.client.deleteStore());
   reviews = new ReviewStore(pool, () => store.client);
   const tasks = createTaskStore(pool);
-  const desk = { agent: agent as unknown as MedinfoAgent, factChecker: createFactChecker({ client: () => store.client }), outreachPlanner: createOutreachPlanner({ client: () => store.client }), reviews, recordDecision: async (item: ReviewItem) => void scored.push(item), a2a: { store: tasks, links: new TaskReviews(pool, tasks), handoff: createHandoffAgent() } };
+  const desk = { agent: agent as unknown as MedinfoAgent, factChecker: createFactChecker({ client: () => store.client }), outreachPlanner: createOutreachPlanner({ client: () => store.client }), reviews, recordDecision: async (item: ReviewItem) => void scored.push(item), a2a: { store: tasks, links: new TaskReviews(pool, tasks), handoff: createHandoffAgent() }, events: { store: new MemoryEventStore(), queue: new InlineQueue(), secrets: {} } };
   const server = createApp(auth, desk).listen(0, "127.0.0.1");
   await new Promise((resolve) => server.once("listening", resolve));
   base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;

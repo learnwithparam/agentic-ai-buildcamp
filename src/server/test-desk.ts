@@ -6,6 +6,7 @@ import { TaskReviews } from "./a2a/tasks";
 import { createMedinfoAgent } from "./medinfo-agent";
 import { createFactChecker } from "./content/fact-check";
 import { createOutreachPlanner } from "./content/outreach";
+import { InlineQueue, MemoryEventStore } from "./events/store";
 import { ReviewStore } from "./reviews";
 import type { Desk } from "./routes";
 
@@ -20,6 +21,7 @@ export function testDesk(pool: pg.Pool = new pg.Pool({ max: 1 })): Desk {
     outreachPlanner: createOutreachPlanner(),
     reviews: new ReviewStore(pool),
     recordDecision: async () => {},
-    a2a: { store, links: new TaskReviews(pool, store), handoff: createHandoffAgent() }
+    a2a: { store, links: new TaskReviews(pool, store), handoff: createHandoffAgent() },
+    events: { store: new MemoryEventStore(), queue: new InlineQueue(), secrets: {} }
   };
 }
