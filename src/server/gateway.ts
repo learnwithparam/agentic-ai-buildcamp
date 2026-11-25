@@ -44,6 +44,30 @@ export function modelClient(): OpenAI {
   return client;
 }
 
+// Lesson 20. The label search turns text into vectors through the same door and the same key,
+// so the gateway records and caps it like any chat call. The model is fixed: every stored vector
+// and every question must come from the same one, or their distances mean nothing.
+export const EMBEDDING_MODEL = "openai/text-embedding-3-small";
+export const EMBEDDING_DIMENSIONS = 1536;
+
+export async function embed(texts: string[]): Promise<number[][]> {
+  if (!texts.length) return [];
+  return startActiveObservation(
+    "embed",
+    async (span) => {
+      span.update({ model: EMBEDDING_MODEL, input: { count: texts.length } });
+      const response = await modelClient().embeddings.create({ model: EMBEDDING_MODEL, input: texts, encoding_format: "float" });
+      const vectors = [...response.data].sort((a, b) => a.index - b.index).map((item) => item.embedding);
+      if (vectors.length !== texts.length || vectors.some((vector) => vector.length !== EMBEDDING_DIMENSIONS)) {
+        throw new Error(`The embedding model did not return one ${EMBEDDING_DIMENSIONS}-number vector per text.`);
+      }
+      span.update({ output: { count: vectors.length }, usageDetails: { input: response.usage?.prompt_tokens ?? 0 } });
+      return vectors;
+    },
+    { asType: "embedding" }
+  );
+}
+
 // The gateway answers 429 spend_limit_exceeded once a key's budget is spent. The doctor sees a
 // plain sentence; the amount and the key stay in the gateway's log.
 export function isBudgetSpent(error: unknown) {
