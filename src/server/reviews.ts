@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { ClientWriteRequestOnDuplicateWrites, type OpenFgaClient } from "@openfga/sdk";
 import type pg from "pg";
 import type { ReviewInbox, ReviewSubmission } from "./graph";
@@ -34,10 +35,12 @@ export type ReviewItem = {
 // filed with the safety database or dismissed as not one.
 export const DECISIONS: Record<ReviewKind, ReviewStatus[]> = {
   draft: ["approved", "rejected"],
-  adverse_event: ["filed", "dismissed"]
+  adverse_event: ["filed", "dismissed"],
+  email: ["approved", "rejected"],
+  outreach: ["approved", "rejected"]
 };
 
-const HOURS: Record<ReviewKind, number> = { draft: REVIEW_HOURS, adverse_event: SAFETY_HOURS };
+const HOURS: Record<ReviewKind, number> = { draft: REVIEW_HOURS, adverse_event: SAFETY_HOURS, email: REVIEW_HOURS, outreach: REVIEW_HOURS };
 
 type Row = {
   id: string;
@@ -72,6 +75,10 @@ const toItem = (row: Row): ReviewItem => ({
 });
 
 
+// Lesson 14. An id made from what is reviewed, so the same email or step checked twice is one
+// item in the inbox, not two. Once decided, the same content stays decided.
+export const contentKey = (...parts: string[]) => createHash("sha256").update(parts.join("\u0000")).digest("hex").slice(0, 24);
+
 export class ReviewStore implements ReviewInbox {
   constructor(
     private pool: pg.Pool,
@@ -93,14 +100,14 @@ export class ReviewStore implements ReviewInbox {
       { writes: [{ user: `company:${item.tenantId}`, relation: "company", object: `${item.kind}:${item.id}` }] },
       { conflict: { onDuplicateWrites: ClientWriteRequestOnDuplicateWrites.Ignore } }
     );
-    const { rows } = await this.pool.query<{ due_at: Date }>(
+    const { rows } = await this.pool.query<{ due_at: Date; status: ReviewStatus }>(
       `INSERT INTO review_items (id, kind, thread_id, tenant_id, trace_id, question, body, due_at)
        VALUES ($1, $2, $3, $4, $5, $6, $7, now() + make_interval(hours => $8))
        ON CONFLICT (id) DO UPDATE SET id = EXCLUDED.id
-       RETURNING due_at`,
+       RETURNING due_at, status`,
       [item.id, item.kind, item.threadId, item.tenantId, item.traceId ?? null, item.question, item.body, HOURS[item.kind]]
     );
-    return { dueAt: rows[0].due_at };
+    return { dueAt: rows[0].due_at, status: rows[0].status };
   }
 
   // A reviewer's inbox: every waiting item OpenFGA says they may decide, the soonest due first.
@@ -162,7 +169,7 @@ export class ReviewStore implements ReviewInbox {
 
   private async decidable(reviewer: Identity): Promise<string[]> {
     if (!reviewer.roles.length) return [];
-    const kinds: ReviewKind[] = ["draft", "adverse_event"];
+    const kinds = Object.keys(DECISIONS) as ReviewKind[];
     const lists = await Promise.all(
       kinds.map((kind) =>
         this.client().listObjects({

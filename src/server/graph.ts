@@ -1,3 +1,4 @@
+import type { ReviewStatus } from "./reviews";
 import type OpenAI from "openai";
 import { randomUUID } from "node:crypto";
 import { Annotation, Command, END, START, StateGraph, interrupt } from "@langchain/langgraph";
@@ -108,7 +109,8 @@ export async function toolsStep(
 // give none, so a throwaway thread writes no inbox row.
 export type ReviewSubmission = {
   id: string;
-  kind: "draft" | "adverse_event";
+  // Lesson 14 adds a flagged email (for a medical reviewer) and an outreach step (for a sales rep).
+  kind: "draft" | "adverse_event" | "email" | "outreach";
   threadId: string;
   tenantId: string;
   traceId?: string;
@@ -117,7 +119,8 @@ export type ReviewSubmission = {
 };
 export interface ReviewInbox {
   // Must be safe to call twice with the same id: a node runs again when its thread resumes.
-  submit(item: ReviewSubmission): Promise<{ dueAt: Date }>;
+  // It returns the item's status: one already decided stays decided.
+  submit(item: ReviewSubmission): Promise<{ dueAt: Date; status: ReviewStatus }>;
 }
 
 export function inboxOf(config: LangGraphRunnableConfig): ReviewInbox | undefined {
