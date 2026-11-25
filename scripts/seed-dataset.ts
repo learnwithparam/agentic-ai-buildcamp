@@ -1,10 +1,10 @@
 import "../src/server/load-env";
 import { LangfuseClient } from "@langfuse/client";
 import { env } from "../src/server/env";
-import { loadMedinfoCases } from "./hcp-cases";
+import { loadAllCases } from "./hcp-cases";
 
 async function main() {
-  const cases = loadMedinfoCases();
+  const cases = loadAllCases();
   if (!env.langfusePublicKey || !env.langfuseSecretKey) {
     throw new Error("Langfuse credentials are required to seed a dataset.");
   }
@@ -20,7 +20,7 @@ async function main() {
       name: env.datasetName,
       description: "HCP medinfo cases from the pinned dataset repo copy in data/hcp",
       metadata: {
-        source: "data/hcp/evals/medinfo.yaml",
+        source: "data/hcp/evals/medinfo.yaml, fact-check.yaml, outreach.yaml",
         workshop: "langfuse-hcp-medinfo"
       }
     });

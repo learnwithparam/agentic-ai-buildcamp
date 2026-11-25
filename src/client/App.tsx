@@ -3,6 +3,8 @@ import { AssistantRuntimeProvider } from "@assistant-ui/react";
 import { useLangGraphRuntime } from "@assistant-ui/react-langgraph";
 import { createThread, loadMe, loadThread, signIn, signOut, streamRun, type Me } from "./chat/api";
 import { Thread } from "./chat/Thread";
+import { Editor } from "./content/Editor";
+import { Outreach } from "./content/Outreach";
 import { Inbox } from "./inbox/Inbox";
 
 function Chat({ tenantId, medicines }: { tenantId: string; medicines: string[] }) {
@@ -63,10 +65,22 @@ export function App() {
   );
 }
 
-// Two pages, chosen by the address: the chat at /, the review inbox at /inbox (lesson 13).
+// The pages, chosen by the address: the chat at /, the review inbox at /inbox (lesson 13), and
+// for a company's staff the email editor and the rep board (lesson 14). The server refuses a
+// page's data to anyone not allowed it; the links here only spare a doctor a page they cannot use.
+const STAFF = ["sales-rep", "medical-reviewer"];
+const PAGES = [
+  { path: "/", label: "Chat", staff: false },
+  { path: "/editor", label: "Email editor", staff: true },
+  { path: "/outreach", label: "Rep board", staff: true },
+  { path: "/inbox", label: "Inbox", staff: false }
+];
+
 function SignedIn({ me }: { me: Me }) {
   const [chat, setChat] = useState(0);
-  const onInbox = window.location.pathname === "/inbox";
+  const path = window.location.pathname;
+  const isStaff = me.user.roles.some((role) => STAFF.includes(role));
+  const onChat = !PAGES.some((page) => page.path !== "/" && page.path === path);
   return (
     <div className="app">
       <header className="topbar">
@@ -77,10 +91,14 @@ function SignedIn({ me }: { me: Me }) {
           <span className="chip">{me.user.country}</span>
         </span>
         <span className="topbar-user">{me.user.name}</span>
-        <a className="button" href={onInbox ? "/" : "/inbox"} aria-current={onInbox ? "page" : undefined}>
-          {onInbox ? "Chat" : "Inbox"}
-        </a>
-        {!onInbox && (
+        <nav className="topbar-nav" aria-label="Pages">
+          {PAGES.filter((page) => isStaff || !page.staff).map((page) => (
+            <a key={page.path} className="button" href={page.path} aria-current={(page.path === "/" ? onChat : page.path === path) ? "page" : undefined}>
+              {page.label}
+            </a>
+          ))}
+        </nav>
+        {onChat && (
           <button type="button" className="button" onClick={() => setChat((count) => count + 1)}>
             New chat
           </button>
@@ -89,7 +107,7 @@ function SignedIn({ me }: { me: Me }) {
           Sign out
         </button>
       </header>
-      {onInbox ? <Inbox /> : <Chat key={chat} tenantId={me.user.tenantId} medicines={me.company.medicines} />}
+      {path === "/inbox" ? <Inbox /> : path === "/editor" ? <Editor /> : path === "/outreach" ? <Outreach /> : <Chat key={chat} tenantId={me.user.tenantId} medicines={me.company.medicines} />}
     </div>
   );
 }

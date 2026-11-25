@@ -1,6 +1,8 @@
 import { MemorySaver } from "@langchain/langgraph";
 import pg from "pg";
 import { createMedinfoAgent } from "./medinfo-agent";
+import { createFactChecker } from "./content/fact-check";
+import { createOutreachPlanner } from "./content/outreach";
 import { ReviewStore } from "./reviews";
 import type { Desk } from "./routes";
 
@@ -8,5 +10,11 @@ import type { Desk } from "./routes";
 // pool's database, so a test that opens a thread passes the test database's pool. A test that
 // stops at sign-in or at MCP passes none: the default pool connects only on its first query.
 export function testDesk(pool: pg.Pool = new pg.Pool({ max: 1 })): Desk {
-  return { agent: createMedinfoAgent(new MemorySaver()), reviews: new ReviewStore(pool), recordDecision: async () => {} };
+  return {
+    agent: createMedinfoAgent(new MemorySaver()),
+    factChecker: createFactChecker(),
+    outreachPlanner: createOutreachPlanner(),
+    reviews: new ReviewStore(pool),
+    recordDecision: async () => {}
+  };
 }

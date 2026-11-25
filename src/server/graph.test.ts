@@ -30,7 +30,7 @@ function routedGraph(tier: Tier, visited: string[]) {
 
 function fakeInbox() {
   const items: ReviewSubmission[] = [];
-  return { items, submit: async (item: ReviewSubmission) => (items.push(item), { dueAt: new Date("2026-11-27T09:00:00Z") }) };
+  return { items, submit: async (item: ReviewSubmission) => (items.push(item), { dueAt: new Date("2026-11-27T09:00:00Z"), status: "waiting" as const }) };
 }
 
 const ask = (content: string): ChatMessage[] => [{ id: "q", type: "human", content }];

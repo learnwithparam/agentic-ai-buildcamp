@@ -3,7 +3,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { CredentialsMethod, OpenFgaClient, type TupleKey, type WriteAuthorizationModelRequest } from "@openfga/sdk";
 import { LABEL_SECTIONS } from "../src/server/labels";
-import { documentTuples } from "../src/server/permissions";
+import { PROFILES } from "../src/server/content/records";
+import { documentTuples, hcpTuples } from "../src/server/permissions";
 
 // Lesson 11. The permission rules are written once, in infra/openfga/model.fga. The OpenFGA CLI
 // (pinned below) turns them into the JSON the server takes; setup and the tests both use this.
@@ -33,9 +34,13 @@ export function testModel(): { ok: boolean; output: string } {
 
 const key = (tuple: TupleKey) => `${tuple.user}|${tuple.relation}|${tuple.object}`;
 
-// Makes the stored document tuples equal to the label library: adds the missing, deletes the stale.
+// The facts OpenFGA stores from the data itself: each document's company and country (lesson 11)
+// and each doctor profile's company (lesson 14).
+const STORED_TYPES = ["document:", "hcp:"];
+
+// Makes the stored document and profile tuples equal to the data: adds the missing, deletes the stale.
 export async function syncDocumentTuples(client: OpenFgaClient) {
-  const wanted = new Map(documentTuples(LABEL_SECTIONS).map((tuple) => [key(tuple), tuple]));
+  const wanted = new Map([...documentTuples(LABEL_SECTIONS), ...hcpTuples(PROFILES)].map((tuple) => [key(tuple), tuple]));
   const stored = new Map<string, TupleKey>();
   let continuationToken: string | undefined;
   do {
@@ -43,7 +48,7 @@ export async function syncDocumentTuples(client: OpenFgaClient) {
     // document ones. Doctor and reviewer facts arrive with each question; the inbox writes its own
     // draft and adverse_event tuples (lesson 13), and this leaves them alone.
     const page = await client.read({}, { continuationToken });
-    for (const { key: tuple } of page.tuples) if (tuple.object.startsWith("document:")) stored.set(key(tuple), { user: tuple.user, relation: tuple.relation, object: tuple.object });
+    for (const { key: tuple } of page.tuples) if (STORED_TYPES.some((type) => tuple.object.startsWith(type))) stored.set(key(tuple), { user: tuple.user, relation: tuple.relation, object: tuple.object });
     continuationToken = page.continuation_token || undefined;
   } while (continuationToken);
   const writes = [...wanted].filter(([id]) => !stored.has(id)).map(([, tuple]) => tuple);

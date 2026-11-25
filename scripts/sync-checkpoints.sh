@@ -48,6 +48,7 @@ TAGS=(
   checkpoint/11-sign-in
   checkpoint/12-mcp-sandbox
   checkpoint/13-durable-review
+  checkpoint/14-content-agents
 )
 
 # Files whose code is what the next lesson changes. Add a file here when a
@@ -87,26 +88,40 @@ TIER_FILES="src/server/tiers.ts src/server/tiers.test.ts src/server/phi.ts src/s
   src/client/inbox/Inbox.tsx src/client/inbox/format.ts
   infra/openfga/model.fga infra/openfga/model.fga.yaml scripts/fga-model.ts scripts/identity-setup.ts
   scripts/prompt-variants.ts scripts/prompt-variants.test.ts scripts/run-dataset.ts"
+# Lesson 14 adds a fact-checker and an outreach planner on the same base; the files it changes and
+# adds (CONTENT_FILES) stay as they were on tags before it, so lesson 13's inbox has two kinds of item.
+CONTENT_FILES="src/server/content/records.ts src/server/content/fact-check.ts src/server/content/outreach.ts
+  src/server/content/content.test.ts src/server/migrations/003_content_reviews.sql
+  src/client/content/Editor.tsx src/client/content/Outreach.tsx
+  src/server/graph.ts src/server/graph.test.ts src/server/inbox.test.ts src/server/index.ts src/server/permissions.ts
+  src/server/reviews.ts src/server/routes.ts src/server/test-desk.ts src/server/users.ts
+  src/client/App.tsx src/client/chat/api.ts src/client/inbox/Inbox.tsx src/client/styles/app.css
+  infra/openfga/model.fga infra/openfga/model.fga.yaml scripts/fga-model.ts scripts/identity-setup.ts
+  scripts/hcp-cases.ts scripts/seed-dataset.ts scripts/run-dataset.ts scripts/scoreboard.ts scripts/scoreboard.test.ts
+  package.json package-lock.json"
 milestone_files() {
   case "$1" in
     checkpoint/00-setup | checkpoint/01-base-app | checkpoint/02-tracing)
-      echo "src/server/index.ts src/server/medinfo-agent.ts src/server/tools.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES"
+      echo "src/server/index.ts src/server/medinfo-agent.ts src/server/tools.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES"
       ;;
     checkpoint/03-prompt-management)
-      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES"
+      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES"
       ;;
     # Lessons 06 and 07 run the dataset with the correctness judge; lesson 09 replaces it.
     checkpoint/04-* | checkpoint/05-* | checkpoint/06-* | checkpoint/07-* | checkpoint/08-* | checkpoint/09-*)
-      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES"
+      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES"
       ;;
     checkpoint/10-*)
-      echo "$AUTH_FILES $MCP_FILES $TIER_FILES"
+      echo "$AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES"
       ;;
     checkpoint/11-*)
-      echo "$MCP_FILES $TIER_FILES"
+      echo "$MCP_FILES $TIER_FILES $CONTENT_FILES"
       ;;
     checkpoint/12-*)
-      echo "$TIER_FILES"
+      echo "$TIER_FILES $CONTENT_FILES"
+      ;;
+    checkpoint/13-*)
+      echo "$CONTENT_FILES"
       ;;
     *)
       echo ""

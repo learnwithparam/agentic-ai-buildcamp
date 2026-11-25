@@ -38,6 +38,7 @@ pre {
 
 .topbar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 12px;
   padding: 12px 20px;
@@ -389,6 +390,18 @@ a.button {
   text-decoration: none;
 }
 
+/* Lesson 14: the page links; the one you are on is marked. */
+.topbar-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+a.button[aria-current="page"] {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
 .running {
   color: var(--muted);
   font-size: 13px;
@@ -433,4 +446,82 @@ a.button {
   .message-user {
     max-width: 100%;
   }
+}
+
+/* Lesson 14: the email editor and the rep board */
+.editor-form {
+  display: grid;
+  gap: 8px;
+}
+
+.approval .editor-form {
+  padding-top: 12px;
+}
+
+.editor-input {
+  font: inherit;
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--fg);
+}
+
+.editor-draft,
+.checks {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+  display: grid;
+  gap: 8px;
+}
+
+.editor-draft li {
+  padding: 6px 8px;
+  border-left: 3px solid var(--line);
+  color: var(--fg2);
+}
+
+.check {
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--pass);
+  border-radius: var(--r);
+}
+
+.check-flagged {
+  border-left-color: var(--fail);
+  background: var(--failbg);
+}
+
+.check-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.check-number {
+  font-family: var(--mono);
+  font-weight: 700;
+}
+
+.check-sentence {
+  margin: 6px 0 4px;
+}
+
+.check-meta {
+  margin: 0;
+  color: var(--fg2);
+  font-size: 13px;
+}
+
+.check-suggestion {
+  margin-top: 8px;
+  padding: 6px 8px;
+  border-left: 3px solid var(--pass);
+  background: var(--surface);
+}
+
+.check-suggestion p {
+  margin: 4px 0 0;
 }

@@ -1,6 +1,7 @@
 /**
- * The medinfo cases from the dataset repo copy (data/hcp/evals/medinfo.yaml), shaped as
- * Langfuse dataset items. This is the only place the buildcamp reads them, so the
+ * The cases from the dataset repo copy (data/hcp/evals), shaped as Langfuse dataset items:
+ * medinfo.yaml for the medical information desk, and, from lesson 14, fact-check.yaml and
+ * outreach.yaml for the two agents built on the same base. Each item says which agent answers it. This is the only place the buildcamp reads them, so the
  * dataset in Langfuse is always the pinned dataset repo, never a hand-typed copy.
  */
 import { readFileSync } from "node:fs";
@@ -26,11 +27,14 @@ const TEXT_CHECKS = new Set<string>(["contains", "not-contains", "regex", "not-r
 
 export type CaseExpectation = { idealAnswer: string; expectedBehavior: Behavior; checks: TextCheck[] };
 
+export const AGENTS = ["medinfo", "fact-check", "outreach"] as const;
+export type AgentName = (typeof AGENTS)[number];
+
 export type CaseItem = {
   id: string;
   input: CaseInput;
   expectedOutput: CaseExpectation;
-  metadata: { caseId: string; slice: string; chapter: string; riskTier: string; split: string; showcase?: string };
+  metadata: { caseId: string; agent: AgentName; slice: string; chapter: string; riskTier: string; split: string; showcase?: string };
 };
 
 type RawAssert = { type: string; value: string };
@@ -39,13 +43,22 @@ type RawCase = {
   description: string;
   vars: Record<string, string>;
   assert?: RawAssert[];
-  metadata: { slice: string; chapter: string; riskTier: string; split: string; expectedBehavior: Behavior; showcase?: string; idealAnswer: string };
+  metadata: { slice: string; chapter: string; riskTier: string; split: string; expectedBehavior: Behavior; showcase?: string; idealAnswer?: string };
 };
 
-const CASES_FILE = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../data/hcp/evals/medinfo.yaml");
+const EVALS = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../data/hcp/evals");
 
 export function loadMedinfoCases(): CaseItem[] {
-  const config = parse(readFileSync(CASES_FILE, "utf8")) as {
+  return loadCases("medinfo");
+}
+
+// Every case of every agent, in the order the scoreboard lists their slices.
+export function loadAllCases(): CaseItem[] {
+  return AGENTS.flatMap(loadCases);
+}
+
+export function loadCases(agent: AgentName): CaseItem[] {
+  const config = parse(readFileSync(path.join(EVALS, `${agent}.yaml`), "utf8")) as {
     defaultTest: { vars: Record<string, string>; assert?: RawAssert[] };
     tests: RawCase[];
   };
@@ -63,13 +76,14 @@ export function loadMedinfoCases(): CaseItem[] {
         country: vars.country
       },
       expectedOutput: {
-        idealAnswer,
+        // The two content agents' cases have no ideal answer: their codes and citations are the answer.
+        idealAnswer: idealAnswer ?? "",
         expectedBehavior,
         checks: [...(config.defaultTest.assert ?? []), ...(test.assert ?? [])].filter((check): check is TextCheck =>
           TEXT_CHECKS.has(check.type)
         )
       },
-      metadata: { caseId, ...tags }
+      metadata: { caseId, agent, ...tags }
     };
   });
 }

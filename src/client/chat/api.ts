@@ -105,7 +105,7 @@ export async function* streamRun(
 
 export type ReviewItem = {
   id: string;
-  kind: "draft" | "adverse_event";
+  kind: "draft" | "adverse_event" | "email" | "outreach";
   question: string;
   body: string;
   createdAt: string;
@@ -132,3 +132,37 @@ export async function decide(itemId: string, decision: ReviewItem["status"], not
   if (!response.ok) throw new Error(body.error ?? `The server answered ${response.status}`);
   return body;
 }
+
+// ---------- Lesson 14: the email editor and the rep board (src/server/routes.ts) ----------
+
+export type Claim = { claimId: string; docId: string; section: string; country: string; text: string };
+export type SentenceCheck = { sentence: string; verdict: "APPROVED" | "NOT_APPROVED_IN_COUNTRY" | "UNAPPROVED_CLAIM"; claim?: Claim; suggestion?: Claim };
+export type Draft = { draftId: string; brandId: string; country: string; title: string; sentences: string[] };
+// The inbox item a flagged result became, and its status: the same content checked again is the same item.
+type ItemRef = { itemId: string | null; itemStatus: ReviewItem["status"] | null };
+export type FactCheck = { country: string; checks: SentenceCheck[]; report: string } & ItemRef;
+export type HcpRecord = {
+  profile: { hcpId: string; country: string; specialty: string; emailConsent: boolean; preferredChannel: string };
+  sends: Array<{ sendId: string; team: string; campaign: string; sentAt: string }>;
+  calls: Array<{ callId: string; loggedAt: string; note: string }>;
+  notes: Array<{ noteId: string; rep: string; loggedAt: string; note: string }>;
+  samples: Array<{ requestId: string; brandId: string; status: string; requestedAt: string }>;
+};
+export type OutreachPlan = { hcpId: string | null; outcome: "INSUFFICIENT_CONTEXT" | "HOLD_OUTREACH" | "NEEDS_APPROVAL"; step: string | null; email: string[] | null; report: string } & ItemRef;
+
+async function send<T>(path: string, body?: unknown): Promise<T> {
+  const response = await api(path, {
+    method: body ? "POST" : "GET",
+    headers: body ? { "Content-Type": "application/json" } : undefined,
+    body: body ? JSON.stringify(body) : undefined,
+    signal: AbortSignal.timeout(90_000)
+  });
+  const json = (await response.json()) as T & { error?: string };
+  if (!response.ok) throw new Error(json.error ?? `The server answered ${response.status}`);
+  return json;
+}
+
+export const loadDrafts = () => send<{ drafts: Draft[] }>("/api/drafts");
+export const factCheck = (request: { draftId: string } | { text: string; country: string }) => send<FactCheck>("/api/fact-check", request);
+export const loadHcps = () => send<{ hcps: HcpRecord[] }>("/api/hcps");
+export const planOutreach = (query: string) => send<OutreachPlan>("/api/outreach/plan", { query });

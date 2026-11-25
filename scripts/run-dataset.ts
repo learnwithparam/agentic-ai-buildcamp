@@ -2,8 +2,9 @@
  * Run the hosted Langfuse dataset against the live agent.
  *
  * For each item in the dataset:
- *   1. Call the same graph the web app uses, through answerWithSources(...), signed in as
- *      the case's company and country (lesson 11).
+ *   1. Call the agent the case is for (its metadata.agent): the medinfo desk through
+ *      answerWithSources(...), or, from lesson 14, the fact-checker or the outreach planner.
+ *      Each runs signed in as the case's company and country (lesson 11).
  *   2. Roll the per-item traces into one experiment run row.
  *   3. Attach callback evaluators from runExperiment:
  *      - behavior_match (decision model + deterministic match)
@@ -28,10 +29,12 @@ import { LangfuseSpanProcessor } from "@langfuse/otel";
 import { LangfuseClient } from "@langfuse/client";
 import { env } from "../src/server/env";
 import { answerWithSources } from "../src/server/medinfo-agent";
+import { createFactChecker, readRequest } from "../src/server/content/fact-check";
+import { createOutreachPlanner } from "../src/server/content/outreach";
 import { scriptUser } from "../src/server/users";
 import { decide, useService } from "../src/server/gateway";
 import { JUDGED_SLICES, judgeFaithfulness, SCORE_NAME } from "./judge/faithfulness";
-import { BEHAVIORS, failedChecks, type Behavior, type CaseExpectation, type CaseInput } from "./hcp-cases";
+import { BEHAVIORS, failedChecks, type AgentName, type Behavior, type CaseExpectation, type CaseInput } from "./hcp-cases";
 import { appendScoreboardRow, LEARNER_SCOREBOARD_FILE, SCOREBOARD_FILE, scoreboardRow, TIERED_SLICES } from "./scoreboard";
 
 function caseIdOf(item: { metadata?: unknown }) {
@@ -116,6 +119,8 @@ async function main() {
 
   // The agent and the judge run on the eval-runner key: its own models, its own daily budget.
   useService("eval-runner");
+  const factChecker = createFactChecker();
+  const outreachPlanner = createOutreachPlanner();
 
   // --- 5. Pull the hosted dataset by DATASET_NAME from .env.
   const langfuse = new LangfuseClient({
@@ -154,7 +159,15 @@ async function main() {
     // evaluators below score.
     task: async (item) => {
       const input = item.input as DatasetInput;
-      const { answer, sources, tier } = await answerWithSources(input.messages, scriptUser(input.tenantId, input.country));
+      const user = scriptUser(input.tenantId, input.country);
+      const agent = ((item.metadata as { agent?: AgentName } | undefined)?.agent ?? "medinfo") as AgentName;
+      // Lesson 14: the two content agents read one request and write one report. No inbox: a
+      // script's threads are thrown away, so nothing waits for a human.
+      // They run as a sales rep of the case's company: OpenFGA lets only staff use them.
+      const rep = scriptUser(input.tenantId, input.country, ["sales-rep"]);
+      if (agent === "fact-check") return (await factChecker({ request: readRequest(input.messages.at(-1)!.content), user: rep })).report;
+      if (agent === "outreach") return (await outreachPlanner({ query: input.messages.at(-1)!.content, user: rep })).report;
+      const { answer, sources, tier } = await answerWithSources(input.messages, user);
       sourcesByInput.set(JSON.stringify(input), sources);
       tierByInput.set(JSON.stringify(input), tier);
       return answer;
