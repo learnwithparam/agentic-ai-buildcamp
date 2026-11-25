@@ -1,11 +1,10 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
-import type OpenAI from "openai";
 import { MemorySaver } from "@langchain/langgraph";
 import { aiText, type AiMessage, type ChatMessage } from "../shared/messages";
 import { checkCitations, evidenceOf, parseCitations, quantities, WITHHELD_REPLY, type RetrievedSection } from "./citations";
-import { buildGraph, citeStep, runGraph, type CitationOutcome } from "./graph";
+import { buildGraph, runGraph } from "./graph";
 import { scriptUser } from "./users";
 
 // Lesson 21. The fixtures are four answers the agent really gave, read from Langfuse with the
@@ -72,66 +71,7 @@ test("a follow-up may cite what the first question's search found", () => {
   assert.deepEqual(evidenceOf(messages).retrieved.map((section) => section.section), retrieved.map((section) => section.section));
 });
 
-// --- The node. A fake model client streams one fixed reply per call and counts the calls.
-function fakeModel(replies: string[]) {
-  const calls: unknown[] = [];
-  const client = {
-    chat: {
-      completions: {
-        create: async (request: unknown) => {
-          calls.push(request);
-          const text = replies[calls.length - 1] ?? "";
-          return (async function* () {
-            yield { choices: [{ delta: { content: text } }] };
-          })();
-        }
-      }
-    }
-  } as unknown as OpenAI;
-  return { client, calls };
-}
-
-function stateFor(name: string, answer = fixtures[name].answer) {
-  const { retrieved, asked } = fixtures[name];
-  const messages: ChatMessage[] = [
-    { id: "q", type: "human", content: asked },
-    { id: "tool-1", type: "tool", tool_call_id: "1", name: "search_labels", content: JSON.stringify({ ok: true, results: retrieved }), status: "success" },
-    { id: "answer-1", type: "ai", content: [{ type: "text", text: answer }], tool_calls: [] }
-  ];
-  return { messages, route: null, dueAt: null, today: "2026-11-25" };
-}
-
-const run = async (name: string, replies: string[]) => {
-  const model = fakeModel(replies);
-  const outcomes: CitationOutcome[] = [];
-  const update = await citeStep(model.client, "system", stateFor(name), {}, (result) => outcomes.push(result));
-  return { model, outcome: outcomes[0], message: update.messages?.[0] as AiMessage | undefined };
-};
-
-test("an answer that passes goes out as written, with no model call", async () => {
-  const { model, outcome, message } = await run("nursing-passes", []);
-  assert.equal(model.calls.length, 0);
-  assert.equal(outcome.outcome, "passed");
-  assert.equal(message, undefined);
-});
-
-test("a failing answer is rewritten once, in place, with the problems spelled out", async () => {
-  const fixed = "50 mg twice daily is not an approved regimen; the US dose is in [cardionex-uspi-v2, 2.2].";
-  const { model, outcome, message } = await run("expired-draft", [fixed]);
-  assert.equal(model.calls.length, 1);
-  assert.match(JSON.stringify(model.calls[0]), /cardionex-draft-2024, 2\.1\] is expired/);
-  assert.equal(outcome.outcome, "rewritten");
-  assert.equal(message?.id, "answer-1");
-  assert.equal(aiText(message!), fixed);
-});
-
-test("a rewrite that fails again is withheld, never sent", async () => {
-  const { model, outcome, message } = await run("expired-draft", [fixtures["expired-draft"].answer]);
-  assert.equal(model.calls.length, 1);
-  assert.equal(outcome.outcome, "withheld");
-  assert.equal(message?.id, "answer-1");
-  assert.equal(aiText(message!), WITHHELD_REPLY);
-});
+// The rewrite and the withhold are proven on the real model: scripts/citations-replay.test.ts.
 
 // The wiring: every final answer, on the answer and the review tier, goes through cite.
 for (const tier of ["answer", "review"] as const) {
@@ -140,7 +80,7 @@ for (const tier of ["answer", "review"] as const) {
     const graph = buildGraph(
       {
         router: () => ({ route: { tier, reason: "test", asksForAdvice: false } }),
-        agent: () => ({ messages: [stateFor("expired-draft").messages[2]] }),
+        agent: () => ({ messages: [{ id: "answer-1", type: "ai", content: [{ type: "text", text: fixtures["expired-draft"].answer }], tool_calls: [] }] }),
         tools: () => ({}),
         cite: () => (visited.push("cite"), { messages: [{ id: "answer-1", type: "ai", content: [{ type: "text", text: WITHHELD_REPLY }], tool_calls: [] }] }),
         submit: (state) => (visited.push(`submit:${aiText(state.messages.at(-1) as AiMessage)}`), {}),

@@ -85,7 +85,13 @@ export async function agentStep(
 // A failing answer gets one rewrite, with the problems spelled out and the tools off; the rewrite
 // streams over the first answer in the chat, under the same message id. If the rewrite fails too,
 // the doctor gets WITHHELD_REPLY instead. Either way the check, not the model, has the last word.
-export type CitationOutcome = { outcome: "passed" | "rewritten" | "withheld"; problems: CitationProblem[]; afterRewrite: CitationProblem[] };
+// rewrite is the model's second answer, kept so a withheld one can be read in the trace.
+export type CitationOutcome = {
+  outcome: "passed" | "rewritten" | "withheld";
+  problems: CitationProblem[];
+  afterRewrite: CitationProblem[];
+  rewrite?: string;
+};
 
 export async function citeStep(
   openai: OpenAI,
@@ -116,10 +122,10 @@ export async function citeStep(
   );
   const afterRewrite = checkCitations(aiText(rewrite), retrieved, asked);
   if (!afterRewrite.length) {
-    onChecked({ outcome: "rewritten", problems, afterRewrite });
+    onChecked({ outcome: "rewritten", problems, afterRewrite, rewrite: aiText(rewrite) });
     return { messages: [{ ...rewrite, id: answer.id, tool_calls: [] }] };
   }
-  onChecked({ outcome: "withheld", problems, afterRewrite });
+  onChecked({ outcome: "withheld", problems, afterRewrite, rewrite: aiText(rewrite) });
   const withheld: AiMessage = { id: answer.id, type: "ai", content: [{ type: "text", text: WITHHELD_REPLY }], tool_calls: [] };
   config.writer?.(withheld);
   return { messages: [withheld] };

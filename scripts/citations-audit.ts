@@ -16,7 +16,8 @@ import { env } from "../src/server/env";
 import { sinceTime } from "./judge-calibrate";
 
 type Observation = { traceId: string; name: string; startTime: string; input?: unknown; output?: unknown };
-export type StoredTurn = { traceId: string; asked: string; answer: string; retrieved: RetrievedSection[] };
+export type StoredSearch = { query: string; results: RetrievedSection[] };
+export type StoredTurn = { traceId: string; asked: string; answer: string; retrieved: RetrievedSection[]; searches: StoredSearch[] };
 
 const AGENT_GENERATION = "OpenAI.chat";
 const parse = (value: unknown) => {
@@ -44,10 +45,11 @@ function askedOf(generation: Observation): string {
 }
 
 export function storedTurns(searches: Observation[], generations: Observation[]): StoredTurn[] {
-  const retrieved = new Map<string, RetrievedSection[]>();
-  for (const search of searches) {
+  const retrieved = new Map<string, StoredSearch[]>();
+  for (const search of [...searches].sort((a, b) => a.startTime.localeCompare(b.startTime))) {
     const results = (parse(search.output) as { results?: RetrievedSection[] } | null)?.results ?? [];
-    retrieved.set(search.traceId, [...(retrieved.get(search.traceId) ?? []), ...results]);
+    const query = String((parse(search.input) as { query?: unknown } | null)?.query ?? "");
+    retrieved.set(search.traceId, [...(retrieved.get(search.traceId) ?? []), { query, results }]);
   }
   const latest = new Map<string, Observation>();
   for (const generation of generations) {
@@ -59,7 +61,8 @@ export function storedTurns(searches: Observation[], generations: Observation[])
     traceId: generation.traceId,
     asked: askedOf(generation),
     answer: answerOf(generation)!,
-    retrieved: retrieved.get(generation.traceId)!
+    retrieved: retrieved.get(generation.traceId)!.flatMap((search) => search.results),
+    searches: retrieved.get(generation.traceId)!
   }));
 }
 
@@ -79,15 +82,22 @@ async function observations(query: string): Promise<Observation[]> {
   return rows;
 }
 
-async function main() {
-  const since = process.argv.indexOf("--since");
-  const from = sinceTime(since === -1 ? undefined : process.argv[since + 1]).toISOString();
+// Every stored turn that searched the labels, and the project id for trace links.
+export async function loadStoredTurns(sinceArg?: string): Promise<{ turns: StoredTurn[]; projectId: string }> {
+  const from = sinceTime(sinceArg).toISOString();
   const [searches, generations] = await Promise.all([
     observations(`fromStartTime=${from}&name=search_labels`),
     observations(`fromStartTime=${from}&type=GENERATION&name=${AGENT_GENERATION}`)
   ]);
-  const turns = storedTurns(searches, generations);
   const [project] = (await (await fetch(`${env.langfuseBaseUrl}/api/public/projects`, { headers: { authorization: auth } })).json()).data as { id: string }[];
+  return { turns: storedTurns(searches, generations), projectId: project.id };
+}
+
+export const traceLink = (projectId: string, traceId: string) => `${env.langfuseBaseUrl}/project/${projectId}/traces/${traceId}`;
+
+async function main() {
+  const since = process.argv.indexOf("--since");
+  const { turns, projectId } = await loadStoredTurns(since === -1 ? undefined : process.argv[since + 1]);
   const failed = turns.map((turn) => ({ turn, problems: checkCitations(turn.answer, turn.retrieved, turn.asked) })).filter((row) => row.problems.length);
   const kinds = new Map<CitationProblem["kind"], number>();
   for (const { problems } of failed) for (const kind of new Set(problems.map((problem) => problem.kind))) kinds.set(kind, (kinds.get(kind) ?? 0) + 1);
@@ -96,7 +106,7 @@ async function main() {
   for (const { turn, problems } of failed) {
     const first = problems[0];
     const what = "citation" in first ? `[${first.citation}]` : `"${first.quantity}"`;
-    console.log(`\n${first.kind} ${what}: ${turn.asked.split("\n").at(-1)?.slice(0, 90)}\n  ${env.langfuseBaseUrl}/project/${project.id}/traces/${turn.traceId}`);
+    console.log(`\n${first.kind} ${what}: ${turn.asked.split("\n").at(-1)?.slice(0, 90)}\n  ${traceLink(projectId, turn.traceId)}`);
   }
 }
 

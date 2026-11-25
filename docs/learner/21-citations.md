@@ -44,6 +44,7 @@ The checkpoint adds:
 - `src/server/graph.ts`: the `cite` node and `citeStep`, the one rewrite.
 - `src/server/medinfo-agent.ts`: the `cite` span and the `citations` score.
 - `scripts/citations-audit.ts`: `npm run citations:audit`, the check over stored answers.
+- `scripts/citations-replay.ts`: `npm run citations:replay`, the `cite` node on those answers with the real model.
 - `src/server/citations.test.ts`, with four real stored answers in `citations.fixtures.json`.
 
 No new npm package and no new container.
@@ -123,6 +124,26 @@ One rewrite, not a loop: a model that failed twice on the same sections is not g
 
 On the review tier, the reviewer from lesson 13 sees only the checked answer. A draft with an expired citation never reaches their inbox.
 
+Now run the node on the 13 stored answers that fail. Each one is rebuilt as the thread the model saw: the question, its searches, its answer. The app's own `cite` node then runs on it, with the real model:
+
+```bash
+npm run citations:replay
+```
+
+```text
+428 stored answers, 13 fail the check. Replaying each on the model.
+
+withheld (uncited): What is the CardioNex dose for a patient with eGFR of 24 mL/min who is not on dialysis?
+  http://localhost:5174/project/<project>/traces/9dac043e611d252d4debdee6638cbada
+...
+rewritten (not_in_force): Was CardioNex approved at 50mg twice daily?
+  http://localhost:5174/project/<project>/traces/bd2604f7949c01b32a6d295635b00140
+
+13 replayed: 12 rewritten, 1 withheld.
+```
+
+Twelve rewrites passed the check. All six that cited the expired draft now cite only active sections. One rewrite still gave a dose with no citation, so the doctor would have got the withheld reply. Each run is a trace tagged `citations-replay`, and the script writes `data/evidence/citations-replay.json`.
+
 ## Step 4: Count the outcomes in Langfuse
 
 `medinfo-agent.ts` wraps the node in a `cite` span. Its output is the outcome and the problems, and it writes a categorical score on the trace:
@@ -148,14 +169,14 @@ In our seven tries of this question and the "40 %" question in the app, every an
 ## Step 5: The tests
 
 ```bash
-npx tsx --test src/server/citations.test.ts scripts/citations-audit.test.ts
+npx tsx --test src/server/citations.test.ts scripts/citations-audit.test.ts scripts/citations-replay.test.ts
 ```
 
 - **The four stored answers** in `citations.fixtures.json` (a passing nursing answer, the uncited 5 mg, the "40 %" and the expired draft) give exactly the problems the audit found.
-- **The rewrite and the withhold** run with a fake model client. A pass makes no call. A failure is rewritten under the same id, and the feedback names the expired draft. A second failure is withheld.
+- **The rewrite and the withhold** in `scripts/citations-replay.test.ts` read the real model's replies from `data/evidence/citations-replay.json`. The check runs again on each rewrite. A rewritten answer must pass, and a withheld one must fail twice.
 - **The graph wiring:** the answer tier runs router, agent, cite; the review tier runs cite before submit.
 
-Bypass the `cite` edge and drop the status check, and 7 of these tests fail.
+Bypass the `cite` edge and drop the status check, and 4 of these tests fail.
 
 ## Results
 

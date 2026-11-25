@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { MemorySaver, type BaseCheckpointSaver } from "@langchain/langgraph";
+import { MemorySaver, type BaseCheckpointSaver, type LangGraphRunnableConfig } from "@langchain/langgraph";
 import { observeOpenAI } from "@langfuse/openai";
 import { getActiveTraceId, observe, propagateAttributes, updateActiveObservation } from "@langfuse/tracing";
 import { LangfuseClient } from "@langfuse/client";
@@ -75,6 +75,27 @@ function scrubbed(messages: ChatMessage[] | undefined): ChatMessage[] | undefine
 }
 const REMOVED = /\[(?:record number|email|ID number|phone number) removed\]/;
 
+// Lesson 21: the check's outcome is the span's output and a score on the trace, so Langfuse can
+// count how often an answer was rewritten or withheld. Exported for npm run citations:replay,
+// which runs this same node on answers already stored.
+export const citeNode = observe(
+  async (state: Parameters<typeof citeStep>[2], config: LangGraphRunnableConfig) => {
+    updateActiveObservation({ input: state.messages.at(-1) });
+    const langfusePrompt = await getPrompt();
+    const openai = observeOpenAI(modelClient(), { generationName: "citation-rewrite", ...(langfusePrompt ? { langfusePrompt } : {}) });
+    let outcome: CitationOutcome | undefined;
+    const update = await citeStep(openai, langfusePrompt?.prompt ?? SYSTEM_PROMPT, state, config, (result) => (outcome = result));
+    updateActiveObservation({ output: outcome });
+    const traceId = getActiveTraceId();
+    if (traceId && outcome) {
+      langfuse.score.create({ traceId, name: "citations", value: outcome.outcome, dataType: "CATEGORICAL" });
+      await langfuse.score.flush();
+    }
+    return { update, outcome };
+  },
+  { name: "cite", asType: "span", captureInput: false, captureOutput: false }
+);
+
 // One agent, two homes for its threads. The web app passes PostgresSaver, so a paused draft
 // survives a restart; scripts pass MemorySaver, because their threads are thrown away after one answer.
 export function createMedinfoAgent(checkpointer: BaseCheckpointSaver) {
@@ -112,25 +133,7 @@ export function createMedinfoAgent(checkpointer: BaseCheckpointSaver) {
         },
         { name: "tools", asType: "span", captureInput: false }
       ),
-      // Lesson 21: the check's outcome is the span's output and a score on the trace, so Langfuse
-      // can count how often an answer was rewritten or withheld.
-      cite: observe(
-        async (state, config) => {
-          updateActiveObservation({ input: state.messages.at(-1) });
-          const langfusePrompt = await getPrompt();
-          const openai = observeOpenAI(modelClient(), { generationName: "citation-rewrite", ...(langfusePrompt ? { langfusePrompt } : {}) });
-          let outcome: CitationOutcome | undefined;
-          const update = await citeStep(openai, langfusePrompt?.prompt ?? SYSTEM_PROMPT, state, config, (result) => (outcome = result));
-          updateActiveObservation({ output: outcome });
-          const traceId = getActiveTraceId();
-          if (traceId && outcome) {
-            langfuse.score.create({ traceId, name: "citations", value: outcome.outcome, dataType: "CATEGORICAL" });
-            await langfuse.score.flush();
-          }
-          return update;
-        },
-        { name: "cite", asType: "span", captureInput: false, captureOutput: false }
-      ),
+      cite: async (state, config) => (await citeNode(state, config)).update,
       submit: (state, config) => submitDraftStep(state, config, getActiveTraceId()),
       review: reviewStep,
       safety: observe(
