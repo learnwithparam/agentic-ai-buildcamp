@@ -1,0 +1,1179 @@
+{
+ "body": {
+  "children": [
+   {
+    "$ref": "#/texts/0"
+   },
+   {
+    "$ref": "#/texts/1"
+   },
+   {
+    "$ref": "#/texts/2"
+   },
+   {
+    "$ref": "#/groups/0"
+   },
+   {
+    "$ref": "#/texts/4"
+   },
+   {
+    "$ref": "#/groups/1"
+   },
+   {
+    "$ref": "#/texts/7"
+   },
+   {
+    "$ref": "#/texts/8"
+   },
+   {
+    "$ref": "#/groups/2"
+   },
+   {
+    "$ref": "#/texts/11"
+   },
+   {
+    "$ref": "#/tables/0"
+   },
+   {
+    "$ref": "#/texts/12"
+   },
+   {
+    "$ref": "#/texts/13"
+   },
+   {
+    "$ref": "#/texts/14"
+   },
+   {
+    "$ref": "#/texts/15"
+   },
+   {
+    "$ref": "#/texts/16"
+   },
+   {
+    "$ref": "#/texts/17"
+   },
+   {
+    "$ref": "#/texts/18"
+   },
+   {
+    "$ref": "#/texts/19"
+   },
+   {
+    "$ref": "#/texts/20"
+   },
+   {
+    "$ref": "#/texts/21"
+   },
+   {
+    "$ref": "#/texts/22"
+   },
+   {
+    "$ref": "#/texts/23"
+   },
+   {
+    "$ref": "#/texts/24"
+   },
+   {
+    "$ref": "#/texts/25"
+   },
+   {
+    "$ref": "#/texts/26"
+   },
+   {
+    "$ref": "#/texts/27"
+   },
+   {
+    "$ref": "#/texts/28"
+   },
+   {
+    "$ref": "#/texts/29"
+   },
+   {
+    "$ref": "#/texts/30"
+   },
+   {
+    "$ref": "#/texts/31"
+   },
+   {
+    "$ref": "#/texts/32"
+   },
+   {
+    "$ref": "#/texts/33"
+   },
+   {
+    "$ref": "#/texts/34"
+   },
+   {
+    "$ref": "#/texts/35"
+   },
+   {
+    "$ref": "#/texts/36"
+   },
+   {
+    "$ref": "#/texts/37"
+   },
+   {
+    "$ref": "#/texts/38"
+   },
+   {
+    "$ref": "#/texts/39"
+   },
+   {
+    "$ref": "#/texts/40"
+   },
+   {
+    "$ref": "#/texts/41"
+   },
+   {
+    "$ref": "#/texts/42"
+   },
+   {
+    "$ref": "#/texts/43"
+   },
+   {
+    "$ref": "#/texts/44"
+   },
+   {
+    "$ref": "#/texts/45"
+   },
+   {
+    "$ref": "#/texts/46"
+   },
+   {
+    "$ref": "#/texts/47"
+   },
+   {
+    "$ref": "#/texts/48"
+   },
+   {
+    "$ref": "#/texts/49"
+   }
+  ]
+ },
+ "groups": [
+  {
+   "self_ref": "#/groups/0",
+   "children": [
+    {
+     "$ref": "#/texts/3"
+    }
+   ]
+  },
+  {
+   "self_ref": "#/groups/1",
+   "children": [
+    {
+     "$ref": "#/texts/5"
+    },
+    {
+     "$ref": "#/texts/6"
+    }
+   ]
+  },
+  {
+   "self_ref": "#/groups/2",
+   "children": [
+    {
+     "$ref": "#/texts/9"
+    },
+    {
+     "$ref": "#/texts/10"
+    }
+   ]
+  }
+ ],
+ "texts": [
+  {
+   "self_ref": "#/texts/0",
+   "label": "section_header",
+   "prov": [
+    {
+     "page_no": 1,
+     "bbox": {
+      "l": 146.4377955,
+      "t": 742.26008674,
+      "r": 551.0768434439999,
+      "b": 731.26057474,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "CARDIONEX (cardionexib) Prescribing Information, September 2026 Revision"
+  },
+  {
+   "self_ref": "#/texts/1",
+   "label": "text",
+   "prov": [
+    {
+     "page_no": 1,
+     "bbox": {
+      "l": 146.4377955,
+      "t": 715.8621741025,
+      "r": 377.8545545343275,
+      "b": 708.4625158525,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "Document cardionex-uspi-v2 \u00b7 US \u00b7 effective 2026-09-15 \u00b7 status active"
+  },
+  {
+   "self_ref": "#/texts/2",
+   "label": "section_header",
+   "prov": [
+    {
+     "page_no": 1,
+     "bbox": {
+      "l": 146.4377955,
+      "t": 681.9000925,
+      "r": 245.62904550000002,
+      "b": 661.0200925,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "0.0 Boxed Warning and Contraindications"
+  },
+  {
+   "self_ref": "#/texts/3",
+   "label": "list_item",
+   "prov": [
+    {
+     "page_no": 1,
+     "bbox": {
+      "l": 155.44362525,
+      "t": 649.8355064725,
+      "r": 286.78460397824983,
+      "b": 563.8200922225001,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "BOXED WARNING: FETAL TOXICITY: When pregnancy is detected, discontinue CardioNex as soon as possible. Drugs that act directly on the reninangiotensin system can cause injury and death to the developing fetus. \u00b7"
+  },
+  {
+   "self_ref": "#/texts/4",
+   "label": "section_header",
+   "prov": [
+    {
+     "page_no": 1,
+     "bbox": {
+      "l": 155.44362525,
+      "t": 561.1315064725,
+      "r": 253.41565889741793,
+      "b": 552.7320922225001,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "CONTRAINDICATIONS: \u00b7"
+  },
+  {
+   "self_ref": "#/texts/5",
+   "label": "list_item",
+   "prov": [
+    {
+     "page_no": 1,
+     "bbox": {
+      "l": 169.68700425,
+      "t": 550.5336281462501,
+      "r": 286.57604799075955,
+      "b": 475.1160922225,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "Concomitant use with ACE inhibitors is contraindicated due to angioedema risk. Allow a strict 36-hour washout period when switching from an ACE inhibitor to CardioNex. \u25e6"
+  },
+  {
+   "self_ref": "#/texts/6",
+   "label": "list_item",
+   "prov": [
+    {
+     "page_no": 1,
+     "bbox": {
+      "l": 169.68700425,
+      "t": 472.91762814624997,
+      "r": 281.9055400739999,
+      "b": 441.85209222250006,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "Contraindicated in patients with end-stage renal disease (ESRD) requiring dialysis. \u25e6"
+  },
+  {
+   "self_ref": "#/texts/7",
+   "label": "section_header",
+   "prov": [
+    {
+     "page_no": 1,
+     "bbox": {
+      "l": 146.4377955,
+      "t": 426.4680925,
+      "r": 256.9757955000001,
+      "b": 417.4680925,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "1.1 Indications and Usage"
+  },
+  {
+   "self_ref": "#/texts/8",
+   "label": "text",
+   "prov": [
+    {
+     "page_no": 1,
+     "bbox": {
+      "l": 146.4377955,
+      "t": 406.2835064725,
+      "r": 286.93176188325003,
+      "b": 342.4440922225001,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "CardioNex is indicated ONLY to reduce the risk of cardiovascular death and hospitalization for heart failure in adult patients with chronic heart failure with reduced ejection fraction (HFrEF, LVEF <= 40%)."
+  },
+  {
+   "self_ref": "#/texts/9",
+   "label": "list_item",
+   "prov": [
+    {
+     "page_no": 1,
+     "bbox": {
+      "l": 155.44362525,
+      "t": 331.3555064725,
+      "r": 272.29783598175,
+      "b": 300.7800922225001,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "Safety and efficacy have NOT been established in pediatric patients (< 18 years). \u00b7"
+  },
+  {
+   "self_ref": "#/texts/10",
+   "label": "list_item",
+   "prov": [
+    {
+     "page_no": 1,
+     "bbox": {
+      "l": 155.44362525,
+      "t": 298.0915064725,
+      "r": 279.77109307949985,
+      "b": 256.4280922225,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "Safety and efficacy have NOT been established in heart failure with preserved ejection fraction (HFpEF, LVEF > 40%). \u00b7"
+  },
+  {
+   "self_ref": "#/texts/11",
+   "label": "section_header",
+   "prov": [
+    {
+     "page_no": 1,
+     "bbox": {
+      "l": 307.559055,
+      "t": 681.9000925,
+      "r": 410.73730500000005,
+      "b": 661.0200925,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "2.2 Dosing and Special Population Adjustments"
+  },
+  {
+   "self_ref": "#/texts/12",
+   "label": "text",
+   "prov": [
+    {
+     "page_no": 1,
+     "bbox": {
+      "l": 307.559055,
+      "t": 441.0295064725,
+      "r": 443.8613774115,
+      "b": 355.01409222250004,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "Footnote *: In patients concurrently taking strong CYP3A4 inhibitors (such as itraconazole, ketoconazole, clarithromycin, or ritonavir), the maximum daily dose of CardioNex must NOT exceed 5mg once daily, even if renal function is normal (eGFR >= 30 mL/min)."
+  },
+  {
+   "self_ref": "#/texts/13",
+   "label": "section_header",
+   "prov": [
+    {
+     "page_no": 1,
+     "bbox": {
+      "l": 307.559055,
+      "t": 339.6300925,
+      "r": 385.74430500000005,
+      "b": 330.6300925,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "2.3 Administration"
+  },
+  {
+   "self_ref": "#/texts/14",
+   "label": "text",
+   "prov": [
+    {
+     "page_no": 1,
+     "bbox": {
+      "l": 307.559055,
+      "t": 319.4455064725,
+      "r": 440.1463255378686,
+      "b": 288.87009222250003,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "Take CardioNex once daily at about the same time each day, with or without food."
+  },
+  {
+   "self_ref": "#/texts/15",
+   "label": "section_header",
+   "prov": [
+    {
+     "page_no": 1,
+     "bbox": {
+      "l": 307.559055,
+      "t": 273.48609250000004,
+      "r": 381.09805500000016,
+      "b": 264.48609250000004,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "5.1 Hyperkalemia"
+  },
+  {
+   "self_ref": "#/texts/16",
+   "label": "text",
+   "prov": [
+    {
+     "page_no": 1,
+     "bbox": {
+      "l": 307.559055,
+      "t": 253.30150647250002,
+      "r": 447.14052100649985,
+      "b": 167.28609222249997,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "CardioNex can raise serum potassium. Check potassium before the first dose, 1 week after starting or changing the dose, and monthly for the first 3 months. Withhold treatment while serum potassium is above 5.5 mEq/L and restart only once it has returned to the normal range."
+  },
+  {
+   "self_ref": "#/texts/17",
+   "label": "section_header",
+   "prov": [
+    {
+     "page_no": 1,
+     "bbox": {
+      "l": 307.559055,
+      "t": 151.90209249999998,
+      "r": 436.08805500000017,
+      "b": 142.90209249999998,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "5.2 Symptomatic Hypotension"
+  },
+  {
+   "self_ref": "#/texts/18",
+   "label": "text",
+   "prov": [
+    {
+     "page_no": 1,
+     "bbox": {
+      "l": 307.559055,
+      "t": 131.71750647250008,
+      "r": 444.79708443075003,
+      "b": 78.96609222250004,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    },
+    {
+     "page_no": 2,
+     "bbox": {
+      "l": 146.4377955,
+      "t": 757.6906717225,
+      "r": 278.07341562599987,
+      "b": 727.1152574725,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "Low blood pressure with dizziness or fainting is most likely in patients who are volume depleted or on high-dose diuretics. Correct volume depletion before the first dose. If hypotension occurs, lower the diuretic dose first, then consider a temporary interruption of CardioNex."
+  },
+  {
+   "self_ref": "#/texts/19",
+   "label": "page_footer",
+   "prov": [
+    {
+     "page_no": 1,
+     "bbox": {
+      "l": 279.73593975,
+      "t": 29.011608369999863,
+      "r": 315.53969169,
+      "b": 22.011852370000042,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "Page 1 of 3"
+  },
+  {
+   "self_ref": "#/texts/20",
+   "label": "section_header",
+   "prov": [
+    {
+     "page_no": 2,
+     "bbox": {
+      "l": 146.4377955,
+      "t": 711.73125775,
+      "r": 215.12804550000004,
+      "b": 702.73125775,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "5.3 Angioedema"
+  },
+  {
+   "self_ref": "#/texts/21",
+   "label": "text",
+   "prov": [
+    {
+     "page_no": 2,
+     "bbox": {
+      "l": 146.4377955,
+      "t": 691.5466717225,
+      "r": 284.1629909572499,
+      "b": 616.6192574725001,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "Swelling of the face, lips, tongue or throat has been reported. Stop CardioNex at once and do not restart it. Patients with a history of angioedema of any cause were not studied and should not receive CardioNex."
+  },
+  {
+   "self_ref": "#/texts/22",
+   "label": "section_header",
+   "prov": [
+    {
+     "page_no": 2,
+     "bbox": {
+      "l": 146.4377955,
+      "t": 601.2352577500001,
+      "r": 275.30879550000003,
+      "b": 592.2352577500001,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "5.4 Worsening Renal Function"
+  },
+  {
+   "self_ref": "#/texts/23",
+   "label": "text",
+   "prov": [
+    {
+     "page_no": 2,
+     "bbox": {
+      "l": 146.4377955,
+      "t": 581.0506717225,
+      "r": 284.6417575694999,
+      "b": 506.12325747250003,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "Serum creatinine may rise in the first weeks of treatment. Measure creatinine at baseline and after 1 to 2 weeks. A rise of more than 30% from baseline calls for a review of the diuretic dose and of other drugs that affect the kidneys."
+  },
+  {
+   "self_ref": "#/texts/24",
+   "label": "section_header",
+   "prov": [
+    {
+     "page_no": 2,
+     "bbox": {
+      "l": 146.4377955,
+      "t": 490.73925775000004,
+      "r": 270.00779550000016,
+      "b": 481.73925775000004,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "6.1 Clinical Trials Experience"
+  },
+  {
+   "self_ref": "#/texts/25",
+   "label": "text",
+   "prov": [
+    {
+     "page_no": 2,
+     "bbox": {
+      "l": 146.4377955,
+      "t": 470.5546717225,
+      "r": 287.43036310049985,
+      "b": 373.4512574725,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "In the placebo-controlled trial, 7.9% of patients on CardioNex and 6.1% on placebo stopped treatment because of an adverse reaction. Adverse reactions reported in at least 2% of patients and more often than placebo were dizziness (6.3% vs 3.9%), fatigue (4.4% vs 3.6%), cough (3.1% vs 2.8%) and nausea (2.5% vs 1.9%)."
+  },
+  {
+   "self_ref": "#/texts/26",
+   "label": "section_header",
+   "prov": [
+    {
+     "page_no": 2,
+     "bbox": {
+      "l": 146.4377955,
+      "t": 358.06725775,
+      "r": 270.97079550000007,
+      "b": 349.06725775,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "7.1 Potassium-Raising Drugs"
+  },
+  {
+   "self_ref": "#/texts/27",
+   "label": "text",
+   "prov": [
+    {
+     "page_no": 2,
+     "bbox": {
+      "l": 146.4377955,
+      "t": 337.88267172250005,
+      "r": 285.5572937227498,
+      "b": 251.8672574725,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "Potassium supplements, potassiumsparing diuretics (spironolactone, eplerenone, amiloride) and salt substitutes that contain potassium increase the chance of hyperkalemia. Monitor serum potassium closely when any of these is used with CardioNex."
+  },
+  {
+   "self_ref": "#/texts/28",
+   "label": "section_header",
+   "prov": [
+    {
+     "page_no": 2,
+     "bbox": {
+      "l": 146.4377955,
+      "t": 236.48325775,
+      "r": 267.9737955000001,
+      "b": 227.48325775,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "7.2 Strong CYP3A4 Inducers"
+  },
+  {
+   "self_ref": "#/texts/29",
+   "label": "text",
+   "prov": [
+    {
+     "page_no": 2,
+     "bbox": {
+      "l": 146.4377955,
+      "t": 216.2986717225,
+      "r": 282.7518893632498,
+      "b": 163.54725747250006,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "Rifampin, carbamazepine, phenytoin and St John's wort lower CardioNex exposure by about 70% and may remove its benefit. Avoid using them together."
+  },
+  {
+   "self_ref": "#/texts/30",
+   "label": "section_header",
+   "prov": [
+    {
+     "page_no": 2,
+     "bbox": {
+      "l": 146.4377955,
+      "t": 148.16325775000007,
+      "r": 207.46679550000005,
+      "b": 139.16325775000007,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "8.1 Pregnancy"
+  },
+  {
+   "self_ref": "#/texts/31",
+   "label": "text",
+   "prov": [
+    {
+     "page_no": 2,
+     "bbox": {
+      "l": 146.4377955,
+      "t": 127.97867172249994,
+      "r": 277.1326812299999,
+      "b": 64.13925747250005,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    },
+    {
+     "page_no": 2,
+     "bbox": {
+      "l": 307.559055,
+      "t": 757.6906717225,
+      "r": 417.1292586178089,
+      "b": 727.1152574725,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "CardioNex can cause fetal harm when given during the second and third trimesters. Stop CardioNex as soon as pregnancy is detected and switch to a treatment that is safe in pregnancy. Women who could become pregnant should use effective contraception during treatment."
+  },
+  {
+   "self_ref": "#/texts/32",
+   "label": "section_header",
+   "prov": [
+    {
+     "page_no": 2,
+     "bbox": {
+      "l": 307.559055,
+      "t": 711.73125775,
+      "r": 362.57605500000005,
+      "b": 702.73125775,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "8.2 Lactation"
+  },
+  {
+   "self_ref": "#/texts/33",
+   "label": "text",
+   "prov": [
+    {
+     "page_no": 2,
+     "bbox": {
+      "l": 307.559055,
+      "t": 691.5466717225,
+      "r": 443.86474944899993,
+      "b": 594.4432574725,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "It is not known whether cardionexib passes into human breast milk. In animal studies it was found in milk at levels close to those in plasma. Because of the risk of low blood pressure and high potassium in a breastfed infant, breastfeeding is not recommended during treatment and for 5 days after the final dose."
+  },
+  {
+   "self_ref": "#/texts/34",
+   "label": "section_header",
+   "prov": [
+    {
+     "page_no": 2,
+     "bbox": {
+      "l": 307.559055,
+      "t": 579.05925775,
+      "r": 379.5950550000002,
+      "b": 570.05925775,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "8.4 Pediatric Use"
+  },
+  {
+   "self_ref": "#/texts/35",
+   "label": "text",
+   "prov": [
+    {
+     "page_no": 2,
+     "bbox": {
+      "l": 307.559055,
+      "t": 558.8746717225,
+      "r": 446.70375146549986,
+      "b": 528.2992574725,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "Safety and effectiveness in patients younger than 18 years have not been established."
+  },
+  {
+   "self_ref": "#/texts/36",
+   "label": "section_header",
+   "prov": [
+    {
+     "page_no": 2,
+     "bbox": {
+      "l": 307.559055,
+      "t": 512.91525775,
+      "r": 378.59605500000015,
+      "b": 503.91525775,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "8.5 Geriatric Use"
+  },
+  {
+   "self_ref": "#/texts/37",
+   "label": "text",
+   "prov": [
+    {
+     "page_no": 2,
+     "bbox": {
+      "l": 307.559055,
+      "t": 492.7306717225,
+      "r": 443.4111810794998,
+      "b": 406.71525747250007,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "Of the patients in the clinical trial, 38% were 65 or older and 14% were 75 or older. No overall differences in effectiveness were seen. Older patients had more dizziness and low blood pressure, so check blood pressure at each visit during the first month."
+  },
+  {
+   "self_ref": "#/texts/38",
+   "label": "section_header",
+   "prov": [
+    {
+     "page_no": 2,
+     "bbox": {
+      "l": 307.559055,
+      "t": 391.33125774999996,
+      "r": 398.0900550000001,
+      "b": 382.33125774999996,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "8.6 Renal Impairment"
+  },
+  {
+   "self_ref": "#/texts/39",
+   "label": "text",
+   "prov": [
+    {
+     "page_no": 2,
+     "bbox": {
+      "l": 307.559055,
+      "t": 371.14667172250006,
+      "r": 435.9525012255,
+      "b": 307.30725747249994,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "Exposure to cardionexib rises as kidney function falls. Starting and maintenance doses by eGFR are given in the dosing table in section 2.2. Patients on dialysis were not studied."
+  },
+  {
+   "self_ref": "#/texts/40",
+   "label": "section_header",
+   "prov": [
+    {
+     "page_no": 2,
+     "bbox": {
+      "l": 307.559055,
+      "t": 291.92325774999995,
+      "r": 406.0910550000001,
+      "b": 282.92325774999995,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "8.7 Hepatic Impairment"
+  },
+  {
+   "self_ref": "#/texts/41",
+   "label": "text",
+   "prov": [
+    {
+     "page_no": 2,
+     "bbox": {
+      "l": 307.559055,
+      "t": 271.73867172250004,
+      "r": 445.72101999824986,
+      "b": 207.89925747250004,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "No dose change is needed in mild or moderate hepatic impairment (ChildPugh A or B). CardioNex has not been studied in severe hepatic impairment (Child-Pugh C) and is not recommended there."
+  },
+  {
+   "self_ref": "#/texts/42",
+   "label": "section_header",
+   "prov": [
+    {
+     "page_no": 2,
+     "bbox": {
+      "l": 307.559055,
+      "t": 192.51525775000005,
+      "r": 372.08905500000014,
+      "b": 183.51525775000005,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "10 Overdosage"
+  },
+  {
+   "self_ref": "#/texts/43",
+   "label": "text",
+   "prov": [
+    {
+     "page_no": 2,
+     "bbox": {
+      "l": 307.559055,
+      "t": 172.33067172250003,
+      "r": 447.1321215922501,
+      "b": 119.57925747249999,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "Low blood pressure is the most likely effect of an overdose. Give supportive care. Cardionexib is highly protein bound and is not removed by hemodialysis."
+  },
+  {
+   "self_ref": "#/texts/44",
+   "label": "section_header",
+   "prov": [
+    {
+     "page_no": 2,
+     "bbox": {
+      "l": 307.559055,
+      "t": 104.19525775,
+      "r": 404.60605500000025,
+      "b": 95.19525775,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "12.3 Pharmacokinetics"
+  },
+  {
+   "self_ref": "#/texts/45",
+   "label": "text",
+   "prov": [
+    {
+     "page_no": 2,
+     "bbox": {
+      "l": 307.559055,
+      "t": 84.01067172249998,
+      "r": 446.22498485325,
+      "b": 53.4352574725001,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    },
+    {
+     "page_no": 3,
+     "bbox": {
+      "l": 146.4377955,
+      "t": 757.6906717225,
+      "r": 286.9599959024998,
+      "b": 716.0272574725,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "Peak plasma levels are reached about 2 hours after a dose. The halflife is about 14 hours, so steady state is reached in 3 to 4 days. Cardionexib is cleared mainly by metabolism in the liver; less than 5% is excreted unchanged in urine."
+  },
+  {
+   "self_ref": "#/texts/46",
+   "label": "page_footer",
+   "prov": [
+    {
+     "page_no": 2,
+     "bbox": {
+      "l": 279.73593975,
+      "t": 29.011608369999863,
+      "r": 315.53969169,
+      "b": 22.011852370000042,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "Page 2 of 3"
+  },
+  {
+   "self_ref": "#/texts/47",
+   "label": "section_header",
+   "prov": [
+    {
+     "page_no": 3,
+     "bbox": {
+      "l": 307.559055,
+      "t": 744.9952577500001,
+      "r": 379.5770550000001,
+      "b": 735.9952577500001,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "16 How Supplied"
+  },
+  {
+   "self_ref": "#/texts/48",
+   "label": "text",
+   "prov": [
+    {
+     "page_no": 3,
+     "bbox": {
+      "l": 307.559055,
+      "t": 724.8106717225,
+      "r": 438.74154035025964,
+      "b": 683.1472574725,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "Film-coated tablets of 5 mg (white, round), 20 mg (yellow, oval) and 40 mg (pink, oval), in bottles of 30 and 90."
+  },
+  {
+   "self_ref": "#/texts/49",
+   "label": "page_footer",
+   "prov": [
+    {
+     "page_no": 3,
+     "bbox": {
+      "l": 279.73593975,
+      "t": 29.011608369999863,
+      "r": 315.53969169,
+      "b": 22.011852370000042,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "Page 3 of 3"
+  }
+ ],
+ "tables": [
+  {
+   "self_ref": "#/tables/0",
+   "label": "table",
+   "prov": [
+    {
+     "page_no": 1,
+     "bbox": {
+      "l": 306.62490568684785,
+      "t": 654.1221595051516,
+      "r": 500.9437310404886,
+      "b": 450.85026798371683,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "data": {
+    "grid": [
+     [
+      {
+       "text": "Patient Population"
+      },
+      {
+       "text": "Recommended Starting Dose"
+      },
+      {
+       "text": "Target Maintenance Dose"
+      },
+      {
+       "text": "Notes & Exceptions"
+      }
+     ],
+     [
+      {
+       "text": "Standard Adult HFrEF (eGFR >= 30 mL/min)"
+      },
+      {
+       "text": "20mg once daily"
+      },
+      {
+       "text": "40mg once daily (titrate after 4 weeks)"
+      },
+      {
+       "text": "Monitor serum potassium and blood pressure"
+      }
+     ],
+     [
+      {
+       "text": "Severe Renal Impairment (eGFR < 30 mL/min, non- dialysis)"
+      },
+      {
+       "text": "5mg once daily"
+      },
+      {
+       "text": "5mg once daily"
+      },
+      {
+       "text": "Do not titrate above 5mg"
+      }
+     ],
+     [
+      {
+       "text": "End-Stage Renal Disease (on dialysis)"
+      },
+      {
+       "text": "Contraindicated"
+      },
+      {
+       "text": "Contraindicated"
+      },
+      {
+       "text": "Do not administer"
+      }
+     ],
+     [
+      {
+       "text": "Co- administration with strong CYP3A4 inhibitors*"
+      },
+      {
+       "text": "5mg once daily"
+      },
+      {
+       "text": "5mg once daily"
+      },
+      {
+       "text": "Applies regardless of renal function"
+      }
+     ]
+    ]
+   }
+  }
+ ],
+ "pages": {
+  "1": {
+   "size": {
+    "width": 595.275591,
+    "height": 841.889764
+   }
+  },
+  "2": {
+   "size": {
+    "width": 595.275591,
+    "height": 841.889764
+   }
+  },
+  "3": {
+   "size": {
+    "width": 595.275591,
+    "height": 841.889764
+   }
+  }
+ }
+}

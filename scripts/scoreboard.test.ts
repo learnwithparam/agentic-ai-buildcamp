@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { test } from "node:test";
 import { failedChecks, loadAllCases, loadMedinfoCases } from "./hcp-cases";
-import { appendScoreboardRow, checkScoreboard, headerRow, LEARNER_SCOREBOARD_FILE, SCOREBOARD_FILE, scoreboardRow, slices } from "./scoreboard";
+import { alignScoreboard, appendScoreboardRow, checkScoreboard, headerRow, LEARNER_SCOREBOARD_FILE, SCOREBOARD_FILE, scoreboardRow, slices } from "./scoreboard";
 
 test("text checks read bold doses and spaced units the way the dataset writes them", () => {
   const checks = [
@@ -53,6 +53,22 @@ test("a slice the run left out shows a dash, not 0 passed", () => {
   const cells = scoreboardRow("09", "Subset", [{ slice: first, passed: true }], "http://run").split("|").map((cell) => cell.trim());
   assert.equal(cells[4], "1/1");
   assert.equal(cells[3 + slices().indexOf(second) + 1], "-");
+});
+
+test("a table from before a slice existed gets that column as dashes, every other cell stays under its slice", () => {
+  const all = slices();
+  const dropped = all[all.length - 2];
+  const kept = all.filter((slice) => slice !== dropped);
+  const oldRow = `| 07 | Old | 2/2 | ${kept.map((slice) => (slice === all[0] ? "1/1" : slice === all[all.length - 1] ? "1/1" : "-")).join(" | ")} | [run](http://run) |`;
+  const old = `# Scoreboard\n\nText.\n\n| Chapter | Change | Passed | ${kept.join(" | ")} | Run |\n|---|\n${oldRow}\n`;
+  assert.notDeepEqual(checkScoreboard(old), []);
+  const aligned = alignScoreboard(old);
+  assert.deepEqual(checkScoreboard(aligned), []);
+  const cells = aligned.split("\n").find((line) => line.startsWith("| 07"))!.split("|").map((cell) => cell.trim());
+  assert.equal(cells[4], "1/1");
+  assert.equal(cells[4 + all.indexOf(dropped)], "-");
+  assert.equal(cells[4 + all.length - 1], "1/1");
+  assert.equal(alignScoreboard(aligned), aligned, "aligning twice changes nothing");
 });
 
 // The runner refuses an id that is not in the dataset, so a lesson that names one gives the

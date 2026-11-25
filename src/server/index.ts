@@ -4,6 +4,7 @@ import { LangfuseSpanProcessor } from "@langfuse/otel";
 import { createApp } from "./app";
 import { createAuth } from "./auth";
 import { createPool, migrate } from "./db";
+import { connectLabelIndex } from "./rag/search";
 import { env } from "./env";
 import { PostgresSaver } from "@langchain/langgraph-checkpoint-postgres";
 import { createFactChecker } from "./content/fact-check";
@@ -26,6 +27,8 @@ import { TENANTS } from "./users";
 const pool = createPool(env.databaseUrl);
 const applied = await migrate(pool);
 if (applied.length) console.log(`Applied migrations: ${applied.join(", ")}`);
+// Lesson 20. search_labels reads the pgvector index of the label PDFs that npm run rag:ingest builds.
+console.log(`Label index: ${await connectLabelIndex(pool)} sections`);
 
 // Lesson 13. Every step of every thread is saved in the same Postgres, in its own schema, so a
 // draft waiting for a reviewer is still waiting after a restart. setup() creates the tables once.

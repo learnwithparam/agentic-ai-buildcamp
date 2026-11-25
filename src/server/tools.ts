@@ -1,6 +1,6 @@
 import type OpenAI from "openai";
 import { observe, updateActiveObservation } from "@langfuse/tracing";
-import { approvedCountries, searchLabels, TODAY } from "./labels";
+import { approvedCountries, searchLabels, TODAY, type LabelSection } from "./labels";
 import { readableDocuments } from "./permissions";
 import { TENANTS, type Identity } from "./users";
 
@@ -54,11 +54,22 @@ function deskRules(user: Identity, today: string): ToolResult {
   };
 }
 
+// Lesson 20. How search_labels finds sections. The server and the dataset runner plug in the
+// pgvector index over the label PDFs (src/server/rag/search.ts, connectLabelIndex); until then,
+// and in the tests that run with no database, it scores the Markdown excerpts by shared words.
+export type LabelSearch = (query: string, readable: ReadonlySet<string>, limit: number, today: string) => Promise<LabelSection[]>;
+
+let search: LabelSearch = async (query, readable, limit, today) => searchLabels(query, readable, limit, today);
+
+export function useLabelSearch(next: LabelSearch) {
+  search = next;
+}
+
 async function labelSearch(input: { query: string }, user: Identity, today: string): Promise<ToolResult> {
   const readable = await readableDocuments(user);
   return {
     ok: true,
-    results: searchLabels(input.query, readable, 4, today).map((hit) => ({
+    results: (await search(input.query, readable, 4, today)).map((hit) => ({
       doc_id: hit.docId,
       section: hit.section,
       title: hit.title,

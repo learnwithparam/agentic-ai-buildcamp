@@ -30,6 +30,8 @@
     "langfuse:code-eval": "tsx scripts/langfuse-code-eval.ts",
     "identity:setup": "tsx scripts/identity-setup.ts",
     "infra:up": "docker compose --env-file .env -f infra/docker-compose.yml up -d --wait",
+    "rag:setup": "tsx scripts/rag-setup.ts",
+    "rag:ingest": "tsx scripts/rag-ingest.ts",
     "identity:smoke": "tsx scripts/identity-smoke.ts",
     "events:send": "tsx scripts/events-send.ts",
     "prepare": "git config core.hooksPath .githooks || true"
