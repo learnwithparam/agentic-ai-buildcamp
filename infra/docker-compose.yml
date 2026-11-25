@@ -94,6 +94,10 @@ services:
     image: quay.io/docling-project/docling-serve-cpu:v1.38.2
     profiles: ["ingest"]
     restart: unless-stopped
+    environment:
+      # A synchronous convert gives up with 504 after 120 seconds by default. The first convert
+      # after the layout models load can take longer than that on a laptop.
+      DOCLING_SERVE_MAX_SYNC_WAIT: "600"
     ports:
       - 127.0.0.1:5001:5001
     healthcheck:
