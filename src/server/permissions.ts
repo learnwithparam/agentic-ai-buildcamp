@@ -37,7 +37,8 @@ const ROLE_RELATION: Record<Role, string> = {
   "medical-reviewer": "medical_reviewer",
   "safety-reviewer": "safety_reviewer",
   "sales-rep": "sales_rep",
-  "sweep-agent": "sweep_agent"
+  "sweep-agent": "sweep_agent",
+  analyst: "analyst"
 };
 
 // Lesson 13. A reviewer's role, from the same verified token: the Keycloak realm role says what
@@ -67,6 +68,24 @@ export async function readableDocuments(user: Identity, client: OpenFgaClient = 
     contextualTuples: doctorTuples(user)
   });
   return new Set(objects.map((object) => object.replace(/^document:/, "")));
+}
+
+// Lesson 22. Each company's sales data is one dataset, owned by that company.
+export const salesDataset = (tenantId: string) => `dataset:sales_${tenantId}`;
+export function datasetTuples(tenantIds: string[]): TupleKey[] {
+  return tenantIds.map((tenantId) => ({ user: `company:${tenantId}`, relation: "owner", object: salesDataset(tenantId) }));
+}
+
+// Lesson 22. May this user ask the insights agent about their company's sales? The analyst role
+// and the company come from the token; OpenFGA holds which company owns which dataset.
+export async function canQuerySales(user: Identity, client: OpenFgaClient = fga()): Promise<boolean> {
+  const { allowed } = await client.check({
+    user: `user:${user.userId}`,
+    relation: "can_query",
+    object: salesDataset(user.tenantId),
+    contextualTuples: reviewerTuples(user)
+  });
+  return Boolean(allowed);
 }
 
 // Lesson 14. Which company's reps call on each doctor, from the CRM's own profiles.

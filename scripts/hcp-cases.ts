@@ -3,7 +3,7 @@
  * medinfo.yaml for the medical information desk, and, from lesson 14, fact-check.yaml and
  * outreach.yaml for the two agents built on the same base, from lesson 15, a2a.yaml for the
  * hand-off between them, from lesson 16, events.yaml for the event handlers, and, from lesson 17,
- * autonomy.yaml for the nightly sweep. Each item says which agent answers it. This is the only place the buildcamp reads them, so the
+ * autonomy.yaml for the nightly sweep, and, from lesson 22, insights.yaml for the sales questions. Each item says which agent answers it. This is the only place the buildcamp reads them, so the
  * dataset in Langfuse is always the pinned dataset repo, never a hand-typed copy.
  */
 import { readFileSync } from "node:fs";
@@ -24,6 +24,8 @@ export type CaseInput = {
   event?: { eventId: string; delivery: number };
   // Lesson 17: a sweep case names the day it runs on and the limits it starts with.
   sweep?: { today: string; budgetUsd: number; spentUsd: number; paused: boolean; instruction?: string };
+  // Lesson 22: who asks a sales question, an analyst or a doctor who must be turned away.
+  role?: "analyst" | "doctor";
 };
 
 // The dataset repo's exact checks on the answer text. llm-rubric checks are left out:
@@ -33,7 +35,7 @@ const TEXT_CHECKS = new Set<string>(["contains", "not-contains", "regex", "not-r
 
 export type CaseExpectation = { idealAnswer: string; expectedBehavior: Behavior; checks: TextCheck[] };
 
-export const AGENTS = ["medinfo", "fact-check", "outreach", "a2a", "events", "autonomy"] as const;
+export const AGENTS = ["medinfo", "fact-check", "outreach", "a2a", "events", "autonomy", "insights"] as const;
 export type AgentName = (typeof AGENTS)[number];
 
 export type CaseItem = {
@@ -85,7 +87,8 @@ export function loadCases(agent: AgentName): CaseItem[] {
         ...(vars.event ? { event: { eventId: vars.event, delivery: Number(vars.delivery ?? "1") } } : {}),
         ...(agent === "autonomy"
           ? { sweep: { today: vars.today, budgetUsd: Number(vars.budgetUsd), spentUsd: Number(vars.spentUsd), paused: vars.paused === "yes", ...(vars.query ? { instruction: vars.query } : {}) } }
-          : {})
+          : {}),
+        ...(agent === "insights" ? { role: vars.role === "analyst" ? ("analyst" as const) : ("doctor" as const) } : {})
       },
       expectedOutput: {
         // The two content agents' cases have no ideal answer: their codes and citations are the answer.

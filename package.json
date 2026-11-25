@@ -32,6 +32,7 @@
     "langfuse:gateway-keys": "tsx scripts/langfuse-gateway-keys.ts",
     "langfuse:code-eval": "tsx scripts/langfuse-code-eval.ts",
     "identity:setup": "tsx scripts/identity-setup.ts",
+    "bi:setup": "tsx scripts/bi-setup.ts",
     "infra:up": "docker compose --env-file .env -f infra/docker-compose.yml up -d --wait",
     "rag:setup": "tsx scripts/rag-setup.ts",
     "rag:ingest": "tsx scripts/rag-ingest.ts",
@@ -68,6 +69,7 @@
     "ink": "8.0.0",
     "jose": "6.2.17",
     "kysely": "0.29.9",
+    "libpg-query": "17.8.3",
     "open": "11.0.4",
     "openai": "7.63.0",
     "openid-client": "6.8.9",
@@ -78,6 +80,7 @@
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "react-markdown": "10.1.0",
+    "recharts": "3.11.1",
     "remark-gfm": "4.0.1",
     "standardwebhooks": "1.1.1",
     "zod": "4.6.7"

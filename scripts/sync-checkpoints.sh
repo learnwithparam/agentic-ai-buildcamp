@@ -56,6 +56,7 @@ TAGS=(
   checkpoint/19-cli
   checkpoint/20-rag
   checkpoint/21-citations
+  checkpoint/22-insights
 )
 
 # Files whose code is what the next lesson changes. Add a file here when a
@@ -159,50 +160,64 @@ CITE_FILES="docs/scoreboard.md package.json scripts/citations-audit.ts scripts/c
   src/server/citations.ts src/server/citations.test.ts src/server/citations.fixtures.json src/server/graph.ts
   src/server/graph.test.ts src/server/durable.test.ts src/server/medinfo-agent.ts
   scripts/citations-replay.ts scripts/citations-replay.test.ts data/evidence/citations-replay.json scripts/no-fake-model.test.ts"
+# Lesson 22 adds the insights agent over sales data. Its files (BI_FILES) stay as they were on
+# tags before it, so lesson 21 has no sales table, no analyst role and no /insights page.
+BI_FILES=".github/start-test-services.sh docs/scoreboard.md infra/docker-compose.yml
+  infra/openfga/model.fga infra/postgres/init/02-bi-roles.sh package-lock.json package.json
+  scripts/bi-setup.ts scripts/experiment.ts scripts/fga-model.ts scripts/hcp-cases.ts
+  scripts/identity-setup.ts src/client/App.tsx src/client/chat/api.ts
+  src/client/insights/Insights.tsx src/client/styles/app.css src/server/a2a/a2a-harness.ts
+  src/server/auth.ts src/server/bi/agent.ts src/server/bi/bi.test.ts src/server/bi/load.ts
+  src/server/bi/query.ts src/server/env.ts src/server/inbox.test.ts src/server/index.ts
+  src/server/mcp.ts src/server/migrations/009_sales.sql src/server/permissions.ts
+  src/server/routes.ts src/server/test-desk.ts src/server/users.ts"
 milestone_files() {
   case "$1" in
     checkpoint/00-setup | checkpoint/01-base-app | checkpoint/02-tracing)
-      echo "src/server/index.ts src/server/medinfo-agent.ts src/server/tools.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES"
+      echo "src/server/index.ts src/server/medinfo-agent.ts src/server/tools.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES"
       ;;
     checkpoint/03-prompt-management)
-      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES"
+      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES"
       ;;
     # Lessons 06 and 07 run the dataset with the correctness judge; lesson 09 replaces it.
     checkpoint/04-* | checkpoint/05-* | checkpoint/06-* | checkpoint/07-* | checkpoint/08-* | checkpoint/09-*)
-      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES"
+      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES"
       ;;
     checkpoint/10-*)
-      echo "$AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES"
+      echo "$AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES"
       ;;
     checkpoint/11-*)
-      echo "$MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES"
+      echo "$MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES"
       ;;
     checkpoint/12-*)
-      echo "$TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES"
+      echo "$TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES"
       ;;
     checkpoint/13-*)
-      echo "$CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES"
+      echo "$CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES"
       ;;
     checkpoint/14-*)
-      echo "$A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES"
+      echo "$A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES"
       ;;
     checkpoint/15-*)
-      echo "$EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES"
+      echo "$EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES"
       ;;
     checkpoint/16-*)
-      echo "$AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES"
+      echo "$AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES"
       ;;
     checkpoint/17-*)
-      echo "$GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES"
+      echo "$GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES"
       ;;
     checkpoint/18-*)
-      echo "$CLI_FILES $RAG_FILES $CITE_FILES"
+      echo "$CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES"
       ;;
     checkpoint/19-*)
-      echo "$RAG_FILES $CITE_FILES"
+      echo "$RAG_FILES $CITE_FILES $BI_FILES"
       ;;
     checkpoint/20-*)
-      echo "$CITE_FILES"
+      echo "$CITE_FILES $BI_FILES"
+      ;;
+    checkpoint/21-*)
+      echo "$BI_FILES"
       ;;
     *)
       echo ""

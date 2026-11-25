@@ -18,6 +18,8 @@ type company
     # Lesson 17: the nightly sweep. It views doctors and plans steps like a rep, and decides nothing:
     # no can_decide below names it, so every step it plans waits for a person.
     define sweep_agent: [user]
+    # Lesson 22: asks the insights agent about the company's sales.
+    define analyst: [user]
 
 type country
   relations
@@ -64,3 +66,10 @@ type outreach
   relations
     define company: [company]
     define can_decide: sales_rep from company
+
+# Lesson 22. A company's sales data. Only its analysts may ask the insights agent about it: a sales
+# rep or a doctor of the same company may not. Postgres holds the same line again, by login.
+type dataset
+  relations
+    define owner: [company]
+    define can_query: analyst from owner

@@ -15,7 +15,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { CredentialsMethod, OpenFgaClient } from "@openfga/sdk";
 import { parse } from "dotenv";
-import { REVIEWER_ROLES, SEED_REVIEWERS, SEED_USERS, TENANTS, type ReviewerRole } from "../src/server/users";
+import { SIGN_IN_ROLES, SEED_REVIEWERS, SEED_USERS, TENANTS, type ReviewerRole } from "../src/server/users";
 import { CLI_CALLBACK_PORT, CLI_CLIENT_ID } from "../src/cli/config";
 import { modelJson, syncDocumentTuples } from "./fga-model";
 
@@ -49,6 +49,8 @@ function ensureSecrets(): Record<string, string> {
     if (!current[name]) missing[name] = make();
   };
   for (const name of ["POSTGRES_PASSWORD", "KEYCLOAK_DB_PASSWORD", "OPENFGA_DB_PASSWORD", "MEDINFO_DB_PASSWORD"]) want(name, secret);
+  // Lesson 22: the insights agent signs in to Postgres as its company, one login each.
+  for (const tenant of Object.keys(TENANTS)) want(`BI_DB_PASSWORD_${tenant.toUpperCase()}`, secret);
   for (const name of ["KEYCLOAK_ADMIN_PASSWORD", "FGA_API_TOKEN", "OIDC_CLIENT_SECRET", "SEED_USER_PASSWORD"]) want(name, secret);
   const medinfo = missing.MEDINFO_DB_PASSWORD ?? current.MEDINFO_DB_PASSWORD;
   want("DATABASE_URL", () => `postgresql://medinfo:${medinfo}@localhost:5442/medinfo`);
@@ -299,17 +301,18 @@ async function setupReviewerRoles(): Promise<Record<ReviewerRole, { id: string; 
   const descriptions: Record<ReviewerRole, string> = {
     "medical-reviewer": "Approves drafts before they are sent (lesson 13)",
     "safety-reviewer": "Files or dismisses adverse event reports (lesson 13)",
-    "sales-rep": "Approves each outreach step before it reaches a doctor (lesson 14)"
+    "sales-rep": "Approves each outreach step before it reaches a doctor (lesson 14)",
+    analyst: "Asks the insights agent about the company's sales (lesson 22)"
   };
   const roles = {} as Record<ReviewerRole, { id: string; name: string }>;
-  for (const name of REVIEWER_ROLES) {
+  for (const name of SIGN_IN_ROLES) {
     const body = { name, description: descriptions[name] };
     const found = await kcJson<{ id: string; name: string }>(`/${REALM}/roles/${name}`);
     if (found) await kc("PUT", `/${REALM}/roles/${name}`, body);
     else await kc("POST", `/${REALM}/roles`, body);
     roles[name] = (await kcJson<{ id: string; name: string }>(`/${REALM}/roles/${name}`))!;
   }
-  console.log(`Realm roles: ${REVIEWER_ROLES.join(", ")}`);
+  console.log(`Realm roles: ${SIGN_IN_ROLES.join(", ")}`);
   return roles;
 }
 
@@ -345,7 +348,7 @@ async function setupPeople(
     }
     // At most one reviewer role, the listed one. A doctor has none.
     const held = (await kcJson<{ id: string; name: string }[]>(`/${REALM}/users/${user.id}/role-mappings/realm`)) ?? [];
-    const wrong = held.filter((role) => (REVIEWER_ROLES as readonly string[]).includes(role.name) && role.name !== person.role);
+    const wrong = held.filter((role) => (SIGN_IN_ROLES as readonly string[]).includes(role.name) && role.name !== person.role);
     if (wrong.length) await kc("DELETE", `/${REALM}/users/${user.id}/role-mappings/realm`, wrong);
     if (person.role && !held.some((role) => role.name === person.role)) await kc("POST", `/${REALM}/users/${user.id}/role-mappings/realm`, [roles[person.role]]);
   }
