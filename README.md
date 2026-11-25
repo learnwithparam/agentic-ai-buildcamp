@@ -23,7 +23,7 @@ Open the app at [http://localhost:3333](http://localhost:3333) and Langfuse at [
 
 ## Lessons
 
-Each lesson names the checkpoint tag to check out, what to change, and how to check that it worked.
+Each lesson starts from a checkpoint tag. It shows the problem, how the part works, how to build it and how to prove it. [The walkthrough](./docs/walkthrough.md) shows the whole system in one page, with every new word defined once.
 
 | Step | Lesson | Checkpoint | What you do |
 | --- | --- | --- | --- |

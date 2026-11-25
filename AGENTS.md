@@ -56,8 +56,10 @@ Do not stop at a PR to `main` when checkpoints still carry the old shared state.
 
 - Keep the root `README.md` focused on learners: workshop scope, how to run it, the lesson map, and minimal checkpoint usage.
 - Facilitator notes live in the private teach repo (`teach/courses/agentic-ai-buildcamp`), never in this repo.
-- Learner lessons open with `## Why …` (why the practice matters), then `## Goal` (what this lab achieves), then `## Starting point` (the checkout), then the numbered steps.
-- Do not recreate overview files such as `docs/README.md`, `docs/learner/README.md`, or `docs/checkpoints.md`. Put learner-facing overview content in the root README or the learner lessons; put maintainer-only checkpoint strategy here.
+- Every learner lesson has one shape: `## The problem`, `## What you build`, `## How it works` (with `### The flow`, `### Where it sits`, an optional `### The states`, and `### Concepts`), `## Build it`, `## Prove it`, `## Stuck points`, `## What to watch for`, `## Results`, `## Where to go next`. `docs/learner/21-citations.md` is the model page. No product name goes in a title, a heading or "The problem". `npm run check:pages` enforces this (`scripts/lesson-shape.ts`), and runs in CI beside `npm run check`, not inside it, because the tag sync runs `npm run check` on tags whose code a diagram names before it exists.
+- Diagrams are drawn from the code. "The flow" is a sequence diagram with at least one refusal path, and "Where it sits" a flowchart. A state diagram starts with `%% states: <file> <export>`, and `scripts/mermaid.ts` fails it when its states differ from that declaration. Every diagram must render with mermaid-cli (`npm i -g @mermaid-js/mermaid-cli`).
+- Pages read at grade 6 (`plainEnglish` in package.json, `scripts/plain-english.ts`, the same numbers as live-labs). Every new word is defined once in `docs/walkthrough.md` under `### Concepts`, and each lesson links 2 to 5 of them (`scripts/glossary.ts`, rules G1 to G6).
+- Do not recreate overview files such as `docs/README.md`, `docs/learner/README.md`, or `docs/checkpoints.md`. The one exception is `docs/walkthrough.md`: it holds the whole system's diagrams and the Concepts list, the single place each word is defined, so the lessons link to it instead of repeating it. Put learner-facing overview content in the root README or the learner lessons; put maintainer-only checkpoint strategy here.
 
 ## Checkpoint strategy
 
