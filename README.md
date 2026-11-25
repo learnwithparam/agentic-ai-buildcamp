@@ -43,6 +43,7 @@ Each lesson names the checkpoint tag to check out, what to change, and how to ch
 | 13 | [Route each request by risk and keep approvals in Postgres](./docs/learner/13-durable-state-and-review.md) | `checkpoint/13-durable-review` | Sort every message into a risk tier in code, send drafts and adverse events to a reviewer inbox, and resume a paused thread after a restart. |
 | 14 | [Build a fact-checker and an outreach planner on one agent base](./docs/learner/14-fact-checker-and-outreach.md) | `checkpoint/14-content-agents` | Two more agents on the same gateway, sign-in and inbox: flag every unapproved sentence in an email, and hold duplicate outreach until a sales rep approves. |
 | 15 | [Hand work between agents over A2A](./docs/learner/15-agents-hand-off-over-a2a.md) | `checkpoint/15-a2a` | Both agents behind A2A servers with public cards and Keycloak sign-in: a flagged email is a task that waits for a reviewer, and the whole hand-off is one Langfuse trace. |
+| 16 | [Start agents from events](./docs/learner/16-event-driven-agents.md) | `checkpoint/16-events` | Signed events through a pg-boss queue start the agents: each event is handled once however often it arrives, and still stops at review and safety. |
 
 Helper commands used by the lessons:
 
