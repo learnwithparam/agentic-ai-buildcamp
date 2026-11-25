@@ -67,13 +67,22 @@ function ensureSecrets(): Record<string, string> {
 // ---------- Keycloak admin API ----------
 
 let adminToken = "";
+let adminPassword = "";
 
+// Keycloak's admin token lasts 60 seconds. On a busy laptop this script runs longer, so a 401
+// signs in again once and repeats the call.
 async function kc(method: string, route: string, body?: unknown): Promise<Response> {
-  const response = await fetch(`${KEYCLOAK}/admin/realms${route}`, {
-    method,
-    headers: { Authorization: `Bearer ${adminToken}`, ...(body === undefined ? {} : { "Content-Type": "application/json" }) },
-    body: body === undefined ? undefined : JSON.stringify(body)
-  });
+  const send = () =>
+    fetch(`${KEYCLOAK}/admin/realms${route}`, {
+      method,
+      headers: { Authorization: `Bearer ${adminToken}`, ...(body === undefined ? {} : { "Content-Type": "application/json" }) },
+      body: body === undefined ? undefined : JSON.stringify(body)
+    });
+  let response = await send();
+  if (response.status === 401) {
+    await signInAsAdmin(adminPassword);
+    response = await send();
+  }
   if (!response.ok && response.status !== 404 && response.status !== 409) {
     throw new Error(`Keycloak ${method} ${route} answered ${response.status}: ${(await response.text()).slice(0, 300)}`);
   }
@@ -86,6 +95,7 @@ async function kcJson<T>(route: string): Promise<T | null> {
 }
 
 async function signInAsAdmin(password: string) {
+  adminPassword = password;
   for (let attempt = 0; attempt < 60; attempt += 1) {
     try {
       const response = await fetch(`${KEYCLOAK}/realms/master/protocol/openid-connect/token`, {
