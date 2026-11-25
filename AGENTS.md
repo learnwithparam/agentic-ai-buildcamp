@@ -127,7 +127,7 @@ The lesson 10 files are `GATEWAY_FILES` in the script, the lesson 11 files are `
 
 Inside a milestone file, regions marked `// checkpoint-sync:begin <name>` / `// checkpoint-sync:end <name>` still come from `main`. The sync fails if `main` has a region that a tag's milestone file lacks. When a new lesson starts editing a file, add it to `milestone_files()` for the earlier tags.
 
-The `Sync checkpoint tags` GitHub Action (`.github/workflows/sync-checkpoints.yml`) runs on every push to `main` (and by hand). It runs `npm ci`, then `./scripts/sync-checkpoints.sh --verify --push`. With `--verify`, every tag must pass `npm run check`, moved or not. Each changed tag gets one commit and is force-moved. With no `SOURCE_REF`, the script fetches and uses `origin/main`, never a local `main` that may be behind. All moved tags are pushed together, and only once every tag has passed. `.github/` and `scripts/sync-checkpoints.sh` stay on `main` only.
+The `Sync checkpoint tags` GitHub Action (`.github/workflows/sync-checkpoints.yml`) runs on every push to `main` (and by hand). It runs `npm ci`, then `./scripts/sync-checkpoints.sh --verify --push`. With `--verify`, every tag must pass `npm run check`, moved or not. Each changed tag gets one commit and is force-moved. With no `SOURCE_REF`, the script fetches and uses `origin/main`, never a local `main` that may be behind. All moved tags are pushed together, and only once every tag has passed. `.github/`, `scripts/sync-checkpoints.sh` and `scripts/align-scoreboard*.ts` stay on `main` only.
 
 To run it locally (clean working tree required):
 

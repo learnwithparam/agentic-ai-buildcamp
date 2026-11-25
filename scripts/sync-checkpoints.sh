@@ -225,8 +225,11 @@ trap cleanup EXIT
 
 mkdir -p "$STAGE/source" "$STAGE/keep"
 git archive "$SOURCE_REF" | tar -x -C "$STAGE/source"
-# The workflow and this script only run on main. A tag without them stays clean.
-rm -rf "$STAGE/source/.github" "$STAGE/source/scripts/sync-checkpoints.sh"
+# The workflow, this script and the scoreboard alignment only run on main. A tag without them
+# stays clean; the alignment is copied in for one step below and removed again.
+cp "$STAGE/source/scripts/align-scoreboard.ts" "$STAGE/align-scoreboard.ts"
+rm -rf "$STAGE/source/.github" "$STAGE/source/scripts/sync-checkpoints.sh" \
+  "$STAGE/source/scripts/align-scoreboard.ts" "$STAGE/source/scripts/align-scoreboard.test.ts"
 
 sync_regions() {
   python3 - "$1" "$2" <<'PY'
@@ -292,7 +295,10 @@ for tag in "${TAGS[@]}"; do
 
   # A tag keeps its own scoreboard, but the dataset is shared, so a slice added later is a new
   # column there too: the tag's rows get a dash in it.
+  # It runs inside the tag so it reads that tag's own header (headerRow from scripts/scoreboard.ts).
+  cp "$STAGE/align-scoreboard.ts" scripts/align-scoreboard.ts
   npx tsx scripts/align-scoreboard.ts
+  rm scripts/align-scoreboard.ts
 
   git add -A
   # --verify checks every tag, moved or not: a tag already in sync is still what a learner checks out.
