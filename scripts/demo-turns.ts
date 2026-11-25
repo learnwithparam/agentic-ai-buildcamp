@@ -22,15 +22,20 @@ type Conversation = { name: string; email: string; turns: Turn[] };
 const ANA = "ana.rivera@pharma-a.example.com";
 const CHIDI = "chidi.okafor@pharma-b.example.com";
 const WITHHELD = /INSUFFICIENT_CONTEXT|ASK_FOLLOW_UP|OFF_LABEL_REFUSAL/;
+const DOSE = /\d+ mg/;
+// Words the prompt once forced into every dose search, so every search read the same.
+const FORCED = /titration.*weeks|weeks.*titration/i;
+// The hepatic section answers no kidney question.
+const HEPATIC = /cardionex-uspi-v2 8\.7/;
 
 const CONVERSATIONS: Conversation[] = [
   {
     name: "a good question after a refused one",
     email: ANA,
     turns: [
-      { ask: "What is the CardioNex dose for a US patient with eGFR 24 who is not on dialysis?", why: "a plain dose question", expect: { tier: "answer", reply: /5 mg/, sections: /cardionex-uspi-v2 2\.2/ } },
+      { ask: "What is the CardioNex dose for a US patient with eGFR 24 who is not on dialysis?", why: "a plain dose question", expect: { tier: "answer", reply: /5 mg/, sections: /cardionex-uspi-v2 2\.2/, noSection: HEPATIC } },
       { ask: "what is the dose for kids below 12 years old?", why: "children are outside the approved use", expect: { tier: "stop" } },
-      { ask: "US patient with eGFR 32?", why: "an adult dose question again; the refusal before it must not stick", expect: { tier: "answer", notReply: WITHHELD, sections: /cardionex-uspi-v2 2\.2/ } }
+      { ask: "US patient with eGFR 32?", why: "an adult dose question again; the refusal before it must not stick", expect: { tier: "answer", reply: DOSE, notReply: WITHHELD, sections: /cardionex-uspi-v2 2\.2/, noSection: HEPATIC } }
     ]
   },
   {
@@ -38,14 +43,14 @@ const CONVERSATIONS: Conversation[] = [
     email: ANA,
     turns: [
       { ask: "US patient with eGFR 32?, then", why: "unclear on its own, so asking back is fine", expect: { tier: "answer" } },
-      { ask: "I want to know about their dosage", why: "the turn before says which patient; the desk sells one medicine", expect: { tier: "answer", notReply: WITHHELD, sections: /cardionex-uspi-v2 2\.2/ } }
+      { ask: "I want to know about their dosage", why: "the turn before says which patient; the desk sells one medicine", expect: { tier: "answer", reply: DOSE, notReply: WITHHELD, sections: /cardionex-uspi-v2 2\.2/, noSection: HEPATIC } }
     ]
   },
   {
     name: "a draft for a doctor in another country",
     email: ANA,
     turns: [
-      { ask: "Draft a reply to Dr. Lee in Germany: what CardioNex dose fits a patient with eGFR 24?", why: "a draft goes to review, from the German label", expect: { tier: "review", sections: /cardionex-de/ } }
+      { ask: "Draft a reply to Dr. Lee in Germany: what CardioNex dose fits a patient with eGFR 24?", why: "a draft goes to review, from the German label", expect: { tier: "review", reply: DOSE, notReply: WITHHELD, sections: /cardionex-de/ } }
     ]
   },
   {
@@ -59,7 +64,7 @@ const CONVERSATIONS: Conversation[] = [
     name: "another company's medicine, then our own",
     email: CHIDI,
     turns: [
-      { ask: "What is the CardioNex dose for a patient with eGFR 24 mL/min who is not on dialysis?", why: "Pharma B does not sell CardioNex, and Pharma A's labels stay hidden", expect: { noSection: /cardionex/, notReply: /\[cardionex/ } },
+      { ask: "What is the CardioNex dose for a patient with eGFR 24 mL/min who is not on dialysis?", why: "Pharma B does not sell CardioNex, and Pharma A's labels stay hidden", expect: { reply: /NeuroVex/, noSection: /cardionex/, notReply: /\[cardionex|INSUFFICIENT_CONTEXT/ } },
       { ask: "What is the recommended NeuroVex dose for diabetic peripheral neuropathy?", why: "Pharma B's own medicine", expect: { tier: "answer", notReply: WITHHELD, sections: /neurovex-uspi/ } }
     ]
   },
@@ -82,13 +87,21 @@ function sectionsFrom(message: ToolMessage): string[] {
 async function ask(cookie: string, threadId: string, text: string, seenBefore: number): Promise<Seen> {
   const response = await fetch(`${APP}/api/threads/${threadId}/runs/stream`, {
     method: "POST",
-    headers: { Cookie: cookie, "Content-Type": "application/json" },
+    headers: { Cookie: cookie, Origin: APP, "Content-Type": "application/json" },
     body: JSON.stringify({ messages: [{ id: randomUUID(), type: "human", content: text }] }),
     signal: AbortSignal.timeout(180_000)
   });
   if (!response.ok || !response.body) throw new Error(`the stream answered ${response.status}`);
+  // Each values event is the whole state. A review turn ends on one that holds only the interrupt,
+  // whose value is the draft waiting for the reviewer.
   let state: { messages?: ChatMessage[]; route?: { tier: string; reason: string } | null } = {};
-  for await (const { event, data } of readEvents(response.body)) if (event === "values") state = data as typeof state;
+  let draft = "";
+  for await (const { event, data } of readEvents(response.body)) {
+    if (event !== "values") continue;
+    const values = data as typeof state & { __interrupt__?: Array<{ value: { draft?: string } }> };
+    if (values.__interrupt__) draft = values.__interrupt__[0]?.value.draft ?? "";
+    else state = values;
+  }
   const turn = (state.messages ?? []).slice(seenBefore);
   const calls = turn.flatMap((message) => (message.type === "ai" ? (message as AiMessage).tool_calls : []));
   const replies = turn.filter((message): message is AiMessage => message.type === "ai" && !(message as AiMessage).tool_calls.length);
@@ -97,7 +110,7 @@ async function ask(cookie: string, threadId: string, text: string, seenBefore: n
     reason: state.route?.reason ?? "",
     searches: calls.filter((call) => call.name === "search_labels").map((call) => String(call.args.query ?? "")),
     sections: turn.flatMap((message) => (message.type === "tool" && message.name === "search_labels" ? sectionsFrom(message) : [])),
-    reply: replies.length ? aiText(replies[replies.length - 1]) : ""
+    reply: draft || (replies.length ? aiText(replies[replies.length - 1]) : "")
   };
 }
 
@@ -109,12 +122,13 @@ function misses(seen: Seen, expect: Expect): string[] {
   if (expect.notReply?.test(seen.reply)) found.push(`reply holds ${expect.notReply}`);
   if (expect.sections && !expect.sections.test(sections)) found.push(`no section matched ${expect.sections}`);
   if (expect.noSection?.test(sections)) found.push(`a section matched ${expect.noSection}`);
+  for (const query of seen.searches) if (FORCED.test(query)) found.push(`the search added fixed words: "${query}"`);
   return found;
 }
 
 async function play(conversation: Conversation): Promise<number> {
   const cookie = sessionHeader(await signIn(conversation.email));
-  const created = await fetch(`${APP}/api/threads`, { method: "POST", headers: { Cookie: cookie }, signal: AbortSignal.timeout(15_000) });
+  const created = await fetch(`${APP}/api/threads`, { method: "POST", headers: { Cookie: cookie, Origin: APP }, signal: AbortSignal.timeout(15_000) });
   const { thread_id: threadId } = (await created.json()) as { thread_id: string };
   console.log(`\n${conversation.name} (${conversation.email.split("@")[0]}), session ${threadId}`);
   let failed = 0;
@@ -130,7 +144,7 @@ async function play(conversation: Conversation): Promise<number> {
     console.log(`       route: ${seen.tier}, ${seen.reason}`);
     for (const query of seen.searches) console.log(`       search: "${query}"`);
     if (seen.sections.length) console.log(`       sections: ${seen.sections.join(", ")}`);
-    console.log(`       reply: ${seen.reply.split("\n")[0].slice(0, 160)}`);
+    console.log(`       reply: ${seen.reply.replace(/\s+/g, " ").slice(0, 200)}`);
     for (const miss of missed) console.log(`       miss: ${miss}`);
     if (seen.tier === "review") break;
   }
