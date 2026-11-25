@@ -49,6 +49,13 @@ test("an npm script named only in a sentence is unused", () => {
   assert.match(problems.join("\n"), /"foo"/);
 });
 
+test("an npm lifecycle script needs no doc, because npm install runs it", () => {
+  const problems = run({
+    "package.json": JSON.stringify({ engines: { node: ">=22.18.0" }, scripts: { seed: "tsx scripts/seed.ts", prepare: "git config core.hooksPath .githooks" } }),
+  });
+  assert.doesNotMatch(problems.join("\n"), /"prepare"/);
+});
+
 test("code that names a missing repo path fails", () => {
   const problems = run({ "scripts/lib.ts": "spawn('tsx', ['scripts/gone.ts']);\nexport const load = 1;\n" });
   assert.match(problems.join("\n"), /names scripts\/gone\.ts, which does not exist/);
