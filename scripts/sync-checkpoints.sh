@@ -98,7 +98,8 @@ TIER_FILES="src/server/tiers.ts src/server/tiers.test.ts src/server/phi.ts src/s
 # Lesson 14 adds a fact-checker and an outreach planner on the same base; the files it changes and
 # adds (CONTENT_FILES) stay as they were on tags before it, so lesson 13's inbox has two kinds of item.
 CONTENT_FILES="src/server/content/records.ts src/server/content/fact-check.ts src/server/content/outreach.ts
-  src/server/content/content.test.ts src/server/migrations/003_content_reviews.sql src/server/migrations/004_review_requests.sql
+  src/server/content/content.test.ts src/server/content/content.live.ts scripts/live-spans.ts
+  src/server/migrations/003_content_reviews.sql src/server/migrations/004_review_requests.sql
   src/client/content/Editor.tsx src/client/content/Outreach.tsx
   src/server/graph.ts src/server/graph.test.ts src/server/inbox.test.ts src/server/index.ts src/server/permissions.ts
   src/server/reviews.ts src/server/routes.ts src/server/test-desk.ts src/server/users.ts
@@ -134,7 +135,8 @@ AUTO_FILES="docs/scoreboard.md infra/openfga/model.fga infra/openfga/model.fga.y
   src/client/content/Sweep.tsx src/client/styles/app.css src/server/a2a/a2a.test.ts src/server/auto/limits.ts
   src/server/auto/queue.ts src/server/auto/sweep.test.ts src/server/auto/sweep.ts src/server/events/handlers.ts
   src/server/events/store.ts src/server/inbox.test.ts src/server/index.ts src/server/migrations/007_sweep.sql
-  src/server/permissions.ts src/server/routes.ts src/server/test-desk.ts src/server/users.ts"
+  src/server/permissions.ts src/server/routes.ts src/server/test-desk.ts src/server/users.ts
+  src/server/a2a/a2a-harness.ts src/server/a2a/a2a.live.ts src/server/auto/counting-desk.ts src/server/auto/sweep.live.ts"
 # Lesson 18 adds the release gate and its pre-push hook, and moves the case runner into
 # scripts/experiment.ts; the files it changes and adds (GATE_FILES) stay as they were on tags before it.
 GATE_FILES=".githooks/pre-push docs/scoreboard.md package.json scripts/experiment.ts scripts/release-gate.test.ts
@@ -148,14 +150,15 @@ CLI_FILES="package.json package-lock.json scripts/identity-setup.ts src/server/a
 # (RAG_FILES) stay as they were on tags before it, so lesson 19 still searches by keyword.
 RAG_FILES="docs/scoreboard.md package.json package-lock.json scripts/experiment.ts scripts/rag-ingest.ts
   scripts/rag-setup.ts src/server/index.ts src/server/tools.ts src/server/migrations/008_label_chunks.sql
-  src/server/rag/extract.ts src/server/rag/ingest.ts src/server/rag/rag.test.ts src/server/rag/search.ts
+  src/server/rag/extract.ts src/server/rag/ingest.ts src/server/rag/rag.test.ts src/server/rag/rag.live.ts src/server/rag/search.ts
   src/server/rag/store.ts src/server/rag/fixtures/cardionex-clarion-hf-trial.docling.json
   src/server/rag/fixtures/cardionex-clarion-hf-trial.docling.md src/server/rag/fixtures/cardionex-uspi-v2.docling.json"
 # Lesson 21 checks every answer's citations before it is sent; the files it changes and adds
 # (CITE_FILES) stay as they were on tags before it, so lesson 20's answer goes out unchecked.
 CITE_FILES="docs/scoreboard.md package.json scripts/citations-audit.ts scripts/citations-audit.test.ts
   src/server/citations.ts src/server/citations.test.ts src/server/citations.fixtures.json src/server/graph.ts
-  src/server/graph.test.ts src/server/durable.test.ts src/server/medinfo-agent.ts"
+  src/server/graph.test.ts src/server/durable.test.ts src/server/medinfo-agent.ts
+  scripts/citations-replay.ts scripts/citations-replay.test.ts data/evidence/citations-replay.json scripts/no-fake-model.test.ts"
 milestone_files() {
   case "$1" in
     checkpoint/00-setup | checkpoint/01-base-app | checkpoint/02-tracing)

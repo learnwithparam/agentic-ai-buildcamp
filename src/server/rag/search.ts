@@ -34,7 +34,7 @@ export function vectorSearch(
 export async function connectLabelIndex(pool: pg.Pool): Promise<number> {
   const store = new LabelChunkStore(pool);
   const sections = await store.count(EMBEDDING_MODEL);
-  if (!sections) throw new Error("The label index is empty. Run npm run rag:ingest (lesson 20).");
+  if (!sections) throw new Error(`The label index has no sections from ${EMBEDDING_MODEL}. Run npm run rag:ingest (lesson 20).`);
   useLabelSearch(vectorSearch(store));
   return sections;
 }

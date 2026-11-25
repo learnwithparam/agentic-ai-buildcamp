@@ -7,7 +7,7 @@
  * citations-replay, with the cite span and the citations score, exactly as in the app.
  *
  * It writes data/evidence/citations-replay.json: per answer, the problems, the outcome, the
- * rewrite and the search results, so src/server/citations-replay.test.ts can check the outcomes
+ * rewrite and the search results, so scripts/citations-replay.test.ts can check the outcomes
  * again with no model call. It calls the model once per failing answer.
  *
  *   npm run citations:replay

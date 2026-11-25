@@ -5,6 +5,7 @@ export const env = {
   openaiApiKey: process.env.OPENAI_API_KEY ?? "",
   openaiModel: process.env.OPENAI_MODEL ?? "openai/gpt-6-luna",
   decisionModel: process.env.DECISION_MODEL ?? "openai/gpt-6-luna-decisions",
+  embeddingModel: process.env.EMBEDDING_MODEL ?? "openai/text-embedding-3-small",
   decisionsUrl: process.env.DECISIONS_URL ?? "https://openrouter.ai/api/alpha/decisions",
   gatewayUrl: process.env.LANGFUSE_GATEWAY_URL ?? "http://localhost:3031",
   gatewayKeyMedinfoApp: process.env.GATEWAY_KEY_MEDINFO_APP ?? "",
