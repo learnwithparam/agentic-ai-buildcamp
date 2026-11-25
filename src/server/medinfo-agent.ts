@@ -9,6 +9,7 @@ import { checkInput, modelClient } from "./gateway";
 import {
   agentStep,
   buildGraph,
+  citeStep,
   fixedReply,
   readThread,
   reviewStep,
@@ -17,6 +18,7 @@ import {
   submitDraftStep,
   toolsStep,
   userOf,
+  type CitationOutcome,
   type Turn
 } from "./graph";
 import { LABEL_SECTIONS } from "./labels";
@@ -109,6 +111,25 @@ export function createMedinfoAgent(checkpointer: BaseCheckpointSaver) {
           return toolsStep(state, (name, args) => executeTool(name, args, userOf(config), state.today));
         },
         { name: "tools", asType: "span", captureInput: false }
+      ),
+      // Lesson 21: the check's outcome is the span's output and a score on the trace, so Langfuse
+      // can count how often an answer was rewritten or withheld.
+      cite: observe(
+        async (state, config) => {
+          updateActiveObservation({ input: state.messages.at(-1) });
+          const langfusePrompt = await getPrompt();
+          const openai = observeOpenAI(modelClient(), { generationName: "citation-rewrite", ...(langfusePrompt ? { langfusePrompt } : {}) });
+          let outcome: CitationOutcome | undefined;
+          const update = await citeStep(openai, langfusePrompt?.prompt ?? SYSTEM_PROMPT, state, config, (result) => (outcome = result));
+          updateActiveObservation({ output: outcome });
+          const traceId = getActiveTraceId();
+          if (traceId && outcome) {
+            langfuse.score.create({ traceId, name: "citations", value: outcome.outcome, dataType: "CATEGORICAL" });
+            await langfuse.score.flush();
+          }
+          return update;
+        },
+        { name: "cite", asType: "span", captureInput: false, captureOutput: false }
       ),
       submit: (state, config) => submitDraftStep(state, config, getActiveTraceId()),
       review: reviewStep,

@@ -31,6 +31,7 @@ Canonical checkpoint tags:
 - `checkpoint/18-release-gate`
 - `checkpoint/19-cli`
 - `checkpoint/20-rag`
+- `checkpoint/21-citations`
 
 What to propagate:
 
@@ -87,6 +88,7 @@ Canonical progression:
 - `18-release-gate`: the scoreboard becomes a gate (`scripts/release-gate.ts`). It runs the 8 `RELEASE_CASES` through the experiment runner in `scripts/experiment.ts` (shared with `run-dataset.ts`) with the run evaluator `release_pass_rate`, and raises Langfuse's `RegressionError` unless every case ran and passed, so a case the SDK skipped on a provider error is red. `--label staging --promote` resolves the label to one version, pins the agent to it (`usePromptVersion`; a pinned prompt never falls back to `SYSTEM_PROMPT`) and moves `production` onto that version only when green. `.githooks/pre-push` (turned on by the `prepare` script) runs it on the production prompt when a push changes a `GATED_PATHS` file; tags, deletes, docs and the web client skip it. Unpinned, the app reads `LANGFUSE_PROMPT_LABEL`.
 - `19-cli`: `medinfo`, a terminal client (`src/cli/`, Ink and commander) on the same API, sign-in and permissions as the web app. `medinfo login` reads `GET /.well-known/oauth-protected-resource/api` (RFC 9728, `src/server/auth.ts`, public) to find Keycloak, then signs in through the public `medinfo-cli` client (PKCE S256, redirect `http://127.0.0.1:33419/callback`, made by `identity:setup`) with a one-shot listener that refuses a wrong `state`. Tokens live in the system keychain (`@napi-rs/keyring`), never a file; a token with under 30 s left is refreshed, `invalid_grant` signs the CLI out, Keycloak being down does not. `ask` reads the same SSE stream as the chat page (`src/shared/sse.ts`, shared with `src/client/chat/api.ts`) through the pure reducer `src/cli/turn.ts`; a draft that waits for review shows the inbox item, never the draft text. `inbox` and `decide` call the lesson 13 routes, so OpenFGA decides who may decide. Without a TTY, or with `--json`, output is plain. `npm run medinfo` runs it from source; `npm run build:cli` (part of `build`) writes `dist/cli/index.js`, the package `bin`.
 - `20-rag`: `search_labels` reads the label PDFs (`data/hcp/pdf`, the manifest names each PDF's tenant, brand, status, date, country and source Markdown). `npm run rag:setup` creates the `vector` extension and starts docling-serve (compose profile `ingest`); `npm run rag:ingest` converts each PDF to Docling JSON, `readingOrder` (`src/server/rag/extract.ts`) orders the layout boxes column by column (Docling's own Markdown files a side-by-side table under the wrong section), cuts one chunk per numbered section, and `missingFromExtraction` fails the PDF unless every word of every source section came out; a failed PDF is not stored and nothing is removed. Chunks are embedded with `text-embedding-3-small` through the gateway and stored in `label_chunks` (migration 008, pgvector HNSW cosine), keyed by PDF sha256 and model, so an unchanged PDF makes no model call. `vectorSearch` (`src/server/rag/search.ts`) filters to the documents OpenFGA lets the asker read inside the query (`hnsw.iterative_scan = strict_order`) and drops hits under `MIN_SIMILARITY` 0.35 (measured: real questions 0.48 and up, the scraper request 0.26). The server and the dataset runner call `connectLabelIndex` at start and stop on an empty index with the command to run. Tests: `src/server/rag/rag.test.ts`, on real Docling output for two PDFs and a fake embedder.
+- `21-citations`: every answer the agent writes is checked in code before it is final (`src/server/citations.ts`, the `cite` node in `src/server/graph.ts` after the agent and before `submit`). Each `[doc_id, section]` must be a section `search_labels` returned in this thread and `status` `active`; each dose, wait or rate (`quantities`) must appear in the text of the sections its sentence cites (else its paragraph's, else the answer's); a number the doctor gave is skipped. A failing answer gets one rewrite with the problems as feedback and no tools, streamed under the same message id; a second failure is replaced by `WITHHELD_REPLY`. The `cite` span's output and a CATEGORICAL `citations` score (passed, rewritten, withheld) are on the trace. `npm run citations:audit` replays stored answers from Langfuse through the check with no model calls (405 checked, 13 stopped when written). Tests: `src/server/citations.test.ts` on four real stored answers (`citations.fixtures.json`) and a fake model client, and `scripts/citations-audit.test.ts`.
 
 What makes the checkpoints stitchable:
 
@@ -108,22 +110,23 @@ Every `checkpoint/*` tag is `main`'s tree except for its milestone files: the fi
 
 | Tags | Milestone files (kept from the tag) |
 | --- | --- |
-| `00-setup`, `01-base-app`, `02-tracing` | the untraced app (`index.ts`, `medinfo-agent.ts`, `tools.ts`), the runner, and the lesson 10 to 20 files |
-| `03-prompt-management` | `medinfo-agent.ts` with no Langfuse prompt fetch, the runner, and the lesson 10 to 20 files |
-| `04-monitoring` to `09-advanced-evals` | `medinfo-agent.ts`, the runner, and the lesson 10 to 20 files |
-| `10-ai-gateway` | the lesson 11 to 20 files |
-| `11-sign-in` | the lesson 12 to 20 files |
-| `12-mcp-sandbox` | the lesson 13 to 20 files |
-| `13-durable-review` | the lesson 14 to 20 files |
-| `14-content-agents` | the lesson 15 to 20 files |
-| `15-a2a` | the lesson 16 to 20 files |
-| `16-events` | the lesson 17 to 20 files |
-| `17-autonomy` | the lesson 18 to 20 files |
-| `18-release-gate` | the lesson 19 and 20 files |
-| `19-cli` | the lesson 20 files |
-| `20-rag` | none (equal to `main`) |
+| `00-setup`, `01-base-app`, `02-tracing` | the untraced app (`index.ts`, `medinfo-agent.ts`, `tools.ts`), the runner, and the lesson 10 to 21 files |
+| `03-prompt-management` | `medinfo-agent.ts` with no Langfuse prompt fetch, the runner, and the lesson 10 to 21 files |
+| `04-monitoring` to `09-advanced-evals` | `medinfo-agent.ts`, the runner, and the lesson 10 to 21 files |
+| `10-ai-gateway` | the lesson 11 to 21 files |
+| `11-sign-in` | the lesson 12 to 21 files |
+| `12-mcp-sandbox` | the lesson 13 to 21 files |
+| `13-durable-review` | the lesson 14 to 21 files |
+| `14-content-agents` | the lesson 15 to 21 files |
+| `15-a2a` | the lesson 16 to 21 files |
+| `16-events` | the lesson 17 to 21 files |
+| `17-autonomy` | the lesson 18 to 21 files |
+| `18-release-gate` | the lesson 19 to 21 files |
+| `19-cli` | the lesson 20 and 21 files |
+| `20-rag` | the lesson 21 files |
+| `21-citations` | none (equal to `main`) |
 
-The lesson 10 files are `GATEWAY_FILES` in the script, the lesson 11 files are `AUTH_FILES`, the lesson 12 files are `MCP_FILES`, the lesson 13 files are `TIER_FILES`, the lesson 14 files are `CONTENT_FILES`, the lesson 15 files are `A2A_FILES`, the lesson 16 files are `EVENT_FILES`, the lesson 17 files are `AUTO_FILES`, the lesson 18 files are `GATE_FILES`, the lesson 19 files are `CLI_FILES`, and the lesson 20 files are `RAG_FILES`. A tag keeps its own `docs/scoreboard.md`, so the sync runs `scripts/align-scoreboard.ts` on it: a slice added by a later lesson becomes a column of dashes there. A milestone file a tag does not have stays absent on it, which is why `npm run check` finds its tests by glob, not by name.
+The lesson 10 files are `GATEWAY_FILES` in the script, the lesson 11 files are `AUTH_FILES`, the lesson 12 files are `MCP_FILES`, the lesson 13 files are `TIER_FILES`, the lesson 14 files are `CONTENT_FILES`, the lesson 15 files are `A2A_FILES`, the lesson 16 files are `EVENT_FILES`, the lesson 17 files are `AUTO_FILES`, the lesson 18 files are `GATE_FILES`, the lesson 19 files are `CLI_FILES`, the lesson 20 files are `RAG_FILES`, and the lesson 21 files are `CITE_FILES`. A tag keeps its own `docs/scoreboard.md`, so the sync runs `scripts/align-scoreboard.ts` on it: a slice added by a later lesson becomes a column of dashes there. A milestone file a tag does not have stays absent on it, which is why `npm run check` finds its tests by glob, not by name.
 
 Inside a milestone file, regions marked `// checkpoint-sync:begin <name>` / `// checkpoint-sync:end <name>` still come from `main`. The sync fails if `main` has a region that a tag's milestone file lacks. When a new lesson starts editing a file, add it to `milestone_files()` for the earlier tags.
 
