@@ -206,6 +206,8 @@ A correct run has the chat on port 3333 and Langfuse on port 5174. After the fir
 | Port 5174 does not open | Docker is not running, or the first start is still going | Start Docker, then run `docker compose ... up -d` again |
 | Your shell key seems to win | It does not, `.env` wins | Edit `.env`, not your shell |
 
+For anything else, run `npm run doctor`. It names each problem and links its fix in [the troubleshooting page](./troubleshooting.md).
+
 ## What to watch for
 
 - **A silent install.** A tool that skips a file without a warning fails later, far from the cause. Our hold is a version named on this page and tested against `package.json`.
