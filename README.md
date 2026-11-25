@@ -26,7 +26,7 @@ npm run dev
 
 Run it again at any time. Each step skips what is already done, and it never prints a key or a password.
 
-The two gateway keys are made by hand in Langfuse. So the first run stops once with a short list of clicks. Lesson 10 shows each screen. Lesson 00 walks the same setup one step at a time.
+The two gateway keys are made by hand in Langfuse. So the first run stops once with a short list of clicks. Lesson 10 shows each screen. Lesson 00 walks the same setup one step at a time. On a checkpoint tag before lesson 22, follow that lesson's page instead, because `npm run setup` is not there yet.
 
 The app runs at [http://localhost:3333](http://localhost:3333). Langfuse, which keeps the traces, runs at [http://localhost:5174](http://localhost:5174). Sign in to it with the details below.
 
