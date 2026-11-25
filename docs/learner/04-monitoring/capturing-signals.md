@@ -7,7 +7,9 @@ description: "Score user disagreement and all-caps frustration on production tra
 
 ## Why capture signals
 
-Once traces are coming in, you want a judgment on them without opening each one. A production signal is something the user does or says that shows whether a turn went well: a correction, a retry, a request for a human, a thank-you. Stored as a score on the trace, it points you to the rows worth reading. Start with the negative ones: a user rarely corrects an answer they were happy with.
+Once traces come in, you want a verdict on each one without opening it. A production signal is something the user does or says. It shows whether a turn went well. Examples are a correction, a retry, a request for a human, or a thank-you.
+
+Store it as a score on the trace. It then points you to the rows worth reading. Start with the negative ones. A user rarely corrects an answer they liked.
 
 Complementary materials:
 
@@ -16,10 +18,10 @@ Complementary materials:
 
 ## Goal
 
-Capture two conversation signals for the agent, so you can find these turns without opening every trace:
+Capture two conversation signals for the agent. Then you can find these turns without opening every trace.
 
-- **User disagreement:** the clinician pushes back ("That is wrong, our pharmacy still gives 10 mg"). Either the agent quoted the wrong label or the label library is showing its limits.
-- **All-caps frustration:** the clinician writes something like "I NEED THE ONCOX DOSE RIGHT NOW". A long run of capital letters is a cheap deterministic clue that the conversation may need extra attention. It is a triage hint, not proof that the clinician is angry.
+- **User disagreement:** the clinician pushes back, like "That is wrong, our pharmacy still gives 10 mg". Either the agent quoted the wrong label, or the label library has a gap.
+- **All-caps frustration:** the clinician writes "I NEED THE ONCOX DOSE RIGHT NOW". A long run of capital letters is a cheap rule-based clue that the chat needs a look. It is a hint, not proof of anger.
 
 ## Starting point
 
@@ -33,27 +35,27 @@ The disagreement judge needs a model connection on the project. The keys in `.en
 
 1. In Langfuse, open **Project Settings → LLM Connections**.
 2. Click **Add LLM Connection**.
-3. Choose OpenAI, name the connection `openrouter`, paste your OpenRouter key into the secret field, and set the base URL to `https://openrouter.ai/api/v1`. Add `openai/gpt-6-luna` as a custom model.
+3. Choose OpenAI and name the connection `openrouter`. Paste your OpenRouter key into the secret field. Set the base URL to `https://openrouter.ai/api/v1`. Add `openai/gpt-6-luna` as a custom model.
 4. Save the connection.
 
 If a connection is already there, keep it and continue.
 
 Keep the API key in the Langfuse secret field only. Do not paste it into workshop transcripts or shared notes.
 
-When the evaluator wizard in Step 1 asks you to pick a model, choose this connection and `openai/gpt-6-luna`.
+When the evaluator wizard in Step 1 asks for a model, choose this connection and `openai/gpt-6-luna`.
 
 ![Pick the evaluator model in the Set up evaluator wizard.](../../images/monitoring/default-evaluation-model.png)
 
-## Step 1: Wire the judge-based monitor (Langfuse UI)
+## Step 1: Wire the judge-based monitor
 
 Langfuse ships a published **Detect User Disagreement** template. It is an LLM-as-a-judge evaluator that reads variables from observations.
 
-**Detect User Disagreement** maps `{{conversation_history}}` to every input message and `{{last_user_message}}` to the last input message. Target the root `hcp-medinfo-chat-turn` agent observation.
+It maps `{{conversation_history}}` to every input message. It maps `{{last_user_message}}` to the last input message. Target the root `hcp-medinfo-chat-turn` agent observation.
 
-Pick **Detect User Disagreement** for the mapping in this step.
+1. In Langfuse, open **Evaluators → New Evaluator**. Pick **Detect User Disagreement** from the **Template Gallery**.
+2. On the right, select the trace root as a sample observation. The panel already filters on `isRootObservation:true`. So pick an `hcp-medinfo-chat-turn` row of type **AGENT**. That is the root, where the whole trace input and output is logged.
 
-1. In Langfuse, open **Evaluators → New Evaluator** and pick **Detect User Disagreement** from the **Template Gallery**.
-2. On the right side, select the trace root as a sample observation. The panel already filters on `isRootObservation:true`, so pick an `hcp-medinfo-chat-turn` row of type **AGENT**. That is the root observation, where the overall trace input and output is logged. **Hint**: hover a filter chip to see what it filters out.
+   **Hint**: hover a filter chip to see what it hides.
 
    ![Select the trace root as a sample observation in the evaluator setup panel.](../../images/monitoring/select-sample-observation.png)
 
@@ -66,31 +68,39 @@ Pick **Detect User Disagreement** for the mapping in this step.
 
    ![Bind the last user message with Use on Input → messages → last.](../../images/monitoring/user-disagreement-last-user-message-mapping.png)
 
-4. In the right panel, you can test run your evaluator on a sample observation.
+4. In the right panel, test run your evaluator on a sample observation.
 
    ![Test the User Disagreement evaluator on the selected sample observation.](../../images/monitoring/user-disagreement-test-evaluator.png)
 
-5. Finally click on **Create evaluator**. The next screen shows which observations the evaluator scores, a sampling rate, and a weekly cost estimate (locally it can read **Unavailable**). Leave **Run evaluator on past observations** off. As soon as you click **Execute**, your first evaluator is running.
+5. Click **Create evaluator**. The next screen shows which observations it scores, a sampling rate and a weekly cost estimate.
+
+   Locally the estimate can read **Unavailable**. Leave **Run evaluator on past observations** off. Click **Execute**, and your first evaluator is running.
 
    ![Execute the saved evaluator on incoming observations using the configured filters.](../../images/monitoring/user-disagreement-execute-evaluator.png)
 
-The rule scores observations that arrive after you execute it. The seeded batch is already in the project, so it is the sample for mapping and testing. New turns are what receive the live score. The same evaluator can be run on historical observations with [batch evaluation](https://langfuse.com/docs/evaluation/get-started/online).
+The rule scores observations that arrive after you execute it. The seeded batch is already in the project. It is the sample for mapping and testing. New turns get the live score. You can run the same evaluator on old observations with [batch evaluation](https://langfuse.com/docs/evaluation/get-started/online).
 
 ## Step 2: Add a code evaluator for all-caps frustration
 
-The monitor above uses LLM-as-a-judge because it needs semantic judgment. This one does not. We just want a cheap deterministic check for a user message that contains a long run of capital letters, indicating a user might be upset from the interaction with our system.
+The monitor above is an LLM judge, because it needs meaning. This one does not. We want a cheap check for a message with a long run of capital letters. It hints that a user may be upset.
 
-Code evaluators are a good fit for that pattern: no model call, no prompt design, just a simple rule that runs on live observations.
+A code evaluator fits well. It needs no model call and no prompt. It is a simple rule that runs on live observations.
 
-1. In Langfuse, open **Evaluators → New Evaluator** and pick **Detect User Frustration (ALL CAPS)**. In the view you can see a pre-configured code evaluator, that is targeting the Input of an observation and checks whether more than 70% of a message are all caps letters.
+1. In Langfuse, open **Evaluators → New Evaluator**. Pick **Detect User Frustration (ALL CAPS)**. It is a ready-made code evaluator.
+
+   It reads the Input of an observation. It checks whether more than 70% of a message is capital letters.
 2. Target the same root agent observation as the disagreement monitor:
 
    ![Target the same root observation for the user-frustration code evaluator.](../../images/monitoring/user-frustration-target-root-observation.png)
 
 3. Run a test on the evaluator.
-4. Click on **Create Evaluator** and then on execute.
+4. Click **Create Evaluator**, then execute.
 
-This evaluator runs as TypeScript, so it does not use the OpenRouter connection. Langfuse Cloud runs it in a sandbox. The local Langfuse runs it inside its worker, which `langfuse/workshop.override.yml` turns on with `LANGFUSE_CODE_EVAL_DISPATCHER: insecure-local`. Without that line, saving shows "Code evaluations are not enabled for this deployment". That worker also holds Langfuse's own secrets, and an evaluator can read them: lesson 12 moves code evaluators into a sandbox of their own.
+This evaluator runs as TypeScript. So it does not use the OpenRouter connection. Langfuse Cloud runs it in a sandbox. The local Langfuse runs it inside its worker.
+
+`langfuse/workshop.override.yml` turns that on with `LANGFUSE_CODE_EVAL_DISPATCHER: insecure-local`. Without that line, saving shows "Code evaluations are not enabled for this deployment".
+
+That worker also holds Langfuse's own secrets, and an evaluator can read them. Lesson 12 moves code evaluators into a sandbox of their own.
 
 ## Step 3: Verify the monitors
 
@@ -98,54 +108,52 @@ This evaluator runs as TypeScript, so it does not use the OpenRouter connection.
 npm run dev
 ```
 
-Send two turns that should each light up one monitor. These have to be new turns, sent after both evaluators are executing:
+Send two turns. Each should light up one monitor. They must be new turns, sent after both evaluators are running:
 
-1. **Disagreement**: ask "What is the CardioZ dose in the US?", then reply with "That is wrong, our pharmacy still gives 10 mg"
-2. **All caps**: "I NEED THE ONCOX DOSE FOR GERMANY RIGHT NOW"
+1. **Disagreement:** ask "What is the CardioZ dose in the US?". Then reply "That is wrong, our pharmacy still gives 10 mg".
+2. **All caps:** send "I NEED THE ONCOX DOSE FOR GERMANY RIGHT NOW".
 
-In Langfuse, wait for the evaluators to run (refresh after a few seconds), then filter for traces with the respective evaluator score:
+In Langfuse, wait a few seconds for the evaluators to run, then refresh. Filter for traces with the matching evaluator score:
 
 1. Open **Tracing**.
 2. Open the **Filters** sidebar.
-3. Under the matching score type (for example **Boolean Scores** for All CAPS), pick the evaluator name, set the operator to `equals`, and choose the value you care about (`true` / `false`).
-4. The table now shows only traces that match that score.
+3. Find the score type. For example, All CAPS is under **Boolean Scores**. Pick the evaluator name and set the operator to `equals`. Choose the value you want (`true` or `false`).
+4. The table now shows only matching traces.
 
 ![Filter Tracing for traces with a specific evaluator score.](../../images/monitoring/filter-traces-by-evaluator-score.png)
 
 To watch the signals over time, put them on a dashboard:
 
 1. Open **Dashboards → Widgets → New widget**.
-2. Pick the **Scores Boolean** view, add the filter **Boolean Value** `=` `true`, and break it down by **Name**.
-3. Name it `Conversation signals (true)`, choose **Horizontal Bar Chart**, and save.
-4. Open **Dashboards → New dashboard**, name it `Conversation signals`, choose **Add Widget**, and pick the widget. Set the range to the past 7 days.
+2. Pick the **Scores Boolean** view. Add the filter **Boolean Value** `=` `true`. Break it down by **Name**.
+3. Name it `Conversation signals (true)`. Choose **Horizontal Bar Chart** and save.
+4. Open **Dashboards → New dashboard** and name it `Conversation signals`. Choose **Add Widget** and pick the widget. Set the range to the past 7 days.
 
 ![A dashboard of conversation signals, with one bar per signal score.](../../images/monitoring/user-frustration-dashboard.png)
 
-The seeded traffic already carries signal scores, so the bars are not empty before your own two turns.
+The seeded traffic already carries signal scores. So the bars are not empty before your own two turns.
 
-User disagreement is a high-signal event. When a user pushes back on an answer the agent just gave, something almost certainly went wrong: wrong tool result, missing context, an answer from a label for the wrong country. These are the traces you want to read first, and they're prime candidates to turn into dataset items in [05 Build eval datasets](../05-dataset.md).
+User disagreement is a strong event. When a user pushes back on an answer, something almost surely went wrong. It may be a wrong tool result, missing context, or a label for the wrong country. Read these traces first. They are good candidates for dataset items in [05 Build eval datasets](../05-dataset.md).
 
-The all-caps signal is a rougher clue that the conversation might be going sideways. Paired with the disagreement judge, it is a good "review these first" monitor.
+The all-caps signal is a rougher clue that a chat may be going wrong. Paired with the disagreement judge, it makes a good review-first monitor.
 
-Open a few traces already in the project and compare them with the two turns you just scored. As further production turns arrive, the same evaluators score them.
+Open a few traces already in the project. Compare them with the two turns you just scored. As more production turns arrive, the same evaluators score them.
 
 ## Bonus: Conversation signals with decision models
 
-A [decision model](https://langfuse.com/docs/evaluation/evaluation-methods/decision-models) returns a typed answer for each question instead of free-form text, so it is the cheaper evaluator when you do not need written reasoning.
-
-Using this, we can capture a variety of signals in one call.
+A [decision model](https://langfuse.com/docs/evaluation/evaluation-methods/decision-models) gives a typed answer to each question, not free text. It is the cheaper evaluator when you do not need written reasons. With it you can capture many signals in one call.
 
 1. Open **Evaluators → New Evaluator** and choose **Decision model**.
-2. Add one question per signal, for example a yes or no "Does the user disagree with the last answer?" and a score "How frustrated is the clinician?".
+2. Add one question per signal. Ask yes or no, like "Does the user disagree?" Or ask for a score. Try "How upset is the clinician?"
 3. Test it on one or two root observations and save.
 
-Decision models need a direct OpenAI, Google AI Studio or TypeSafe connection. The OpenRouter connection from this lab does not appear there, so skip this bonus unless you have one of those keys.
+Decision models need a direct OpenAI, Google AI Studio or TypeSafe connection. The OpenRouter connection from this lab does not show there. Skip this bonus unless you have one of those keys.
 
 ## Wrap-up
 
-The scores answer which traces to open. [Section 4.1 Error analysis](./error-analysis.md) is how you decide which further signals are worth adding, by reading what actually goes wrong and naming it. [Dashboards](https://langfuse.com/docs/metrics/features/custom-dashboards) are where a score becomes a trend over time.
+The scores tell you which traces to open. [Section 4.1 Error analysis](./error-analysis.md) helps you pick which signals to add next. You read what goes wrong and name it. [Dashboards](https://langfuse.com/docs/metrics/features/custom-dashboards) turn a score into a trend over time.
 
-The traces you catch with these monitors are also the best source for the next step, [05 Build eval datasets](../05-dataset.md), because they're real examples of behavior you want to lock in or fix.
+The traces these monitors catch are real examples of behavior to lock in or fix. They are the best source for [05 Build eval datasets](../05-dataset.md).
 
 ## End state
 
