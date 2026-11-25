@@ -163,10 +163,11 @@ CITE_FILES="docs/scoreboard.md package.json scripts/citations-audit.ts scripts/c
 # Lesson 22 adds the insights agent over sales data. Its files (BI_FILES) stay as they were on
 # tags before it, so lesson 21 has no sales table, no analyst role and no /insights page.
 # npm run setup (scripts/setup.ts) runs every lesson's scripts, so it exists only from lesson 22 on.
+# npm run doctor (scripts/doctor.ts) checks the stack setup builds, so it follows setup.
 BI_FILES=".github/start-test-services.sh docs/scoreboard.md infra/docker-compose.yml
   infra/openfga/model.fga infra/postgres/init/02-bi-roles.sh package-lock.json package.json
   scripts/bi-setup.ts scripts/experiment.ts scripts/fga-model.ts scripts/hcp-cases.ts
-  scripts/identity-setup.ts scripts/identity-smoke.ts scripts/setup.ts scripts/setup.test.ts src/client/App.tsx src/client/chat/api.ts
+  scripts/identity-setup.ts scripts/identity-smoke.ts scripts/setup.ts scripts/setup.test.ts scripts/doctor.ts scripts/doctor.test.ts src/client/App.tsx src/client/chat/api.ts
   src/client/insights/Insights.tsx src/client/styles/app.css src/server/a2a/a2a-harness.ts
   src/server/auth.ts src/server/bi/agent.ts src/server/bi/bi.test.ts src/server/bi/load.ts
   src/server/bi/query.ts src/server/env.ts src/server/inbox.test.ts src/server/index.ts

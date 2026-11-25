@@ -8,6 +8,7 @@
   },
   "scripts": {
     "setup": "tsx scripts/setup.ts",
+    "doctor": "tsx scripts/doctor.ts",
     "dev": "concurrently \"npm:dev:server\" \"npm:dev:client\"",
     "dev:client": "vite --host 127.0.0.1",
     "dev:server": "tsx watch src/server/index.ts",
