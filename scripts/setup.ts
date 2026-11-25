@@ -16,7 +16,7 @@ const envFile = path.join(root, ".env");
 const LANGFUSE = ["compose", "-f", "langfuse/docker-compose.yml", "-f", "langfuse/workshop.override.yml"];
 const MIN_DOCKER_GB = 6;
 // The prompt the finished app serves as production: lesson 20 promotes it through the release gate.
-export const PRODUCTION_VARIANT = "library";
+export const PRODUCTION_VARIANT = "lookups";
 
 class Stop extends Error {}
 

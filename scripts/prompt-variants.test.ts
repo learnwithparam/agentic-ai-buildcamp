@@ -58,3 +58,14 @@ test("the library prompt is the tiered prompt plus the stricter-limit rule", () 
   assert.ok(page.includes(STRICTER_LIMIT_RULE), "docs/learner/20-rag.md does not show the stricter-limit rule");
   assert.ok(page.includes("WORKSHOP_PROMPT_VARIANT=library npm run prompt:publish -- --label staging"), "docs/learner/20-rag.md does not show how to publish it");
 });
+
+// Fix 0. The production prompt names every lookup tool the model is given, so a tool added to
+// src/server/tools.ts is never one the prompt does not tell the model about.
+test("the lookups prompt names every lookup tool", async () => {
+  const { TOOL_DEFINITIONS } = await import("../src/server/tools");
+  const names = TOOL_DEFINITIONS.flatMap((tool) => (tool.type === "function" ? [tool.function.name] : []));
+  const missing = names.filter((name) => !PROMPT_VARIANTS.lookups.includes(name));
+  assert.deepEqual(missing, []);
+  const { PRODUCTION_VARIANT } = await import("./setup");
+  assert.equal(PRODUCTION_VARIANT, "lookups");
+});

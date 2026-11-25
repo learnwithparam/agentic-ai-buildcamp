@@ -148,7 +148,7 @@ test("a signed-in client sees the two read-only tools", async () => {
   const client = await connect(okafor);
   const { tools } = await client.listTools();
   await client.close();
-  assert.deepEqual(tools.map((tool) => tool.name).sort(), ["get_desk_rules", "search_labels"]);
+  assert.deepEqual(tools.map((tool) => tool.name).sort(), ["approval_status", "check_interaction", "get_desk_rules", "label_versions", "read_section", "search_labels", "trial_results"]);
   assert.ok(tools.every((tool) => tool.annotations?.readOnlyHint === true));
 });
 

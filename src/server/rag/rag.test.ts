@@ -27,7 +27,7 @@ const section = (sections: Array<{ section: string; text: string }>, id: string)
 
 test("Docling's own Markdown files the CLARION-HF table under the wrong section, and the check says so", () => {
   const sections = sectionsFromMarkdown(fixture("cardionex-clarion-hf-trial.docling.md"));
-  assert.ok(!words(section(sections, "3.1")).includes("142"), "3.1 should come out empty from Docling's row-by-row Markdown");
+  assert.ok(!words(section(sections, "3.1")).includes("142"), "3.1 should not hold the efficacy table in Docling's row-by-row Markdown");
   assert.ok(missingFromExtraction(sourceOf("cardionex-clarion-hf-trial"), sections).includes("section 3.1 lost words on the way out of the PDF"));
 });
 

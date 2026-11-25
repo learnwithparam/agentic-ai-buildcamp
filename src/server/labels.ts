@@ -1,9 +1,11 @@
-import { readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-// The label library: the dataset repo's HCP documents, copied into data/hcp/docs
-// by scripts/sync-dataset.ts. Each "## 2.2 Title" heading is one searchable section.
+// The label library: the dataset repo's HCP documents, copied into data/hcp by
+// scripts/sync-dataset.ts. Each document is read from its full label in data/hcp/labels, the
+// text the label PDFs are printed from, or from its short excerpt in data/hcp/docs when it has no
+// full label. Each "## 2.2 Title" heading is one section.
 
 export type LabelSection = {
   docId: string;
@@ -17,7 +19,9 @@ export type LabelSection = {
   country: string;
 };
 
-const DOCS_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../data/hcp/docs");
+const DATA_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../data/hcp");
+const DOCS_DIR = path.join(DATA_DIR, "docs");
+const LABELS_DIR = path.join(DATA_DIR, "labels");
 
 export function parseLabelDoc(raw: string): LabelSection[] {
   const match = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
@@ -51,7 +55,10 @@ export function parseLabelDoc(raw: string): LabelSection[] {
 export const LABEL_SECTIONS: LabelSection[] = readdirSync(DOCS_DIR)
   .filter((name) => name.endsWith(".md"))
   .sort()
-  .flatMap((name) => parseLabelDoc(readFileSync(path.join(DOCS_DIR, name), "utf8")));
+  .flatMap((name) => {
+    const full = path.join(LABELS_DIR, name);
+    return parseLabelDoc(readFileSync(existsSync(full) ? full : path.join(DOCS_DIR, name), "utf8"));
+  });
 
 // The dataset fixes "today" so every run sees the same labels in force. An event can name
 // another day (lesson 16: a label comes into force), and the status below follows that day.
@@ -113,4 +120,86 @@ export function approvedCountries(tenantId: string, today = TODAY): string[] {
     (section) => section.country
   );
   return [...new Set(countries)].sort();
+}
+
+// Fix 0. The lookups behind the desk's label tools (src/server/tools.ts). Each takes the documents
+// the asker may read, from OpenFGA, and never looks past them.
+
+// "CardioNex" -> "brand_cardionex", the brand id in each document's front matter.
+export const brandId = (medicine: string) => `brand_${medicine.trim().toLowerCase().replace(/[^a-z0-9]+/g, "")}`;
+
+// A prescribing label, as opposed to a trial summary, the FAQ, the formulary or the SOP.
+const isLabel = (docId: string) => /(uspi|smpc|label|draft)/.test(docId);
+
+function documents(readable: ReadonlySet<string>) {
+  const byId = new Map<string, LabelSection>();
+  for (const section of LABEL_SECTIONS) if (readable.has(section.docId) && !byId.has(section.docId)) byId.set(section.docId, section);
+  return [...byId.values()];
+}
+
+export function readSection(docId: string, section: string, readable: ReadonlySet<string>, today = TODAY) {
+  const hit = LABEL_SECTIONS.find((each) => readable.has(each.docId) && each.docId === docId && each.section === section);
+  return hit && { ...hit, status: statusOn(hit, today) };
+}
+
+// Why a version has the status it has on that day, in words a doctor can check.
+function versionReason(doc: LabelSection, today: string): string {
+  const status = statusOn(doc, today);
+  if (status === "active") return `in force since ${doc.effectiveDate}`;
+  if (status === "superseded") {
+    const newer = replacedBy(doc.docId, today);
+    const since = newer && LABEL_SECTIONS.find((each) => each.docId === newer)?.effectiveDate;
+    return newer ? `replaced by ${newer} on ${since}` : "replaced by a newer version";
+  }
+  if (status === "approved") return `approved, in force from ${doc.effectiveDate}`;
+  if (status === "draft") return "a draft, never in force";
+  return status;
+}
+
+export function labelVersions(medicine: string, country: string, readable: ReadonlySet<string>, today = TODAY) {
+  return documents(readable)
+    .filter((doc) => doc.brandId === brandId(medicine) && doc.country === country.toUpperCase() && isLabel(doc.docId))
+    .sort((a, b) => a.effectiveDate.localeCompare(b.effectiveDate))
+    .map((doc) => ({ docId: doc.docId, status: statusOn(doc, today), effectiveDate: doc.effectiveDate, reason: versionReason(doc, today) }));
+}
+
+// The one label of a medicine in force in a country on that day, if there is one.
+export function labelInForce(medicine: string, country: string, readable: ReadonlySet<string>, today = TODAY) {
+  return labelVersions(medicine, country, readable, today).find((version) => version.status === "active")?.docId;
+}
+
+const sectionsOf = (docId: string, today: string) =>
+  LABEL_SECTIONS.filter((section) => section.docId === docId).map((section) => ({ ...section, status: statusOn(section, today) }));
+
+// Where a medicine is approved, and for what: the use sections of the label in force there.
+export function approvalStatus(medicine: string, country: string, readable: ReadonlySet<string>, today = TODAY) {
+  const docId = labelInForce(medicine, country, readable, today);
+  const uses = docId ? sectionsOf(docId, today).filter((section) => /indication|approved use|not approved/i.test(section.title)) : [];
+  return { approved: Boolean(docId), docId, uses };
+}
+
+// Every section of the label in force that names the other drug, then the interaction sections.
+export function checkInteraction(medicine: string, otherDrug: string, country: string, readable: ReadonlySet<string>, today = TODAY) {
+  const docId = labelInForce(medicine, country, readable, today);
+  if (!docId) return { docId, named: false, sections: [] };
+  const drug = otherDrug.trim().toLowerCase();
+  const all = sectionsOf(docId, today);
+  const naming = all.filter((section) => drug.length > 2 && `${section.title} ${section.text}`.toLowerCase().includes(drug));
+  const interactions = all.filter((section) => /^7\.|^4\.5$/.test(section.section) || /interaction/i.test(section.title));
+  return { docId, named: naming.length > 0, sections: naming.length ? naming : interactions };
+}
+
+// The trial summary sections that best match the outcome asked about.
+export function trialResults(medicine: string, endpoint: string, readable: ReadonlySet<string>, today = TODAY) {
+  const trials = documents(readable).filter((doc) => doc.brandId === brandId(medicine) && doc.docId.includes("trial"));
+  const asked = new Set(words(endpoint));
+  return trials.flatMap((trial) => {
+    const sections = sectionsOf(trial.docId, today);
+    const scored = sections
+      .map((section) => ({ section, score: words(`${section.title} ${section.text}`).filter((word) => asked.has(word)).length }))
+      .filter((hit) => hit.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .map((hit) => hit.section);
+    return scored.length ? scored.slice(0, 3) : sections;
+  });
 }

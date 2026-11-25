@@ -70,6 +70,17 @@ export async function readableDocuments(user: Identity, client: OpenFgaClient = 
   return new Set(objects.map((object) => object.replace(/^document:/, "")));
 }
 
+// Fix 0. Every document of the doctor's own company, in any country, for the label lookup tools.
+export async function companyDocuments(user: Identity, client: OpenFgaClient = fga()): Promise<Set<string>> {
+  const { objects } = await client.listObjects({
+    user: `user:${user.userId}`,
+    relation: "can_read_abroad",
+    type: "document",
+    contextualTuples: doctorTuples(user)
+  });
+  return new Set(objects.map((object) => object.replace(/^document:/, "")));
+}
+
 // Lesson 22. Each company's sales data is one dataset, owned by that company.
 export const salesDataset = (tenantId: string) => `dataset:sales_${tenantId}`;
 export function datasetTuples(tenantIds: string[]): TupleKey[] {
