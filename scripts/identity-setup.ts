@@ -16,6 +16,7 @@ import { fileURLToPath } from "node:url";
 import { CredentialsMethod, OpenFgaClient } from "@openfga/sdk";
 import { parse } from "dotenv";
 import { REVIEWER_ROLES, SEED_REVIEWERS, SEED_USERS, TENANTS, type ReviewerRole } from "../src/server/users";
+import { CLI_CALLBACK_PORT, CLI_CLIENT_ID } from "../src/cli/config";
 import { modelJson, syncDocumentTuples } from "./fga-model";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -277,6 +278,19 @@ function setupMcpClient() {
   });
 }
 
+// Lesson 19: the medinfo CLI signs in the same way, as its own client on its own port, so
+// Keycloak shows which program holds each session and one can end without the other.
+function setupCliClient() {
+  return upsertClient({
+    ...NO_SHORTCUTS,
+    clientId: CLI_CLIENT_ID,
+    name: "HCP Medical Information CLI",
+    publicClient: true,
+    redirectUris: [`http://127.0.0.1:${CLI_CALLBACK_PORT}/callback`],
+    attributes: { "pkce.code.challenge.method": "S256" }
+  });
+}
+
 type Person = { email: string; firstName: string; lastName: string; tenantId: string; country: string; role?: ReviewerRole };
 
 // Lesson 13. A reviewer is a realm role, so it is in the token's realm_access claim. The app reads
@@ -393,6 +407,7 @@ async function main() {
   const organizations = await setupOrganizations();
   await setupClient(appUrl, values.OIDC_CLIENT_SECRET);
   await setupMcpClient();
+  await setupCliClient();
   const roles = await setupReviewerRoles();
   await setupPeople(SEED_USERS, organizations, roles, values.SEED_USER_PASSWORD);
   console.log(`Doctors: ${SEED_USERS.map((doctor) => `${doctor.email} (${doctor.tenantId}, ${doctor.country})`).join(", ")}`);

@@ -13,6 +13,10 @@ import { createPool, migrate } from "./db";
 import { env } from "./env";
 import { InlineQueue, MemoryEventStore } from "./events/store";
 import type { Turn } from "./graph";
+import type { StreamEvent } from "../shared/messages";
+import { createApi } from "../cli/api";
+import { CliError } from "../cli/config";
+import { runTurn as readTurn } from "../cli/turn";
 import type { MedinfoAgent } from "./medinfo-agent";
 import { ReviewStore, type ReviewItem } from "./reviews";
 import type { SessionStore } from "./sessions";
@@ -65,10 +69,16 @@ const scored: ReviewItem[] = [];
 // Each stand-in thread waits on one draft, as a real one does: draftA2 is an older draft thread a left behind.
 const waitsOn = new Map<string, string>();
 const agent = {
-  runTurn: async (turn: Turn) => (resumed.push(turn), { messages: [], waitingForApproval: false }),
+  // A new question (lesson 19's CLI asks one) gets one stand-in reply; a decision records the resume.
+  runTurn: async (turn: Turn, emit: (event: StreamEvent) => void) => {
+    if (turn.resume) resumed.push(turn);
+    else emit({ event: "values", data: { messages: [...(turn.messages ?? []), { id: "ai-cli", type: "ai", content: [{ type: "text", text: `Answered for ${turn.user.tenantId}.` }], tool_calls: [] }] } });
+    return { messages: [], waitingForApproval: false };
+  },
   readThread: async (threadId: string) => ({ messages: [], interrupts: waitsOn.has(threadId) ? [{ value: { kind: "approval", itemId: waitsOn.get(threadId) } }] : [] })
 };
 let reviews: ReviewStore;
+const cliThreads: string[] = [];
 let base = "";
 let close = () => {};
 let dropStore = async () => {};
@@ -113,7 +123,7 @@ before(async () => {
 after(async () => {
   close();
   await pool.query("DELETE FROM review_items WHERE thread_id = ANY($1)", [Object.values(threads)]);
-  await pool.query("DELETE FROM threads WHERE thread_id = ANY($1)", [Object.values(threads)]);
+  await pool.query("DELETE FROM threads WHERE thread_id = ANY($1)", [[...Object.values(threads), ...cliThreads]]);
   await pool.end();
   await dropStore();
 });
@@ -216,4 +226,20 @@ test("nobody decides an item any of their requests raised, not only the first re
   assert.equal((await call(chen, `/api/inbox/${ids.emailA}/decision`, { decision: "approved" })).status, 403);
   const { rows } = await pool.query("SELECT thread_id FROM review_requests WHERE item_id = $1 ORDER BY thread_id", [ids.emailA]);
   assert.deepEqual(rows.map((row) => row.thread_id), [threads.lena, threads.maya]);
+});
+
+// Lesson 19. The medinfo CLI is a client of these same routes with a Bearer token: it asks, reads
+// the stream, and lists the inbox as the token's company sees it, and the server refuses it what
+// it refuses the browser.
+test("the CLI asks and reads the inbox with a token, and is refused what the browser is refused", async () => {
+  const cli = (claims: JWTPayload) => createApi(base, () => token(claims));
+  const threadId = await cli(rivera).startThread();
+  cliThreads.push(threadId);
+  const view = await readTurn(cli(rivera).ask(threadId, "What is the CardioNex dose?"), () => {});
+  assert.equal(view.text, "Answered for pharma_a.");
+
+  const seen = (await cli(rossi).inbox()).items.map((item) => item.id).filter((id) => id.includes(run));
+  assert.ok(seen.length > 0 && seen.every((id) => id === ids.draftB), "a pharma_b reviewer sees only pharma_b items");
+  await assert.rejects(cli(rivera).decide(ids.draftA, "approved"), new CliError("You cannot decide this item."));
+  await assert.rejects(readTurn(cli(rivera).ask(threads.a, "Another question"), () => {}), /waits for a reviewer/);
 });
