@@ -4,7 +4,8 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { test } from "node:test";
 import { failedChecks, loadAllCases, loadMedinfoCases } from "./hcp-cases";
-import { alignScoreboard, appendScoreboardRow, checkScoreboard, headerRow, LEARNER_SCOREBOARD_FILE, SCOREBOARD_FILE, scoreboardRow, slices } from "./scoreboard";
+import { alignScoreboard } from "./align-scoreboard";
+import { appendScoreboardRow, checkScoreboard, headerRow, LEARNER_SCOREBOARD_FILE, SCOREBOARD_FILE, scoreboardRow, slices } from "./scoreboard";
 
 test("text checks read bold doses and spaced units the way the dataset writes them", () => {
   const checks = [

@@ -66,29 +66,3 @@ export function checkScoreboard(text = readFileSync(SCOREBOARD_FILE, "utf8")): s
     .filter((line) => line.split("|").length !== columns)
     .map((line) => `docs/scoreboard.md row has the wrong number of cells: ${line}`);
 }
-
-// A table written before a slice existed, put under today's header: each cell moves to the column
-// with its slice's name, and a slice the row never ran shows "-". The checkpoint sync runs this on
-// every tag, because a tag keeps its own scoreboard while the dataset, and so the slices, are shared.
-export function alignScoreboard(text: string): string {
-  const lines = text.split("\n");
-  const at = lines.findIndex((line) => line.startsWith("| Chapter |"));
-  if (at < 0) return text;
-  const names = (line: string) => line.split("|").slice(1, -1).map((cell) => cell.trim());
-  const old = names(lines[at]);
-  const now = names(headerRow());
-  const aligned = lines.map((line, i) => {
-    if (i === at) return headerRow();
-    if (i === at + 1) return `|${" --- |".repeat(now.length)}`;
-    if (i < at + 2 || !line.startsWith("|")) return line;
-    const cells = names(line);
-    return `| ${now.map((name) => (old.includes(name) ? cells[old.indexOf(name)] : "-")).join(" | ")} |`;
-  });
-  return aligned.join("\n");
-}
-
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url) && process.argv[2] === "--align") {
-  const before = readFileSync(SCOREBOARD_FILE, "utf8");
-  const after = alignScoreboard(before);
-  if (after !== before) writeFileSync(SCOREBOARD_FILE, after);
-}

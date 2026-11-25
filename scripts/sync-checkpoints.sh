@@ -292,7 +292,7 @@ for tag in "${TAGS[@]}"; do
 
   # A tag keeps its own scoreboard, but the dataset is shared, so a slice added later is a new
   # column there too: the tag's rows get a dash in it.
-  npx tsx scripts/scoreboard.ts --align
+  npx tsx scripts/align-scoreboard.ts
 
   git add -A
   # --verify checks every tag, moved or not: a tag already in sync is still what a learner checks out.
