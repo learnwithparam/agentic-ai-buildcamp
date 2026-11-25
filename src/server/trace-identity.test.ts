@@ -44,7 +44,8 @@ test("a tool span names the company and country it answered for, not the doctor"
   await executeTool("get_desk_rules", {}, user);
   const { spans } = await recorded();
   const tool = spans.find((span) => span.name === "get_desk_rules")!;
-  assert.deepEqual(JSON.parse(String(tool.attributes["langfuse.observation.input"])), { asker: { tenantId: "pharma_b", country: "US" } });
+  // Lesson 16: the span also names the day the labels were read for, so a trace shows which label was in force.
+  assert.deepEqual(JSON.parse(String(tool.attributes["langfuse.observation.input"])), { asker: { tenantId: "pharma_b", country: "US" }, today: "2026-11-23" });
 });
 
 // Not every step runs above (the tools node, search_labels), so this holds every traced step to

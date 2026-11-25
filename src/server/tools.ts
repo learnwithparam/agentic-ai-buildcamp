@@ -1,13 +1,12 @@
 import type OpenAI from "openai";
 import { observe, updateActiveObservation } from "@langfuse/tracing";
-import { approvedCountries, searchLabels } from "./labels";
+import { approvedCountries, searchLabels, TODAY } from "./labels";
 import { readableDocuments } from "./permissions";
 import { TENANTS, type Identity } from "./users";
 
 type ToolResult = Record<string, unknown>;
 
-// The dataset fixes "today" so every run sees the same labels in force.
-export const TODAY = "2026-11-23";
+export { TODAY };
 
 export const TOOL_DEFINITIONS: OpenAI.Chat.Completions.ChatCompletionTool[] = [
   {
@@ -37,27 +36,29 @@ export const TOOL_DEFINITIONS: OpenAI.Chat.Completions.ChatCompletionTool[] = [
 
 // Lesson 11: both tools answer for the signed-in user. The company, its medicines and the
 // country come from the token, so no question and no prompt can change them.
-function deskRules(user: Identity): ToolResult {
-  const countries = approvedCountries(user.tenantId);
+// Lesson 16: an event can set the day the desk answers for, so the rules and the search say
+// which label is in force on that day.
+function deskRules(user: Identity, today: string): ToolResult {
+  const countries = approvedCountries(user.tenantId, today);
   return {
     ok: true,
     company: user.tenantId,
     medicines: TENANTS[user.tenantId]?.medicines ?? [],
     asker_country: user.country,
     approved_in_asker_country: countries.includes(user.country),
-    today: TODAY,
+    today,
     rules: [
-      "Answer only from label text returned by search_labels.",
+      "Answer only from label text returned by search_labels whose status is active: that text is in force today.",
       "Cite every fact as [doc_id, section], for example [cardionex-uspi-v2, 2.2]."
     ]
   };
 }
 
-async function labelSearch(input: { query: string }, user: Identity): Promise<ToolResult> {
+async function labelSearch(input: { query: string }, user: Identity, today: string): Promise<ToolResult> {
   const readable = await readableDocuments(user);
   return {
     ok: true,
-    results: searchLabels(input.query, readable).map((hit) => ({
+    results: searchLabels(input.query, readable, 4, today).map((hit) => ({
       doc_id: hit.docId,
       section: hit.section,
       title: hit.title,
@@ -73,26 +74,26 @@ async function labelSearch(input: { query: string }, user: Identity): Promise<To
 // for. The doctor's name and email are not in the trace (src/server/trace-identity.test.ts).
 const asker = (user: Identity) => ({ tenantId: user.tenantId, country: user.country });
 const getDeskRulesTool = observe(
-  (user: Identity) => {
-    updateActiveObservation({ input: { asker: asker(user) } }, { asType: "tool" });
-    return deskRules(user);
+  (user: Identity, today: string) => {
+    updateActiveObservation({ input: { asker: asker(user), today } }, { asType: "tool" });
+    return deskRules(user, today);
   },
   { name: "get_desk_rules", asType: "tool", captureInput: false }
 );
 const searchLabelsTool = observe(
-  (input: { query: string }, user: Identity) => {
-    updateActiveObservation({ input: { ...input, asker: asker(user) } }, { asType: "tool" });
-    return labelSearch(input, user);
+  (input: { query: string }, user: Identity, today: string) => {
+    updateActiveObservation({ input: { ...input, asker: asker(user), today } }, { asType: "tool" });
+    return labelSearch(input, user, today);
   },
   { name: "search_labels", asType: "tool", captureInput: false }
 );
 
-export async function executeTool(name: string, input: Record<string, unknown>, user: Identity): Promise<ToolResult> {
+export async function executeTool(name: string, input: Record<string, unknown>, user: Identity, today = TODAY): Promise<ToolResult> {
   switch (name) {
     case "get_desk_rules":
-      return getDeskRulesTool(user);
+      return getDeskRulesTool(user, today);
     case "search_labels":
-      return searchLabelsTool({ query: String(input.query ?? "") }, user);
+      return searchLabelsTool({ query: String(input.query ?? "") }, user, today);
     default:
       return { ok: false, error: `Unsupported tool: ${name}` };
   }

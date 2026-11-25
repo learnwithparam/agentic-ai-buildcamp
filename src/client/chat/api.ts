@@ -183,3 +183,19 @@ export const loadCard = async (path: string) => {
   if (!response.ok) throw new Error(`The agent card answered ${response.status}`);
   return (await response.json()) as AgentCardView;
 };
+
+// Lesson 16. The event inbox: what came in for the company, and what each event started.
+export type EventView = {
+  eventId: string;
+  type: "label.in_force" | "email.received" | "draft.uploaded" | "call.logged";
+  occurredAt: string;
+  deliveries: number;
+  status: "queued" | "handled" | "failed";
+  outcome: "HANDLED" | "INSUFFICIENT_CONTEXT" | null;
+  report: string | null;
+  itemIds: string[];
+  error: string | null;
+  receivedAt: string;
+  handledAt: string | null;
+};
+export const loadEvents = () => send<{ events: EventView[] }>("/api/events");

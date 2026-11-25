@@ -18,7 +18,7 @@ import { env } from "./env";
 import { streamModelTurn, toOpenAIMessages } from "./stream-model";
 import type { Identity } from "./users";
 import type { Route } from "./tiers";
-import { TOOL_DEFINITIONS } from "./tools";
+import { TODAY, TOOL_DEFINITIONS } from "./tools";
 
 // The agent graph. The router sorts the question into a risk tier (lesson 13, see buildGraph).
 // The agent node calls the model, the tools node runs what it asked for. Once the labels
@@ -38,7 +38,9 @@ export const State = Annotation.Root({
   messages: Annotation<ChatMessage[]>({ reducer: mergeById, default: () => [] }),
   // Lesson 13: the tier the router chose for the latest question, and when its reviewer is due.
   route: Annotation<Route | null>({ reducer: (_current, next) => next, default: () => null }),
-  dueAt: Annotation<string | null>({ reducer: (_current, next) => next, default: () => null })
+  dueAt: Annotation<string | null>({ reducer: (_current, next) => next, default: () => null }),
+  // Lesson 16: the day this turn answers for. A chat is today; an event can name its own day.
+  today: Annotation<string>({ reducer: (_current, next) => next, default: () => TODAY })
 });
 type GraphState = typeof State.State;
 type NodeResult = Promise<Partial<GraphState>> | Partial<GraphState>;
@@ -257,6 +259,8 @@ export type Turn = {
   user: Identity;
   messages?: ChatMessage[];
   resume?: ApprovalDecision;
+  // Lesson 16: the day the labels are read for, when an event names one.
+  today?: string;
 };
 
 // route is the tier this turn took (null when the input check refused before any routing).
@@ -269,7 +273,7 @@ export async function runGraph(graph: Graph, turn: Turn, emit: (event: StreamEve
   const input: Parameters<Graph["stream"]>[0] = turn.resume
     ? (new Command({ resume: turn.resume }) as unknown as Parameters<Graph["stream"]>[0])
     : // A new question starts with no tier and no deadline from the last one.
-      { messages: turn.messages ?? [], route: null, dueAt: null };
+      { messages: turn.messages ?? [], route: null, dueAt: null, today: turn.today ?? TODAY };
   const stream = await graph.stream(input, {
     configurable: { thread_id: turn.threadId, user: turn.user, inbox: turn.inbox },
     streamMode: ["custom", "updates", "values"]

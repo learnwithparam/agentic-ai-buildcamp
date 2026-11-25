@@ -46,3 +46,11 @@ export function scriptUser(tenantId = "pharma_a", country = "US", roles: Reviewe
   const id = `script-${tenantId}-${country.toLowerCase()}`;
   return { userId: id, name: "Script", email: `${id}@scripts.example.com`, tenantId, country, roles };
 }
+
+// Lesson 16. An event has no person behind it, so its work runs as the company's event worker:
+// one identity per company and country, holding only the role the handler needs. It raises inbox
+// items and never decides one: deciding needs a signed-in person (lesson 13).
+export function eventWorker(tenantId: string, country: string, roles: ReviewerRole[] = []): Identity {
+  const id = `events-${tenantId}-${country.toLowerCase()}`;
+  return { userId: id, name: "Event worker", email: `${id}@events.example.com`, tenantId, country, roles };
+}

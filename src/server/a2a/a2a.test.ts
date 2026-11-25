@@ -5,6 +5,7 @@ import { after, before, test } from "node:test";
 import { NodeSDK, tracing } from "@opentelemetry/sdk-node";
 import { createLocalJWKSet, exportJWK, generateKeyPair, SignJWT, type JWTPayload } from "jose";
 import type OpenAI from "openai";
+import { InlineQueue, MemoryEventStore } from "../events/store";
 
 // Lesson 15. The two agents as A2A servers and the agent that hands work to them, end to end:
 // the SDK's own client, signed tokens, a real Postgres for the tasks and the inbox, and a real
@@ -102,7 +103,8 @@ before(async () => {
     outreachPlanner: createOutreachPlanner({ model: () => model }),
     reviews: new ReviewStore(pool),
     recordDecision: async () => {},
-    a2a: { store: tasks, links: new TaskReviews(pool, tasks), handoff: createHandoffAgent({ model: () => model }) }
+    a2a: { store: tasks, links: new TaskReviews(pool, tasks), handoff: createHandoffAgent({ model: () => model }) },
+    events: { store: new MemoryEventStore(), queue: new InlineQueue(), secrets: {} }
   };
   server.on("request", createApp(auth, desk));
   close = () => server.close();

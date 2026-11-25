@@ -84,5 +84,13 @@ export function recordOf(profile: HcpProfile): HcpRecord {
   return { profile, sends: mine(SENDS), calls: mine(CALLS), notes: mine(NOTES), samples: mine(SAMPLES) };
 }
 
+// Lesson 16. The answers the desk sent, and the label section each one cites, so a label that
+// comes into force can find the open answers it makes out of date.
+export type SentAnswer = { answerId: string; tenantId: string; hcpId: string; country: string; askedAt: string; question: string; docId: string; section: string; status: string };
+export const ANSWERS: SentAnswer[] = table("crm/answers.csv", (row) => {
+  const [docId, section] = row.cites.split(" ");
+  return { answerId: row.answer_id, tenantId: row.tenant_id, hcpId: row.hcp_id, country: row.country, askedAt: row.asked_at, question: row.question, docId, section, status: row.status };
+});
+
 // Every campaign any team has sent, so the planner can name the one a request means.
 export const CAMPAIGNS = [...new Set(SENDS.map((send) => send.campaign))].sort();

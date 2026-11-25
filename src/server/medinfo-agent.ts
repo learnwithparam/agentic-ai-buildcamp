@@ -96,7 +96,7 @@ export function createMedinfoAgent(checkpointer: BaseCheckpointSaver) {
       tools: observe(
         (state, config) => {
           updateActiveObservation({ input: state });
-          return toolsStep(state, (name, args) => executeTool(name, args, userOf(config)));
+          return toolsStep(state, (name, args) => executeTool(name, args, userOf(config), state.today));
         },
         { name: "tools", asType: "span", captureInput: false }
       ),
