@@ -160,3 +160,26 @@ tests:
       - user: "user:okafor-rep"
         object: "outreach:a-step"
         assertions: { can_decide: false }
+
+  - name: the nightly sweep views its own company's doctors and decides nothing
+    tuples:
+      - { user: "user:sweep-pharma_a-us", relation: sweep_agent, object: "company:pharma_a" }
+    check:
+      - user: "user:sweep-pharma_a-us"
+        object: "hcp:HCP-1001"
+        assertions: { can_view: true }
+      - user: "user:sweep-pharma_a-us"
+        object: "hcp:HCP-1004"
+        assertions: { can_view: false }
+      - user: "user:sweep-pharma_a-us"
+        object: "outreach:a-step"
+        assertions: { can_decide: false }
+      - user: "user:sweep-pharma_a-us"
+        object: "draft:a-lee"
+        assertions: { can_decide: false }
+      - user: "user:sweep-pharma_a-us"
+        object: "email:a-check"
+        assertions: { can_decide: false }
+      - user: "user:sweep-pharma_a-us"
+        object: "adverse_event:a-mrn"
+        assertions: { can_decide: false }

@@ -13,9 +13,13 @@ import { createHandoffAgent } from "./a2a/handoff";
 import { createTaskStore, TaskReviews } from "./a2a/tasks";
 import { createEventHandler } from "./events/handlers";
 import { PostgresEventStore, startEventQueue } from "./events/store";
+import { langfuseSpend, PostgresAgentControls } from "./auto/limits";
+import { PostgresSweepRuns, startSweepQueue } from "./auto/queue";
+import { createSweep } from "./auto/sweep";
 import { eventSecrets } from "./events/webhook";
 import { ReviewStore } from "./reviews";
 import { PostgresSessionStore } from "./sessions";
+import { TENANTS } from "./users";
 
 // Lesson 11. Sessions live in the app's own Postgres; Keycloak signs the doctors in.
 // npm run identity:setup starts both and writes their settings to .env.
@@ -38,7 +42,19 @@ const reviews = new ReviewStore(pool);
 // Lesson 16. Events are stored in the same Postgres (migration 006), and their jobs wait in
 // pg-boss there too. The worker runs in this process and starts the same agents a chat does.
 const eventStore = new PostgresEventStore(pool);
-const eventQueue = await startEventQueue(env.databaseUrl, eventStore, createEventHandler({ agent, factChecker, outreachPlanner, inbox: reviews }));
+const eventDesk = { agent, factChecker, outreachPlanner, inbox: reviews };
+const eventQueue = await startEventQueue(env.databaseUrl, eventStore, createEventHandler(eventDesk));
+
+const langfuseSpanProcessor = new LangfuseSpanProcessor();
+const sdk = new NodeSDK({ spanProcessors: [langfuseSpanProcessor] });
+sdk.start();
+
+// Lesson 17. The nightly sweep: its limits and run log in the same Postgres (migration 007), its
+// schedule on the same pg-boss, and its spend read from Langfuse after this process sends its spans.
+const sweepControls = new PostgresAgentControls(pool);
+const sweepRuns = new PostgresSweepRuns(pool);
+const spend = langfuseSpend({ flush: () => langfuseSpanProcessor.forceFlush() });
+const sweepQueue = await startSweepQueue(eventQueue.boss, createSweep({ desk: eventDesk, controls: sweepControls, spend }), sweepRuns, Object.keys(TENANTS));
 const desk = {
   agent,
   factChecker,
@@ -46,7 +62,8 @@ const desk = {
   reviews,
   recordDecision,
   a2a: { store: a2aStore, links: new TaskReviews(pool, a2aStore), handoff: createHandoffAgent() },
-  events: { store: eventStore, queue: eventQueue.queue, secrets: eventSecrets() }
+  events: { store: eventStore, queue: eventQueue.queue, secrets: eventSecrets() },
+  sweep: { controls: sweepControls, runs: sweepRuns, queue: sweepQueue, spend }
 };
 
 const auth = createAuth({
@@ -57,10 +74,6 @@ const auth = createAuth({
   appUrl: env.appUrl,
   sessions: new PostgresSessionStore(pool)
 });
-
-const langfuseSpanProcessor = new LangfuseSpanProcessor();
-const sdk = new NodeSDK({ spanProcessors: [langfuseSpanProcessor] });
-sdk.start();
 
 const server = createApp(auth, desk).listen(env.port, "127.0.0.1", () => {
   console.log(`HCP Medical Information Agent server listening on http://127.0.0.1:${env.port}`);

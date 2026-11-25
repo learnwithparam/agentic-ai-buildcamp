@@ -199,3 +199,25 @@ export type EventView = {
   handledAt: string | null;
 };
 export const loadEvents = () => send<{ events: EventView[] }>("/api/events");
+
+// Lesson 17. The nightly sweep: its limits, today's spend, and every run with what it left in the inbox.
+export type SweepControls = { paused: boolean; budgetUsd: number; changedBy: string | null; changedAt: string | null };
+export type SweepRunView = {
+  runId: string;
+  trigger: "schedule" | "person";
+  requestedBy: string | null;
+  instruction: string | null;
+  status: "running" | "done" | "budget_stop" | "paused" | "failed";
+  steps: number;
+  spentUsd: number | null;
+  report: string | null;
+  itemIds: string[];
+  traceId: string | null;
+  failed: boolean;
+  startedAt: string;
+  finishedAt: string | null;
+};
+export type SweepView = { controls: SweepControls; spentUsd: number | null; runs: SweepRunView[] };
+export const loadSweep = () => send<SweepView>("/api/sweep");
+export const pauseSweep = (paused: boolean) => send<{ controls: SweepControls }>("/api/sweep/pause", { paused });
+export const runSweepNow = (request: { instruction?: string; today?: string }) => send<{ runId: string }>("/api/sweep/run", request);

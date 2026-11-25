@@ -5,6 +5,7 @@ import { createThread, loadMe, loadThread, signIn, signOut, streamRun, type Me }
 import { Thread } from "./chat/Thread";
 import { Editor } from "./content/Editor";
 import { Events } from "./content/Events";
+import { Sweep } from "./content/Sweep";
 import { Handoffs } from "./content/Handoffs";
 import { Outreach } from "./content/Outreach";
 import { Inbox } from "./inbox/Inbox";
@@ -69,7 +70,7 @@ export function App() {
 }
 
 // The pages, chosen by the address: the chat at /, the review inbox at /inbox (lesson 13), and
-// for a company's staff the email editor and the rep board (lesson 14), hand-offs (lesson 15), and the event inbox (lesson 16). The server refuses a
+// for a company's staff the email editor and the rep board (lesson 14), hand-offs (lesson 15), the event inbox (lesson 16), and the nightly sweep (lesson 17). The server refuses a
 // page's data to anyone not allowed it; the links here only spare a doctor a page they cannot use.
 // Lesson 16: the event inbox is for anyone who decides what events raise, the safety reviewer included.
 const PAGES: Array<{ path: string; label: string; roles?: readonly string[] }> = [
@@ -78,6 +79,7 @@ const PAGES: Array<{ path: string; label: string; roles?: readonly string[] }> =
   { path: "/outreach", label: "Rep board", roles: STAFF_ROLES },
   { path: "/handoffs", label: "Hand-offs", roles: STAFF_ROLES },
   { path: "/events", label: "Events", roles: REVIEWER_ROLES },
+  { path: "/sweep", label: "Sweep", roles: REVIEWER_ROLES },
   { path: "/inbox", label: "Inbox" }
 ];
 
@@ -112,7 +114,7 @@ function SignedIn({ me }: { me: Me }) {
           Sign out
         </button>
       </header>
-      {path === "/inbox" ? <Inbox /> : path === "/editor" ? <Editor /> : path === "/outreach" ? <Outreach /> : path === "/handoffs" ? <Handoffs /> : path === "/events" ? <Events /> : <Chat key={chat} tenantId={me.user.tenantId} medicines={me.company.medicines} />}
+      {path === "/inbox" ? <Inbox /> : path === "/editor" ? <Editor /> : path === "/outreach" ? <Outreach /> : path === "/handoffs" ? <Handoffs /> : path === "/events" ? <Events /> : path === "/sweep" ? <Sweep roles={me.user.roles} /> : <Chat key={chat} tenantId={me.user.tenantId} medicines={me.company.medicines} />}
     </div>
   );
 }

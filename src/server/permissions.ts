@@ -2,7 +2,7 @@ import { CredentialsMethod, OpenFgaClient, type TupleKey } from "@openfga/sdk";
 import { env } from "./env";
 import type { HcpProfile } from "./content/records";
 import type { LabelSection } from "./labels";
-import type { Identity, ReviewerRole } from "./users";
+import type { Identity, Role } from "./users";
 
 // Lesson 11. Which label text a doctor may read is decided by OpenFGA, from the rules in
 // infra/openfga/model.fga. The search asks here first and never scores text outside the answer,
@@ -33,10 +33,11 @@ export function doctorTuples(user: Identity): TupleKey[] {
   ];
 }
 
-const ROLE_RELATION: Record<ReviewerRole, string> = {
+const ROLE_RELATION: Record<Role, string> = {
   "medical-reviewer": "medical_reviewer",
   "safety-reviewer": "safety_reviewer",
-  "sales-rep": "sales_rep"
+  "sales-rep": "sales_rep",
+  "sweep-agent": "sweep_agent"
 };
 
 // Lesson 13. A reviewer's role, from the same verified token: the Keycloak realm role says what

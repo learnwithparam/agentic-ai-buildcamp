@@ -2,7 +2,8 @@
  * The cases from the dataset repo copy (data/hcp/evals), shaped as Langfuse dataset items:
  * medinfo.yaml for the medical information desk, and, from lesson 14, fact-check.yaml and
  * outreach.yaml for the two agents built on the same base, from lesson 15, a2a.yaml for the
- * hand-off between them, and, from lesson 16, events.yaml for the event handlers. Each item says which agent answers it. This is the only place the buildcamp reads them, so the
+ * hand-off between them, from lesson 16, events.yaml for the event handlers, and, from lesson 17,
+ * autonomy.yaml for the nightly sweep. Each item says which agent answers it. This is the only place the buildcamp reads them, so the
  * dataset in Langfuse is always the pinned dataset repo, never a hand-typed copy.
  */
 import { readFileSync } from "node:fs";
@@ -21,6 +22,8 @@ export type CaseInput = {
   country: string;
   // Lesson 16: an event case names a fixture event and which delivery of it this is.
   event?: { eventId: string; delivery: number };
+  // Lesson 17: a sweep case names the day it runs on and the limits it starts with.
+  sweep?: { today: string; budgetUsd: number; spentUsd: number; paused: boolean; instruction?: string };
 };
 
 // The dataset repo's exact checks on the answer text. llm-rubric checks are left out:
@@ -30,7 +33,7 @@ const TEXT_CHECKS = new Set<string>(["contains", "not-contains", "regex", "not-r
 
 export type CaseExpectation = { idealAnswer: string; expectedBehavior: Behavior; checks: TextCheck[] };
 
-export const AGENTS = ["medinfo", "fact-check", "outreach", "a2a", "events"] as const;
+export const AGENTS = ["medinfo", "fact-check", "outreach", "a2a", "events", "autonomy"] as const;
 export type AgentName = (typeof AGENTS)[number];
 
 export type CaseItem = {
@@ -73,12 +76,16 @@ export function loadCases(agent: AgentName): CaseItem[] {
     return {
       id: `hcp-${caseId.toLowerCase()}`,
       input: {
-        // An event case has no question: what the decision model reads is the event itself.
-        messages: [{ role: "user", content: vars.query ?? `Event ${vars.event} (delivery ${vars.delivery}).` }],
+        // An event case has no question: what the decision model reads is the event itself. A
+        // sweep case's question is the instruction a person added to the run, often none.
+        messages: [{ role: "user", content: agent === "autonomy" ? vars.query || `Run the nightly sweep for ${vars.today}.` : (vars.query ?? `Event ${vars.event} (delivery ${vars.delivery}).`) }],
         tenantId: vars.tenantId,
         brandId: vars.brandId,
         country: vars.country,
-        ...(vars.event ? { event: { eventId: vars.event, delivery: Number(vars.delivery ?? "1") } } : {})
+        ...(vars.event ? { event: { eventId: vars.event, delivery: Number(vars.delivery ?? "1") } } : {}),
+        ...(agent === "autonomy"
+          ? { sweep: { today: vars.today, budgetUsd: Number(vars.budgetUsd), spentUsd: Number(vars.spentUsd), paused: vars.paused === "yes", ...(vars.query ? { instruction: vars.query } : {}) } }
+          : {})
       },
       expectedOutput: {
         // The two content agents' cases have no ideal answer: their codes and citations are the answer.

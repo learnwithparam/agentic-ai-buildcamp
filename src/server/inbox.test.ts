@@ -16,6 +16,7 @@ import type { Turn } from "./graph";
 import type { MedinfoAgent } from "./medinfo-agent";
 import { ReviewStore, type ReviewItem } from "./reviews";
 import type { SessionStore } from "./sessions";
+import { testSweep } from "./test-desk";
 
 // Lesson 13. The inbox routes against a real Postgres and a real OpenFGA store made for the test.
 // The tokens are signed by a key the test made, so every reviewer here is a token, not a body field.
@@ -81,7 +82,7 @@ before(async () => {
   dropStore = async () => void (await store.client.deleteStore());
   reviews = new ReviewStore(pool, () => store.client);
   const tasks = createTaskStore(pool);
-  const desk = { agent: agent as unknown as MedinfoAgent, factChecker: createFactChecker({ client: () => store.client }), outreachPlanner: createOutreachPlanner({ client: () => store.client }), reviews, recordDecision: async (item: ReviewItem) => void scored.push(item), a2a: { store: tasks, links: new TaskReviews(pool, tasks), handoff: createHandoffAgent() }, events: { store: new MemoryEventStore(), queue: new InlineQueue(), secrets: {} } };
+  const desk = { agent: agent as unknown as MedinfoAgent, factChecker: createFactChecker({ client: () => store.client }), outreachPlanner: createOutreachPlanner({ client: () => store.client }), reviews, recordDecision: async (item: ReviewItem) => void scored.push(item), a2a: { store: tasks, links: new TaskReviews(pool, tasks), handoff: createHandoffAgent() }, events: { store: new MemoryEventStore(), queue: new InlineQueue(), secrets: {} }, sweep: testSweep() };
   const server = createApp(auth, desk).listen(0, "127.0.0.1");
   await new Promise((resolve) => server.once("listening", resolve));
   base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
