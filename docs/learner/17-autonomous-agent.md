@@ -90,7 +90,7 @@ Type `Clear the pending sample requests.`, set the day to `2027-03-02`, and clic
 What the sweep did, step by step:
 
 1. **Redraft A-01.** No event came, but the sweep lists every open answer whose label is no longer in force on its day, with the same `statusOn` check lesson 16 added. A-01 still cites the old dose. The desk answers again as of that day: 2.5mg, `[cardionex-uspi-v3, 2.2]`, stamped `REVIEW_REQUIRED`.
-2. **Pick the doctors.** The one model call the sweep makes itself. It reads one line of CRM facts for each doctor OpenFGA lets the sweep see, and returns the ids the instruction is about. The ids it may return are fixed to that list, so it cannot reach another company's doctor.
+2. **Pick the doctors.** The one model call the sweep makes itself. The instruction first goes through the PHI scrubber from lesson 13, so a record number typed into it never reaches the model, the trace or the run log. It reads one line of CRM facts for each doctor OpenFGA lets the sweep see, and returns the ids the instruction is about. The ids it may return are fixed to that list, so it cannot reach another company's doctor.
 3. **Plan HCP-1001.** The outreach planner from lesson 14 plans the step under its own rules. A sample shipment needs a rep: `NEEDS_APPROVAL`.
 
 The report starts with `SWEEP_DONE` and says it sends nothing.
