@@ -15,6 +15,9 @@ type company
     define safety_reviewer: [user]
     # Lesson 14: a sales rep approves each outreach step before it reaches a doctor.
     define sales_rep: [user]
+    # Lesson 17: the nightly sweep. It views doctors and plans steps like a rep, and decides nothing:
+    # no can_decide below names it, so every step it plans waits for a person.
+    define sweep_agent: [user]
 
 type country
   relations
@@ -29,14 +32,14 @@ type document
     # Lesson 14. The fact-checker reads every country's claims of its own company, so it can say
     # "approved in the US, not in Germany". Only the staff who send and approve emails use it;
     # a doctor does not, and another company's claims stay out.
-    define can_check_against: sales_rep from owner or medical_reviewer from owner
+    define can_check_against: sales_rep from owner or medical_reviewer from owner or sweep_agent from owner
 
 # Lesson 14. A doctor's profile in the CRM belongs to the company whose reps call on them.
 type hcp
   relations
     define owner: [company]
     # Only the company's sales reps: a doctor signed in to the desk never sees another doctor's record.
-    define can_view: sales_rep from owner
+    define can_view: sales_rep from owner or sweep_agent from owner
 
 # Lesson 13. Who may decide a waiting item. The reviewer roles come from the Keycloak token as
 # contextual tuples, like the doctor facts above. Each item's company is stored when it is made.

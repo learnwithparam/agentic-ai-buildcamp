@@ -220,5 +220,6 @@ export async function startEventQueue(connectionString: string, store: EventStor
       await boss.send(EVENT_QUEUE, job, db ? { db } : {});
     }
   };
-  return { queue, stop: () => boss.stop({ graceful: true, timeout: 30_000 }) };
+  // The same pg-boss also runs the nightly sweep (lesson 17), so one stop ends both.
+  return { queue, boss, stop: () => boss.stop({ graceful: true, timeout: 30_000 }) };
 }

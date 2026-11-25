@@ -525,3 +525,43 @@ a.button[aria-current="page"] {
 .check-suggestion p {
   margin: 4px 0 0;
 }
+
+/* Lesson 17: the sweep page. */
+.button-danger {
+  border-color: var(--fail);
+  color: var(--fail);
+}
+
+.sweep-meter {
+  display: grid;
+  gap: 6px;
+}
+
+.sweep-meter-bar {
+  height: 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--bg);
+  overflow: hidden;
+}
+
+.sweep-meter-bar span {
+  display: block;
+  height: 100%;
+  background: var(--pass);
+}
+
+.sweep-meter-bar span.sweep-meter-full {
+  background: var(--wait);
+}
+
+.sweep-date {
+  min-height: 0;
+  max-width: 200px;
+  font-family: var(--sans);
+}
+
+.inbox h2 {
+  margin: 24px 0 8px;
+  font-size: 16px;
+}
