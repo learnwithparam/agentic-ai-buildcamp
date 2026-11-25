@@ -86,11 +86,22 @@ const PAGES: Array<{ path: string; label: string; roles?: readonly string[] }> =
   { path: "/inbox", label: "Inbox" }
 ];
 
+// A link is hidden from a user without the role, but the address still works when typed. The server
+// refuses the page's data either way; this says why, instead of a page that never answers.
+function NotForYou({ label }: { label: string }) {
+  return (
+    <main className="inbox">
+      <p className="refusal">The {label} page is not part of your role, so it is closed to you.</p>
+    </main>
+  );
+}
+
 function SignedIn({ me }: { me: Me }) {
   const [chat, setChat] = useState(0);
   const path = window.location.pathname;
   const may = (page: (typeof PAGES)[number]) => !page.roles || me.user.roles.some((role) => page.roles!.includes(role));
   const onChat = !PAGES.some((page) => page.path !== "/" && page.path === path);
+  const page = PAGES.find((entry) => entry.path !== "/" && entry.path === path);
   return (
     <div className="app">
       <header className="topbar">
@@ -117,7 +128,7 @@ function SignedIn({ me }: { me: Me }) {
           Sign out
         </button>
       </header>
-      {path === "/inbox" ? <Inbox /> : path === "/editor" ? <Editor /> : path === "/outreach" ? <Outreach /> : path === "/handoffs" ? <Handoffs /> : path === "/events" ? <Events /> : path === "/sweep" ? <Sweep roles={me.user.roles} /> : path === "/insights" ? <Insights company={me.company.name} /> : <Chat key={chat} tenantId={me.user.tenantId} medicines={me.company.medicines} />}
+      {page && !may(page) ? <NotForYou label={page.label} /> : path === "/inbox" ? <Inbox /> : path === "/editor" ? <Editor /> : path === "/outreach" ? <Outreach /> : path === "/handoffs" ? <Handoffs /> : path === "/events" ? <Events /> : path === "/sweep" ? <Sweep roles={me.user.roles} /> : path === "/insights" ? <Insights company={me.company.name} /> : <Chat key={chat} tenantId={me.user.tenantId} medicines={me.company.medicines} />}
     </div>
   );
 }

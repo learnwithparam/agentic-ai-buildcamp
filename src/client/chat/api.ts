@@ -46,7 +46,8 @@ type ServerEvent = { event: string; data: unknown };
 // Lesson 22: the insights page keeps its threads under /api/insights, with the same shape.
 export async function createThread(base = "/api"): Promise<{ externalId: string }> {
   const response = await api(`${base}/threads`, { method: "POST", signal: AbortSignal.timeout(10_000) });
-  const body = (await response.json()) as { thread_id: string };
+  const body = (await response.json()) as { thread_id?: string; error?: string };
+  if (!response.ok || !body.thread_id) throw new Error(body.error ?? `The server answered ${response.status}`);
   return { externalId: body.thread_id };
 }
 
