@@ -125,11 +125,13 @@ medinfo whoami
 ## Step 4: Ask a question
 
 ```bash
-medinfo ask What is the CardioNex starting dose for adults?
-medinfo ask What is the NeuroVex dose?
+medinfo ask "What is the CardioNex starting dose for adults?"
+medinfo ask "What is the NeuroVex dose?"
 ```
 
 ![Two questions from the terminal](../images/cli/02-ask.png)
+
+Put the question in quotes. zsh and bash treat a bare `?` as a file pattern, so `medinfo ask What is the dose?` can fail before the CLI even starts.
 
 The answer streams in, with the citations in colour so a doctor sees at a glance where each fact comes from. Ana works for Pharma A, so the NeuroVex question gets INSUFFICIENT_CONTEXT: the search never returns Pharma B's label, as in lesson 11. Nothing in the CLI does that; the server does.
 
@@ -210,7 +212,7 @@ Every command that prints something has a plain form:
 
 ```bash
 medinfo whoami --json
-medinfo ask --json What is the CardioNex starting dose for adults?
+medinfo ask --json "What is the CardioNex starting dose for adults?"
 medinfo inbox --json | jq '.items[] | select(.status == "waiting") | .id'
 ```
 
