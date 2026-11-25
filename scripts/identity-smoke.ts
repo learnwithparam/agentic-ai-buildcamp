@@ -4,6 +4,7 @@
 //
 //   npm run identity:smoke
 //   npm run identity:smoke -- --save-state <file> --user ana.rivera@pharma-a.example.com
+//   npm run identity:smoke -- --save-state <file> --user maya.chen@pharma-a.example.com   (staff too)
 //
 // --save-state writes that doctor's signed-in browser cookies as a Playwright storage state
 // file (only you can read it), so a browser can open the app already signed in. The password
@@ -13,7 +14,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { parse } from "dotenv";
-import { SEED_USERS, TENANTS } from "../src/server/users";
+import { SEED_REVIEWERS, SEED_USERS, TENANTS } from "../src/server/users";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const settings = parse(readFileSync(path.join(root, ".env"), "utf8"));
@@ -107,8 +108,11 @@ const argument = (name: string) => {
 const saveState = argument("--save-state");
 const only = argument("--user");
 
-const users = SEED_USERS.filter((user) => !only || user.email === only);
-if (!users.length) throw new Error(`No seeded doctor ${only}. Choose one of: ${SEED_USERS.map((user) => user.email).join(", ")}`);
+// With no --user it checks every doctor. --user also takes a staff account (a reviewer, a sales rep or
+// an analyst), so a presenter can save a signed-in browser for each person in the demo.
+const everyone = [...SEED_USERS, ...SEED_REVIEWERS];
+const users = only ? everyone.filter((user) => user.email === only) : [...SEED_USERS];
+if (!users.length) throw new Error(`No seeded user ${only}. Choose one of: ${everyone.map((user) => user.email).join(", ")}`);
 
 let failed = false;
 for (const user of users) {
