@@ -7,6 +7,8 @@ import { createMedinfoAgent } from "./medinfo-agent";
 import { createFactChecker } from "./content/fact-check";
 import { createOutreachPlanner } from "./content/outreach";
 import { InlineQueue, MemoryEventStore } from "./events/store";
+import { FixedControls } from "./auto/limits";
+import { MemorySweepRuns } from "./auto/queue";
 import { ReviewStore } from "./reviews";
 import type { Desk } from "./routes";
 
@@ -22,6 +24,17 @@ export function testDesk(pool: pg.Pool = new pg.Pool({ max: 1 })): Desk {
     reviews: new ReviewStore(pool),
     recordDecision: async () => {},
     a2a: { store, links: new TaskReviews(pool, store), handoff: createHandoffAgent() },
-    events: { store: new MemoryEventStore(), queue: new InlineQueue(), secrets: {} }
+    events: { store: new MemoryEventStore(), queue: new InlineQueue(), secrets: {} },
+    sweep: testSweep()
+  };
+}
+
+// Test-only: the sweep's limits and log in memory, a queue that takes nothing and no spend yet.
+export function testSweep(): Desk["sweep"] {
+  return {
+    controls: new FixedControls({ paused: false, budgetUsd: 0.5, changedBy: null, changedAt: null }),
+    runs: new MemorySweepRuns(),
+    queue: { runNow: async () => null },
+    spend: async () => 0
   };
 }

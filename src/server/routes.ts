@@ -9,12 +9,14 @@ import type { HandoffAgent } from "./a2a/handoff";
 import type { TaskReviews } from "./a2a/tasks";
 import type { TaskStore } from "@a2a-js/sdk/server";
 import type { EventQueue, EventRow, EventStore } from "./events/store";
+import { startOfDay, type AgentControls, type SpendReader } from "./auto/limits";
+import type { SweepQueue, SweepRuns } from "./auto/queue";
 import { BUDGET_SPENT_MESSAGE, isBudgetSpent } from "./gateway";
 import { visibleHcps } from "./permissions";
 import { scrubPhi } from "./phi";
 import type { MedinfoAgent } from "./medinfo-agent";
 import { DECISIONS, type ReviewItem, type ReviewStore } from "./reviews";
-import { REVIEWER_ROLES, STAFF_ROLES, TENANTS } from "./users";
+import { hasRole, REVIEWER_ROLES, STAFF_ROLES, TENANTS } from "./users";
 
 // The chat UI talks to these routes. They follow the LangGraph server's thread API,
 // so assistant-ui's LangGraph runtime can stream from them.
@@ -34,6 +36,11 @@ const factCheckSchema = z.union([
   z.object({ draftId: z.string().min(1) }),
   z.object({ text: z.string().min(1).max(4000), country: z.enum(["US", "DE", "JP"]) })
 ]);
+const pauseSchema = z.object({ paused: z.boolean() });
+const sweepSchema = z.object({
+  instruction: z.string().trim().max(500).optional(),
+  today: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional()
+});
 const planSchema = z.object({ query: z.string().min(1).max(1000) });
 const handoffSchema = z.object({ query: z.string().min(1).max(1000) });
 
@@ -49,6 +56,8 @@ export type Desk = {
   a2a: { store: TaskStore; links: TaskReviews; handoff: HandoffAgent };
   // Lesson 16: the event inbox, the queue its first deliveries go to, and each company's signing secret.
   events: { store: EventStore; queue: EventQueue; secrets: Record<string, string> };
+  // Lesson 17: the nightly sweep's limits, its run log, its queue and its spend meter.
+  sweep: { controls: AgentControls; runs: SweepRuns; queue: SweepQueue; spend: SpendReader };
 };
 
 // Lesson 16. What the event inbox page shows of one event: never the payload itself, which for
@@ -137,17 +146,73 @@ export function createRoutes(auth: Auth, desk: Desk) {
   // the people who decide what events raise (reviewers and reps), not for the doctors.
   routes.get("/api/events", async (_request, response) => {
     const user = currentUser(response);
-    if (!user.roles.some((role) => REVIEWER_ROLES.includes(role))) {
+    if (!hasRole(user, REVIEWER_ROLES)) {
       response.status(403).json({ error: "The event inbox is for your company's reviewers and sales reps." });
       return;
     }
     response.json({ events: (await desk.events.store.list(user.tenantId)).map(eventView) });
   });
 
+  // Lesson 17. The sweep page: its limits, today's spend and its runs, for the same people as the
+  // event inbox. Anyone of them can pause it; only staff can resume it or start a run, because a
+  // safety reviewer who pulls the switch should not be the one who turns it back on unasked.
+  const reviewer = (response: Parameters<typeof currentUser>[0]) => hasRole(currentUser(response), REVIEWER_ROLES);
+  const staff = (response: Parameters<typeof currentUser>[0]) => hasRole(currentUser(response), STAFF_ROLES);
+  routes.get("/api/sweep", async (_request, response) => {
+    if (!reviewer(response)) {
+      response.status(403).json({ error: "The sweep page is for your company's reviewers and sales reps." });
+      return;
+    }
+    const { tenantId } = currentUser(response);
+    const [controls, runs] = await Promise.all([desk.sweep.controls.get(tenantId), desk.sweep.runs.list(tenantId)]);
+    // A meter Langfuse cannot answer shows as unknown, never as zero.
+    const spentUsd = await desk.sweep.spend(tenantId, startOfDay()).catch(() => null);
+    response.json({ controls, spentUsd, runs });
+  });
+
+  routes.post("/api/sweep/pause", async (request, response) => {
+    const parsed = pauseSchema.safeParse(request.body);
+    if (!parsed.success) {
+      response.status(400).json({ error: "Say whether the sweep is paused." });
+      return;
+    }
+    if (parsed.data.paused ? !reviewer(response) : !staff(response)) {
+      response.status(403).json({ error: parsed.data.paused ? "Only your company's reviewers and sales reps can pause the sweep." : "Only a sales rep or a medical reviewer can turn the sweep back on." });
+      return;
+    }
+    const user = currentUser(response);
+    response.json({ controls: await desk.sweep.controls.setPaused(user.tenantId, parsed.data.paused, user.name) });
+  });
+
+  routes.post("/api/sweep/run", async (request, response) => {
+    if (!staff(response)) {
+      response.status(403).json({ error: "Only a sales rep or a medical reviewer can start the sweep." });
+      return;
+    }
+    const parsed = sweepSchema.safeParse(request.body);
+    if (!parsed.success) {
+      response.status(400).json({ error: "The instruction is up to 500 characters, and the date is YYYY-MM-DD." });
+      return;
+    }
+    const user = currentUser(response);
+    const jobId = await desk.sweep.queue.runNow({
+      tenantId: user.tenantId,
+      trigger: "person",
+      requestedBy: user.name,
+      instruction: parsed.data.instruction || undefined,
+      today: parsed.data.today
+    });
+    if (!jobId) {
+      response.status(409).json({ error: "A sweep for your company is already waiting to run." });
+      return;
+    }
+    response.status(202).json({ runId: jobId });
+  });
+
   // Lesson 14. The editor and the rep board are for the company's staff, not the doctors who use
   // the desk. This answers the page with a clear 403; OpenFGA still decides which records they read.
   routes.use(["/api/drafts", "/api/fact-check", "/api/hcps", "/api/outreach", "/api/handoffs"], (_request, response, next) => {
-    if (currentUser(response).roles.some((role) => STAFF_ROLES.includes(role))) return next();
+    if (hasRole(currentUser(response), STAFF_ROLES)) return next();
     response.status(403).json({ error: "This page is for your company's sales reps and medical reviewers." });
   });
 

@@ -1,7 +1,7 @@
 import PostalMime from "postal-mime";
 import { getActiveTraceId, observe, propagateAttributes, updateActiveObservation } from "@langfuse/tracing";
 import { aiText, type AiMessage, type ChatMessage } from "../../shared/messages";
-import { ANSWERS } from "../content/records";
+import { ANSWERS, type SentAnswer } from "../content/records";
 import type { FactChecker } from "../content/fact-check";
 import type { OutreachPlanner } from "../content/outreach";
 import type { ReviewInbox } from "../graph";
@@ -36,7 +36,7 @@ const lastAnswer = (messages: ChatMessage[]) => {
 
 // Asks the desk one question on a thread named after the event. A thread that already holds an
 // answer is read, not asked again, so a second delivery never makes a second draft or report.
-async function askOnce(desk: EventDesk, threadId: string, user: Identity, question: string, today: string) {
+export async function askOnce(desk: EventDesk, threadId: string, user: Identity, question: string, today: string) {
   const done = lastAnswer((await desk.agent.readThread(threadId)).messages);
   if (done) return done;
   await desk.inbox?.ensureThread(threadId, user);
@@ -45,6 +45,30 @@ async function askOnce(desk: EventDesk, threadId: string, user: Identity, questi
 }
 
 const threadFor = (event: HcpEvent, ...parts: string[]) => ["event", event.tenant_id, event.event_id, ...parts].join("-");
+
+// Lesson 17. The open answers of a company that cite a label no longer in force on that day,
+// each with the label that replaced it. The event handler and the nightly sweep both use this.
+export function staleAnswers(tenantId: string, today: string): Array<{ answer: SentAnswer; inForce: string }> {
+  return ANSWERS.filter((answer) => answer.tenantId === tenantId && answer.status === "open").flatMap((answer) => {
+    const inForce = replacedBy(answer.docId, today);
+    return inForce ? [{ answer, inForce }] : [];
+  });
+}
+
+// One corrected draft for one answer, on a thread named after the answer and the label now in
+// force. The event and the sweep share that name, so whichever comes second reads the draft the
+// first one made instead of drafting it again.
+// It runs as whoever started it: the event worker, or the sweep (lesson 17), so its cost is theirs.
+export async function redraftAnswer(desk: EventDesk, answer: SentAnswer, today: string, inForce: string, user = eventWorker(answer.tenantId, answer.country)) {
+  const question = [
+    `Draft a corrected reply to ${answer.hcpId}.`,
+    `On ${answer.askedAt} they asked: "${answer.question}"`,
+    `That answer cited ${answer.docId} ${answer.section}, which is no longer in force. Answer the same question from the label in force today.`
+  ].join(" ");
+  const threadId = ["redraft", answer.tenantId, answer.answerId, inForce].join("-");
+  const draft = await askOnce(desk, threadId, user, question, today);
+  return `${answer.answerId} for ${answer.hcpId} [answers, ${answer.answerId}]:\n\n${draft}`;
+}
 
 // A new label version is in force: every open answer that cites the version it replaced gets a
 // corrected draft, which waits for a medical reviewer before anything reaches the doctor.
@@ -60,15 +84,7 @@ async function labelInForce(desk: EventDesk, event: Extract<HcpEvent, { type: "l
   const lines = [
     `LABEL_IN_FORCE: ${event.doc_id} replaced ${replaced} on ${today} ${cite(event.event_id)}. ${stale.length} open ${stale.length === 1 ? "answer cites" : "answers cite"} the old label.`
   ];
-  for (const answer of stale) {
-    const question = [
-      `Draft a corrected reply to ${answer.hcpId}.`,
-      `On ${answer.askedAt} they asked: "${answer.question}"`,
-      `That answer cited ${answer.docId} ${answer.section}, which is no longer in force. Answer the same question from the label in force today.`
-    ].join(" ");
-    const draft = await askOnce(desk, threadFor(event, answer.answerId), eventWorker(answer.tenantId, answer.country), question, today);
-    lines.push(`${answer.answerId} for ${answer.hcpId} [answers, ${answer.answerId}]:\n\n${draft}`);
-  }
+  for (const answer of stale) lines.push(await redraftAnswer(desk, answer, today, event.doc_id));
   return { outcome: "HANDLED", report: lines.join("\n\n"), itemIds: [] };
 }
 

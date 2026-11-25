@@ -7,7 +7,12 @@ export const REVIEWER_ROLES = ["medical-reviewer", "safety-reviewer", "sales-rep
 export type ReviewerRole = (typeof REVIEWER_ROLES)[number];
 // Lesson 14. The roles that use the email editor and the rep board.
 export const STAFF_ROLES: ReviewerRole[] = ["sales-rep", "medical-reviewer"];
-export type Identity = { userId: string; name: string; email: string; tenantId: string; country: string; roles: ReviewerRole[] };
+// Lesson 17. A role only code gives: the nightly sweep's. No Keycloak token carries it (auth.ts
+// keeps only the reviewer roles), and in OpenFGA it views and plans but decides nothing.
+export const AGENT_ROLES = ["sweep-agent"] as const;
+export type Role = ReviewerRole | (typeof AGENT_ROLES)[number];
+export type Identity = { userId: string; name: string; email: string; tenantId: string; country: string; roles: Role[] };
+export const hasRole = (user: Identity, roles: readonly Role[]) => user.roles.some((role) => roles.includes(role));
 
 // Each company's desk answers only for its own medicines. The key is the Keycloak organization alias.
 export const TENANTS: Record<string, { name: string; domain: string; medicines: string[] }> = {
@@ -53,4 +58,14 @@ export function scriptUser(tenantId = "pharma_a", country = "US", roles: Reviewe
 export function eventWorker(tenantId: string, country: string, roles: ReviewerRole[] = []): Identity {
   const id = `events-${tenantId}-${country.toLowerCase()}`;
   return { userId: id, name: "Event worker", email: `${id}@events.example.com`, tenantId, country, roles };
+}
+
+// Lesson 17. The nightly sweep works alone, so it has its own identity per company and country.
+// Every trace it makes carries this user id, which is how its spend is read back from Langfuse
+// (src/server/auto/limits.ts). It raises items and decides none: its one role (sweep-agent) has no
+// can_decide in infra/openfga/model.fga.
+export const SWEEP_USER_PREFIX = "sweep";
+export function sweepWorker(tenantId: string, country: string): Identity {
+  const id = `${SWEEP_USER_PREFIX}-${tenantId}-${country.toLowerCase()}`;
+  return { userId: id, name: "Night sweep", email: `${id}@sweep.example.com`, tenantId, country, roles: ["sweep-agent"] };
 }
