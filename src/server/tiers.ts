@@ -45,6 +45,7 @@ Call route with exactly one tier.
 
 - safety: the message tells of something that happened to a patient after taking a medicine (a side effect, a reaction, a hospital stay, a faint, swelling, a rash), even when it also asks a question.
 - stop: the message asks how to use one of the medicines below for a use or a patient its approved use does not cover (another disease, a child when the use is for adults).
+  A patient who has the approved disease is covered, even when they are pregnant, breastfeeding, older, or have kidney or liver disease. The label has its own sections for these patients, so that is answer, not stop.
 - review: the message asks for a draft or a written message to send to someone (a reply, an email, a letter).
 - answer: anything else, including questions about how safety reports work, storage, and doses within the approved use.
 
