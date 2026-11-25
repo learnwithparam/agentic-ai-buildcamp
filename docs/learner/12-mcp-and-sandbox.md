@@ -1,40 +1,102 @@
 ---
-title: "Workshop: Expose the Desk over MCP with a Sandbox for Untrusted Code"
-description: "Let Claude Code search the label library over MCP with the doctor's own Keycloak token, teach it the desk's procedure with a skill, and run Langfuse code evaluators in a QuickJS sandbox instead of inside the Langfuse worker."
+title: "Workshop: Open a Second Door With the Same Walls and Run Untrusted Code in a Sandbox"
+description: "Let a coding agent search the label library over MCP with the doctor's own token, teach it the desk's procedure with a skill, and run code evaluators in a sandbox instead of next to your secrets."
 ---
 
-# 12 Expose the desk over MCP with a sandbox for untrusted code
+# 12 Open a second door with the same walls and run untrusted code in a sandbox
 
-## Why other tools need the same walls
+## The problem
 
-Lesson 11 put the walls in the chat: the token says who is asking, and OpenFGA decides what they may read. Doctors and teams also work in other tools. A medical writer in Claude Code wants to check a sentence against the label. Another agent wants to look up a dose. Each new tool is a new way in, and each one brings code you did not write.
+Lesson 11 put the walls in the chat. The token says who is asking, and a permission check decides what they may read. But doctors and teams also work in other tools. A medical writer in a coding agent wants to check a sentence against the label. Each new tool is a new way in, and each one brings code you did not write.
 
 Two things go wrong when that is done the quick way:
 
-- **A side door.** A script that reads the label files directly, or an API key shared by a whole team, skips the token. Every company's text is open again.
-- **Code you did not write runs next to your secrets.** Lesson 04 runs Langfuse code evaluators inside the Langfuse worker. An evaluator is code a person typed into a web page, and it runs in the same process as the database password.
+- **A side door.** A script that reads the label files directly skips the token. So does an API key shared by a whole team. Every company's text is open again.
+- **Foreign code runs next to your secrets.** Lesson 04 runs code evaluators inside the tracing service's worker. An evaluator is code a person typed into a web page. It runs in the same process as the database password.
 
-The fix has three parts:
+For example, one short evaluator can print the names of 22 secrets the worker holds. One more line would print the values.
 
-- **MCP** (Model Context Protocol) is a typed door for tools. Claude Code signs the doctor in on Keycloak, sends their token with every call, and the server applies lesson 11's rules to it.
-- **A skill** is a written procedure a coding agent follows: which tool to call first, when to stop, how to cite.
-- **A sandbox** runs code you did not write with no host, no network, and limits on time and memory.
+## What you build
 
-Complementary materials:
+- **An MCP server in the app.** It has two read-only tools, and it takes the doctor's own token.
+- **A sign-in client for tools.** It is public and uses PKCE.
+- **A skill.** It is a page of plain steps a coding agent follows for a label lookup.
+- **A sandbox.** A small JavaScript engine runs each evaluator. It has no host and no network. It has limits on time and memory.
 
-- Docs: [MCP authorization](https://modelcontextprotocol.io/specification/2025-06-18/basic/authorization) and [Claude Code MCP](https://docs.claude.com/en/docs/claude-code/mcp)
-- Docs: [Claude Code skills](https://docs.claude.com/en/docs/claude-code/skills)
-- Docs: [Langfuse code evaluators](https://langfuse.com/docs/evaluation/evaluation-methods/code-evaluators)
+| Case | What breaks | How the system holds |
+| --- | --- | --- |
+| A request to the MCP door with no token | Anyone reads the labels | The door answers 401 and says where to sign in |
+| A Pharma B doctor searches for CardioNex | Another company's text leaves the desk | The permission check returns only Pharma B text |
+| An evaluator reads the host's settings | It lists the worker's secrets | The sandbox has no `process`, so it stops with an error |
+| An evaluator that never ends | It holds the worker for good | The sandbox stops it after 2 seconds |
+| An evaluator that eats memory | It crashes the machine | The sandbox stops it at its memory limit |
 
-## Goal
+## How it works
 
-Claude Code reads only what the signed-in doctor may read, and an evaluator cannot reach the machine it runs on.
+**MCP** (Model Context Protocol) is a typed door for tools. A coding agent signs the doctor in, and sends their token with every call. The server applies the rules from lesson 11 to that token.
 
-- **Before:** the desk has one way in, the chat. Langfuse code evaluators run inside the Langfuse worker and can list its secrets.
-- **Build:** an MCP server inside the app with two read-only tools, a Keycloak client for MCP clients, the `hcp-labels` skill, and a QuickJS executor that Langfuse sends its code evaluators to.
-- **After:** Claude Code, signed in as a Pharma B doctor, cites NeuroVex and finds no CardioNex text. The planted evaluators stop with an error instead of reading the host.
+A **skill** is a written procedure an agent follows. It says which tool to call first, when to stop, and how to cite. It tells the agent how to work. It is not a wall.
 
-## Starting point
+A **sandbox** runs code you did not write. It has no access to the host, no network, and limits on time and memory. A bad evaluator can only fail inside it.
+
+### The flow
+
+This follows one tool call, from no token to a refusal that holds.
+
+```mermaid
+sequenceDiagram
+    participant C as Coding agent
+    participant M as MCP door
+    participant K as Sign-in service
+    participant F as Permission service
+    C->>M: Call search_labels with no token
+    M-->>C: 401 and where to sign in
+    C->>K: Sign in as a Pharma B doctor
+    K-->>C: Signed token
+    C->>M: get_desk_rules with the token
+    M-->>C: Pharma B, NeuroVex only
+    C->>M: search_labels for CardioNex anyway
+    M->>F: Which documents may this doctor read
+    F-->>M: Pharma B documents only
+    M-->>C: No CardioNex document
+```
+
+The step people doubt is the last one. Why does the skill not matter? The skill told the agent to stop before searching. But the wall is the permission check, and it holds even when the agent ignores the skill.
+
+### Where it sits
+
+The app from lesson 11 gets a second door. The code evaluators move away from the Langfuse worker.
+
+```mermaid
+flowchart LR
+    writer["Coding agent"]
+    doctor["Doctor in the app"]
+    keycloak["Sign-in service"]
+    mcp["MCP door at /api/mcp"]
+    perms["permissions.ts"]
+    search["search_labels"]
+    worker["Langfuse worker"]
+    sandbox["Sandbox executor"]
+    lf[("Traces, prompts, datasets, scores")]
+    writer -->|"token on each call"| mcp
+    writer -->|"sign in"| keycloak
+    doctor -->|"question"| perms
+    mcp -->|"readable documents?"| perms
+    mcp -->|"query, readable only"| search
+    mcp -->|"mcp traces"| lf
+    worker -->|"signed job"| sandbox
+    sandbox -->|"score or error"| worker
+    classDef new fill:#fde68a,stroke:#b45309,color:#1c1917
+    class mcp,sandbox new
+```
+
+### Concepts
+
+- [MCP](../walkthrough.md#c-mcp)
+- [Sandbox](../walkthrough.md#c-sandbox)
+- [Skill](../walkthrough.md#c-skill)
+
+## Build it
 
 ```bash
 git checkout checkpoint/12-mcp-sandbox
@@ -42,14 +104,14 @@ git checkout checkpoint/12-mcp-sandbox
 
 The checkpoint adds:
 
-- `src/server/mcp.ts`: the MCP server at `/api/mcp`, its two tools, and the metadata that names Keycloak as the place to sign in.
-- `.mcp.json`: tells Claude Code where the server is and which Keycloak client to sign in with.
+- `src/server/mcp.ts`: the MCP server at `/api/mcp`, its two tools, and the metadata that names the sign-in service.
+- `.mcp.json`: tells the coding agent where the server is, and which sign-in client to use.
 - `.claude/skills/hcp-labels/SKILL.md`: the procedure for a label lookup.
-- `src/executor/`: the QuickJS executor, its Dockerfile and its tests.
+- `src/executor/`: the sandbox executor, its Dockerfile and its tests.
 - `scripts/langfuse-code-eval.ts`: switches Langfuse to the executor.
 - Tests that need no model: `src/server/mcp.test.ts` and `src/executor/executor.test.ts`.
 
-## Step 1: See the leak
+### Step 1: See the leak
 
 Do this on the previous checkpoint, before you switch:
 
@@ -58,7 +120,7 @@ git checkout checkpoint/11-sign-in
 docker compose -f langfuse/docker-compose.yml -f langfuse/workshop.override.yml up -d
 ```
 
-In Langfuse, open **Evaluators → New evaluator → Code evaluator**, paste this evaluator, and click **Run test on this sample**:
+In Langfuse, open **Evaluators → New evaluator → Code evaluator**. Paste this evaluator, and click **Run test on this sample**:
 
 ```ts
 function evaluate() {
@@ -68,29 +130,29 @@ function evaluate() {
 }
 ```
 
-`console.log` is an object from the host. Its constructor is the host's `Function`, and that hands back the host's `process`. The evaluator lists the names of the worker's settings: the database address, the ClickHouse password, the encryption key. It prints names only. One more line would print the values.
+`console.log` is an object from the host. Its constructor is the host's `Function`, and that hands back the host's `process`. The evaluator lists the names of the worker's settings. They include the database address, the ClickHouse password and the encryption key. It prints names only.
 
 ![Under insecure-local, an evaluator lists 22 secret names from the Langfuse worker](../images/mcp-sandbox/04-before-env-leak.png)
 
 Now switch to `checkpoint/12-mcp-sandbox` for the rest of the lesson.
 
-## Step 2: Open the MCP door
+### Step 2: Open the MCP door
 
 ```bash
 npm run identity:setup
 npm run dev
 ```
 
-`identity:setup` now also creates the `medinfo-mcp` client in Keycloak. A program on a laptop cannot keep a secret, so this client is public and requires PKCE: a stolen sign-in code is useless without the verifier only that program holds. Its tokens carry the same audience, company and country as the chat's.
+`identity:setup` now also creates the `medinfo-mcp` client in Keycloak, the sign-in service. This client is public and requires PKCE. A stolen sign-in code is useless without the verifier only that program holds. Its tokens carry the same audience, company and country as the chat's.
 
-The server lives in the app, at `/api/mcp`, and has two tools. Both are read only:
+The server lives in the app, at `/api/mcp`. It has two tools, and both are read only:
 
 | Tool | What it returns |
 | --- | --- |
 | `get_desk_rules` | Today's date, the company and medicines, the asker's country, and how to cite. All from the token. |
-| `search_labels` | Label text the signed-in doctor may read, filtered by OpenFGA as in lesson 11. |
+| `search_labels` | Label text the signed-in doctor may read. OpenFGA filters it, as in lesson 11. |
 
-Ask without a token and the server says where to sign in:
+Ask without a token, and the server says where to sign in:
 
 ```bash
 curl -i -X POST http://127.0.0.1:3333/api/mcp
@@ -101,38 +163,38 @@ HTTP/1.1 401 Unauthorized
 www-authenticate: Bearer error="invalid_token", error_description="Missing Authorization header", resource_metadata="http://127.0.0.1:3333/.well-known/oauth-protected-resource/api/mcp"
 ```
 
-That metadata names Keycloak's `medinfo` realm (`"authorization_servers": ["http://localhost:8180/realms/medinfo"]`). Any MCP client that follows the standard finds the sign-in page from there.
+That metadata names the `medinfo` realm (`"authorization_servers": ["http://localhost:8180/realms/medinfo"]`). Any MCP client that follows the standard finds the sign-in page from there.
 
-Three more rules hold at the door, each one a test in `src/server/mcp.test.ts`:
+Three more rules hold at the door. Each one is a test in `src/server/mcp.test.ts`:
 
 - A browser session cookie is not a way in. The door takes tokens only.
-- A token minted for another app (another audience) is refused.
-- A request from a page on another site (an `Origin` that is not the app) gets 403, even with a token.
+- A token made for another app (another audience) is refused.
+- A request from a page on another site gets 403, even with a token. Its `Origin` is not the app.
 
-## Step 3: Connect Claude Code
+### Step 3: Connect a coding agent
 
-From the repo folder:
+Claude Code is the coding agent we use here. From the repo folder:
 
 ```bash
 claude
 ```
 
-Claude Code reads `.mcp.json`. Type `/mcp`, pick **medinfo**, then **Authenticate**. Your browser opens Keycloak's page. Sign in as Chidi Okafor (Pharma B, US) with `SEED_USER_PASSWORD` from your `.env`. Claude Code keeps the token, not the password.
+It reads `.mcp.json`. Type `/mcp`, pick **medinfo**, then **Authenticate**. Your browser opens the sign-in page. Sign in as Chidi Okafor (Pharma B, US) with `SEED_USER_PASSWORD` from your `.env`. Claude Code keeps the token, not the password.
 
 Then ask two questions:
 
 1. `/hcp-labels What is the recommended starting dose of NeuroVex for an adult?`
 2. `/hcp-labels What is the CardioNex dose?`
 
-![Claude Code, signed in as Pharma B, answers for NeuroVex and declines CardioNex](../images/mcp-sandbox/01-claude-code-mcp.gif)
+![Signed in as Pharma B, the agent answers for NeuroVex and declines CardioNex](../images/mcp-sandbox/01-claude-code-mcp.gif)
 
 - **NeuroVex:** 50 mg twice daily, cited `[neurovex-uspi-v1, 2.1]`.
 - **CardioNex:** the desk does not cover it. The skill read `get_desk_rules`, saw that Pharma B's desk lists NeuroVex only, and stopped.
-- **Ignore the skill** and ask Claude Code to search "CardioNex dose" anyway: `search_labels` returns only `neurovex-uspi-v1`. The skill is the procedure. The wall is OpenFGA, and it does not depend on the skill.
+- **Ignore the skill** and ask the agent to search "CardioNex dose" anyway. `search_labels` returns only `neurovex-uspi-v1`. The skill is the procedure. The wall is the permission check, and it does not depend on the skill.
 
 ![The last frame: both answers](../images/mcp-sandbox/02-claude-code-answers.png)
 
-## Step 4: Read the skill
+### Step 4: Read the skill
 
 Open `.claude/skills/hcp-labels/SKILL.md`. It is a page of plain steps:
 
@@ -142,21 +204,21 @@ Open `.claude/skills/hcp-labels/SKILL.md`. It is a page of plain steps:
 4. Call `search_labels` once, with the medicine, the patient detail and the country.
 5. Use only sections in force on `today`.
 6. Cite each fact as `[doc_id, section]`.
-7. If no section answers the question, say the label does not cover it, and do not fill the gap from memory.
+7. If no section answers the question, say the label does not cover it. Do not fill the gap from memory.
 
-It also lists what never to do: no dose, interaction or contraindication without a citation, no use the label does not list, and a patient who had a side effect must be reported to the safety team.
+It also lists what never to do. Give no dose, interaction or contraindication without a citation. Name no use the label does not list. Report a patient who had a side effect to the safety team.
 
-The chat agent's prompt (lesson 11) and this skill say the same things to two different agents. The tools are shared; the rules about data are in the server, so neither agent can skip them.
+The chat agent's prompt from lesson 11 and this skill say the same things to two different agents. The tools are shared. The rules about data live in the server, so neither agent can skip them.
 
-## Step 5: Find the MCP calls in Langfuse
+### Step 5: Find the MCP calls in the traces
 
-Each tool call is its own trace, tagged `mcp`, with the doctor's id as the user and `tenantId` and `country` as metadata. Like the chat, it records no name or email.
+Each tool call is its own trace, tagged `mcp`. The doctor's id is the user, and `tenantId` and `country` are metadata. Like the chat, it records no name or email.
 
 ![An MCP search_labels call in Langfuse: the user id, the mcp tag, and the asker from the token](../images/mcp-sandbox/03-mcp-trace.png)
 
-The `asker` in the input is what the token said, not what the client sent. `get_desk_rules` ignores any company a client passes: `src/server/mcp.test.ts` calls it as Pharma B with `company: "pharma_a"` and gets Pharma B's rules back.
+The `asker` in the input is what the token said, not what the client sent. `get_desk_rules` ignores any company a client passes. `src/server/mcp.test.ts` calls it as Pharma B with `company: "pharma_a"` and gets Pharma B's rules back.
 
-## Step 6: Move code evaluators into a sandbox
+### Step 6: Move code evaluators into a sandbox
 
 ```bash
 npm run langfuse:code-eval
@@ -165,8 +227,8 @@ npm run langfuse:code-eval
 It does three things:
 
 1. Writes a signing secret to `langfuse/.env`, unless one is there. It prints no secret.
-2. Builds and starts `code-eval-executor` from `src/executor`, and restarts the Langfuse web and worker with `LANGFUSE_CODE_EVAL_DISPATCHER: external`.
-3. Proves the walls: Langfuse's worker reaches the executor with a signed job and gets a score back, Langfuse still answers on port 5174, and the executor cannot reach the internet.
+2. Builds and starts `code-eval-executor` from `src/executor`. It restarts the Langfuse web and worker with `LANGFUSE_CODE_EVAL_DISPATCHER: external`.
+3. Proves the walls. The worker reaches the executor with a signed job and gets a score back. Langfuse still answers on port 5174. The executor cannot reach the internet.
 
 ```text
 Langfuse's worker reached the executor with a signed job and got a score back.
@@ -175,13 +237,14 @@ The executor cannot reach the internet.
 Code evaluators now run in the sandbox. Open Langfuse, Evaluators, and run one.
 ```
 
-The executor has walls at three levels:
+The executor has four walls:
 
 | Level | Wall |
 | --- | --- |
-| The request | Each job is signed with HMAC-SHA256 over the body and a timestamp. A wrong signature, or one older than five minutes, gets 401. |
-| The evaluator | It runs in QuickJS, a separate JavaScript engine compiled to WebAssembly. A new engine per job, with no `process`, no `require`, no files and no network. 2 seconds and 64 MB, inside a WebAssembly memory that cannot grow past 96 MB. |
-| The container | Its own network with no route out (no internet, no Postgres, no Redis), a read-only file system, no Linux capabilities, 512 MB, 64 processes, one CPU. |
+| The request | Each job is signed with HMAC-SHA256. A wrong or old signature gets 401. |
+| The evaluator | It runs in QuickJS, a separate JavaScript engine. It has no `process`, no `require`, no files and no network. |
+| The limits | Each job gets a new engine, 2 seconds and 64 MB. The memory cannot grow past 96 MB. |
+| The container | Its own network with no route out, a read-only file system and no Linux capabilities. It gets 512 MB, 64 processes and one CPU. |
 
 Now run the same evaluator from step 1 again:
 
@@ -208,39 +271,68 @@ function evaluate() {
 
 ![An evaluator that eats memory: Evaluator exceeded the available memory limit](../images/mcp-sandbox/07-sandbox-out-of-memory.png)
 
-Each failure is the evaluator's, reported back to Langfuse, and the executor keeps running for the next job. The ALL CAPS evaluator from lesson 04 still scores as before.
+Each failure is the evaluator's. It is reported back to Langfuse, and the executor keeps running for the next job. The ALL CAPS evaluator from lesson 04 still scores as before.
 
-`src/executor/executor.test.ts` covers each outcome without Langfuse: the same evaluator under `node:vm` reads the host, in QuickJS it cannot, the loop times out, the memory hog ends as OUT_OF_MEMORY without growing the process past 256 MB, a wrong-shaped score is refused, and an unsigned or stale job gets 401.
+## Prove it
+
+This lesson has no scoreboard row, so the tests are the proof. They call no model.
+
+| Case | Why it matters | Before | After |
+| --- | --- | --- | --- |
+| A request with no token, a cookie, another app's token or another site's page | Each is a way around the token | Open | Refused |
+| A Pharma B search for CardioNex | Another company's text must not leave | Nothing stopped a side door | No Pharma A document returned |
+| The host reader | A bad evaluator must not see secrets | 22 secret names listed | `ReferenceError`, no host |
+| The loop and the memory hog | One evaluator must not hold the worker | They run until the worker fails | `TIMEOUT` and `OUT_OF_MEMORY` |
+
+```bash
+npx tsx --test src/server/mcp.test.ts src/executor/executor.test.ts
+```
+
+- **The door test.** Every MCP route but the metadata refuses a request with no token. A Pharma B search for CardioNex returns no Pharma A document. The same search as Pharma A does.
+- **The executor test.** The same evaluator under `node:vm` reads the host, and in QuickJS it cannot. The loop times out. The memory hog ends as OUT_OF_MEMORY without growing the process past 256 MB. A wrong-shaped score is refused. An unsigned or old job gets 401.
+
+Break it on purpose. In `src/server/mcp.ts`, skip the token check on one route, and run the door test. It names the route that opened.
+
+## Stuck points
+
+In a correct run, `curl` returns 401 with a `resource_metadata` link. Signed in as Chidi Okafor, the NeuroVex question cites `[neurovex-uspi-v1, 2.1]`.
+
+| What you see | Why | What to do |
+| --- | --- | --- |
+| `curl` returns a connection error | The app is not running | Run `npm run dev` and try again |
+| `/mcp` does not show **medinfo** | You are not in the repo folder | Start `claude` from the repo folder |
+| Authenticate says the client is unknown | `identity:setup` has not made the MCP client | Run `npm run identity:setup` |
+| The step 1 evaluator still lists secrets | Langfuse still runs evaluators itself | Run `npm run langfuse:code-eval` |
+| The executor check says it can reach the internet | The executor is on the wrong network | Rerun `npm run langfuse:code-eval` and read its output |
+
+## What to watch for
+
+- **A side door.** A script that reads the files, or a shared key, skips the token. Give every new tool the same door.
+- **A skill taken for a wall.** A skill is advice for an agent. Keep the rules about data in the server.
+- **Code you did not write beside your secrets.** An evaluator can read the worker's settings. Run it where there is no host to climb to.
+- **An evaluator with no limits.** One loop holds the worker. Cap the time and the memory, and test both.
+- **A client that sends its own company.** The server must ignore it. Read the company from the token.
 
 ## Results
 
-This lesson adds no dataset behavior: the chat agent, its prompt and its search are lesson 11's. So there is no new scoreboard row, and lesson 11's row stands:
+This lesson adds no dataset behavior. The chat agent, its prompt and its search are lesson 11's. So there is no new scoreboard row, and lesson 11's row stands:
 
 | Chapter | Change | Passed | staleness | off-label | tenancy | country | injection | multi-turn |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 11 | Sign-in with Keycloak, permissions from OpenFGA | 12/12 | 1/1 | 1/1 | 4/4 | 4/4 | 1/1 | 1/1 |
 
-What this lesson proves instead is in the tests, which call no model:
-
-- `src/server/mcp.test.ts`: every MCP route but the metadata refuses a request with no token; a cookie, another app's token and another site's page are refused; a Pharma B search for CardioNex returns no Pharma A document, while the same search as Pharma A does.
-- `src/executor/executor.test.ts`: the outcomes in step 6.
-
-## How to verify you are done
+What this lesson proves instead is in the tests above. To check you are done:
 
 - `curl -i -X POST http://127.0.0.1:3333/api/mcp` returns 401 with a `resource_metadata` link.
-- In Claude Code, signed in as Chidi Okafor, the NeuroVex question cites `[neurovex-uspi-v1, 2.1]` and a CardioNex search returns no CardioNex document.
+- Signed in as Chidi Okafor, the NeuroVex question cites `[neurovex-uspi-v1, 2.1]`. A CardioNex search returns no CardioNex document.
 - In Langfuse, **Tracing** filtered by the tag `mcp` shows the tool calls with `tenantId` `pharma_b`.
-- The step 1 evaluator gives `ReferenceError: 'process' is not defined`, the loop times out, and the memory hog ends at the memory limit.
+- The step 1 evaluator fails with a `ReferenceError`. The loop times out. The memory hog ends at the memory limit.
 - `npm run check` passes.
 
-## Wrap-up
+## Where to go next
 
-A new tool gets a door, not a key. MCP carries the doctor's own token, so the rules from lesson 11 hold for Claude Code exactly as for the chat. A skill tells an agent how to work, but the walls stay in the server. And code you did not write runs where it cannot see anything worth stealing, with limits on time and memory that hold even when the engine's own count is off.
-
-## Homework
-
-Add a third tool to `src/server/mcp.ts`, `list_documents`, that returns the doc ids and titles the signed-in doctor may read. Use the same OpenFGA check as `search_labels`. Add a test to `src/server/mcp.test.ts` that Pharma B's list holds no `cardionex-` id, and update the skill so it can say which documents it looked in.
-
-## End state
-
-This is the starting point for lesson 13, where a draft waits for a reviewer, and the wait survives a restart.
+- Try the homework. Add a third tool, `list_documents`, to `src/server/mcp.ts`. It returns the doc ids and titles the signed-in doctor may read. Use the same permission check as `search_labels`.
+- Test the homework. Add a test to `src/server/mcp.test.ts` that Pharma B's list holds no `cardionex-` id. Update the skill so it can say which documents it looked in.
+- Read the docs: [MCP authorization](https://modelcontextprotocol.io/specification/2025-06-18/basic/authorization), [Claude Code MCP](https://docs.claude.com/en/docs/claude-code/mcp) and [Claude Code skills](https://docs.claude.com/en/docs/claude-code/skills).
+- Read about Langfuse [code evaluators](https://langfuse.com/docs/evaluation/evaluation-methods/code-evaluators).
+- Lesson 13 starts from this checkpoint. A draft waits for a reviewer, and the wait survives a restart.
