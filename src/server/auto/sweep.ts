@@ -8,6 +8,7 @@ import { env } from "../env";
 import { redraftAnswer, staleAnswers, type EventDesk } from "../events/handlers";
 import { modelClient } from "../gateway";
 import { fga, visibleHcps } from "../permissions";
+import { scrubPhi } from "../phi";
 import { sweepWorker, TENANTS } from "../users";
 import { startOfDay, type AgentControls, type SpendReader } from "./limits";
 
@@ -95,7 +96,10 @@ async function pickDoctors(openai: OpenAI, instruction: string, doctors: HcpProf
 export function createSweep({ desk, controls, spend, model = modelClient, client = fga, now = () => new Date() }: SweepDeps) {
   return observe(
     async (input: SweepInput): Promise<SweepResult> => {
-      const { tenantId, today, runId, instruction } = input;
+      // A person types the instruction, so identifiers leave it before the model, the trace or the
+      // report reads it (lesson 13), whichever path started the run.
+      const { tenantId, today, runId } = input;
+      const instruction = input.instruction ? scrubPhi(input.instruction).text : undefined;
       updateActiveObservation({ input: { tenantId, today, instruction: instruction ?? null } });
       return propagateAttributes(
         {
