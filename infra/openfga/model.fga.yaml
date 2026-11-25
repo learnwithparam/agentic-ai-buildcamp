@@ -20,6 +20,17 @@ tuples:
   - { user: "company:pharma_a", relation: company, object: "outreach:a-step" }
 
 tests:
+  - name: a doctor reads their company's label abroad, never another company's
+    tuples:
+      - { user: "user:rivera", relation: member, object: "company:pharma_a" }
+      - { user: "user:rivera", relation: doctor, object: "country:US" }
+    check:
+      - user: "user:rivera"
+        object: "document:cardionex-de-smpc"
+        assertions: { can_read: false, can_read_abroad: true }
+      - user: "user:rivera"
+        object: "document:neurovex-trial-summary"
+        assertions: { can_read: false, can_read_abroad: false }
   - name: a US doctor at pharma_a reads only pharma_a's US text
     tuples:
       - { user: "user:rivera", relation: member, object: "company:pharma_a" }

@@ -14,7 +14,7 @@ import {
   type StreamEvent,
   type ToolMessage
 } from "../shared/messages";
-import { checkCitations, describeProblem, evidenceOf, WITHHELD_REPLY, type CitationProblem } from "./citations";
+import { checkCitations, describeProblem, evidenceOf, EVIDENCE_TOOLS, WITHHELD_REPLY, type CitationProblem } from "./citations";
 import { env } from "./env";
 import { streamModelTurn, toOpenAIMessages } from "./stream-model";
 import type { Identity } from "./users";
@@ -66,8 +66,12 @@ export async function agentStep(
 ): Promise<Partial<GraphState>> {
   const sinceQuestion = state.messages.slice(state.messages.lastIndexOf(lastHuman(state)!));
   const rounds = sinceQuestion.filter((message) => message.type === "ai").length;
-  // Gather first (desk rules, label searches), then answer with tools off.
-  const searched = sinceQuestion.some((message) => message.type === "tool" && message.name === "search_labels");
+  // Gather first, then answer with tools off. One round may follow the first evidence round, so
+  // the model can open a section or check a version the search turned up (fix 0).
+  const evidenceRounds = sinceQuestion.filter(
+    (message) => message.type === "ai" && message.tool_calls.some((call) => EVIDENCE_TOOLS.includes(call.name))
+  ).length;
+  const searched = evidenceRounds >= 2;
   const reply = await streamModelTurn(
     openai,
     {

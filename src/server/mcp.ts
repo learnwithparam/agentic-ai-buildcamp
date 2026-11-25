@@ -8,7 +8,7 @@ import { decodeJwt } from "jose";
 import { z } from "zod";
 import { AuthError, type Auth } from "./auth";
 import { PUBLISHED_TABLE, runQuery } from "./bi/query";
-import { executeTool } from "./tools";
+import { executeTool, TOOL_DEFINITIONS } from "./tools";
 import { canQuerySales } from "./permissions";
 import type { Identity } from "./users";
 
@@ -54,6 +54,22 @@ function mcpServerFor(user: Identity, canQuery: boolean) {
     },
     ({ query }) => run("search_labels", { query })
   );
+  // Fix 0. The label lookups, from the same definitions the agent's model sees.
+  for (const tool of TOOL_DEFINITIONS) {
+    if (tool.type !== "function" || ["get_desk_rules", "search_labels"].includes(tool.function.name)) continue;
+    const { name, description = "" } = tool.function;
+    const props = (tool.function.parameters?.properties ?? {}) as Record<string, { description: string }>;
+    const required = new Set((tool.function.parameters?.required ?? []) as string[]);
+    const inputSchema = Object.fromEntries(
+      Object.entries(props).map(([key, prop]) => {
+        const field = z.string().min(1).max(200).describe(prop.description);
+        return [key, required.has(key) ? field : field.optional()];
+      })
+    );
+    server.registerTool(name, { title: name, description, inputSchema, annotations: { readOnlyHint: true, openWorldHint: false } }, (input) =>
+      run(name, input as Record<string, unknown>)
+    );
+  }
   // Lesson 22. Only an analyst's server lists the sales tool, and it runs as the login of the
   // company in the token, through the same parser and row rule as the insights page.
   if (canQuery) {

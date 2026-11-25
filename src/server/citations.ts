@@ -107,12 +107,23 @@ export function describeProblem(problem: CitationProblem): string {
 // in it. A follow-up ("and if she is on dialysis?") is often answered from the sections the first
 // question found, with no new search; they were found under the same permissions, on the same day.
 // When a section comes back twice, the later result wins.
+// Every tool whose output holds label sections the answer may cite. search_labels returns
+// results, the lookups return sections or uses, and read_section returns one section itself.
+export const EVIDENCE_TOOLS = ["search_labels", "read_section", "approval_status", "check_interaction", "trial_results"];
+
+type ToolOutput = RetrievedSection & { results?: RetrievedSection[]; sections?: RetrievedSection[]; uses?: RetrievedSection[] };
+
+function sectionsIn(output: ToolOutput): RetrievedSection[] {
+  const listed = [...(output.results ?? []), ...(output.sections ?? []), ...(output.uses ?? [])];
+  return output.doc_id && output.section && output.text ? [...listed, output] : listed;
+}
+
 export function evidenceOf(messages: ChatMessage[]): { retrieved: RetrievedSection[]; asked: string } {
   const sections = new Map<string, RetrievedSection>();
   for (const message of messages) {
-    if (message.type !== "tool" || message.name !== "search_labels") continue;
+    if (message.type !== "tool" || !EVIDENCE_TOOLS.includes(message.name ?? "")) continue;
     try {
-      for (const section of (JSON.parse(message.content) as { results?: RetrievedSection[] }).results ?? []) {
+      for (const section of sectionsIn(JSON.parse(message.content))) {
         sections.set(`${section.doc_id}, ${section.section}`, section);
       }
     } catch {

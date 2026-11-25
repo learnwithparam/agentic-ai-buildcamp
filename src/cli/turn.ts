@@ -15,9 +15,14 @@ export type TurnView = {
 
 export const START: TurnView = { text: "", activity: "Reading your question", waiting: null, done: false };
 
-const TOOL_WORDS: Record<string, string> = {
+export const TOOL_WORDS: Record<string, string> = {
   get_desk_rules: "Reading the desk rules",
-  search_labels: "Searching the labels"
+  search_labels: "Searching the labels",
+  read_section: "Reading a label section",
+  label_versions: "Checking which label version is in force",
+  approval_status: "Checking where it is approved",
+  check_interaction: "Checking the label for an interaction",
+  trial_results: "Reading the trial results"
 };
 
 // The answer to this question: the last reply after the last question in the thread.

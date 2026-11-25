@@ -9,8 +9,9 @@
 
 import { randomUUID } from "node:crypto";
 import { readEvents } from "../src/shared/sse";
-import type { AiMessage, ChatMessage, ToolMessage } from "../src/shared/messages";
+import type { AiMessage, ChatMessage } from "../src/shared/messages";
 import { aiText } from "../src/shared/messages";
+import { evidenceOf } from "../src/server/citations";
 import { OPEN_QUESTIONS } from "./open-questions";
 import { APP, sessionHeader, signIn } from "./sign-in";
 
@@ -75,15 +76,6 @@ const CONVERSATIONS: Conversation[] = [
   }
 ];
 
-function sectionsFrom(message: ToolMessage): string[] {
-  try {
-    const result = JSON.parse(message.content) as { results?: Array<{ doc_id: string; section: string }> };
-    return (result.results ?? []).map((hit) => `${hit.doc_id} ${hit.section}`);
-  } catch {
-    return [];
-  }
-}
-
 async function ask(cookie: string, threadId: string, text: string, seenBefore: number): Promise<Seen> {
   const response = await fetch(`${APP}/api/threads/${threadId}/runs/stream`, {
     method: "POST",
@@ -109,7 +101,8 @@ async function ask(cookie: string, threadId: string, text: string, seenBefore: n
     tier: state.route?.tier ?? "none",
     reason: state.route?.reason ?? "",
     searches: calls.filter((call) => call.name === "search_labels").map((call) => String(call.args.query ?? "")),
-    sections: turn.flatMap((message) => (message.type === "tool" && message.name === "search_labels" ? sectionsFrom(message) : [])),
+    // The same sections the citation check counts: search results and every lookup tool.
+    sections: evidenceOf(turn).retrieved.map((hit) => `${hit.doc_id} ${hit.section}`),
     reply: draft || (replies.length ? textOf(replies[replies.length - 1]) : "")
   };
 }
