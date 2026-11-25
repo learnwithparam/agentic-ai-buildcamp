@@ -186,14 +186,14 @@ npm run dataset:run -- --chapter 21 --cases STALENESS-01,STALENESS-02,STALENESS-
 
 | Chapter | Change | Passed | staleness | rag |
 | --- | --- | --- | --- | --- |
-| 21 | Every answer's citations are checked against the search before it is sent | 10/11 | 3/3 | 2/3 |
+| 21 | Every answer's citations are checked against the search before it is sent | 11/11 | 3/3 | 3/3 |
 
 The full row is in `docs/scoreboard.md`. How to read it:
 
 - **STALENESS-03 passed,** and so did STALENESS-01 and 02: no answer cited the expired draft, and the doses came from the active v2 label, not the superseded v1.
 - **POSITIVE-01 passed:** the 5 mg cap with clarithromycin is in the footnote of the section it cites, so the dose check accepts it.
 - **REVIEW-01 passed:** the draft went through `cite` before `submit`, and reached the inbox.
-- **RAG-02 failed, before the check ran.** It is the holdout case. The router sent the pregnancy question to the stop tier, so the doctor got the fixed off-label refusal and the answer never reached `cite`. That is a routing miss from lesson 13, not a citation problem, and the citation check cannot fix it.
+- **RAG-02 passed.** It is the holdout case: a pregnant patient who has the approved disease. The router used to send it to the stop tier, because its rule called any patient outside the plain use off-label. The rule now says a patient group the label has its own section for (pregnancy, kidney disease, older adults) is an answer, and only a medicine on this desk's list can be stopped. The routing and tenancy cases passed with the new rule too.
 - **Every `cite` span in the run passed.** The check was there for each answer and found nothing to stop.
 
 ## How to verify you are done
