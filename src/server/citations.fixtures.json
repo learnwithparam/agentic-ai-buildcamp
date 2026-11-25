@@ -1,0 +1,114 @@
+{
+  "nursing-passes": {
+    "trace": "4369cd38880927ed325b4e24a4fd4bf1",
+    "asked": "Can a mother who is nursing her newborn take CardioNex?",
+    "answer": "Breastfeeding is not recommended while taking CardioNex or for 5 days after the final dose, because of potential risks of low blood pressure and high potassium in the infant. It is not known whether CardioNex passes into human milk. [cardionex-uspi-v2, 8.2]",
+    "retrieved": [
+      {
+        "doc_id": "cardionex-uspi-v2",
+        "section": "8.2",
+        "status": "active",
+        "text": "It is not known whether cardionexib passes into human breast milk. In animal studies it was found in milk at levels close to those in plasma. Because of the risk of low blood pressure and high potassium in a breastfed infant, breastfeeding is not recommended during treatment and for 5 days after the final dose."
+      },
+      {
+        "doc_id": "cardionex-uspi-v2",
+        "section": "8.1",
+        "status": "active",
+        "text": "CardioNex can cause fetal harm when given during the second and third trimesters. Stop CardioNex as soon as pregnancy is detected and switch to a treatment that is safe in pregnancy. Women who could become pregnant should use effective contraception during treatment."
+      },
+      {
+        "doc_id": "cardionex-uspi-v2",
+        "section": "0.0",
+        "status": "active",
+        "text": "- BOXED WARNING: FETAL TOXICITY: When pregnancy is detected, discontinue CardioNex as soon as possible. Drugs that act directly on the reninangiotensin system can cause injury and death to the developing fetus.\n\nCONTRAINDICATIONS:\n\n- Concomitant use with ACE inhibitors is contraindicated due to angioedema risk. Allow a strict 36-hour washout period when switching from an ACE inhibitor to CardioNex.\n\n- Contraindicated in patients with end-stage renal disease (ESRD) requiring dialysis."
+      },
+      {
+        "doc_id": "cardionex-uspi-v2",
+        "section": "2.3",
+        "status": "active",
+        "text": "Take CardioNex once daily at about the same time each day, with or without food."
+      }
+    ]
+  },
+  "dose-without-citation": {
+    "trace": "d534f966f3fefed09a0cabd913307f5d",
+    "asked": "What is the CardioNex dose for a patient with eGFR of 24 mL/min who is not on dialysis?",
+    "answer": "For eGFR 24 mL/min without dialysis, the recommended CardioNex dose is **5 mg once daily**. Do not titrate above 5 mg.  \n\nCardioNex US Prescribing Information, section 2.2.",
+    "retrieved": [
+      {
+        "doc_id": "cardionex-uspi-v2",
+        "section": "2.2",
+        "status": "active",
+        "text": "| Patient Population | Recommended Starting Dose | Target Maintenance Dose | Notes & Exceptions |\n| :--- | :--- | :--- | :--- |\n| Standard Adult HFrEF (eGFR >= 30 mL/min) | 20mg once daily | 40mg once daily (titrate after 4 weeks) | Monitor serum potassium and blood pressure |\n| Severe Renal Impairment (eGFR < 30 mL/min, non-dialysis) | 5mg once daily | 5mg once daily | Do not titrate above 5mg |\n| End-Stage Renal Disease (on dialysis) | Contraindicated | Contraindicated | Do not administer |\n| Co-administration with strong CYP3A4 inhibitors* | 5mg once daily | 5mg once daily | Applies regardless of renal function |\n\n**Footnote \\*:** In patients concurrently taking strong CYP3A4 inhibitors (such as itraconazole, ketoconazole, clarithromycin, or ritonavir), the maximum daily dose of CardioNex **must NOT exceed 5mg once daily**, even if renal function is normal (eGFR >= 30 mL/min)."
+      },
+      {
+        "doc_id": "cardionex-uspi-v1",
+        "section": "2.2",
+        "status": "superseded",
+        "text": "- **Normal or mild-to-moderate renal impairment (eGFR >= 30 mL/min):** Start at 20mg orally once daily; titrate to 40mg once daily after 2 weeks.\n- **Severe renal impairment (eGFR < 30 mL/min):** Administer 10mg orally once daily."
+      },
+      {
+        "doc_id": "cardionex-uspi-v3",
+        "section": "2.2",
+        "status": "approved",
+        "text": "- **Standard adult HFrEF (eGFR >= 30 mL/min):** Start at 20mg once daily. Raise to 40mg once daily after **6 weeks**.\n- **Severe renal impairment (eGFR < 30 mL/min, no dialysis):** Give 2.5mg once daily."
+      },
+      {
+        "doc_id": "cardionex-uspi-v2",
+        "section": "0.0",
+        "status": "active",
+        "text": "- **BOXED WARNING: FETAL TOXICITY:** When pregnancy is detected, discontinue CardioNex as soon as possible. Drugs that act directly on the renin-angiotensin system can cause injury and death to the developing fetus.\n- **CONTRAINDICATIONS:**\n  - Concomitant use with ACE inhibitors is contraindicated due to angioedema risk. Allow a strict **36-hour washout period** when switching from an ACE inhibitor to CardioNex.\n  - Contraindicated in patients with end-stage renal disease (ESRD) requiring dialysis."
+      }
+    ]
+  },
+  "number-from-another-section": {
+    "trace": "b33d76af8e7cbc1c777e32c95662c7eb",
+    "asked": "How many weeks should I wait before raising CardioNex from 10mg to 20mg?",
+    "answer": "For adults with chronic heart failure and LVEF \u226440% with eGFR \u226530 mL/min, raise from 10 mg to 20 mg once daily after 8 weeks. [cardionex-jp-label, 2.2]",
+    "retrieved": [
+      {
+        "doc_id": "cardionex-jp-label",
+        "section": "2.2",
+        "status": "active",
+        "text": "- **Standard adult HFrEF (eGFR >= 30 mL/min):** Start at 10mg once daily. Raise to 20mg once daily after **8 weeks**.\n- **Severe renal impairment (eGFR < 30 mL/min, no dialysis):** Give 5mg once daily. Do not raise the dose."
+      },
+      {
+        "doc_id": "cardionex-jp-label",
+        "section": "3.1",
+        "status": "active",
+        "text": "Approved only for adults with chronic heart failure and an LVEF of 40% or lower."
+      }
+    ]
+  },
+  "expired-draft": {
+    "trace": "1d8600ae6af4514d6c6b403e7fb1d8f3",
+    "asked": "Was CardioNex approved at 50mg twice daily?",
+    "answer": "In the current **US** label, 50 mg twice daily is not listed as an approved regimen. It appears only in an expired document describing an investigational Phase 2 regimen. [cardionex-uspi-v2, 2.2] [cardionex-draft-2024, 2.1]\n\nIf you mean approval in Germany or Japan, please specify the country.",
+    "retrieved": [
+      {
+        "doc_id": "cardionex-uspi-v2",
+        "section": "2.2",
+        "status": "active",
+        "text": "| Patient Population | Recommended Starting Dose | Target Maintenance Dose | Notes & Exceptions |\n| :--- | :--- | :--- | :--- |\n| Standard Adult HFrEF (eGFR >= 30 mL/min) | 20mg once daily | 40mg once daily (titrate after 4 weeks) | Monitor serum potassium and blood pressure |\n| Severe Renal Impairment (eGFR < 30 mL/min, non-dialysis) | 5mg once daily | 5mg once daily | Do not titrate above 5mg |\n| End-Stage Renal Disease (on dialysis) | Contraindicated | Contraindicated | Do not administer |\n| Co-administration with strong CYP3A4 inhibitors* | 5mg once daily | 5mg once daily | Applies regardless of renal function |\n\n**Footnote \\*:** In patients concurrently taking strong CYP3A4 inhibitors (such as itraconazole, ketoconazole, clarithromycin, or ritonavir), the maximum daily dose of CardioNex **must NOT exceed 5mg once daily**, even if renal function is normal (eGFR >= 30 mL/min)."
+      },
+      {
+        "doc_id": "cardionex-draft-2024",
+        "section": "2.1",
+        "status": "expired",
+        "text": "Investigational dosing schedule evaluated in Phase-2 dose-finding cohorts: 50mg orally twice daily (100mg total daily dose)."
+      },
+      {
+        "doc_id": "cardionex-uspi-v1",
+        "section": "2.2",
+        "status": "superseded",
+        "text": "- **Normal or mild-to-moderate renal impairment (eGFR >= 30 mL/min):** Start at 20mg orally once daily; titrate to 40mg once daily after 2 weeks.\n- **Severe renal impairment (eGFR < 30 mL/min):** Administer 10mg orally once daily."
+      },
+      {
+        "doc_id": "cardionex-uspi-v3",
+        "section": "2.2",
+        "status": "approved",
+        "text": "- **Standard adult HFrEF (eGFR >= 30 mL/min):** Start at 20mg once daily. Raise to 40mg once daily after **6 weeks**.\n- **Severe renal impairment (eGFR < 30 mL/min, no dialysis):** Give 2.5mg once daily."
+      }
+    ]
+  }
+}

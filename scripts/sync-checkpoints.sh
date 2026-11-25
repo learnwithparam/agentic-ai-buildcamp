@@ -54,7 +54,8 @@ TAGS=(
   checkpoint/17-autonomy
   checkpoint/18-release-gate
   checkpoint/19-cli
-checkpoint/20-rag
+  checkpoint/20-rag
+  checkpoint/21-citations
 )
 
 # Files whose code is what the next lesson changes. Add a file here when a
@@ -150,47 +151,55 @@ RAG_FILES="docs/scoreboard.md package.json package-lock.json scripts/experiment.
   src/server/rag/extract.ts src/server/rag/ingest.ts src/server/rag/rag.test.ts src/server/rag/search.ts
   src/server/rag/store.ts src/server/rag/fixtures/cardionex-clarion-hf-trial.docling.json
   src/server/rag/fixtures/cardionex-clarion-hf-trial.docling.md src/server/rag/fixtures/cardionex-uspi-v2.docling.json"
+# Lesson 21 checks every answer's citations before it is sent; the files it changes and adds
+# (CITE_FILES) stay as they were on tags before it, so lesson 20's answer goes out unchecked.
+CITE_FILES="docs/scoreboard.md package.json scripts/citations-audit.ts scripts/citations-audit.test.ts
+  src/server/citations.ts src/server/citations.test.ts src/server/citations.fixtures.json src/server/graph.ts
+  src/server/graph.test.ts src/server/durable.test.ts src/server/medinfo-agent.ts"
 milestone_files() {
   case "$1" in
     checkpoint/00-setup | checkpoint/01-base-app | checkpoint/02-tracing)
-      echo "src/server/index.ts src/server/medinfo-agent.ts src/server/tools.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES"
+      echo "src/server/index.ts src/server/medinfo-agent.ts src/server/tools.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES"
       ;;
     checkpoint/03-prompt-management)
-      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES"
+      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES"
       ;;
     # Lessons 06 and 07 run the dataset with the correctness judge; lesson 09 replaces it.
     checkpoint/04-* | checkpoint/05-* | checkpoint/06-* | checkpoint/07-* | checkpoint/08-* | checkpoint/09-*)
-      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES"
+      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES"
       ;;
     checkpoint/10-*)
-      echo "$AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES"
+      echo "$AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES"
       ;;
     checkpoint/11-*)
-      echo "$MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES"
+      echo "$MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES"
       ;;
     checkpoint/12-*)
-      echo "$TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES"
+      echo "$TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES"
       ;;
     checkpoint/13-*)
-      echo "$CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES"
+      echo "$CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES"
       ;;
     checkpoint/14-*)
-      echo "$A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES"
+      echo "$A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES"
       ;;
     checkpoint/15-*)
-      echo "$EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES"
+      echo "$EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES"
       ;;
     checkpoint/16-*)
-      echo "$AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES"
+      echo "$AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES"
       ;;
     checkpoint/17-*)
-      echo "$GATE_FILES $CLI_FILES $RAG_FILES"
+      echo "$GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES"
       ;;
     checkpoint/18-*)
-      echo "$CLI_FILES $RAG_FILES"
+      echo "$CLI_FILES $RAG_FILES $CITE_FILES"
       ;;
     checkpoint/19-*)
-      echo "$RAG_FILES"
+      echo "$RAG_FILES $CITE_FILES"
+      ;;
+    checkpoint/20-*)
+      echo "$CITE_FILES"
       ;;
     *)
       echo ""

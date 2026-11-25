@@ -14,6 +14,7 @@ import {
   type StreamEvent,
   type ToolMessage
 } from "../shared/messages";
+import { checkCitations, describeProblem, evidenceOf, WITHHELD_REPLY, type CitationProblem } from "./citations";
 import { env } from "./env";
 import { streamModelTurn, toOpenAIMessages } from "./stream-model";
 import type { Identity } from "./users";
@@ -78,6 +79,50 @@ export async function agentStep(
     (partial) => config.writer?.(partial)
   );
   return { messages: [reply] };
+}
+
+// Lesson 21. The answer is checked against the sections the search returned before it is final.
+// A failing answer gets one rewrite, with the problems spelled out and the tools off; the rewrite
+// streams over the first answer in the chat, under the same message id. If the rewrite fails too,
+// the doctor gets WITHHELD_REPLY instead. Either way the check, not the model, has the last word.
+export type CitationOutcome = { outcome: "passed" | "rewritten" | "withheld"; problems: CitationProblem[]; afterRewrite: CitationProblem[] };
+
+export async function citeStep(
+  openai: OpenAI,
+  system: string,
+  state: GraphState,
+  config: LangGraphRunnableConfig,
+  onChecked: (result: CitationOutcome) => void = () => {}
+): Promise<Partial<GraphState>> {
+  const answer = last(state, "ai");
+  if (!answer) return {};
+  const { retrieved, asked } = evidenceOf(state.messages);
+  const problems = checkCitations(aiText(answer), retrieved, asked);
+  if (!problems.length) return (onChecked({ outcome: "passed", problems, afterRewrite: [] }), {});
+  const feedback = [
+    "The desk's citation check stopped your answer before it reached the doctor:",
+    ...problems.map((problem) => `- ${describeProblem(problem)}`),
+    "Write the whole answer again from the active label sections already found, citing each fact as [doc_id, section]. If those sections do not answer the question, write INSUFFICIENT_CONTEXT and say why."
+  ].join("\n");
+  const rewrite = await streamModelTurn(
+    openai,
+    {
+      model: env.openaiModel,
+      messages: [...toOpenAIMessages(system, state.messages), { role: "user", content: feedback }],
+      tools: TOOL_DEFINITIONS,
+      allowTools: false
+    },
+    (partial) => config.writer?.({ ...partial, id: answer.id })
+  );
+  const afterRewrite = checkCitations(aiText(rewrite), retrieved, asked);
+  if (!afterRewrite.length) {
+    onChecked({ outcome: "rewritten", problems, afterRewrite });
+    return { messages: [{ ...rewrite, id: answer.id, tool_calls: [] }] };
+  }
+  onChecked({ outcome: "withheld", problems, afterRewrite });
+  const withheld: AiMessage = { id: answer.id, type: "ai", content: [{ type: "text", text: WITHHELD_REPLY }], tool_calls: [] };
+  config.writer?.(withheld);
+  return { messages: [withheld] };
 }
 
 export function userOf(config: LangGraphRunnableConfig): Identity {
@@ -208,10 +253,10 @@ export async function submitAdverseEvent(state: GraphState, config: LangGraphRun
   });
 }
 
-type Nodes = { router: Node; agent: Node; tools: Node; submit: Node; review: Node; safety: Node; stop: Node };
+type Nodes = { router: Node; agent: Node; tools: Node; cite: Node; submit: Node; review: Node; safety: Node; stop: Node };
 
-// START -> router -> answer: agent <-> tools -> END
-//                 -> review: agent <-> tools -> submit -> review (waits for a human) -> END
+// START -> router -> answer: agent <-> tools -> cite -> END
+//                 -> review: agent <-> tools -> cite -> submit -> review (waits for a human) -> END
 //                 -> safety: fixed reply, report to the safety inbox -> END
 //                 -> stop:   fixed refusal -> END
 // The router may also answer itself (the lesson 10 out-of-scope door), and then the turn ends.
@@ -220,6 +265,7 @@ export function buildGraph(nodes: Nodes, checkpointer: BaseCheckpointSaver) {
     .addNode("router", nodes.router)
     .addNode("agent", nodes.agent)
     .addNode("tools", nodes.tools)
+    .addNode("cite", nodes.cite)
     .addNode("submit", nodes.submit)
     .addNode("review", nodes.review)
     .addNode("safety", nodes.safety)
@@ -238,10 +284,12 @@ export function buildGraph(nodes: Nodes, checkpointer: BaseCheckpointSaver) {
     )
     .addConditionalEdges(
       "agent",
-      (state) => (last(state, "ai")?.tool_calls.length ? "tools" : state.route?.tier === "review" ? "submit" : END),
-      ["tools", "submit", END]
+      (state) => (last(state, "ai")?.tool_calls.length ? "tools" : "cite"),
+      ["tools", "cite"]
     )
     .addEdge("tools", "agent")
+    // Lesson 21: a reviewer only ever sees a draft that passed the citation check.
+    .addConditionalEdges("cite", (state) => (state.route?.tier === "review" ? "submit" : END), ["submit", END])
     .addEdge("submit", "review")
     .addEdge("review", END)
     .addEdge("safety", END)
