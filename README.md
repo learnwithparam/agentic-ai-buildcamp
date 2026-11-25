@@ -46,6 +46,7 @@ Each lesson names the checkpoint tag to check out, what to change, and how to ch
 | 16 | [Start agents from events](./docs/learner/16-event-driven-agents.md) | `checkpoint/16-events` | Signed events through a pg-boss queue start the agents: each event is handled once however often it arrives, and still stops at review and safety. |
 | 17 | [Let an agent work alone within limits](./docs/learner/17-autonomous-agent.md) | `checkpoint/17-autonomy` | A nightly sweep redrafts stale answers and plans outreach on its own, stops at a daily budget read from Langfuse or a kill switch any reviewer can pull, and decides nothing itself. |
 | 18 | [Block a bad change before it ships](./docs/learner/18-release-gate.md) | `checkpoint/18-release-gate` | A release gate runs the cases every lesson keeps green on a prompt before it is promoted and on every push that changes an agent, and a failed case stops the change. |
+| 19 | [Ask and review from the terminal](./docs/learner/19-cli.md) | `checkpoint/19-cli` | A doctor signs in from the terminal through the same Keycloak, asks with citations, and a reviewer approves a draft from an inbox in the terminal, with the same permissions as the web app. |
 
 Helper commands used by the lessons:
 
