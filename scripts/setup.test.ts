@@ -38,3 +38,20 @@ test("node and key checks", () => {
   assert.match(checkNode("v20.19.0") ?? "", /too old/);
   assert.deepEqual(missingKeys({ A: "x", B: " ", C: undefined }, ["A", "B", "C"]), ["B", "C"]);
 });
+
+// A first run on a fresh clone failed: compose refused to start Langfuse because the signing
+// secret only langfuse:code-eval writes was not there yet. Every variable a Langfuse compose file
+// requires must be written by a script setup runs before it starts Langfuse.
+test("setup writes every variable Langfuse compose requires before it starts Langfuse", () => {
+  const compose = read("langfuse/docker-compose.yml") + read("langfuse/workshop.override.yml");
+  const required = new Set([...compose.matchAll(/\$\{([A-Z_]+):\?/g)].map((match) => match[1]));
+  const writers: Record<string, string> = { LANGFUSE_CODE_EVAL_EXTERNAL_SIGNING_SECRET: "langfuse:code-eval" };
+  const up = setup.indexOf('[...LANGFUSE, "up"');
+  assert.ok(up > 0, "setup.ts no longer starts Langfuse with the LANGFUSE compose args");
+  for (const name of required) {
+    const writer = writers[name];
+    assert.ok(writer, `${name} is required by a Langfuse compose file, and no script setup runs writes it`);
+    const call = setup.indexOf(`npm("${writer}")`);
+    assert.ok(call > 0 && call < up, `setup.ts must run ${writer} before it starts Langfuse, so ${name} exists`);
+  }
+});

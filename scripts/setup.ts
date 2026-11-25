@@ -81,6 +81,9 @@ function checkEnvFile() {
 
 function startLangfuse() {
   step("Langfuse");
+  // The compose file needs the code evaluator's signing secret before any Langfuse container can
+  // start. langfuse:code-eval writes it once (and skips it after), then starts the sandbox.
+  npm("langfuse:code-eval");
   execFileSync("docker", [...LANGFUSE, "up", "-d", "--wait"], { cwd: root, stdio: "inherit" });
   ok("Langfuse runs at http://localhost:5174");
   npm("langfuse:gateway-keys");
