@@ -45,6 +45,7 @@ Each lesson names the checkpoint tag to check out, what to change, and how to ch
 | 15 | [Hand work between agents over A2A](./docs/learner/15-agents-hand-off-over-a2a.md) | `checkpoint/15-a2a` | Both agents behind A2A servers with public cards and Keycloak sign-in: a flagged email is a task that waits for a reviewer, and the whole hand-off is one Langfuse trace. |
 | 16 | [Start agents from events](./docs/learner/16-event-driven-agents.md) | `checkpoint/16-events` | Signed events through a pg-boss queue start the agents: each event is handled once however often it arrives, and still stops at review and safety. |
 | 17 | [Let an agent work alone within limits](./docs/learner/17-autonomous-agent.md) | `checkpoint/17-autonomy` | A nightly sweep redrafts stale answers and plans outreach on its own, stops at a daily budget read from Langfuse or a kill switch any reviewer can pull, and decides nothing itself. |
+| 18 | [Block a bad change before it ships](./docs/learner/18-release-gate.md) | `checkpoint/18-release-gate` | A release gate runs the cases every lesson keeps green on a prompt before it is promoted and on every push that changes an agent, and a failed case stops the change. |
 
 Helper commands used by the lessons:
 
