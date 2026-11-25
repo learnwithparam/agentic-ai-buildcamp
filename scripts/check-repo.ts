@@ -73,7 +73,8 @@ export function findProblems(files: Map<string, string>, tracked: string[]): str
   for (const path of tracked) if (path.endsWith(".test.ts") && testFolders.some((folder) => path.startsWith(folder))) used.add(path);
   const tokensFor = (path: string) => {
     const tokens = [path, basename(path)];
-    if (path.endsWith(".ts")) tokens.push(`./${basename(path, ".ts")}`);
+    // An import names the file without .ts: "./limits", or a path such as "../../../scripts/no-model-call".
+    if (path.endsWith(".ts")) tokens.push(`./${basename(path, ".ts")}`, path.slice(0, -3));
     return tokens;
   };
   for (let grew = true; grew; ) {
