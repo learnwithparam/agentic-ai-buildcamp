@@ -3,6 +3,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Auth } from "./auth";
 import { isLangfuseConfigured } from "./env";
+import { FactCheckExecutor, OutreachExecutor } from "./a2a/executors";
+import { createA2aRouter } from "./a2a/server";
 import { createMcpRouter } from "./mcp";
 import { createRoutes, type Desk } from "./routes";
 
@@ -13,6 +15,14 @@ export function createApp(auth: Auth, desk: Desk) {
   app.set("trust proxy", "loopback");
   // Lesson 12: MCP takes tokens, never cookies, so it sits before the cookie checks below.
   app.use(createMcpRouter(auth));
+  // Lesson 15: the A2A agents take tokens too, for the same reason.
+  const tasks = { inbox: desk.reviews, links: desk.a2a.links };
+  app.use(
+    createA2aRouter(auth, {
+      store: desk.a2a.store,
+      executors: { "fact-checker": new FactCheckExecutor(desk.factChecker, tasks), "outreach-planner": new OutreachExecutor(desk.outreachPlanner, tasks) }
+    })
+  );
   app.use("/api", auth.sameOrigin);
   app.use(express.json({ limit: "1mb" }));
   app.use(auth.router);

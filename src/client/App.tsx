@@ -4,6 +4,7 @@ import { useLangGraphRuntime } from "@assistant-ui/react-langgraph";
 import { createThread, loadMe, loadThread, signIn, signOut, streamRun, type Me } from "./chat/api";
 import { Thread } from "./chat/Thread";
 import { Editor } from "./content/Editor";
+import { Handoffs } from "./content/Handoffs";
 import { Outreach } from "./content/Outreach";
 import { Inbox } from "./inbox/Inbox";
 
@@ -66,13 +67,14 @@ export function App() {
 }
 
 // The pages, chosen by the address: the chat at /, the review inbox at /inbox (lesson 13), and
-// for a company's staff the email editor and the rep board (lesson 14). The server refuses a
+// for a company's staff the email editor and the rep board (lesson 14), and hand-offs (lesson 15). The server refuses a
 // page's data to anyone not allowed it; the links here only spare a doctor a page they cannot use.
 const STAFF = ["sales-rep", "medical-reviewer"];
 const PAGES = [
   { path: "/", label: "Chat", staff: false },
   { path: "/editor", label: "Email editor", staff: true },
   { path: "/outreach", label: "Rep board", staff: true },
+  { path: "/handoffs", label: "Hand-offs", staff: true },
   { path: "/inbox", label: "Inbox", staff: false }
 ];
 
@@ -107,7 +109,7 @@ function SignedIn({ me }: { me: Me }) {
           Sign out
         </button>
       </header>
-      {path === "/inbox" ? <Inbox /> : path === "/editor" ? <Editor /> : path === "/outreach" ? <Outreach /> : <Chat key={chat} tenantId={me.user.tenantId} medicines={me.company.medicines} />}
+      {path === "/inbox" ? <Inbox /> : path === "/editor" ? <Editor /> : path === "/outreach" ? <Outreach /> : path === "/handoffs" ? <Handoffs /> : <Chat key={chat} tenantId={me.user.tenantId} medicines={me.company.medicines} />}
     </div>
   );
 }

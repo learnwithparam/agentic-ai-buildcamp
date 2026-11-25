@@ -166,3 +166,20 @@ export const loadDrafts = () => send<{ drafts: Draft[] }>("/api/drafts");
 export const factCheck = (request: { draftId: string } | { text: string; country: string }) => send<FactCheck>("/api/fact-check", request);
 export const loadHcps = () => send<{ hcps: HcpRecord[] }>("/api/hcps");
 export const planOutreach = (query: string) => send<OutreachPlan>("/api/outreach/plan", { query });
+
+// Lesson 15. A hand-off: which agent took the work, each state its task passed through, and the report.
+export type Handoff = { contextId: string; agent: string | null; tasks: Array<{ id: string; state: string }>; itemId: string | null; report: string };
+export const handOff = (query: string) => send<Handoff>("/api/handoffs", { query });
+
+// An agent's public card, read from its well-known path like any other A2A client would.
+export type AgentCardView = {
+  name: string;
+  description: string;
+  skills: Array<{ id: string; name: string; description: string; examples: string[] }>;
+  securitySchemes: Record<string, { openIdConnectSecurityScheme?: { description?: string; openIdConnectUrl?: string } }>;
+};
+export const loadCard = async (path: string) => {
+  const response = await fetch(path, { signal: AbortSignal.timeout(10_000) });
+  if (!response.ok) throw new Error(`The agent card answered ${response.status}`);
+  return (await response.json()) as AgentCardView;
+};

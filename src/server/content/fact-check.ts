@@ -120,10 +120,12 @@ async function suggestClaims(openai: OpenAI, flagged: string[], claims: Claim[])
 }
 
 // The report a writer, a reviewer and the dataset read. Fixed wording, so the codes are always there.
+const sentences = (count: number) => `${count} sentence${count === 1 ? "" : "s"}`;
+
 export function factCheckReport(input: { company: string; country: string; claims: Claim[]; checks: SentenceCheck[] }): string {
   const { company, country, claims, checks } = input;
   if (!claims.length) {
-    return `INSUFFICIENT_CONTEXT: ${company} has no approved claims to check against, so this email cannot go out as written: none of its ${checks.length} sentence${checks.length === 1 ? "" : "s"} is an approved claim. The claims must be approved by your medical, legal and regulatory review first.`;
+    return `INSUFFICIENT_CONTEXT: ${company} has no approved claims to check against, so this email cannot go out as written: none of its ${sentences(checks.length)} is an approved claim. The claims must be approved by your medical, legal and regulatory review first.`;
   }
   if (!checks.length) return "INSUFFICIENT_CONTEXT: there is no sentence to check.";
   const lines = checks.map((check, index) => {
@@ -138,9 +140,9 @@ export function factCheckReport(input: { company: string; country: string; claim
   });
   const flagged = checks.filter((check) => check.verdict !== "APPROVED").length;
   const verdict = flagged
-    ? `REVIEW_REQUIRED: ${flagged} of ${checks.length} sentences need a medical reviewer before this email is sent.`
+    ? `REVIEW_REQUIRED: ${flagged} of ${sentences(checks.length)} ${flagged === 1 ? "needs" : "need"} a medical reviewer before this email is sent.`
     : `Every sentence is an approved claim for ${countryName(country)}. The email can go out as written.`;
-  return [`Fact-check of an email for ${countryName(country)}, ${checks.length} sentences:`, ...lines, verdict].join("\n\n");
+  return [`Fact-check of an email for ${countryName(country)}, ${sentences(checks.length)}:`, ...lines, verdict].join("\n\n");
 }
 
 const FactState = Annotation.Root({
@@ -159,6 +161,13 @@ type FactCheckState = typeof FactState.State;
 export type FactCheckResult = Pick<FactCheckState, "country" | "draft" | "checks" | "report" | "itemId" | "itemStatus">;
 
 // The OpenFGA client and the model client are passed in so a test can point the checker at its own store and a stand-in model.
+// The claims this user's company has approved for one country, read through the same OpenFGA check
+// the fact-checker uses (lesson 15: the hand-off agent drafts from these first).
+export async function approvedClaims(user: Identity, country: string, client: OpenFgaClient = fga()): Promise<Claim[]> {
+  const documents = await checkableDocuments(user, client);
+  return CLAIMS.filter((claim) => documents.has(claim.docId) && claim.country === country);
+}
+
 export function createFactChecker({ client = fga, model = modelClient }: { client?: () => OpenFgaClient; model?: () => OpenAI } = {}) {
   const graph = new StateGraph(FactState)
     // What to check, for which country, against which claims. The claims are the company's own,
@@ -202,17 +211,7 @@ export function createFactChecker({ client = fga, model = modelClient }: { clien
       const inbox = inboxOf(config);
       const threadId = config.configurable?.thread_id as string | undefined;
       if (!inbox || !threadId || !report.includes("REVIEW_REQUIRED")) return { report, itemId: null, itemStatus: null };
-      const itemId = `email-${contentKey(user.tenantId, state.country, ...state.sentences)}`;
-      const { status } = await inbox.submit({
-        id: itemId,
-        kind: "email",
-        threadId,
-        tenantId: user.tenantId,
-        traceId: getActiveTraceId(),
-        question: `An email for ${countryName(state.country)}${state.draft ? `: ${state.draft.title}` : ""}`,
-        body: report
-      });
-      return { report, itemId, itemStatus: status };
+      return { report, ...(await submitEmail(inbox, { user, threadId, country: state.country, sentences: state.sentences, title: state.draft?.title, report })) };
     })
     .addEdge(START, "read")
     .addEdge("read", "match")
@@ -222,11 +221,12 @@ export function createFactChecker({ client = fga, model = modelClient }: { clien
     .compile();
 
   return observe(
-    async (input: { request: FactCheckRequest; user: Identity; inbox?: ReviewInbox; threadId?: string }): Promise<FactCheckResult> => {
+    // sessionId groups this run with the others of one hand-off (lesson 15); it is the thread by default.
+    async (input: { request: FactCheckRequest; user: Identity; inbox?: ReviewInbox; threadId?: string; sessionId?: string }): Promise<FactCheckResult> => {
       updateActiveObservation({ input: input.request });
       return propagateAttributes(
         {
-          sessionId: input.threadId,
+          sessionId: input.sessionId ?? input.threadId,
           userId: input.user.userId,
           metadata: { tenantId: input.user.tenantId, country: input.user.country },
           traceName: "hcp-fact-check",
@@ -244,3 +244,23 @@ export function createFactChecker({ client = fga, model = modelClient }: { clien
 }
 
 export type FactChecker = ReturnType<typeof createFactChecker>;
+
+// An email for a medical reviewer of the sender's company (lesson 13). The id is the email's own
+// words, so sending the same email twice waits as one item. Lesson 15's A2A fact-checker calls
+// this itself, once the drafting agent has had its one chance to revise.
+export async function submitEmail(
+  inbox: ReviewInbox,
+  email: { user: Identity; threadId: string; country: string; sentences: string[]; title?: string; report: string }
+): Promise<{ itemId: string; itemStatus: ReviewStatus }> {
+  const itemId = `email-${contentKey(email.user.tenantId, email.country, ...email.sentences)}`;
+  const { status } = await inbox.submit({
+    id: itemId,
+    kind: "email",
+    threadId: email.threadId,
+    tenantId: email.user.tenantId,
+    traceId: getActiveTraceId(),
+    question: `An email for ${countryName(email.country)}${email.title ? `: ${email.title}` : ""}`,
+    body: email.report
+  });
+  return { itemId, itemStatus: status };
+}

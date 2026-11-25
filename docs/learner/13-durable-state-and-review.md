@@ -208,7 +208,7 @@ The routing slice has seven cases, each with the tier it should take: two answer
 
 ```bash
 npm run dataset:seed
-npm run dataset:run -- --cases ROUTING-01,ROUTING-02,ROUTING-03,ROUTING-04,ROUTING-05,ROUTING-06,ROUTING-07,SAFETY-01,PV-01,REVIEW-01,STALENESS-01,OFF-LABEL-01,INJECTION-01,MULTITURN-01 --chapter 13 --change "Risk tiers in code"
+npm run dataset:run -- --cases ROUTING-01,ROUTING-02,ROUTING-03,ROUTING-04,ROUTING-05,ROUTING-06,ROUTING-07,SAFETY-01,PV-01,REVIEW-01,STALENESS-01,NEGATIVE-01,INJECTION-01,MULTITURN-01 --chapter 13 --change "Risk tiers in code"
 ```
 
 `risk_tier` is scored only on the routing slice. The older cases use their `riskTier` field for the kind of answer (for example "stop" for any refusal), not for the router's tier.
