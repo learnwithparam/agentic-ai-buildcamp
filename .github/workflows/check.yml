@@ -32,3 +32,11 @@ jobs:
 
       - name: Typecheck, tests and repo checks
         run: npm run check
+
+      # The page checks render every diagram with mermaid-cli, the same tool live-labs uses.
+      # It is installed here, not as a dev dependency, so learners do not download a browser.
+      - name: Install mermaid-cli
+        run: npm i -g @mermaid-js/mermaid-cli@11.6.0
+
+      - name: Lesson pages, walkthrough and diagrams
+        run: npm run check:pages
