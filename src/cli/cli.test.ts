@@ -4,6 +4,7 @@ import { renderToString } from "ink";
 import * as oidc from "openid-client";
 import { createElement } from "react";
 import type { StreamEvent } from "../shared/messages";
+import { clean, createApi } from "./api";
 import { CLI_CALLBACK_PORT, CliError } from "./config";
 import { accessToken, SESSION_ENDED, SIGNED_OUT, waitForCallback, type Tokens, type TokenStore } from "./session";
 import { applyEvent, runTurn, START } from "./turn";
@@ -109,4 +110,22 @@ test("a token with time left is used, a near-expired one is renewed, an ended se
   assert.notEqual(down.saved, null, "Keycloak being down does not sign the doctor out");
 
   await assert.rejects(accessToken(memoryStore(null), refused, NOW), new CliError(SIGNED_OUT));
+});
+
+test("text from the server cannot send the terminal control sequences", () => {
+  const hostile = { question: "Dose?\u001b]52;c;cm0gLXJmIH4=\u0007\u001b[2J", items: [{ body: "5 mg\u009b31m\nonce daily\tok" }] };
+  assert.deepEqual(clean(hostile), { question: "Dose?]52;c;cm0gLXJmIH4=[2J", items: [{ body: "5 mg31m\nonce daily\tok" }] });
+});
+
+test("the API client cleans what the inbox and the stream return", async (t) => {
+  const escape = "\u001b[2J";
+  t.mock.method(globalThis, "fetch", async (url: URL) =>
+    url.pathname === "/api/inbox"
+      ? Response.json({ reviewer: true, items: [{ question: `Dose?${escape}` }] })
+      : new Response(`event: values\ndata: ${JSON.stringify({ messages: [ai(`5 mg${escape}`)] })}\n\n`)
+  );
+  const api = createApi("http://127.0.0.1:1", async () => "token");
+  assert.equal((await api.inbox()).items[0].question, "Dose?[2J");
+  const view = await runTurn(api.ask("t-1", "Dose?"), () => {});
+  assert.equal(view.text, "5 mg[2J");
 });

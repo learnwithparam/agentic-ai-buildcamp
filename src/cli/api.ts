@@ -13,6 +13,19 @@ export type { Me, ReviewItem };
 export type Inbox = { reviewer: boolean; items: ReviewItem[] };
 export type Decision = "approved" | "rejected" | "filed" | "dismissed";
 
+// Every string from the server is text someone else wrote: another doctor's question, a model's
+// answer. A terminal obeys control characters, so an escape sequence in that text could rewrite
+// the screen, hide a line or set the clipboard. They are removed here, once, before anything is
+// shown; new lines and tabs stay.
+const CONTROL = /[\u0000-\u0008\u000b-\u001f\u007f-\u009f]/g;
+
+export function clean<T>(value: T): T {
+  if (typeof value === "string") return value.replace(CONTROL, "") as T;
+  if (Array.isArray(value)) return value.map(clean) as T;
+  if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([key, entry]) => [key, clean(entry)])) as T;
+  return value;
+}
+
 export function createApi(appUrl: string, token: () => Promise<string>) {
   async function call(path: string, init: RequestInit = {}): Promise<Response> {
     let response: Response;
@@ -28,7 +41,7 @@ export function createApi(appUrl: string, token: () => Promise<string>) {
 
   async function json<T>(path: string, init: RequestInit = {}): Promise<T> {
     const response = await call(path, { ...init, signal: AbortSignal.timeout(30_000) });
-    const body = (await response.json().catch(() => ({}))) as T & { error?: string };
+    const body = clean((await response.json().catch(() => ({}))) as T & { error?: string });
     if (!response.ok) throw new CliError(body.error ?? `The server answered ${response.status}.`);
     return body;
   }
@@ -53,10 +66,10 @@ export function createApi(appUrl: string, token: () => Promise<string>) {
         signal
       });
       if (!response.ok || !response.body) {
-        const body = (await response.json().catch(() => ({}))) as { error?: string };
+        const body = clean((await response.json().catch(() => ({}))) as { error?: string });
         throw new CliError(body.error ?? `The server answered ${response.status}.`);
       }
-      yield* readEvents(response.body);
+      for await (const event of readEvents(response.body)) yield clean(event);
     }
   };
 }

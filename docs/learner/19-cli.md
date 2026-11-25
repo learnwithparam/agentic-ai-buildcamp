@@ -180,6 +180,8 @@ Up and down choose an item, and the box below shows the question and the draft. 
 | Draft answer, email, outreach step | `a` approve, `r` reject |
 | Adverse event | `f` file, `d` dismiss |
 
+The question in the box was written by another doctor, and the draft by a model. A terminal obeys control characters, so text with an escape sequence in it could clear Maya's screen, hide a line, or set her clipboard. `src/cli/api.ts` removes control characters from everything the server returns, once, before any screen sees it; new lines and tabs stay.
+
 Maya presses `a`. The CLI calls the lesson 13 decision route, the row turns to approved, and the keys go away, because a decided item takes no more decisions. Back in Langfuse, the decision is a score on the trace with Maya as the approver, exactly as if she had clicked in the browser.
 
 For a script, the same decision is one command:
@@ -222,7 +224,7 @@ No dataset run in this lesson. The CLI changes no answer: it reaches the same ag
 
 | Test | What it proves |
 | --- | --- |
-| `src/cli/cli.test.ts` | the screen follows the stream; a waiting draft never shows its text; a doctor who is not a reviewer gets no keys; the listener refuses a wrong `state` and reports a refused sign-in; a token is used, renewed, or dropped in the three cases of step 3 |
+| `src/cli/cli.test.ts` | the screen follows the stream; a waiting draft never shows its text; a doctor who is not a reviewer gets no keys; the listener refuses a wrong `state` and reports a refused sign-in; a token is used, renewed, or dropped in the three cases of step 3; control characters from the inbox and the stream never reach the screen |
 | `src/server/auth.test.ts` | the metadata route names our Keycloak, and every other route still needs a token |
 | `src/server/inbox.test.ts` | with real tokens, the CLI's API code sees one company's items, a doctor cannot decide, and a waiting thread takes no new question |
 
