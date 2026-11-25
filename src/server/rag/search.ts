@@ -20,8 +20,15 @@ export const MIN_SIMILARITY = 0.35;
 // force first, keeps the one the agent may cite in the results, and the old ones after it.
 export const CANDIDATES_PER_RESULT = 4;
 
+// A document in force this short is returned whole when any of its sections is a hit. Measured on
+// this library: every document but the full US label is 150 words or less. The reporting
+// procedure's 1.2 (what a report never holds) scores below label sections on its own (ROUTING-05),
+// so the question only reaches it through 1.1, its neighbour. The other sections come as extras
+// after their hit: the nearest `limit` hits are never pushed out. Old versions bring nothing.
+export const SHORT_DOCUMENT_WORDS = 200;
+
 export function vectorSearch(
-  store: Pick<LabelChunkStore, "nearest">,
+  store: Pick<LabelChunkStore, "nearest" | "shortDocuments">,
   embedQuery: (text: string) => Promise<number[]> = async (text) => (await embed([text]))[0],
   minSimilarity = MIN_SIMILARITY,
   model = EMBEDDING_MODEL
@@ -34,7 +41,20 @@ export function vectorSearch(
       .map(({ similarity: _similarity, ...section }): LabelSection => ({ ...section, status: statusOn(section, today) }));
     // A stable sort: in force first, each group still nearest first.
     const inForce = (section: LabelSection) => (section.status === "active" ? 0 : 1);
-    return sections.sort((a, b) => inForce(a) - inForce(b)).slice(0, limit);
+    sections.sort((a, b) => inForce(a) - inForce(b));
+    const top = sections.slice(0, limit);
+    // Each hit in force from a short document brings the rest of that document right after it.
+    const active = [...new Set(top.filter((section) => section.status === "active").map((section) => section.docId))];
+    const whole = await store.shortDocuments(active, SHORT_DOCUMENT_WORDS, model);
+    const key = (section: LabelSection) => `${section.docId} ${section.section}`;
+    const seen = new Set(top.map(key));
+    return top.flatMap((hit) => {
+      const extras = whole
+        .filter((section) => section.docId === hit.docId && !seen.has(key(section)))
+        .map((section): LabelSection => ({ ...section, status: statusOn(section, today) }));
+      extras.forEach((section) => seen.add(key(section)));
+      return [hit, ...extras];
+    });
   };
 }
 

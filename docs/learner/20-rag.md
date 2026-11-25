@@ -161,6 +161,11 @@ Then a floor. A section below 0.35 cosine similarity is not about the question, 
 
 A floor cannot do one job, and the page should say so. "Can my patient drink alcohol while taking CardioNex?" scores 0.60 on the boxed warning: it is about CardioNex, just not about anything the label says. Telling "related" from "answered" stays the agent's job.
 
+Two rules then shape the list the agent reads:
+
+- **Sections in force come first.** Each version of the label has a dose section with almost the same words. So the nearest four can all be old versions. Search reads four times as many rows, then puts the sections in force first.
+- **A short document comes whole.** For example, "What must a safety report never contain?" finds 1.1 of the reporting procedure, but its 1.2 ranks below six label sections. Every document but the full US label is under 150 words. So a hit in a short document in force brings that document's other sections in after it, as extras. The nearest four stay in the list.
+
 The server checks the index when it starts. An empty index stops it with the command to run:
 
 ```text
