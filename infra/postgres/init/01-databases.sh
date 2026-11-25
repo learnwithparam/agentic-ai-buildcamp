@@ -16,3 +16,8 @@ psql -v ON_ERROR_STOP=1 --username postgres <<'SQL'
 CREATE DATABASE medinfo_test OWNER medinfo;
 REVOKE ALL ON DATABASE medinfo_test FROM PUBLIC;
 SQL
+# Lesson 20. pgvector for the label index. Only the owner of the server may install an extension,
+# so it is done here, not by the app's migrations. npm run rag:setup does the same on an older volume.
+for db in medinfo medinfo_test; do
+  psql -v ON_ERROR_STOP=1 --username postgres --dbname "$db" -c "CREATE EXTENSION IF NOT EXISTS vector;"
+done

@@ -34,6 +34,8 @@ import { startA2a } from "./a2a-runner";
 import { startEvents } from "./events-runner";
 import { runCaseSweep } from "./sweep-runner";
 import { decide, useService } from "../src/server/gateway";
+import { createPool, migrate } from "../src/server/db";
+import { connectLabelIndex } from "../src/server/rag/search";
 import { JUDGED_SLICES, judgeFaithfulness, SCORE_NAME } from "./judge/faithfulness";
 import { BEHAVIORS, failedChecks, type AgentName, type Behavior, type CaseExpectation, type CaseInput } from "./hcp-cases";
 import { TIERED_SLICES } from "./scoreboard";
@@ -142,6 +144,11 @@ export async function startExperiment() {
 
   // The agent and the judge run on the eval-runner key: its own models, its own daily budget.
   useService("eval-runner");
+  // Lesson 20: search_labels reads the pgvector index of the label PDFs, as the server does.
+  if (!env.databaseUrl) throw new Error("DATABASE_URL is not set. Run npm run identity:setup (lesson 11).");
+  const pool = createPool(env.databaseUrl);
+  await migrate(pool);
+  await connectLabelIndex(pool);
   const factChecker = createFactChecker();
   const outreachPlanner = createOutreachPlanner();
   // Lesson 15: the two agents as A2A servers on a port of this process, for the a2a cases.
@@ -249,6 +256,7 @@ export async function startExperiment() {
   const close = async () => {
     await a2a.close();
     await events.close();
+    await pool.end();
     await langfuse.flush();
     await langfuseSpanProcessor.forceFlush();
     await sdk.shutdown();

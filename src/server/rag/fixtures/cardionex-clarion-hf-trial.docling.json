@@ -1,0 +1,307 @@
+{
+ "body": {
+  "children": [
+   {
+    "$ref": "#/texts/0"
+   },
+   {
+    "$ref": "#/texts/1"
+   },
+   {
+    "$ref": "#/texts/2"
+   },
+   {
+    "$ref": "#/texts/3"
+   },
+   {
+    "$ref": "#/tables/0"
+   },
+   {
+    "$ref": "#/groups/0"
+   },
+   {
+    "$ref": "#/texts/6"
+   },
+   {
+    "$ref": "#/groups/1"
+   },
+   {
+    "$ref": "#/texts/8"
+   }
+  ]
+ },
+ "groups": [
+  {
+   "self_ref": "#/groups/0",
+   "children": [
+    {
+     "$ref": "#/texts/4"
+    },
+    {
+     "$ref": "#/texts/5"
+    }
+   ]
+  },
+  {
+   "self_ref": "#/groups/1",
+   "children": [
+    {
+     "$ref": "#/texts/7"
+    }
+   ]
+  }
+ ],
+ "texts": [
+  {
+   "self_ref": "#/texts/0",
+   "label": "section_header",
+   "prov": [
+    {
+     "page_no": 1,
+     "bbox": {
+      "l": 146.4377955,
+      "t": 742.26008674,
+      "r": 439.5422780921373,
+      "b": 731.26057474,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "CLARION-HF Phase-3 Clinical Trial Summary (N = 4,820)"
+  },
+  {
+   "self_ref": "#/texts/1",
+   "label": "text",
+   "prov": [
+    {
+     "page_no": 1,
+     "bbox": {
+      "l": 146.4377955,
+      "t": 715.8621741025,
+      "r": 398.81778635657736,
+      "b": 708.4625158525,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "Document cardionex-clarion-hf-trial \u00b7 US \u00b7 effective 2026-08-20 \u00b7 status active"
+  },
+  {
+   "self_ref": "#/texts/2",
+   "label": "section_header",
+   "prov": [
+    {
+     "page_no": 1,
+     "bbox": {
+      "l": 146.4377955,
+      "t": 681.9000925,
+      "r": 258.46979550000003,
+      "b": 661.0200925,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "3.1 Primary and Subgroup Efficacy Outcomes"
+  },
+  {
+   "self_ref": "#/texts/3",
+   "label": "section_header",
+   "prov": [
+    {
+     "page_no": 1,
+     "bbox": {
+      "l": 307.559055,
+      "t": 681.9000925,
+      "r": 421.7713050000002,
+      "b": 661.0200925,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "3.2 Adverse Reactions and Initiation Thresholds"
+  },
+  {
+   "self_ref": "#/texts/4",
+   "label": "list_item",
+   "prov": [
+    {
+     "page_no": 1,
+     "bbox": {
+      "l": 316.56488475000003,
+      "t": 649.8355064725,
+      "r": 319.5046797375,
+      "b": 641.4360922225001,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "\u00b7"
+  },
+  {
+   "self_ref": "#/texts/5",
+   "label": "list_item",
+   "prov": [
+    {
+     "page_no": 1,
+     "bbox": {
+      "l": 321.83905500000003,
+      "t": 649.8355064725,
+      "r": 423.280869764484,
+      "b": 630.3480922225001,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "Common Adverse Events (CardioNex vs. Placebo):"
+  },
+  {
+   "self_ref": "#/texts/6",
+   "label": "text",
+   "prov": [
+    {
+     "page_no": 1,
+     "bbox": {
+      "l": 321.83905500000003,
+      "t": 627.6595064725,
+      "r": 448.80460080299997,
+      "b": 574.9080922225,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "Symptomatic hypotension (9.1% vs. 4.5%), hyperkalemia (6.8% vs. 3.4%), worsening renal function (4.2% vs. 3.8%), angioedema (0.4% vs. 0.1%)."
+  },
+  {
+   "self_ref": "#/texts/7",
+   "label": "list_item",
+   "prov": [
+    {
+     "page_no": 1,
+     "bbox": {
+      "l": 316.56488475000003,
+      "t": 572.2195064725,
+      "r": 445.78081167299996,
+      "b": 475.1160922225,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "Footnote \u2020 (Potassium Exclusion Rule): Patients with screening serum potassium > 5.2 mEq/L were excluded from CLARION-HF. Per clinical protocol and labeling, do NOT initiate CardioNex if baseline serum potassium exceeds 5.0 mEq/L. \u00b7"
+  },
+  {
+   "self_ref": "#/texts/8",
+   "label": "page_footer",
+   "prov": [
+    {
+     "page_no": 1,
+     "bbox": {
+      "l": 279.73593975,
+      "t": 29.011608369999863,
+      "r": 315.53969169,
+      "b": 22.011852370000042,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "text": "Page 1 of 1"
+  }
+ ],
+ "tables": [
+  {
+   "self_ref": "#/tables/0",
+   "label": "table",
+   "prov": [
+    {
+     "page_no": 1,
+     "bbox": {
+      "l": 145.47683443755724,
+      "t": 653.7271306633312,
+      "r": 313.0433644001702,
+      "b": 529.0917321279593,
+      "coord_origin": "BOTTOMLEFT"
+     }
+    }
+   ],
+   "data": {
+    "grid": [
+     [
+      {
+       "text": "Population / Subgroup"
+      },
+      {
+       "text": "CardioNex Event Rate"
+      },
+      {
+       "text": "Placebo Event Rate"
+      },
+      {
+       "text": "Hazard Ratio (95% CI)"
+      },
+      {
+       "text": "P- Value"
+      }
+     ],
+     [
+      {
+       "text": "Overall Intention-to- Treat (ITT)"
+      },
+      {
+       "text": "14.2%"
+      },
+      {
+       "text": "19.1%"
+      },
+      {
+       "text": "0.74 (0.65- 0.84)"
+      },
+      {
+       "text": "p < 0.001"
+      }
+     ],
+     [
+      {
+       "text": "Age >= 75 Years"
+      },
+      {
+       "text": "17.8%"
+      },
+      {
+       "text": "21.9%"
+      },
+      {
+       "text": "0.81 (0.68- 0.96)"
+      },
+      {
+       "text": "p = 0.014"
+      }
+     ],
+     [
+      {
+       "text": "Baseline eGFR 30- 59 mL/min"
+      },
+      {
+       "text": "16.0%"
+      },
+      {
+       "text": "21.4%"
+      },
+      {
+       "text": "0.73 (0.61- 0.88)"
+      },
+      {
+       "text": "p = 0.001"
+      }
+     ]
+    ]
+   }
+  }
+ ],
+ "pages": {
+  "1": {
+   "size": {
+    "width": 595.275591,
+    "height": 841.889764
+   }
+  }
+ }
+}

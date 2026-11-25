@@ -19,7 +19,7 @@ export type LabelSection = {
 
 const DOCS_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../data/hcp/docs");
 
-function parseDoc(raw: string): LabelSection[] {
+export function parseLabelDoc(raw: string): LabelSection[] {
   const match = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
   if (!match) return [];
   const meta = Object.fromEntries(
@@ -51,7 +51,7 @@ function parseDoc(raw: string): LabelSection[] {
 export const LABEL_SECTIONS: LabelSection[] = readdirSync(DOCS_DIR)
   .filter((name) => name.endsWith(".md"))
   .sort()
-  .flatMap((name) => parseDoc(readFileSync(path.join(DOCS_DIR, name), "utf8")));
+  .flatMap((name) => parseLabelDoc(readFileSync(path.join(DOCS_DIR, name), "utf8")));
 
 // The dataset fixes "today" so every run sees the same labels in force. An event can name
 // another day (lesson 16: a label comes into force), and the status below follows that day.

@@ -54,6 +54,7 @@ TAGS=(
   checkpoint/17-autonomy
   checkpoint/18-release-gate
   checkpoint/19-cli
+checkpoint/20-rag
 )
 
 # Files whose code is what the next lesson changes. Add a file here when a
@@ -142,44 +143,54 @@ GATE_FILES=".githooks/pre-push docs/scoreboard.md package.json scripts/experimen
 CLI_FILES="package.json package-lock.json scripts/identity-setup.ts src/server/auth.ts src/server/auth.test.ts
   src/server/inbox.test.ts src/client/chat/api.ts src/shared/sse.ts src/shared/messages.ts src/cli/api.ts
   src/cli/cli.test.ts src/cli/config.ts src/cli/index.tsx src/cli/session.ts src/cli/turn.ts src/cli/ui.tsx"
+# Lesson 20 reads the label PDFs through Docling into pgvector; the files it changes and adds
+# (RAG_FILES) stay as they were on tags before it, so lesson 19 still searches by keyword.
+RAG_FILES="docs/scoreboard.md package.json package-lock.json scripts/experiment.ts scripts/rag-ingest.ts
+  scripts/rag-setup.ts src/server/index.ts src/server/tools.ts src/server/migrations/008_label_chunks.sql
+  src/server/rag/extract.ts src/server/rag/ingest.ts src/server/rag/rag.test.ts src/server/rag/search.ts
+  src/server/rag/store.ts src/server/rag/fixtures/cardionex-clarion-hf-trial.docling.json
+  src/server/rag/fixtures/cardionex-clarion-hf-trial.docling.md src/server/rag/fixtures/cardionex-uspi-v2.docling.json"
 milestone_files() {
   case "$1" in
     checkpoint/00-setup | checkpoint/01-base-app | checkpoint/02-tracing)
-      echo "src/server/index.ts src/server/medinfo-agent.ts src/server/tools.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES"
+      echo "src/server/index.ts src/server/medinfo-agent.ts src/server/tools.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES"
       ;;
     checkpoint/03-prompt-management)
-      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES"
+      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES"
       ;;
     # Lessons 06 and 07 run the dataset with the correctness judge; lesson 09 replaces it.
     checkpoint/04-* | checkpoint/05-* | checkpoint/06-* | checkpoint/07-* | checkpoint/08-* | checkpoint/09-*)
-      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES"
+      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES"
       ;;
     checkpoint/10-*)
-      echo "$AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES"
+      echo "$AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES"
       ;;
     checkpoint/11-*)
-      echo "$MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES"
+      echo "$MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES"
       ;;
     checkpoint/12-*)
-      echo "$TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES"
+      echo "$TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES"
       ;;
     checkpoint/13-*)
-      echo "$CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES"
+      echo "$CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES"
       ;;
     checkpoint/14-*)
-      echo "$A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES"
+      echo "$A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES"
       ;;
     checkpoint/15-*)
-      echo "$EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES"
+      echo "$EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES"
       ;;
     checkpoint/16-*)
-      echo "$AUTO_FILES $GATE_FILES $CLI_FILES"
+      echo "$AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES"
       ;;
     checkpoint/17-*)
-      echo "$GATE_FILES $CLI_FILES"
+      echo "$GATE_FILES $CLI_FILES $RAG_FILES"
       ;;
     checkpoint/18-*)
-      echo "$CLI_FILES"
+      echo "$CLI_FILES $RAG_FILES"
+      ;;
+    checkpoint/19-*)
+      echo "$RAG_FILES"
       ;;
     *)
       echo ""
@@ -214,8 +225,11 @@ trap cleanup EXIT
 
 mkdir -p "$STAGE/source" "$STAGE/keep"
 git archive "$SOURCE_REF" | tar -x -C "$STAGE/source"
-# The workflow and this script only run on main. A tag without them stays clean.
-rm -rf "$STAGE/source/.github" "$STAGE/source/scripts/sync-checkpoints.sh"
+# The workflow, this script and the scoreboard alignment only run on main. A tag without them
+# stays clean; the alignment is copied in for one step below and removed again.
+cp "$STAGE/source/scripts/align-scoreboard.ts" "$STAGE/align-scoreboard.ts"
+rm -rf "$STAGE/source/.github" "$STAGE/source/scripts/sync-checkpoints.sh" \
+  "$STAGE/source/scripts/align-scoreboard.ts" "$STAGE/source/scripts/align-scoreboard.test.ts"
 
 sync_regions() {
   python3 - "$1" "$2" <<'PY'
@@ -278,6 +292,13 @@ for tag in "${TAGS[@]}"; do
       sync_regions "$STAGE/source/$file" "$file"
     fi
   done
+
+  # A tag keeps its own scoreboard, but the dataset is shared, so a slice added later is a new
+  # column there too: the tag's rows get a dash in it.
+  # It runs inside the tag so it reads that tag's own header (headerRow from scripts/scoreboard.ts).
+  cp "$STAGE/align-scoreboard.ts" scripts/align-scoreboard.ts
+  npx tsx scripts/align-scoreboard.ts
+  rm scripts/align-scoreboard.ts
 
   git add -A
   # --verify checks every tag, moved or not: a tag already in sync is still what a learner checks out.
