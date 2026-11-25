@@ -199,7 +199,8 @@ export function createRoutes(auth: Auth, desk: Desk) {
       tenantId: user.tenantId,
       trigger: "person",
       requestedBy: user.name,
-      instruction: parsed.data.instruction || undefined,
+      // Scrubbed here too, so the queued job and the run log never hold an identifier.
+      instruction: parsed.data.instruction ? scrubPhi(parsed.data.instruction).text : undefined,
       today: parsed.data.today
     });
     if (!jobId) {

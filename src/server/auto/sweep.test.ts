@@ -147,6 +147,28 @@ describe("the work", () => {
     assert.match(result.report, /covers HCP-1001\./);
   });
 
+  test("an instruction loses its patient identifiers before the picker, the planner or the report reads it", async () => {
+    const { desk, planned } = standIn();
+    const seen: string[] = [];
+    const model = () =>
+      ({
+        chat: {
+          completions: {
+            create: async (request: { messages: Array<{ content: string }> }) => {
+              seen.push(request.messages.map((message) => message.content).join("\n"));
+              return (picker(["HCP-1001"])() as { chat: { completions: { create: () => Promise<unknown> } } }).chat.completions.create();
+            }
+          }
+        }
+      }) as never;
+    const sweep = createSweep({ desk, controls: new FixedControls(LIMITS), spend: async () => 0, model, client: fgaOfPharmaA });
+    const result = await run(sweep, "2026-11-23", "Follow up on MRN-77310, reply to pat.lee@example.com.");
+    for (const text of [...seen, ...planned, result.report]) {
+      assert.doesNotMatch(text, /77310|pat\.lee@example\.com/);
+    }
+    assert.match(planned[0]!, /\[record number removed\]/);
+  });
+
   test("the picker reads facts from the CRM files for each doctor", () => {
     const line = doctorLine({ hcpId: "HCP-1001", tenantId: "pharma_a", country: "US", specialty: "cardiology", emailConsent: true, preferredChannel: "email" });
     assert.match(line, /^HCP-1001: cardiology, US, email consent yes; sample requests: R-01 pending; campaigns sent: heart-failure-update-nov$/);
