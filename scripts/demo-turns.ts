@@ -110,8 +110,13 @@ async function ask(cookie: string, threadId: string, text: string, seenBefore: n
     reason: state.route?.reason ?? "",
     searches: calls.filter((call) => call.name === "search_labels").map((call) => String(call.args.query ?? "")),
     sections: turn.flatMap((message) => (message.type === "tool" && message.name === "search_labels" ? sectionsFrom(message) : [])),
-    reply: draft || (replies.length ? aiText(replies[replies.length - 1]) : "")
+    reply: draft || (replies.length ? textOf(replies[replies.length - 1]) : "")
   };
+}
+
+// The server's error reply carries its text as a plain string, not as parts.
+function textOf(message: AiMessage): string {
+  return typeof message.content === "string" ? message.content : aiText(message);
 }
 
 function misses(seen: Seen, expect: Expect): string[] {
