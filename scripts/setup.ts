@@ -126,7 +126,16 @@ async function verify() {
   const { env } = await import("../src/server/env");
   const { modelClient } = await import("../src/server/gateway");
   const langfuse = new LangfuseClient({ publicKey: env.langfusePublicKey, secretKey: env.langfuseSecretKey, baseUrl: env.langfuseBaseUrl });
-  const datasets = await langfuse.api.datasets.get(env.datasetName);
+  // Langfuse can miss one request while Docker is short of memory, so ask for up to 30 seconds.
+  let datasets: { name: string } | undefined;
+  for (let attempt = 1; !datasets; attempt++) {
+    try {
+      datasets = await langfuse.api.datasets.get(env.datasetName);
+    } catch (error) {
+      if (attempt === 10) throw new Stop(`Langfuse did not answer at ${env.langfuseBaseUrl} for 30 seconds. Run npm run doctor.`);
+      await new Promise((resolve) => setTimeout(resolve, 3_000));
+    }
+  }
   ok(`Langfuse answers, and the dataset "${datasets.name}" is there`);
   const reply = await modelClient().chat.completions.create({
     model: env.openaiModel,
