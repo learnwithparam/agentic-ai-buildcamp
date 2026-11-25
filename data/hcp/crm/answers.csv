@@ -1,0 +1,5 @@
+answer_id,tenant_id,hcp_id,country,asked_at,question,cites,status
+A-01,pharma_a,HCP-1001,US,2026-11-19,What is the CardioNex dose for a patient with severe renal impairment (eGFR 25) who is not on dialysis?,cardionex-uspi-v2 2.2,open
+A-02,pharma_a,HCP-1001,US,2026-10-02,What is the CardioNex dose for severe renal impairment?,cardionex-uspi-v2 2.2,closed
+A-03,pharma_a,HCP-1002,DE,2026-11-12,What is the CardioNex dose for severe renal impairment?,cardionex-de-smpc 2.2,open
+A-04,pharma_b,HCP-1004,US,2026-11-18,What is the NeuroVex starting dose?,neurovex-uspi-v1 2.1,open
