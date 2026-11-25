@@ -1,6 +1,6 @@
 {
   "repo": "learnwithparam/dataset",
-  "commit": "90d95c461e97741466545eebae29e9f2cbccad7a",
+  "commit": "64fcf47ef44a30134d0395cc83af581fa37a2829",
   "files": {
     "content/approved-claims.csv": "1ddb245191c11c5417ee03937355610a563c26e48d7626d48e576d373aac109f",
     "content/draft-email-de.md": "11e483de41ac15e857a40de3f84f7c7d376ce304df341f0d97ed84d473cc35e4",
@@ -25,13 +25,27 @@
     "docs/pv-reporting-sop.md": "9bd0fc74628a34429cdc47930104be4268fb015316152a84f340f229b6109bef",
     "events/ae-report-evt-02.eml": "4e4dcfd5cef3ce0a2958beb4e2c7242f6f4e66fe14af23f2c12880112fc266aa",
     "events/events.jsonl": "76cfe15eea4894d5b8bc1b28ef347c4c9afd2279f97189ebc01a8bc2774cfb5c",
+    "labels/cardionex-uspi-2026-v2.md": "5210b032d4394440cd80694455eae30216225958221dcd0a5ce9851bc099de9a",
+    "pdf/cardionex-clarion-hf-trial.pdf": "692c199d2b6090250b2ad14dba283b52b063fc6f85d8c241310f2ce31b9d0f0b",
+    "pdf/cardionex-de-smpc-2026.pdf": "814282cd17bed5f16fec57c20fc76e617ebf93c48de72c0dae41aafb54a67e75",
+    "pdf/cardionex-draft-2024.pdf": "0ef766b0202f46d8ad20cb19bad85ae240e36443e2f94bd1dd77b1f2b0a907fc",
+    "pdf/cardionex-jp-label-2025.pdf": "9031210c1c987ce9cbdde2ed8233b1a57ff3b673c5a87f491df4fab3aeff6e32",
+    "pdf/cardionex-medinfo-faq.pdf": "3121517e8668a3879a74b8bcb596bdc28ae6563954eb4b4a41c4909077eca9d3",
+    "pdf/cardionex-payer-formulary-2026.pdf": "317ade04ca621e6cd0236c7835aa5bd19f608cf9e79575a269ae981be79270f7",
+    "pdf/cardionex-uspi-2025-v1.pdf": "3a96797893d169babaf940a917a38283529d3cfa747ac30a101c8aebabee8830",
+    "pdf/cardionex-uspi-2026-v2.pdf": "3fd5f87b9f153b4ef9c2b2736409c210ca8f4f222129eda5c447de70266c5144",
+    "pdf/cardionex-uspi-2027-v3.pdf": "754b4063013e48da89cd4a0144806282a8ebba43fc2ca77465da601ddae1fb64",
+    "pdf/manifest.json": "6da955263e69c04525039be694189dab3a0f705755b176aab2f20f6d3211f0f4",
+    "pdf/neurovex-trial-summary.pdf": "d4b6b979cad46e5114a2347af4afee478365ec09b3d357505fecf344bb805e4a",
+    "pdf/neurovex-uspi-2026-v1.pdf": "c1afd7065c74a4c15f6f571e34ec452e01d4429e0cb2c62ae7fb6e5b2012d3b1",
+    "pdf/pv-reporting-sop.pdf": "a04487ba036b2c16d795eea529e57df7f357cf7f3abcb1c50c322dc97b0783d2",
     "sql/pharma_a_territory_rx.csv": "a9ebb0646ce9870a543075cb32b6a5b41c065439da29f871326c8d66bb90b590",
     "sql/pharma_b_dispenses.csv": "b818c20f0c3973cd9f75ddab3eef8341a5f433a712841bc4ccb8d4db42531224",
     "evals/a2a.yaml": "324ab5daaf82192a718e309abc30a8461d9d4561dab3ed27b41c2778632552f9",
     "evals/autonomy.yaml": "fc75f5f06186fab0a83b277da0d3846047a3de40b1015b4de0cb39ca80e6a9f1",
     "evals/events.yaml": "5f9d456b6931a024588db9bc73e8c9ea9e0b50b3a79464452077ed3fcea8f458",
     "evals/fact-check.yaml": "94138533f7bb0546aa8ab6582bbf887b82ac269f9714b501e847d4408df64afa",
-    "evals/medinfo.yaml": "9198173159d077a2f0f174c0b365573c6476be6ed4a7e15fe586bcce09ef417d",
+    "evals/medinfo.yaml": "b46404e9ac8d46d6b65fb34571d57c528687d26b748755767e2d101e04094a9c",
     "evals/outreach.yaml": "0e982c665d923915936963571599907b0bc0e40b483371b57d62a1f1880badaa"
   }
 }
