@@ -120,6 +120,13 @@ test("a group of fewer than 11 prescribers is left out, and the totals match the
   }
 });
 
+test("a date comes back as the day Postgres holds, in any time zone", async () => {
+  const result = await runQuery("SELECT DATE '2026-09-01' AS day, min(period_start) AS first FROM bi.territory_rx", "pharma_b", url);
+  assert.ok(result.ok);
+  assert.equal(result.rows[0].day, "2026-09-01");
+  assert.match(String(result.rows[0].first), /^\d{4}-\d{2}-01$/);
+});
+
 test("an answer is cut at 500 rows", async () => {
   const result = await runQuery("SELECT a.territory FROM bi.territory_rx a, bi.territory_rx b", "pharma_a", url);
   assert.ok(result.ok);

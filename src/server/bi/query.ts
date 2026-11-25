@@ -80,6 +80,15 @@ export async function refusal(sql: string): Promise<string | null> {
 // One pool per company login. Each holds few connections: the login allows 5 in all.
 const pools = new Map<string, pg.Pool>();
 
+// A DATE stays the text Postgres sends, such as 2026-09-01. By default pg makes it a Date at local
+// midnight, and JSON then writes it in UTC: east of Greenwich, 1 September became 31 August, and the
+// agent told an analyst September had no data.
+const DATE_OID = 1082;
+const types = {
+  getTypeParser: ((oid: number, format?: "text" | "binary") =>
+    oid === DATE_OID ? (value: string) => value : pg.types.getTypeParser(oid, format)) as typeof pg.types.getTypeParser
+};
+
 export function biPool(tenantId: string, databaseUrl = env.databaseUrl): pg.Pool {
   const key = `${tenantId} ${databaseUrl}`;
   let pool = pools.get(key);
@@ -89,7 +98,7 @@ export function biPool(tenantId: string, databaseUrl = env.databaseUrl): pg.Pool
     const url = new URL(databaseUrl);
     url.username = `bi_${tenantId}`;
     url.password = password;
-    pool = new pg.Pool({ connectionString: url.toString(), max: 3 });
+    pool = new pg.Pool({ connectionString: url.toString(), max: 3, types });
     pools.set(key, pool);
   }
   return pool;
