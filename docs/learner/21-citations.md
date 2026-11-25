@@ -1,36 +1,121 @@
 ---
 title: "Workshop: Check Every Citation Before the Answer Is Sent"
-description: "Check each answer in code against the sections the search returned: every citation was found and is in force, every dose is in the section it cites. A failing answer is rewritten once, then withheld, and Langfuse counts each outcome."
+description: "Check each answer in code against the sections the search found. Every citation must be found and in force, and every dose must be in the section it cites. A failing answer is rewritten once, then held back, and each outcome is counted on the trace."
 ---
 
 # 21 Check every citation before the answer is sent
 
-## Why a prompt rule is not enough
+## The problem
 
-The desk rules already say "Answer only from label text returned by search_labels" and "Cite every fact as [doc_id, section]". A rule in a prompt is a request. The model follows it most of the time, and the answers where it does not look just as sure as the rest.
+A doctor asks the desk a short question. "Was CardioNex approved at 50mg twice daily?" The agent answers with a citation, and the answer looks sure. But it cites a 2024 draft that expired. We found this in 6 of 9 stored answers to that question.
 
-Lesson 20 made the search find the right section. It did not make the answer stay inside what the search found. Three ways it leaves, all from answers already stored in Langfuse:
+The desk rules already say "answer only from label text the search returned". They also say "cite every fact". A rule in a prompt is a request. The model follows it most of the time. When it does not, the answer looks just as sure as a good one.
 
-- **It cites a document that is not in force.** Asked "Was CardioNex approved at 50mg twice daily?", the agent cited the expired 2024 draft, `[cardionex-draft-2024, 2.1]`, in 6 of 9 stored answers.
-- **It gives a dose with no citation.** "5 mg once daily" for a patient with eGFR 24, with nothing to say where 5 mg came from.
-- **It cites a real section for a number that section does not have.** A "40 %" written next to `[cardionex-uspi-v2, 2.2]`, which says nothing about 40 %.
+We checked 405 stored answers. 13 broke a rule, and each one went to a doctor. They broke it in three ways:
 
-A doctor cannot tell these from a good answer. So the answer is checked in code, against the search results, before it is final.
+- **A citation to a document not in force.** For example, the expired draft above.
+- **A dose with no citation.** One answer said "5 mg once daily" for a patient with weak kidneys. Nothing said where 5 mg came from.
+- **A number the cited section does not hold.** A "40 %" next to a section that says nothing about 40 %.
 
-Complementary materials:
+A doctor cannot tell these from a good answer. So code must check the answer before it is sent.
 
-- Docs: [Langfuse scores](https://langfuse.com/docs/evaluation/evaluation-methods/scores-via-sdk), including categorical scores
-- Docs: [LangGraph conditional edges](https://langchain-ai.github.io/langgraphjs/concepts/low_level/#conditional-edges)
+## What you build
 
-## Goal
+- **A citation check,** in plain code with no model call. It reads the answer and the sections the search returned.
+- **One rewrite.** A failing answer goes back to the model once, with each problem spelled out.
+- **A held answer.** If the rewrite fails too, the doctor is told to ask a person.
+- **A score on each trace,** in Langfuse, which keeps every trace. It counts how often an answer passed, was rewritten or was held.
+- **Two scripts.** One finds the stored answers that broke a rule. One replays them through the new check on the real model.
 
-No answer reaches a doctor with a citation the search did not return, a document that is not in force, or a dose its citation does not state.
+| Case | What breaks | How the system holds |
+| --- | --- | --- |
+| A citation to the expired draft | The doctor reads a dose that is not approved | The check sees the document is not in force |
+| A dose with no citation | Nobody can say where the dose came from | The check finds a number with no source |
+| A number the section lacks | The citation looks real but proves nothing | The check looks for the number in the section |
+| A rewrite that fails again | A second try costs time and still misleads | The answer is held, and a person answers |
 
-- **Before:** 13 of 405 stored answers break one of those rules, and each one went to the doctor.
-- **Build:** a `cite` node after the agent. It checks the answer, asks for one rewrite with the problems listed, and withholds the answer if the rewrite fails too. The outcome is a score on the trace.
-- **After:** the same 13 answers would be stopped, and Langfuse counts how often an answer passed, was rewritten or was withheld.
+## How it works
 
-## Starting point
+The model writes the answer, and code decides if it goes out. The check reads only what the doctor asked and what the search returned. So it needs no second model, and a right answer costs nothing.
+
+### The flow
+
+This follows one real question from the doctor to the answer they see. Here the first answer cites the expired draft.
+
+```mermaid
+sequenceDiagram
+    participant D as Doctor
+    participant R as Router
+    participant A as Agent
+    participant S as Label search
+    participant C as Citation check
+    participant M as Model
+    participant T as Trace
+    D->>R: Was it approved at 50mg twice daily?
+    R->>A: Answer tier
+    A->>S: Search the labels
+    S-->>A: Four sections, one expired
+    A->>C: First answer cites the expired draft
+    C->>C: Not in force, so it fails
+    C->>M: Rewrite once, tools off, problems listed
+    M-->>C: Second answer
+    alt Rewrite passes
+        C-->>D: Rewritten answer, same message
+    else Rewrite fails too
+        C-->>D: Held, please ask a person
+    end
+    C->>T: Score passed, rewritten or held
+```
+
+The doctor never sees the first answer. The rewrite streams under the same message id. So the answer changes in place, and no second answer appears.
+
+### Where it sits
+
+The check sits between the agent and the end of the turn. On the review tier, it runs before the draft reaches the reviewer.
+
+```mermaid
+flowchart LR
+    U[Doctor in the app] -->|signed-in question| API[API]
+    API -->|may this user read it| FGA[Permissions]
+    API --> RT[Router]
+    RT -->|answer or review tier| AG[Agent]
+    AG -->|search_labels| VS[(Label index)]
+    AG -->|model call| GW[Gateway]
+    AG -->|answer and search results| CT[Citation check]
+    CT -->|review tier| RV[(Review inbox)]
+    CT -->|answer tier| U
+    CT -->|outcome score| LF[(Traces)]
+    classDef new fill:#fde68a,stroke:#b45309,color:#1c1917
+    class CT new
+```
+
+A reviewer only ever sees a checked draft. A draft with an expired citation never reaches the inbox.
+
+### The states
+
+Each answer ends in one of three outcomes.
+
+```mermaid
+%% states: src/server/graph.ts CitationOutcome
+stateDiagram-v2
+    [*] --> passed: check finds no problem
+    [*] --> rewritten: check fails, rewrite passes
+    [*] --> withheld: rewrite fails too
+    passed --> [*]
+    rewritten --> [*]
+    withheld --> [*]
+```
+
+There is one rewrite, not a loop. A model that failed twice on the same sections will not pass on a third try. Each try costs a call and the doctor's time.
+
+### Concepts
+
+- [Citation](../walkthrough.md#c-citation)
+- [In force](../walkthrough.md#c-in-force)
+- [Citation check](../walkthrough.md#c-citation-check)
+- [Held answer](../walkthrough.md#c-held-answer)
+
+## Build it
 
 ```bash
 git checkout checkpoint/21-citations
@@ -38,20 +123,17 @@ npm install
 npm run dev
 ```
 
-The checkpoint adds:
+The checkpoint adds these files. No new package and no new container.
 
-- `src/server/citations.ts`: `checkCitations`, the check itself, with no model call.
+- `src/server/citations.ts`: `checkCitations`, the check itself.
 - `src/server/graph.ts`: the `cite` node and `citeStep`, the one rewrite.
 - `src/server/medinfo-agent.ts`: the `cite` span and the `citations` score.
-- `scripts/citations-audit.ts`: `npm run citations:audit`, the check over stored answers.
-- `scripts/citations-replay.ts`: `npm run citations:replay`, the `cite` node on those answers with the real model.
-- `src/server/citations.test.ts`, with four real stored answers in `citations.fixtures.json`.
+- `scripts/citations-audit.ts`: the check over stored answers.
+- `scripts/citations-replay.ts`: the `cite` node on those answers, with the real model.
 
-No new npm package and no new container.
+### Step 1: Find the answers that broke the rules
 
-## Step 1: Find the answers that broke the rules
-
-The answers are already in Langfuse, with the search results the model read before writing them. Run the check over them:
+The answers are already in Langfuse. Each one sits next to the search results the model read. Run the check over them:
 
 ```bash
 npm run citations:audit
@@ -70,19 +152,17 @@ not_in_force [cardionex-draft-2024, 2.1]: Was CardioNex approved at 50mg twice d
   http://localhost:5174/project/<project>/traces/1d8600ae6af4514d6c6b403e7fb1d8f3
 ```
 
-It makes no model calls: it reads the stored search results and answers, and runs the same function the app now runs. Your numbers depend on what your Langfuse holds; `--since 1d` limits it to the last day.
+It makes no model call. It runs the same function the app now runs. Your numbers depend on what your traces hold. Add `--since 1d` to read only the last day.
 
-Open the last link. The search returned four sections, and the answer cites one marked expired:
+Open the last link. The search returned four sections. The answer cites one marked expired.
 
-![The Langfuse trace of a stored answer: search_labels returned four sections, and the answer cites cardionex-uspi-v2 2.2 and cardionex-draft-2024 2.1, an expired document.](../images/citations/01-expired-draft.png)
+![The trace: four sections came back, and the answer cites the expired draft.](../images/citations/01-expired-draft.png)
 
-The answer even calls the draft "an expired document" and cites it anyway. The case for this lesson is STALENESS-03: the expired draft must never be cited.
+The answer even calls the draft "an expired document", and cites it anyway. The case for this lesson is STALENESS-03. The expired draft must never be cited.
 
-## Step 2: The check
+### Step 2: Check every citation
 
-`checkCitations(answer, retrieved, asked)` in `src/server/citations.ts` returns a list of problems. An empty list is a pass. It checks two things.
-
-**Every citation.** Each `[doc_id, section]` must be a section `search_labels` returned in this conversation, with status `active`:
+`checkCitations(answer, retrieved, asked)` returns a list of problems. An empty list is a pass. First, each `[doc_id, section]` must be a section the search returned, and it must be in force:
 
 ```ts
 for (const citation of new Set(all)) {
@@ -92,39 +172,40 @@ for (const citation of new Set(all)) {
 }
 ```
 
-The status comes from the search result, which comes from the PDF manifest of lesson 20. The model never decides whether a document is in force.
+The status comes from the search result. The search reads it from the PDF list of lesson 20. The model never decides if a document is in force.
 
-**Every number a doctor acts on.** `quantities` finds each dose, wait, lab value or rate: "5 mg", "4 weeks", "36 hours", "40 %". Each one must be in the text of the sections its sentence cites. A sentence with no citation of its own uses its paragraph's, and then the whole answer's, because "Start at 20 mg. Raise to 40 mg after 4 weeks. [doc, 2.2]" cites both sentences at once.
+### Step 3: Check every number a doctor acts on
+
+`quantities` finds each dose, wait, lab value or rate. For example, "5 mg", "4 weeks" or "40 %". Each one must be in the text of the sections its sentence cites.
+
+A sentence with no citation of its own uses its paragraph's. If the paragraph has none, it uses the whole answer's. That is because "Start at 20 mg. Raise to 40 mg after 4 weeks. [doc, 2.2]" cites both sentences at once.
 
 Two things are left alone on purpose:
 
-- **A number the doctor gave.** "eGFR 24" in the answer is about the patient, not a claim from the label.
-- **An answer with no number and no citation,** such as a follow-up question or a refusal. There is nothing to check.
+- **A number the doctor gave.** "eGFR 24" is about the patient. It is not a claim from the label.
+- **An answer with no number and no citation.** A follow-up question or a refusal has nothing to check.
 
-A follow-up ("and if she is on dialysis?") is often answered from the sections the first question found. `evidenceOf` collects every search result in the thread, so that answer is checked against them too.
+A follow-up such as "and if she is on dialysis?" often uses the sections the first question found. `evidenceOf` collects every search result in the thread. So that answer is checked against them too.
 
-## Step 3: Rewrite once, then withhold
+### Step 4: Rewrite once, then hold
 
-The graph gets a node between the agent and the end of the turn:
+The graph gets a node between the agent and the end of the turn. `citeStep` in `src/server/graph.ts` does one of three things:
+
+1. **Passed.** No problems, so the answer goes on unchanged. There is no model call.
+2. **Rewritten.** The model gets its answer back with each problem in plain words. Tools are off, so it answers from the sections it already has.
+3. **Withheld.** The rewrite fails the check too. The doctor gets the reply `WITHHELD_REPLY` instead:
 
 ```text
-before:  agent ─▶ END            (answer tier)    agent ─▶ submit ─▶ review   (review tier)
-after:   agent ─▶ cite ─▶ END                     agent ─▶ cite ─▶ submit ─▶ review
+I could not tie every fact in my answer to a label section that is in force today, so I am not sending it. Please ask the medical information team.
 ```
 
-`citeStep` in `src/server/graph.ts` does one of three things:
+For example, this is what the model reads about the expired draft:
 
-1. **Passed.** No problems. The answer goes on unchanged, with no model call.
-2. **Rewritten.** The model gets its own answer back with each problem in plain words, for example "[cardionex-draft-2024, 2.1] is expired, not in force today. Do not cite it or state its doses; answer from active sections only." Tools are off, so it answers from the sections it already has. The rewrite streams under the same message id, so the doctor sees the answer change in place, not a second answer.
-3. **Withheld.** The rewrite fails the check too. The answer becomes:
+```text
+[cardionex-draft-2024, 2.1] is expired, not in force today. Do not cite it or state its doses.
+```
 
-   > I could not tie every fact in my answer to a label section that is in force today, so I am not sending it. Please ask the medical information team.
-
-One rewrite, not a loop: a model that failed twice on the same sections is not going to pass on the third try, and each try costs a call and the doctor's time.
-
-On the review tier, the reviewer from lesson 13 sees only the checked answer. A draft with an expired citation never reaches their inbox.
-
-Now run the node on the 13 stored answers that fail. Each one is rebuilt as the thread the model saw: the question, its searches, its answer. The app's own `cite` node then runs on it, with the real model:
+Now run the node on the 13 stored answers that fail. Each one is rebuilt as the thread the model saw. The app's own `cite` node then runs on it, with the real model:
 
 ```bash
 npm run citations:replay
@@ -142,41 +223,65 @@ rewritten (not_in_force): Was CardioNex approved at 50mg twice daily?
 13 replayed: 12 rewritten, 1 withheld.
 ```
 
-Twelve rewrites passed the check. All six that cited the expired draft now cite only active sections. One rewrite still gave a dose with no citation, so the doctor would have got the withheld reply. Each run is a trace tagged `citations-replay`, and the script writes `data/evidence/citations-replay.json`.
+Twelve rewrites passed the check. All six that cited the expired draft now cite only sections in force. One rewrite still gave a dose with no citation. So that doctor would get the held reply. Each run is a trace tagged `citations-replay`, and the script writes `data/evidence/citations-replay.json`.
 
-## Step 4: Count the outcomes in Langfuse
+### Step 5: Count the outcomes
 
-`medinfo-agent.ts` wraps the node in a `cite` span. Its output is the outcome and the problems, and it writes a categorical score on the trace:
+`medinfo-agent.ts` wraps the node in a `cite` span. It writes the outcome as a score on the trace:
 
 ```ts
 langfuse.score.create({ traceId, name: "citations", value: outcome.outcome, dataType: "CATEGORICAL" });
 ```
 
-The rewrite's model call is named `citation-rewrite`, so its cost shows apart from the agent's.
+The rewrite's model call is named `citation-rewrite`. So its cost shows apart from the agent's.
 
 Sign in as Ana Rivera and ask "Was CardioNex approved at 50mg twice daily?":
 
-![The chat answers no, the US label gives 20 mg once daily up to 40 mg after 4 weeks, citing cardionex-uspi-v2 section 2.2. The search results show the active v2, the approved 2027 v3 and the superseded v1.](../images/citations/02-checked-answer.png)
+![The chat answer cites only the label in force, and the search found three versions.](../images/citations/02-checked-answer.png)
 
-The search returned the active label next to the 2027 label and the superseded one, and the answer cites only the active one. Open the trace:
+The search returned the label in force, the next label and the old one. The answer cites only the one in force. Open the trace:
 
-![The Langfuse trace: router, agent, tools, search_labels, agent, then the cite span with outcome passed and no problems. The trace header shows the score citations: passed.](../images/citations/03-cite-span.png)
+![The trace ends in the cite span, and its header shows the score citations passed.](../images/citations/03-cite-span.png)
 
-The `cite` span comes last, and the header shows `citations: passed`. In Langfuse, filter the traces by the `citations` score to see every rewritten or withheld answer, or chart the score on a dashboard to watch the rate over time.
+The `cite` span comes last, and the header shows `citations: passed`. Filter traces by the `citations` score to see every rewritten or held answer. Or chart the score to watch the rate over time.
 
-In our seven tries of this question and the "40 %" question in the app, every answer passed. The stored failures were rare to begin with, 13 in 405. That is the point of a check: it costs nothing when the answer is right, and it is there for the one that is not.
+## Prove it
 
-## Step 5: The tests
+| Case | Why it matters | Before | After |
+| --- | --- | --- | --- |
+| STALENESS-03 | The expired draft must never reach a doctor | 6 stored answers cited it | All 6 rewritten |
+| A dose with no citation | Nobody can check where it came from | 3 stored answers sent | 2 rewritten, 1 held |
+| A number the section lacks | The citation looks real but proves nothing | 4 stored answers sent | All 4 rewritten |
+| REVIEW-01 | A draft is checked before the reviewer sees it | Not checked | Checked, then sent on |
+
+The tests make no model call:
 
 ```bash
 npx tsx --test src/server/citations.test.ts scripts/citations-audit.test.ts scripts/citations-replay.test.ts
 ```
 
-- **The four stored answers** in `citations.fixtures.json` (a passing nursing answer, the uncited 5 mg, the "40 %" and the expired draft) give exactly the problems the audit found.
-- **The rewrite and the withhold** in `scripts/citations-replay.test.ts` read the real model's replies from `data/evidence/citations-replay.json`. The check runs again on each rewrite. A rewritten answer must pass, and a withheld one must fail twice.
-- **The graph wiring:** the answer tier runs router, agent, cite; the review tier runs cite before submit.
+- **Four stored answers** in `citations.fixtures.json` give exactly the problems the audit found. They are a good nursing answer, the uncited 5 mg, the "40 %" and the expired draft.
+- **The rewrite and the held answer** read the real model's replies from `data/evidence/citations-replay.json`. The check runs again on each one. A rewrite must pass, and a held answer must fail twice.
+- **The graph wiring.** The answer tier runs router, agent, cite. The review tier runs cite before submit.
 
-Bypass the `cite` edge and drop the status check, and 4 of these tests fail.
+Break it on purpose. Skip the `cite` edge in `graph.ts`, and drop the status check in `citations.ts`. Four of these tests fail.
+
+## Stuck points
+
+In a correct run, `npm run citations:audit` prints a count. A new chat trace ends in a `cite` span with a `citations` score.
+
+| What you see | Why | What to do |
+| --- | --- | --- |
+| The audit says 0 answers checked | Your traces hold no answers yet | Ask a few questions in the app first |
+| The audit counts differ from the page | Your traces are not ours | Read the kinds, not the totals |
+| No `cite` span in a new trace | The server runs old code | Restart `npm run dev` |
+| Every answer is held | Search returns no section in force | Run `npm run rag:ingest` from lesson 20 |
+
+## What to watch for
+
+- **A check that is too strict.** If it holds good answers, doctors stop trusting the desk. Watch the share of held answers. A rise means the check or the search went wrong.
+- **A number written in words.** "Half the usual dose" has no number to find. The check lets it through. A list of words like "half" and "double" would catch it.
+- **A rewrite that hides the cause.** Rewrites fix the answer, but the first answer was still wrong. Read the rewritten ones each week. They show where the prompt or search is weak.
 
 ## Results
 
@@ -190,26 +295,14 @@ npm run dataset:run -- --chapter 21 --cases STALENESS-01,STALENESS-02,STALENESS-
 
 The full row is in `docs/scoreboard.md`. How to read it:
 
-- **STALENESS-03 passed,** and so did STALENESS-01 and 02: no answer cited the expired draft, and the doses came from the active v2 label, not the superseded v1.
-- **POSITIVE-01 passed:** the 5 mg cap with clarithromycin is in the footnote of the section it cites, so the dose check accepts it.
-- **REVIEW-01 passed:** the draft went through `cite` before `submit`, and reached the inbox.
-- **RAG-02 passed.** It is the holdout case: a pregnant patient who has the approved disease. The router used to send it to the stop tier, because its rule called any patient outside the plain use off-label. The rule now says a patient group the label has its own section for (pregnancy, kidney disease, older adults) is an answer, and only a medicine on this desk's list can be stopped. The routing and tenancy cases passed with the new rule too.
-- **Every `cite` span in the run passed.** The check was there for each answer and found nothing to stop.
+- **All three staleness cases passed.** No answer cited the expired draft. The doses came from the label in force.
+- **REVIEW-01 passed.** The draft went through the check before it reached the inbox.
+- **RAG-02 passed.** The router used to stop it, because it called any patient outside the plain use off-label. Now a patient group with its own label section, such as pregnancy, gets an answer.
+- **Every `cite` span passed.** The check ran on each answer and found nothing to stop.
 
-## How to verify you are done
+## Where to go next
 
-- `npm run citations:audit` prints how many stored answers it checked and how many it would stop.
-- A trace from the app ends in a `cite` span, and its header shows a `citations` score.
-- `npm run check` passes, including `src/server/citations.test.ts`.
-
-## Wrap-up
-
-The model writes the answer; code decides whether it goes out. The check reads only what the search returned and what the doctor asked, so it needs no second model and makes no call when the answer is right. When it fails, the model gets one chance with the exact problem, and after that the doctor is told to ask a person. Langfuse keeps the count, so a rise in rewrites shows a prompt or a search going wrong before a doctor notices.
-
-## Homework
-
-The dose check matches numbers with units. Write an answer that says "half the usual dose" where the label says 10 mg, and run `checkCitations` on it. Decide whether the check should catch it, and what it would take: a list of words like "half" and "double", or a judge that reads the sentence.
-
-## End state
-
-This is the starting point for lesson 22.
+- Read `checkCitations` in `src/server/citations.ts`, then `citeStep` in `src/server/graph.ts`.
+- Try the homework. Write an answer that says "half the usual dose" where the label says 10 mg. Run `checkCitations` on it, and decide if the check should catch it.
+- Read about [scores on a trace](https://langfuse.com/docs/evaluation/evaluation-methods/scores-via-sdk) and [conditional edges](https://langchain-ai.github.io/langgraphjs/concepts/low_level/#conditional-edges).
+- Lesson 22 starts from this checkpoint.
