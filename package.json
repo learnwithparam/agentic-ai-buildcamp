@@ -98,10 +98,5 @@
   },
   "engines": {
     "node": ">=22.18.0"
-  },
-  "plainEnglish": {
-    "grade": 6,
-    "longest": 18,
-    "average": 12
   }
 }
