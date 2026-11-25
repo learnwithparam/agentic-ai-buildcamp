@@ -69,8 +69,8 @@ let base = "";
 let close = () => {};
 let dropStore = async () => {};
 const run = crypto.randomUUID().slice(0, 8);
-const ids = { draftA: `draft-${run}-a`, draftA2: `draft-${run}-a2`, eventA: `ae-${run}-a`, draftB: `draft-${run}-b`, draftC: `draft-${run}-c`, stepA: `outreach-${run}-a` };
-const threads = { a: `thread-${run}-a`, b: `thread-${run}-b`, c: `thread-${run}-c`, rep: `thread-${run}-rep` };
+const ids = { draftA: `draft-${run}-a`, draftA2: `draft-${run}-a2`, eventA: `ae-${run}-a`, draftB: `draft-${run}-b`, draftC: `draft-${run}-c`, stepA: `outreach-${run}-a`, emailA: `email-${run}-a` };
+const threads = { a: `thread-${run}-a`, b: `thread-${run}-b`, c: `thread-${run}-c`, rep: `thread-${run}-rep`, lena: `thread-${run}-lena`, maya: `thread-${run}-maya` };
 
 before(async () => {
   await migrate(pool);
@@ -97,6 +97,12 @@ before(async () => {
   // Lesson 14: Priya Nair asks the planner for a step; it waits for a sales rep.
   await reviews.createThread(threads.rep, { ...doctor, userId: "kc-nair", roles: ["sales-rep"] });
   await reviews.submit({ ...item, id: ids.stepA, kind: "outreach", threadId: threads.rep, tenantId: "pharma_a" });
+  // Lena Fischer checks an email and it is flagged; then Maya Chen checks the same text. One item,
+  // two requests: Maya asked for it too, so she may not decide it.
+  await reviews.createThread(threads.lena, { ...doctor, userId: "kc-fischer", roles: ["sales-rep"] });
+  await reviews.createThread(threads.maya, { ...doctor, userId: "kc-chen", roles: ["medical-reviewer"] });
+  await reviews.submit({ ...item, id: ids.emailA, kind: "email", threadId: threads.lena, tenantId: "pharma_a" });
+  await reviews.submit({ ...item, id: ids.emailA, kind: "email", threadId: threads.maya, tenantId: "pharma_a" });
   waitsOn.set(threads.a, ids.draftA).set(threads.b, ids.draftB).set(threads.c, ids.draftC);
 });
 after(async () => {
@@ -198,4 +204,11 @@ test("an outreach step waits for another sales rep: not the rep who asked, not a
   const response = await call(fischer, `/api/inbox/${ids.stepA}/decision`, { decision: "approved" });
   assert.equal(response.status, 200);
   assert.equal(response.json.decidedBy, "kc-fischer");
+});
+
+test("nobody decides an item any of their requests raised, not only the first request", async () => {
+  assert.ok(!(await inboxIds(chen)).includes(ids.emailA));
+  assert.equal((await call(chen, `/api/inbox/${ids.emailA}/decision`, { decision: "approved" })).status, 403);
+  const { rows } = await pool.query("SELECT thread_id FROM review_requests WHERE item_id = $1 ORDER BY thread_id", [ids.emailA]);
+  assert.deepEqual(rows.map((row) => row.thread_id), [threads.lena, threads.maya]);
 });
