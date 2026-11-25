@@ -4,7 +4,8 @@
 // signs doctors in through Keycloak and asks OpenFGA what each may read. Safe to run again: each
 // step looks first and changes only what differs.
 //
-// Secrets are generated into .env the first time and never printed. Sign in with a seeded doctor
+// Secrets are generated into .env the first time and never printed. From lesson 16 that includes
+// each company's event signing secret, so running it again on an older .env adds only those. Sign in with a seeded doctor
 // using the password in your own .env (SEED_USER_PASSWORD).
 
 import { execFileSync } from "node:child_process";
@@ -51,6 +52,8 @@ function ensureSecrets(): Record<string, string> {
   const medinfo = missing.MEDINFO_DB_PASSWORD ?? current.MEDINFO_DB_PASSWORD;
   want("DATABASE_URL", () => `postgresql://medinfo:${medinfo}@localhost:5442/medinfo`);
   want("TEST_DATABASE_URL", () => `postgresql://medinfo:${medinfo}@localhost:5442/medinfo_test`);
+  // Lesson 16: each company signs the events it sends with its own secret (Standard Webhooks format).
+  for (const tenant of Object.keys(TENANTS)) want(`EVENT_SECRET_${tenant.toUpperCase()}`, () => `whsec_${randomBytes(32).toString("base64")}`);
   if (Object.keys(missing).length) {
     setEnv(missing);
     console.log(`Generated into .env (values not shown): ${Object.keys(missing).join(", ")}`);

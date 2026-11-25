@@ -94,13 +94,14 @@ async function draftUploaded(desk: EventDesk, event: Extract<HcpEvent, { type: "
   return { outcome: "HANDLED", report: `DRAFT_UPLOADED: ${event.draft_id} ${cite(event.event_id)}\n\n${result.report}`, itemIds: result.itemId ? [result.itemId] : [] };
 }
 
-// The call center logged a call: the planner reads that doctor's record again, call included, so
-// an opt-out holds the next email before anyone plans it.
+// The call center logged a call: the planner plans that doctor's next email again with the call
+// included, so an opt-out holds the email before anyone sends it. The hold is the planner's rule,
+// not the model's choice.
 async function callLogged(desk: EventDesk, event: Extract<HcpEvent, { type: "call.logged" }>): Promise<EventResult> {
   const user = eventWorker(event.tenant_id, event.country, ["sales-rep"]);
   const threadId = threadFor(event);
   if (desk.inbox) await desk.inbox.ensureThread(threadId, user);
-  const plan = await desk.outreachPlanner({ query: `Plan the next step for ${event.hcp_id}.`, user, inbox: desk.inbox, threadId: desk.inbox ? threadId : undefined });
+  const plan = await desk.outreachPlanner({ query: `Plan the next email to ${event.hcp_id}; the call center just logged ${event.call_id}.`, user, inbox: desk.inbox, threadId: desk.inbox ? threadId : undefined });
   return { outcome: "HANDLED", report: `CALL_LOGGED: ${event.call_id} for ${event.hcp_id} ${cite(event.event_id)}\n\n${plan.report}`, itemIds: plan.itemId ? [plan.itemId] : [] };
 }
 

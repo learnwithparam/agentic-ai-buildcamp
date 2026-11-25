@@ -24,7 +24,8 @@
     "langfuse:code-eval": "tsx scripts/langfuse-code-eval.ts",
     "identity:setup": "tsx scripts/identity-setup.ts",
     "infra:up": "docker compose --env-file .env -f infra/docker-compose.yml up -d --wait",
-    "identity:smoke": "tsx scripts/identity-smoke.ts"
+    "identity:smoke": "tsx scripts/identity-smoke.ts",
+    "events:send": "tsx scripts/events-send.ts"
   },
   "dependencies": {
     "@a2a-js/sdk": "1.3.0",
