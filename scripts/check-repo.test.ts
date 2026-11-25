@@ -123,3 +123,9 @@ test("a test is in use when the check script's glob covers its folder, and only 
   assert.doesNotMatch(problems, /scripts\/lib\.test\.ts/);
   assert.match(run({ "scripts/lib.test.ts": "" }).join("\n"), /scripts\/lib\.test\.ts/);
 });
+
+test("an import by repo path, from another folder, counts as use", () => {
+  const changes = { "scripts/guard.ts": "export const guard = 1;\n", "scripts/seed.ts": 'import { load } from "./lib";\nimport { guard } from "../scripts/guard";\nconst file = resolve("../data/items.json");\n' };
+  assert.deepEqual(run(changes), []);
+  assert.deepEqual(run({ ...changes, "scripts/seed.ts": base["scripts/seed.ts"] }), ["scripts/guard.ts: nothing in use reads, links or calls it. Use it or delete it."]);
+});
