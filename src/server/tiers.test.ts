@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { LABEL_SECTIONS } from "./labels";
 import { scrubPhi } from "./phi";
-import { approvedUses, reportingProcedure, routeTool, safetyReply, stopReply, SAFETY_HOURS, withFloor, type Route } from "./tiers";
+import { approvedUses, reportingProcedure, routerInput, routeTool, safetyReply, stopReply, SAFETY_HOURS, withFloor, type Route } from "./tiers";
 
 // Lesson 13. The parts of the tiers that are code, not a model: no model calls.
 
@@ -64,4 +64,20 @@ test("a request for something to send goes to review even when the router says a
   assert.equal(withFloor(answer, "What is the starting dose of NeuroVex?").tier, "answer");
   // The floor only raises answer; it never lowers safety or stop to review.
   for (const tier of ["safety", "stop"] as const) assert.equal(withFloor({ ...answer, tier }, "Write an email about her rash").tier, tier);
+});
+
+test("the router sorts the latest message, and never reads the text of a refusal", () => {
+  const refusal = "OFF_LABEL_REFUSAL The approved label does not cover a child under 12, so I cannot give a dose.";
+  const input = routerInput([
+    { type: "human", id: "1", content: "What is the CardioNex dose for eGFR 24?" },
+    { type: "ai", id: "2", content: [{ type: "text", text: "5 mg once daily [cardionex-uspi-v2, 2.2]." }], tool_calls: [] },
+    { type: "human", id: "3", content: "And for a 9-year-old?" },
+    { type: "ai", id: "4", content: [{ type: "text", text: refusal }], tool_calls: [] },
+    { type: "human", id: "5", content: "US patient with eGFR 32?" }
+  ]);
+  assert.match(input, /Message to sort:\nDoctor: US patient with eGFR 32\?$/);
+  assert.match(input, /\(the desk replied OFF_LABEL_REFUSAL\)/);
+  assert.match(input, /\(the desk answered\)/);
+  assert.ok(!input.includes("child under 12"), "the refusal's wording reached the router");
+  assert.equal(routerInput([{ type: "human", id: "1", content: "Storage?" }]), "Message to sort:\nDoctor: Storage?");
 });
