@@ -23,3 +23,4 @@ Each row is a promise from [case study 1](../case-studies/enterprise-agentic-hcp
 | Each new email, note, draft or label starts the right work once, inside one company | 16 | EVENT-01, EVENT-02, EVENT-03, EVENT-04, EVENT-05, EVENT-06 |
 | The system works alone only on plain answers, inside a budget, with an off switch | 17 | AUTO-01, AUTO-02, AUTO-03, AUTO-04, AUTO-05 |
 | A doctor's own words find the right section of the full label PDF, with no word lost from the PDF | 20 | RAG-01, RAG-02, RAG-03 |
+| An answer never cites a section the search did not return or one not in force, and every dose it gives is in the section it cites | 21 | STALENESS-03, RAG-01, POSITIVE-01 |
