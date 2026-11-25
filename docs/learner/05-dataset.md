@@ -1,34 +1,89 @@
 ---
-title: "Workshop: Build Eval Datasets"
+title: "Workshop: Write Down What Your Agent Must Get Right"
 description: "Decide what your eval dataset should cover, design the item shape, and seed it into Langfuse for experiments."
 ---
 
-# 05 Build eval datasets
+# 05 Write down what your agent must get right
 
-## Why build datasets
+## The problem
 
-A dataset is your representation of what the system will face in production: the inputs you expect, and for each, what a good answer looks like. With a clear set of expectations written down, you can rerun the agent against them after every change and know whether you helped or hurt. A good dataset is the foundation for shipping confidently and iterating without regressing.
+Lesson 04 found failures in 20 traces. They live in notes on those traces. Nothing can rerun them.
 
-Complementary materials:
+So after a prompt change, nobody can say if it helped. Version 2 from lesson 03 may fix the dose question and break a refusal. The only test is to ask the agent a few questions by hand and hope.
 
-- Docs: [Datasets](https://langfuse.com/docs/evaluation/experiments/datasets)
-- Academy: [Datasets](https://langfuse.com/academy/datasets)
+A doctor in Germany gets the wrong country's text. A superseded label gets cited. A refusal loses its reason. Each fails in a different way, and none is caught until a doctor sees it.
 
-## Goal
+## What you build
 
-Turn the failures you found in error analysis into one dataset, with a slice for every promise the agent makes.
+- **A dataset,** which is a set of eval cases kept in one place. Every change runs against the same set.
+- **A slice for every promise.** Each case says which promise it tests.
+- **A shape for each case,** with the input, the ideal answer and the expected behavior.
+- **A seed script,** which loads every case into Langfuse.
 
-- **Before:** the failures live in annotation notes on 20 traces. Nothing can rerun them.
-- **Build:** decide what to test, read the item shape, and seed 28 cases into Langfuse.
-- **After:** the `hcp-medinfo-workshop` dataset holds 28 items, each tagged with its slice and the chapter that makes it pass.
+| Case | What breaks | How the system holds |
+| --- | --- | --- |
+| A superseded label gets cited | An old dose reaches a doctor | A `staleness` slice, with words the answer must never contain |
+| Germany gets the US text | Wrong country, wrong dose | A `country` slice, with the German label cited |
+| A refusal has no reason | A reviewer cannot count refusals | The case needs a reason code in the answer |
+| A prompt is tuned on every case | You cannot tell if it learned the cases | A `split` field keeps holdout cases out of tuning |
 
-## Starting point
+## How it works
+
+You write each case once, in a file. A seed script reads the file and creates one dataset item per case. The items are the same every run, so a score today and a score next week compare.
+
+Each case answers two questions. Is the answer correct? Does the agent behave right? It might reply, defer a question, or ask a follow-up first. A right fact with the wrong move still fails.
+
+### The flow
+
+This follows the seed script. The second path shows a failure.
+
+```mermaid
+sequenceDiagram
+    participant Y as Case file
+    participant S as Seed script
+    participant L as Langfuse
+    S->>Y: Read every case
+    Y-->>S: Cases with checks and metadata
+    alt A case has no ID
+        S-->>S: Stop, name the case
+    else Every case has an ID
+        S->>L: Create the dataset
+        L-->>S: Created, or already there
+        S->>L: Create one item per case
+        L-->>S: Items stored
+    end
+```
+
+The step people doubt is the item id. Each id comes from the case id, like `hcp-country-01`. So seeding twice writes the same items again. It does not add copies.
+
+### Where it sits
+
+The dataset sits in Langfuse next to the traces. Lesson 06 reads it back and runs the agent on each item.
+
+```mermaid
+flowchart LR
+    Y["Case file in data/hcp/evals"] -->|"cases with checks"| H["hcp-cases loader"]
+    H -->|"dataset items"| S["Seed script"]
+    S -->|"create dataset and items"| DS[("Langfuse dataset")]
+    TR[("Traces from lesson 04")] -.->|"candidates for new items"| DS
+    DS -->|"items to run, next lesson"| EX["Experiment script"]
+    classDef new fill:#fde68a,stroke:#b45309,color:#1c1917
+    class DS new
+```
+
+### Concepts
+
+- [Eval case](../walkthrough.md#c-eval-case)
+- [Dataset](../walkthrough.md#c-dataset)
+- [Expected behavior](../walkthrough.md#c-expected-behavior)
+
+## Build it
 
 ```bash
 git checkout checkpoint/05-dataset
 ```
 
-You have a traced, attributed, monitored app. The cases live in `data/hcp/evals/medinfo.yaml`, a pinned copy of the dataset repo, and `scripts/seed-dataset.ts` loads them into Langfuse.
+You have a traced, attributed, monitored app. The cases live in `data/hcp/evals/medinfo.yaml`, a pinned copy of the dataset repo. `scripts/seed-dataset.ts` loads them into Langfuse.
 
 Make sure `.env` has:
 
@@ -36,25 +91,25 @@ Make sure `.env` has:
 DATASET_NAME=hcp-medinfo-workshop
 ```
 
-## Step 1: Decide what the dataset tests
+### Step 1: Decide what the dataset tests
 
-Build your eval dataset from what you expect your system to hit in production, and from what is important to you: the things you want to evaluate to make sure the system works. A previous error analysis is a good place to start.
+Build the dataset from what you expect in production, and from what matters to you. A past error analysis is a good place to start.
 
 For the agent, two things matter most:
 
 - **The answers are correct.**
-- **The agent behaves appropriately**: it knows when to reply, when to defer a question, and when to ask a follow-up first. Error analysis showed the agent asking for facts it does not need and giving a dose where it should refuse.
+- **The agent behaves right.** It knows when to reply, defer or ask a follow-up. Error analysis showed it asking for facts it does not need. It also gave a dose where it should refuse.
 
-On top of that, the dataset should cover the shapes of input we expect the agent to handle in production, at least the ones we have seen so far. It mixes cases that already work well, for example traces that passed error analysis, with cases that caused problems in the past and cases that must be handled correctly.
+The dataset should also cover the shapes of input we expect, at least the ones we have seen. It mixes cases that already work, such as traces that passed error analysis. It adds cases that caused problems before, and cases that must be handled right.
 
-The dataset has 28 cases, one per promise the agent must keep. Each case says what it tests in its `metadata`:
+The dataset has one case for each promise the agent must keep. Each case says what it tests in its `metadata`:
 
-- **`slice`**: the failure family, such as `staleness` (a superseded label must lose), `country` (Germany gets the German text), `off-label` or `injection`.
+- **`slice`**: the failure family. Examples are `staleness`, `country`, `off-label` and `injection`.
 - **`chapter`**: the chapter whose build makes the case pass. Early chapters leave many cases red on purpose.
 - **`riskTier`**: `answer`, `review`, `safety` or `stop`.
 - **`split`**: `train` or `holdout`. Tune prompts on train cases only.
 
-## Step 2: Read the item shape
+### Step 2: Read the item shape
 
 One item, as `scripts/hcp-cases.ts` builds it from the YAML:
 
@@ -75,48 +130,80 @@ One item, as `scripts/hcp-cases.ts` builds it from the YAML:
 }
 ```
 
-The two fields inside `expectedOutput` match the two evaluation questions from Step 1:
+The two fields inside `expectedOutput` match the two questions from Step 1:
 
 - **`idealAnswer`**: is the answer correct? This is the reply we want, with its source.
-- **`expectedBehavior`**: did the agent behave appropriately? One of `reply`, `defer_question`, or `ask_follow_up`.
+- **`expectedBehavior`**: did the agent behave right? One of `reply`, `defer_question`, or `ask_follow_up`.
 
-Each case in the YAML also carries text checks: words the answer must contain, such as `2.5mg`, and words it must never contain, such as the superseded `10mg`. A refusal must also write its reason code, such as `OFF_LABEL_REFUSAL`, so a reviewer can count refusals by reason. The dataset README lists every code.
+Each case in the YAML also carries text checks. Some are words the answer must contain, such as `2.5mg`. Others are words it must never contain, such as the superseded `10mg`.
 
-In chapter 06 you will see how each of these is evaluated. `metadata` lets you slice runs by slice, chapter or split when you compare experiment runs side by side. [docs/coverage.md](../coverage.md) lists which cases test each promise.
+A refusal must also write its reason code, such as `OFF_LABEL_REFUSAL`. That way a reviewer can count refusals by reason. The dataset README lists every code.
 
-## Step 3: Seed the dataset
+Lesson 06 shows how each of these is scored. `metadata` lets you slice runs by slice, chapter or split. [docs/coverage.md](../coverage.md) lists which cases test each promise.
 
-You have several options for getting items into a Langfuse dataset:
+### Step 3: Seed the dataset
 
-- **Add items manually** in the UI (Datasets → New item).
-- **Upload a CSV / JSON** file via the UI.
-- **Turn live production traces** into dataset items directly from the Trace view: this is the most powerful path once you have monitoring catching interesting traces.
-- **Programmatic seeding** via the SDK / CLI: best for an initial bulk load like ours.
+You have four ways to get items into a Langfuse dataset:
 
-For this workshop we use the programmatic path because we already have a curated file, `data/hcp/evals/medinfo.yaml`:
+- **Add items by hand** in the UI (Datasets → New item).
+- **Upload a CSV or JSON** file in the UI.
+- **Turn live traces into items** from the Trace view. This is the strongest path once monitoring catches interesting traces.
+- **Seed with code** through the SDK or CLI. It is best for a first bulk load like ours.
+
+We seed with code, because we already have a curated file:
 
 ```bash
 npm run dataset:seed
 ```
 
-Open Langfuse → **Datasets**. The list view should show the new `hcp-medinfo-workshop` dataset with 28 items and no experiment runs yet.
+Open Langfuse and go to **Datasets**. The list shows the new `hcp-medinfo-workshop` dataset, with one item per case and no experiment runs yet.
 
-Click into the dataset and switch to the **Items** tab. You should see every seeded item with input, expected output, and metadata columns:
+Click into the dataset and open the **Items** tab. Each item shows its input, expected output and metadata:
 
-![The Items tab of hcp-medinfo-workshop: each row has the brand, country and messages input, the text checks of the expected output, and the slice, split, case id and chapter metadata.](../images/datasets/05-dataset-items.png)
+![The Items tab: each row has an input, an expected output and metadata.](../images/datasets/05-dataset-items.png)
 
-## How to verify you are done
+## Prove it
 
-- The dataset shows up in Langfuse with 28 items.
-- Item inputs look like the `messages` array a real chat turn would have.
-- You can articulate the failure modes the dataset covers.
+| Case | Why it matters | Before | After |
+| --- | --- | --- | --- |
+| The seed script | Cases must be in one shared place | Failures in notes on 20 traces | The `hcp-medinfo-workshop` dataset, one item per case |
+| An item's input | It must look like a real turn | Free text in a note | A `messages` array a chat turn would hold |
+| Every case | Each promise needs a test | Promises with no case | Every case is in a row of `docs/coverage.md` |
 
-## Wrap-up
+One check holds the link between cases and promises. `npm run check` fails in three cases. A case is in no row of `docs/coverage.md`. A row names a case that does not exist. A row has no case.
 
-Datasets are how you write down what your system is expected to handle. A good one gives you confidence to ship and to iterate without regressing. You can seed datasets via the [Langfuse CLI](https://langfuse.com/docs/api-and-data-platform/features/cli) or skill, build them from production traces in the UI, or maintain them in code like we did: the right approach depends on where your best examples come from.
+```bash
+npx tsx scripts/check-repo.ts
+```
 
-Next we use this dataset to run experiments against the agent.
+Break it on purpose. Delete `COUNTRY-01` from its row in `docs/coverage.md`, and run the command. It says the case is in no row. Put the id back.
 
-## End state
+## Stuck points
 
-This is the starting point for `06-experiments`.
+A correct run prints `Seeded dataset "hcp-medinfo-workshop" with 38 items.` The dataset page lists the same number.
+
+| What you see | Why | What to do |
+| --- | --- | --- |
+| "Langfuse credentials are required" | The keys are missing in `.env` | Fill in the Langfuse keys, as in lesson 00 |
+| The dataset has a different name | `DATASET_NAME` differs | Set it to `hcp-medinfo-workshop` |
+| A case has no ID | The `[ID]` prefix is missing in the YAML | Start its description with the id in brackets |
+| Seeding twice shows the same count | Item ids come from case ids | This is expected, so no copies are made |
+
+## What to watch for
+
+- **A dataset that only holds wins.** Cases that already pass tell you little. Our hold is a mix of passing cases, past failures and must-handle cases.
+- **Tuning on every case.** A prompt tuned on all cases looks good on those cases only. Our hold is the `split` field, so holdout cases stay out of tuning.
+- **A case with no promise.** A case nobody can explain is noise. Our hold is `docs/coverage.md`, which `npm run check` enforces.
+
+## Results
+
+This lesson has no scoreboard row, because nothing runs the agent yet. The proof is the seeded dataset and the passing check.
+
+Lesson 06 runs the agent on every item and writes the first row.
+
+## Where to go next
+
+- Read `docs/coverage.md`, then pick one case in `data/hcp/evals/medinfo.yaml` and find its promise.
+- Read [Datasets](https://langfuse.com/docs/evaluation/experiments/datasets) in the Langfuse docs and the Academy page on [datasets](https://langfuse.com/academy/datasets).
+- Try the [Langfuse CLI](https://langfuse.com/docs/api-and-data-platform/features/cli) or the Langfuse skill. Both can seed datasets.
+- Lesson 06 uses this dataset to run experiments against the agent.
