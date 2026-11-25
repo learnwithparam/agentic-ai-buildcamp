@@ -49,6 +49,7 @@ TAGS=(
   checkpoint/12-mcp-sandbox
   checkpoint/13-durable-review
   checkpoint/14-content-agents
+  checkpoint/15-a2a
 )
 
 # Files whose code is what the next lesson changes. Add a file here when a
@@ -99,29 +100,43 @@ CONTENT_FILES="src/server/content/records.ts src/server/content/fact-check.ts sr
   infra/openfga/model.fga infra/openfga/model.fga.yaml scripts/fga-model.ts scripts/identity-setup.ts
   scripts/hcp-cases.ts scripts/seed-dataset.ts scripts/run-dataset.ts scripts/scoreboard.ts scripts/scoreboard.test.ts
   package.json package-lock.json docs/scoreboard.md"
+# Lesson 15 puts both agents behind A2A servers and adds the agent that hands work to them; the files
+# it changes and adds (A2A_FILES) stay as they were on tags before it, so lesson 14 still calls each
+# agent as a function.
+A2A_FILES="docs/scoreboard.md package-lock.json package.json scripts/a2a-runner.ts scripts/hcp-cases.ts
+  scripts/run-dataset.ts scripts/scoreboard.test.ts scripts/seed-dataset.ts src/client/App.tsx
+  src/client/chat/api.ts src/client/content/Handoffs.tsx src/client/inbox/Inbox.tsx
+  src/server/a2a/a2a.test.ts src/server/a2a/cards.ts src/server/a2a/executors.ts
+  src/server/a2a/handoff.ts src/server/a2a/server.ts src/server/a2a/tasks.ts src/server/app.ts
+  src/server/auth.ts src/server/content/fact-check.ts src/server/content/outreach.ts
+  src/server/inbox.test.ts src/server/index.ts src/server/migrations/005_a2a_tasks.sql
+  src/server/routes.ts src/server/test-desk.ts"
 milestone_files() {
   case "$1" in
     checkpoint/00-setup | checkpoint/01-base-app | checkpoint/02-tracing)
-      echo "src/server/index.ts src/server/medinfo-agent.ts src/server/tools.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES"
+      echo "src/server/index.ts src/server/medinfo-agent.ts src/server/tools.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES"
       ;;
     checkpoint/03-prompt-management)
-      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES"
+      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES"
       ;;
     # Lessons 06 and 07 run the dataset with the correctness judge; lesson 09 replaces it.
     checkpoint/04-* | checkpoint/05-* | checkpoint/06-* | checkpoint/07-* | checkpoint/08-* | checkpoint/09-*)
-      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES"
+      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES"
       ;;
     checkpoint/10-*)
-      echo "$AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES"
+      echo "$AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES"
       ;;
     checkpoint/11-*)
-      echo "$MCP_FILES $TIER_FILES $CONTENT_FILES"
+      echo "$MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES"
       ;;
     checkpoint/12-*)
-      echo "$TIER_FILES $CONTENT_FILES"
+      echo "$TIER_FILES $CONTENT_FILES $A2A_FILES"
       ;;
     checkpoint/13-*)
-      echo "$CONTENT_FILES"
+      echo "$CONTENT_FILES $A2A_FILES"
+      ;;
+    checkpoint/14-*)
+      echo "$A2A_FILES"
       ;;
     *)
       echo ""

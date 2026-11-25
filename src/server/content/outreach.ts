@@ -283,11 +283,12 @@ export function createOutreachPlanner({ client = fga, model = modelClient }: { c
     .compile();
 
   return observe(
-    async (input: { query: string; user: Identity; inbox?: ReviewInbox; threadId?: string }): Promise<OutreachPlan & { itemId: string | null; itemStatus: ReviewStatus | null }> => {
+    // sessionId groups this run with the others of one hand-off (lesson 15); it is the thread by default.
+    async (input: { query: string; user: Identity; inbox?: ReviewInbox; threadId?: string; sessionId?: string }): Promise<OutreachPlan & { itemId: string | null; itemStatus: ReviewStatus | null }> => {
       updateActiveObservation({ input: { query: input.query } });
       return propagateAttributes(
         {
-          sessionId: input.threadId,
+          sessionId: input.sessionId ?? input.threadId,
           userId: input.user.userId,
           metadata: { tenantId: input.user.tenantId, country: input.user.country },
           traceName: "hcp-outreach-plan",

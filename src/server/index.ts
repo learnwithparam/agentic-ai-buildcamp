@@ -9,6 +9,8 @@ import { PostgresSaver } from "@langchain/langgraph-checkpoint-postgres";
 import { createFactChecker } from "./content/fact-check";
 import { createOutreachPlanner } from "./content/outreach";
 import { createMedinfoAgent, recordDecision } from "./medinfo-agent";
+import { createHandoffAgent } from "./a2a/handoff";
+import { createTaskStore, TaskReviews } from "./a2a/tasks";
 import { ReviewStore } from "./reviews";
 import { PostgresSessionStore } from "./sessions";
 
@@ -22,13 +24,17 @@ if (applied.length) console.log(`Applied migrations: ${applied.join(", ")}`);
 // draft waiting for a reviewer is still waiting after a restart. setup() creates the tables once.
 const checkpointer = new PostgresSaver(pool, undefined, { schema: "langgraph" });
 await checkpointer.setup();
+// Lesson 15. A2A tasks live in the same Postgres (migration 005), so a task waiting for a
+// reviewer outlives a restart, as a waiting draft does.
+const a2aStore = createTaskStore(pool);
 const desk = {
   agent: createMedinfoAgent(checkpointer),
   // Lesson 14: the fact-checker and the outreach planner share the inbox, the door and the sign-in.
   factChecker: createFactChecker(),
   outreachPlanner: createOutreachPlanner(),
   reviews: new ReviewStore(pool),
-  recordDecision
+  recordDecision,
+  a2a: { store: a2aStore, links: new TaskReviews(pool, a2aStore), handoff: createHandoffAgent() }
 };
 
 const auth = createAuth({

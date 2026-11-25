@@ -5,6 +5,8 @@ import { createOutreachPlanner } from "./content/outreach";
 import { after, before, test } from "node:test";
 import { createLocalJWKSet, exportJWK, generateKeyPair, SignJWT, type JWTPayload } from "jose";
 import { createTestStore } from "../../scripts/fga-model";
+import { createHandoffAgent } from "./a2a/handoff";
+import { createTaskStore, TaskReviews } from "./a2a/tasks";
 import { createApp } from "./app";
 import { createAuth } from "./auth";
 import { createPool, migrate } from "./db";
@@ -77,7 +79,8 @@ before(async () => {
   const store = await createTestStore(env.fgaApiUrl, env.fgaApiToken);
   dropStore = async () => void (await store.client.deleteStore());
   reviews = new ReviewStore(pool, () => store.client);
-  const desk = { agent: agent as unknown as MedinfoAgent, factChecker: createFactChecker({ client: () => store.client }), outreachPlanner: createOutreachPlanner({ client: () => store.client }), reviews, recordDecision: async (item: ReviewItem) => void scored.push(item) };
+  const tasks = createTaskStore(pool);
+  const desk = { agent: agent as unknown as MedinfoAgent, factChecker: createFactChecker({ client: () => store.client }), outreachPlanner: createOutreachPlanner({ client: () => store.client }), reviews, recordDecision: async (item: ReviewItem) => void scored.push(item), a2a: { store: tasks, links: new TaskReviews(pool, tasks), handoff: createHandoffAgent() } };
   const server = createApp(auth, desk).listen(0, "127.0.0.1");
   await new Promise((resolve) => server.once("listening", resolve));
   base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;

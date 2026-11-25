@@ -1,10 +1,13 @@
 import { randomUUID } from "node:crypto";
 import { Router } from "express";
 import { z } from "zod";
-import { currentUser, type Auth } from "./auth";
+import { AuthError, currentUser, type Auth } from "./auth";
 import { CONTENT_DRAFTS, PROFILES, recordOf } from "./content/records";
 import type { FactChecker } from "./content/fact-check";
 import type { OutreachPlanner } from "./content/outreach";
+import type { HandoffAgent } from "./a2a/handoff";
+import type { TaskReviews } from "./a2a/tasks";
+import type { TaskStore } from "@a2a-js/sdk/server";
 import { BUDGET_SPENT_MESSAGE, isBudgetSpent } from "./gateway";
 import { visibleHcps } from "./permissions";
 import { scrubPhi } from "./phi";
@@ -31,6 +34,7 @@ const factCheckSchema = z.union([
   z.object({ text: z.string().min(1).max(4000), country: z.enum(["US", "DE", "JP"]) })
 ]);
 const planSchema = z.object({ query: z.string().min(1).max(1000) });
+const handoffSchema = z.object({ query: z.string().min(1).max(1000) });
 
 // What the routes need besides sign-in: the agents, and where threads and review items live.
 export type Desk = {
@@ -40,6 +44,8 @@ export type Desk = {
   outreachPlanner: OutreachPlanner;
   reviews: ReviewStore;
   recordDecision: (item: ReviewItem) => Promise<void>;
+  // Lesson 15: the two agents as A2A servers, the tasks they keep, and the agent that hands work to them.
+  a2a: { store: TaskStore; links: TaskReviews; handoff: HandoffAgent };
 };
 
 // Lesson 11. Sign-in, sign-out and the callback live in src/server/auth.ts. Everything here needs
@@ -110,7 +116,7 @@ export function createRoutes(auth: Auth, desk: Desk) {
 
   // Lesson 14. The editor and the rep board are for the company's staff, not the doctors who use
   // the desk. This answers the page with a clear 403; OpenFGA still decides which records they read.
-  routes.use(["/api/drafts", "/api/fact-check", "/api/hcps", "/api/outreach"], (_request, response, next) => {
+  routes.use(["/api/drafts", "/api/fact-check", "/api/hcps", "/api/outreach", "/api/handoffs"], (_request, response, next) => {
     if (currentUser(response).roles.some((role) => STAFF_ROLES.includes(role))) return next();
     response.status(403).json({ error: "This page is for your company's sales reps and medical reviewers." });
   });
@@ -163,6 +169,28 @@ export function createRoutes(auth: Auth, desk: Desk) {
     }
   });
 
+  // Lesson 15. The rep asks one agent, and it hands the work to the agent that does it, over A2A,
+  // with the rep's own Keycloak token. The other agent sees who is asking, not this app.
+  routes.post("/api/handoffs", async (request, response) => {
+    const user = currentUser(response);
+    const parsed = handoffSchema.safeParse(request.body);
+    if (!parsed.success) {
+      response.status(400).json({ error: "Say what you want done." });
+      return;
+    }
+    try {
+      const token = await auth.accessTokenOf(request);
+      response.json(await desk.a2a.handoff({ query: scrubPhi(parsed.data.query).text, user, token, baseUrl: auth.appUrl, inbox: desk.reviews }));
+    } catch (error) {
+      if (error instanceof AuthError) {
+        response.status(401).json({ error: "Sign in again so the agents can see who is asking." });
+        return;
+      }
+      console.error(error);
+      response.status(isBudgetSpent(error) ? 429 : 502).json({ error: isBudgetSpent(error) ? BUDGET_SPENT_MESSAGE : "The hand-off could not finish. Please try again." });
+    }
+  });
+
   // Lesson 13. A reviewer sees what waits for them; a doctor sees what became of their own items.
   routes.get("/api/inbox", async (_request, response) => {
     const user = currentUser(response);
@@ -211,6 +239,8 @@ export function createRoutes(auth: Auth, desk: Desk) {
         return;
       }
     }
+    // Lesson 15: an A2A task waiting on this item completes or is rejected with it.
+    await desk.a2a.links.settle(decided);
     await desk.recordDecision(decided).catch((error) => console.error("The decision score was not written:", error));
     response.json(decided);
   });
