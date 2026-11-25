@@ -19,6 +19,7 @@ function routedGraph(tier: Tier, visited: string[]) {
       router: () => (seen("router"), { route }),
       agent: () => (seen("agent"), { messages: [draft] }),
       tools: () => (seen("tools"), {}),
+      cite: () => (seen("cite"), {}),
       submit: (state, config) => (seen("submit"), submitDraftStep(state, config, "trace-1")),
       review: (state, config) => (seen("review"), reviewStep(state, config)),
       safety: async (state, config) => (seen("safety"), await submitAdverseEvent(state, config, "PV_ESCALATION", "trace-1"), fixedReply(state, "PV_ESCALATION")),
@@ -37,8 +38,8 @@ const ask = (content: string): ChatMessage[] => [{ id: "q", type: "human", conte
 const lastText = (messages: ChatMessage[]) => aiText(messages.filter((message): message is AiMessage => message.type === "ai").at(-1)!);
 
 for (const [tier, path, waits, kinds] of [
-  ["answer", ["router", "agent"], false, []],
-  ["review", ["router", "agent", "submit", "review"], true, ["draft"]],
+  ["answer", ["router", "agent", "cite"], false, []],
+  ["review", ["router", "agent", "cite", "submit", "review"], true, ["draft"]],
   ["safety", ["router", "safety"], false, ["adverse_event"]],
   ["stop", ["router", "stop"], false, []]
 ] as const) {
@@ -95,6 +96,7 @@ test("a turn with no tier stops instead of answering", async () => {
       router: () => ({}),
       agent: () => ({ messages: [draft] }),
       tools: () => ({}),
+      cite: () => ({}),
       submit: () => ({}),
       review: () => ({}),
       safety: () => ({}),

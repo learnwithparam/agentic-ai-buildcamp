@@ -20,6 +20,7 @@
     "prompt:publish": "tsx scripts/publish-prompt.ts",
     "dataset:seed": "tsx scripts/seed-dataset.ts",
     "judge:calibrate": "tsx scripts/judge-calibrate.ts",
+    "citations:audit": "tsx scripts/citations-audit.ts",
     "dataset:run": "tsx scripts/run-dataset.ts",
     "release:gate": "tsx scripts/release-gate.ts",
     "langfuse:seed:error-analysis": "tsx scripts/seed-error-analysis-traces.ts",

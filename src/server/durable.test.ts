@@ -31,6 +31,7 @@ function serverGraph(checkpointer: BaseCheckpointSaver) {
       router: () => ({ route: { tier: "review", reason: "test", asksForAdvice: false } }),
       agent: () => ({ messages: [draft] }),
       tools: () => ({}),
+      cite: () => ({}),
       submit: (state, config) => submitDraftStep(state, config),
       review: reviewStep,
       safety: (state) => fixedReply(state, ""),
