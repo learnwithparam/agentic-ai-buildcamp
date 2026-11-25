@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { test } from "node:test";
 import { glossaryProblems } from "./glossary";
 import { readmeProblems, shapeProblems } from "./lesson-shape";
@@ -92,7 +92,10 @@ test("the prose check fails a long sentence and reads past front matter", () => 
 
 // CI runs check:pages (.github/workflows/check.yml). It is not in `npm run check`, because the tag
 // sync runs that on every tag, and a state diagram names code an early tag does not have yet.
-test("check:pages runs every page check", () => {
+// A tag carries no .github folder and keeps its own package.json, so this holds on main only.
+test("CI runs check:pages, and check:pages runs every page check", (t) => {
+  if (!existsSync(".github/workflows/check.yml")) return t.skip("a checkpoint tag has no CI");
+  assert.match(readFileSync(".github/workflows/check.yml", "utf8"), /run: npm run check:pages/);
   const scripts = JSON.parse(readFileSync("package.json", "utf8")).scripts as Record<string, string>;
-  for (const check of ["plain-english", "lesson-shape", "glossary", "mermaid"]) assert.match(scripts["check:pages"], new RegExp(`scripts/${check}\\.ts`));
+  for (const check of ["plain-english", "lesson-shape", "glossary", "mermaid"]) assert.match(scripts["check:pages"] ?? "", new RegExp(`scripts/${check}\\.ts`));
 });

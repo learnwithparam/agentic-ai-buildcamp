@@ -7,16 +7,11 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { basename, join, relative, resolve } from "node:path";
 const ROOT = process.cwd();
 
-// A course for everyone (no code) can lower this in package.json: "plainEnglish": { "grade": 6 }.
-const DEFAULT_READING_GRADE = 6;
-const LONGEST_SENTENCE = 25;
-
-// A page can ask for shorter sentences in package.json: "plainEnglish": { "longest": 18, "average": 12 }.
-function configuredNumber(name: string, fallback: number): number {
-  const packageJson = JSON.parse(readFileSync(join(process.cwd(), "package.json"), "utf8"));
-  const value = packageJson.plainEnglish?.[name];
-  return typeof value === "number" ? value : fallback;
-}
+// The same limits as the live-labs repo, so the two do not drift. They live here, not in
+// package.json, because a checkpoint tag keeps its own package.json.
+const READING_GRADE = 6;
+const LONGEST_SENTENCE = 18;
+const AVERAGE_SENTENCE = 12;
 
 const SKIPPED_FOLDERS = new Set([
   "node_modules",
@@ -289,7 +284,7 @@ function sentenceProblems(file: string, sentences: string[]): Problem[] {
   const problems: Problem[] = [];
   for (const sentence of sentences) {
     const count = wordsOf(sentence).length;
-    if (count > configuredNumber("longest", LONGEST_SENTENCE)) {
+    if (count > LONGEST_SENTENCE) {
       const opening = sentence.split(" ").slice(0, 8).join(" ");
       problems.push({ file, message: `${count}-word sentence "${opening}..."; split it` });
     }
@@ -312,7 +307,7 @@ export function problemsIn(file: string, page: string, gradeLimit: number): Prob
   ];
 
   const average = averageWords(sentences);
-  const averageLimit = configuredNumber("average", 999);
+  const averageLimit = AVERAGE_SENTENCE;
   if (sentences.length >= 5 && average > averageLimit) {
     const message = `sentences average ${average.toFixed(1)} words, above ${averageLimit}; cut them shorter`;
     problems.push({ file, message });
@@ -430,7 +425,7 @@ export function teachProblems(file: string, page: string, gradeLimit: number): P
   for (const line of strictTextOf(markdown).split("\n")) {
     for (const sentence of line.split(/(?<=[.!?])\s+/)) {
       const count = sentence.split(/\s+/).length;
-      if (count > configuredNumber("longest", LONGEST_SENTENCE)) {
+      if (count > LONGEST_SENTENCE) {
         problems.push({ file, message: `${count}-word cell or label "${sentence.slice(0, 40)}..."; split it` });
       }
     }
@@ -439,12 +434,6 @@ export function teachProblems(file: string, page: string, gradeLimit: number): P
   const grade = strictGradeOf(markdown);
   if (grade > gradeLimit) problems.push({ file, message: `grade ${grade.toFixed(1)} over the sentences in tables and labels, above ${gradeLimit}` });
   return problems;
-}
-
-function configuredGrade(): number {
-  const packageJson = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8"));
-  const grade = packageJson.plainEnglish?.grade;
-  return typeof grade === "number" ? grade : DEFAULT_READING_GRADE;
 }
 
 // The check tests itself first: code quoted inside a longer fence is never read as prose.
@@ -458,7 +447,7 @@ if (import.meta.main) {
     console.error("plain-english.ts reads quoted code as prose. Fix proseOf first.");
     process.exit(1);
   }
-  const gradeLimit = configuredGrade();
+  const gradeLimit = READING_GRADE;
   // Named files narrow the run (check:changed and the prose test). Author pages stay skipped.
   const named = process.argv.slice(2).map((file) => resolve(ROOT, file));
   const files =
