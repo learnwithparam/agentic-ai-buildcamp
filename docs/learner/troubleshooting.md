@@ -158,7 +158,7 @@ This is not an error. The doctor says if `npm run dev` is running. Then you know
 
 ## Check the conversations a demo uses
 
-With `npm run dev` running, this plays real multi-turn chats as the demo users, through the real model. Each turn says what a right answer is. It prints the tier, the searches, the sections found and the first line of each reply, and fails on any miss.
+With `npm run dev` running, this plays real multi-turn chats as the demo users, through the real model. Each turn says what a right answer is. For each turn it prints the tier, the searches, the sections found and the reply. It fails on any miss.
 
 ```bash
 npm run demo:check
