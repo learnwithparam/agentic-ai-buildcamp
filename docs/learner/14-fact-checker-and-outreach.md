@@ -203,7 +203,7 @@ Sign in as Ana Rivera, a doctor, and open `/editor`. The page says it is for the
 Each case in `fact-check.yaml` and `outreach.yaml` has text checks: the codes it must show, the citations, and what must not appear. The runner sends each case to the agent its metadata names, signed in as a rep of the case's company.
 
 ```bash
-npm run dataset:run -- --cases FACT-01,FACT-02,FACT-03,FACT-04,FACT-05,FACT-06,OUTREACH-01,OUTREACH-02,OUTREACH-03,OUTREACH-04,OUTREACH-05,OUTREACH-06,STALENESS-01,OFF-LABEL-01,INJECTION-01,MULTITURN-01 --chapter 14 --change "Fact-checker and outreach planner"
+npm run dataset:run -- --cases FACT-01,FACT-02,FACT-03,FACT-04,FACT-05,FACT-06,OUTREACH-01,OUTREACH-02,OUTREACH-03,OUTREACH-04,OUTREACH-05,OUTREACH-06,STALENESS-01,NEGATIVE-01,INJECTION-01,MULTITURN-01 --chapter 14 --change "Fact-checker and outreach planner"
 ```
 
 Your row goes to `my-scoreboard.md`. The scoreboard gains two columns, `fact-check` and `outreach`.
