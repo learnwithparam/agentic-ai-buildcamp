@@ -1,0 +1,138 @@
+{
+  "docs": [
+    {
+      "doc_id": "cardionex-clarion-hf-trial",
+      "tenant_id": "pharma_a",
+      "brand_id": "brand_cardionex",
+      "status": "active",
+      "effective_date": "2026-08-20",
+      "country": "US",
+      "pdf": "data/hcp/pdf/cardionex-clarion-hf-trial.pdf",
+      "source": "data/hcp/docs/cardionex-clarion-hf-trial.md",
+      "sha256": "9578badfdd75af407bf993a2e6ca204dc357084befe4a0b98e2c3480ed0c908c"
+    },
+    {
+      "doc_id": "cardionex-de-smpc",
+      "tenant_id": "pharma_a",
+      "brand_id": "brand_cardionex",
+      "status": "active",
+      "effective_date": "2026-06-01",
+      "country": "DE",
+      "pdf": "data/hcp/pdf/cardionex-de-smpc-2026.pdf",
+      "source": "data/hcp/docs/cardionex-de-smpc-2026.md",
+      "sha256": "708a1eaf1d6b12dea46f94b089099c68e93d4a3e4db685d36b479de700525d39"
+    },
+    {
+      "doc_id": "cardionex-draft-2024",
+      "tenant_id": "pharma_a",
+      "brand_id": "brand_cardionex",
+      "status": "expired",
+      "effective_date": "2024-01-10",
+      "country": "US",
+      "expires_at": "2024-11-30",
+      "pdf": "data/hcp/pdf/cardionex-draft-2024.pdf",
+      "source": "data/hcp/docs/cardionex-draft-2024.md",
+      "sha256": "594aa4747e1440bd9e7c6c147ff32e86995f2cd3ae3861cf5eb416c75964a8e2"
+    },
+    {
+      "doc_id": "cardionex-jp-label",
+      "tenant_id": "pharma_a",
+      "brand_id": "brand_cardionex",
+      "status": "active",
+      "effective_date": "2025-11-01",
+      "country": "JP",
+      "pdf": "data/hcp/pdf/cardionex-jp-label-2025.pdf",
+      "source": "data/hcp/docs/cardionex-jp-label-2025.md",
+      "sha256": "033f1bc1f2b6cd095fc473d224bebab8b95eed7c9e69bc049a5b8904e2d5ed33"
+    },
+    {
+      "doc_id": "cardionex-medinfo-faq",
+      "tenant_id": "pharma_a",
+      "brand_id": "brand_cardionex",
+      "status": "active",
+      "effective_date": "2026-10-15",
+      "country": "US",
+      "pdf": "data/hcp/pdf/cardionex-medinfo-faq.pdf",
+      "source": "data/hcp/docs/cardionex-medinfo-faq.md",
+      "sha256": "cd74adacdd30c84d2b02fb0e00469013d0bdb8d4f07d614e33441c6b16dc5b4a"
+    },
+    {
+      "doc_id": "cardionex-payer-formulary-2026",
+      "tenant_id": "pharma_a",
+      "brand_id": "brand_cardionex",
+      "status": "active",
+      "effective_date": "2026-10-01",
+      "country": "US",
+      "pdf": "data/hcp/pdf/cardionex-payer-formulary-2026.pdf",
+      "source": "data/hcp/docs/cardionex-payer-formulary-2026.md",
+      "sha256": "b0d46d1b5a69924cb84aeee5aac997a05d943b8d29943eb7880110ab3862ec57"
+    },
+    {
+      "doc_id": "cardionex-uspi-v1",
+      "tenant_id": "pharma_a",
+      "brand_id": "brand_cardionex",
+      "status": "superseded",
+      "effective_date": "2025-02-01",
+      "country": "US",
+      "superseded_by": "cardionex-uspi-v2",
+      "pdf": "data/hcp/pdf/cardionex-uspi-2025-v1.pdf",
+      "source": "data/hcp/docs/cardionex-uspi-2025-v1.md",
+      "sha256": "3cc2ec68eceb2cf5bd30ba85abcd578b4a632d7a3dd9f2e7336b14dea99cc7e1"
+    },
+    {
+      "doc_id": "cardionex-uspi-v2",
+      "tenant_id": "pharma_a",
+      "brand_id": "brand_cardionex",
+      "status": "active",
+      "effective_date": "2026-09-15",
+      "country": "US",
+      "pdf": "data/hcp/pdf/cardionex-uspi-2026-v2.pdf",
+      "source": "data/hcp/labels/cardionex-uspi-2026-v2.md",
+      "sha256": "5210b032d4394440cd80694455eae30216225958221dcd0a5ce9851bc099de9a"
+    },
+    {
+      "doc_id": "cardionex-uspi-v3",
+      "tenant_id": "pharma_a",
+      "brand_id": "brand_cardionex",
+      "status": "approved",
+      "effective_date": "2027-03-01",
+      "country": "US",
+      "pdf": "data/hcp/pdf/cardionex-uspi-2027-v3.pdf",
+      "source": "data/hcp/docs/cardionex-uspi-2027-v3.md",
+      "sha256": "3e101998f9ce05d5779a173c8d152a2477c92a8b9ff18aeea0af0dfccc5d8e9e"
+    },
+    {
+      "doc_id": "neurovex-trial-summary",
+      "tenant_id": "pharma_b",
+      "brand_id": "brand_neurovex",
+      "status": "active",
+      "effective_date": "2026-06-10",
+      "country": "US",
+      "pdf": "data/hcp/pdf/neurovex-trial-summary.pdf",
+      "source": "data/hcp/docs/neurovex-trial-summary.md",
+      "sha256": "9d8956a3e92c7eb8904160ea0d98870137660aafd77a01f98b3fd017686eed2d"
+    },
+    {
+      "doc_id": "neurovex-uspi-v1",
+      "tenant_id": "pharma_b",
+      "brand_id": "brand_neurovex",
+      "status": "active",
+      "effective_date": "2026-05-01",
+      "country": "US",
+      "pdf": "data/hcp/pdf/neurovex-uspi-2026-v1.pdf",
+      "source": "data/hcp/docs/neurovex-uspi-2026-v1.md",
+      "sha256": "54624da552ba7744b4b95b85ee195fbaa6c1e90dea9ebe6818d0b6b9585e644f"
+    },
+    {
+      "doc_id": "pv-reporting-sop",
+      "tenant_id": "pharma_a",
+      "brand_id": "brand_cardionex",
+      "status": "active",
+      "effective_date": "2026-03-01",
+      "country": "US",
+      "pdf": "data/hcp/pdf/pv-reporting-sop.pdf",
+      "source": "data/hcp/docs/pv-reporting-sop.md",
+      "sha256": "9bd0fc74628a34429cdc47930104be4268fb015316152a84f340f229b6109bef"
+    }
+  ]
+}
