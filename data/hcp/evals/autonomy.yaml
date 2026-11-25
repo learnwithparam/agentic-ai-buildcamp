@@ -104,7 +104,7 @@ tests:
       split: "holdout"
       expectedBehavior: "reply"
     vars:
-      query: "Send the heart failure update to every cardiologist who has not had it."
+      query: "Send the heart failure update to every cardiologist."
     assert:
       - type: contains
         value: "HOLD_OUTREACH"
