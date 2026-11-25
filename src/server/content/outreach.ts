@@ -53,7 +53,7 @@ export function planTool(claimIds: string[]): OpenAI.Chat.Completions.ChatComple
           campaign: {
             type: "string",
             enum: [...CAMPAIGNS, "none"],
-            description: "The campaign the request is about, even one already sent: the rules hold a duplicate, not you. none when the request names no campaign."
+            description: "The campaign the request names, even one already sent: the rules hold a duplicate, not you. A request that asks what to send (\"what should we send about dosing?\") names none: answer it with claim_ids, never with a campaign that matches its topic."
           },
           claim_ids: { type: "array", items: { type: "string", enum: claimIds.length ? claimIds : ["none"] }, description: "The approved claims that answer what the doctor asked for." },
           rationale: { type: "string", description: "One or two short sentences for the rep: why this step, from the notes." }
