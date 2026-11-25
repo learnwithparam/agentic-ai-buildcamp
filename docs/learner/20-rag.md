@@ -173,7 +173,7 @@ Sign in as Ana Rivera and ask "Can a mother who is nursing her newborn take Card
 
 ![The chat answers that breastfeeding is not recommended during treatment or for 5 days after the last dose, citing cardionex-uspi-v2 section 8.2.](../images/rag/02-nursing-answer.png)
 
-`search_labels` returned 8.2 Lactation first, then 0.0, 8.1 and 8.4. The trace shows the search and its `embed` call through the gateway:
+`search_labels` returned 8.2 Lactation first. The trace shows the search and its `embed` call through the gateway:
 
 ![The Langfuse trace of that turn: search_labels with an embed child, then the agent's answer.](../images/rag/03-trace.png)
 
