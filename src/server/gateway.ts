@@ -48,7 +48,8 @@ export function modelClient(): OpenAI {
 // so the gateway records and caps it like any chat call. Every stored vector and every question
 // must come from the same model, or their distances mean nothing: rows are keyed by model, so a new
 // EMBEDDING_MODEL finds an empty index and the server stops until npm run rag:ingest has run.
-export const EMBEDDING_MODEL = env.embeddingModel;
+// Read here, not in env.ts: this file reaches lesson 10, whose env.ts does not know it.
+export const EMBEDDING_MODEL = process.env.EMBEDDING_MODEL ?? "openai/text-embedding-3-small";
 export const EMBEDDING_DIMENSIONS = 1536;
 
 export async function embed(texts: string[]): Promise<number[][]> {
