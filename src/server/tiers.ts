@@ -42,6 +42,7 @@ const cite = (section: LabelSection) => `${section.docId}, ${section.section}`;
 // checkpoint-sync:begin router-prompt
 export const ROUTER_PROMPT = `You sort one message sent to a pharmaceutical company's medical information desk.
 Call route with exactly one tier.
+Sort only the message under "Message to sort". Earlier turns only tell you which medicine and patient it is about: a refused earlier message does not make this one refused, and an earlier answer does not make this one safe.
 
 - safety: the message tells of something that happened to a patient after taking a medicine (a side effect, a reaction, a hospital stay, a faint, swelling, a rash), even when it also asks a question.
 - stop: the message asks how to use one of the medicines below for a use or a patient its approved use does not cover (another disease, a child when the use is for adults).
@@ -94,16 +95,31 @@ export function routeTool(uses: LabelSection[]): OpenAI.Chat.Completions.ChatCom
   };
 }
 
-// The conversation as the router reads it: who said what, as plain text, the latest message last.
-function transcript(messages: ChatMessage[]): string {
-  return messages
-    .flatMap((message) => {
-      if (message.type === "human") return [`Doctor: ${message.content}`];
-      if (message.type === "ai" && aiText(message)) return [`Desk: ${aiText(message)}`];
-      return [];
-    })
+// What the router reads. Only the latest message is sorted. Earlier turns come as context, so a
+// follow-up such as "US patient with eGFR 32?" still knows which medicine it is about. A desk reply
+// comes as its kind only ("refused: OFF_LABEL_REFUSAL"), never its text: a refusal's wording
+// would make every later message look like the refused one.
+const REPLY_CODE = /^([A-Z][A-Z_]{3,})\b/;
+
+function deskKind(text: string): string {
+  const code = REPLY_CODE.exec(text.trim())?.[1];
+  return code ? `the desk replied ${code}` : "the desk answered";
+}
+
+export function routerInput(messages: ChatMessage[]): string {
+  const said = messages.flatMap((message) => {
+    if (message.type === "human") return [{ doctor: true, text: message.content }];
+    if (message.type === "ai" && aiText(message)) return [{ doctor: false, text: aiText(message) }];
+    return [];
+  });
+  const lastAt = said.map((line) => line.doctor).lastIndexOf(true);
+  if (lastAt < 0) return "";
+  const earlier = said
+    .slice(0, lastAt)
     .slice(-6)
-    .join("\n\n");
+    .map((line) => (line.doctor ? `Doctor: ${line.text}` : `(${deskKind(line.text)})`));
+  const latest = `Message to sort:\nDoctor: ${said[lastAt]!.text}`;
+  return earlier.length ? `Earlier turns, for context only:\n${earlier.join("\n")}\n\n${latest}` : latest;
 }
 
 export async function routeRequest(openai: OpenAI, model: string, messages: ChatMessage[], uses: LabelSection[]): Promise<Route> {
@@ -115,7 +131,7 @@ export async function routeRequest(openai: OpenAI, model: string, messages: Chat
     temperature: 0,
     messages: [
       { role: "system", content: `${ROUTER_PROMPT}\n\nApproved uses:\n${useList}` },
-      { role: "user", content: transcript(messages) }
+      { role: "user", content: routerInput(messages) }
     ],
     tools: [routeTool(uses)],
     tool_choice: { type: "function", function: { name: "route" } }
