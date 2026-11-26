@@ -1,0 +1,41 @@
+{
+  "chapter": "18",
+  "change": "A release gate on every prompt promotion and agent push",
+  "passed": 8,
+  "total": 8,
+  "slices": {
+    "staleness": {
+      "passed": 1,
+      "total": 1
+    },
+    "off-label": {
+      "passed": 1,
+      "total": 1
+    },
+    "tenancy": {
+      "passed": 1,
+      "total": 1
+    },
+    "pv-phi": {
+      "passed": 1,
+      "total": 1
+    },
+    "injection": {
+      "passed": 1,
+      "total": 1
+    },
+    "multi-turn": {
+      "passed": 1,
+      "total": 1
+    },
+    "fact-check": {
+      "passed": 1,
+      "total": 1
+    },
+    "auto": {
+      "passed": 1,
+      "total": 1
+    }
+  },
+  "run": "http://localhost:5174/project/hcp-medinfo/experiments/results?baseline=e2ee33f38659a8e2"
+}

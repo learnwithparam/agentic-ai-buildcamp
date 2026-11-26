@@ -1,0 +1,65 @@
+{
+  "chapter": "06",
+  "change": "The agent as lesson 03 left it",
+  "passed": 5,
+  "total": 28,
+  "slices": {
+    "staleness": {
+      "passed": 0,
+      "total": 3
+    },
+    "footnote": {
+      "passed": 1,
+      "total": 3
+    },
+    "multi-hop": {
+      "passed": 1,
+      "total": 1
+    },
+    "off-label": {
+      "passed": 0,
+      "total": 3
+    },
+    "tenancy": {
+      "passed": 1,
+      "total": 4
+    },
+    "pv-phi": {
+      "passed": 0,
+      "total": 2
+    },
+    "guardrail": {
+      "passed": 0,
+      "total": 1
+    },
+    "country": {
+      "passed": 0,
+      "total": 4
+    },
+    "future-label": {
+      "passed": 1,
+      "total": 1
+    },
+    "injection": {
+      "passed": 1,
+      "total": 2
+    },
+    "multi-turn": {
+      "passed": 0,
+      "total": 1
+    },
+    "ambiguous": {
+      "passed": 0,
+      "total": 1
+    },
+    "pushback": {
+      "passed": 0,
+      "total": 1
+    },
+    "review": {
+      "passed": 0,
+      "total": 1
+    }
+  },
+  "run": "http://localhost:5174/project/hcp-medinfo/experiments/results?baseline=b5acf60835ec0295"
+}

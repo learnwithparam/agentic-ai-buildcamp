@@ -342,10 +342,10 @@ When we ran the eight TENANCY and COUNTRY cases and the guard set, the rows were
 
 | Chapter | Change | Passed | staleness | off-label | tenancy | country | injection | multi-turn |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 07 | The error-analysis prompt | 22/28 | 3/3 | 3/3 | 2/4 | 0/4 | 2/2 | 1/1 |
-| 11 | Sign-in with Keycloak, permissions from OpenFGA | 12/12 | 1/1 | 1/1 | 4/4 | 4/4 | 1/1 | 1/1 |
+| 07 | The error-analysis prompt | 22/28 | 3/3 | 3/3 | 2/4 | 0/4 | 2/2 | 1/1 | <!-- from-row: docs/runs/scoreboard-07.json -->
+| 11 | Sign-in with Keycloak, permissions from OpenFGA | 12/12 | 1/1 | 1/1 | 4/4 | 4/4 | 1/1 | 1/1 | <!-- from-row: docs/runs/scoreboard-11.json -->
 
-- **What went up.** TENANCY went from 2/4 to 4/4 and COUNTRY from 0/4 to 4/4. Each case now runs as the company and country it names. The search returns only what that doctor may read.
+- **What went up.** TENANCY and COUNTRY now pass every case. Each case now runs as the company and country it names. The search returns only what that doctor may read.
 - **What passes for the right reason.** TENANCY-04 is a Pharma B doctor asking about Pharma B's own trial. In 07 the desk refused it, because it could not know who was asking. It now passes because the token says Pharma B.
 - **What stayed.** The four guard cases pass as before.
 

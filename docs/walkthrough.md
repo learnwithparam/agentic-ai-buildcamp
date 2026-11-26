@@ -53,7 +53,8 @@ sequenceDiagram
     participant T as Trace
     D->>W: Sign in
     W->>I: Code flow with PKCE
-    I-->>W: Token with company and country
+    I-->>W: Token with company and country, kept on the server
+    W-->>D: Session cookie, no token
     D->>W: Can she take 50 mg twice a day?
     W->>G: Input check and spend check
     alt blocked input or no budget left
@@ -370,7 +371,7 @@ The [lesson list](../README.md#lessons) gives each lesson's checkpoint and the q
 
 ### A rule in a prompt
 
-A prompt rule is a request, and the model follows it most of the time. For example, "cite every fact" still let 13 of 405 answers through with a bad citation. When a rule protects a patient or a company, move it into code and test the code.
+A prompt rule is a request, and the model follows it most of the time. For example, "cite every fact" still let some answers through with a bad citation. When a rule protects a patient or a company, move it into code and test the code.
 
 ### A check after the fact
 

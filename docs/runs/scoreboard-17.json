@@ -1,0 +1,33 @@
+{
+  "chapter": "17",
+  "change": "A nightly sweep inside a budget, a scope and an off switch",
+  "passed": 10,
+  "total": 10,
+  "slices": {
+    "staleness": {
+      "passed": 1,
+      "total": 1
+    },
+    "off-label": {
+      "passed": 1,
+      "total": 1
+    },
+    "injection": {
+      "passed": 1,
+      "total": 1
+    },
+    "multi-turn": {
+      "passed": 1,
+      "total": 1
+    },
+    "event": {
+      "passed": 1,
+      "total": 1
+    },
+    "auto": {
+      "passed": 5,
+      "total": 5
+    }
+  },
+  "run": "http://localhost:5174/project/hcp-medinfo/experiments/results?baseline=2cf10bd047c93f07"
+}

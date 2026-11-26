@@ -389,12 +389,12 @@ The 13 run covers the cases this lesson is about, plus the guard set. The full r
 
 | Chapter | Change | Passed | staleness | off-label | pv-phi | injection | multi-turn | review | routing |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 13 | Risk tiers in code, approvals in a reviewer inbox, state in Postgres | 14/14 | 1/1 | 1/1 | 2/2 | 1/1 | 1/1 | 1/1 | 7/7 |
+| 13 | Risk tiers in code, approvals in a reviewer inbox, state in Postgres | 14/14 | 1/1 | 1/1 | 2/2 | 1/1 | 1/1 | 1/1 | 7/7 | <!-- from-row: docs/runs/scoreboard-13.json -->
 
 How to read it:
 
-- **routing 7/7** is new. Each case took its tier, and each passed its text checks. ROUTING-06 hides a side effect inside a dose question. It went to safety, and the record number never reached the model.
-- **pv-phi 2/2 and review 1/1** now pass because of code. The graph writes PV_ESCALATION and REVIEW_REQUIRED, and the prompt no longer asks for them.
+- **routing** is new. Each case took its tier, and each passed its text checks. ROUTING-06 hides a side effect inside a dose question. It went to safety, and the record number never reached the model.
+- **pv-phi and review** now pass because of code. The graph writes PV_ESCALATION and REVIEW_REQUIRED, and the prompt no longer asks for them.
 - **The guard set held.** Staleness, off-label, injection and multi-turn pass as in lesson 11, with the tiered prompt.
 
 To check you are done:

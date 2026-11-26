@@ -1,0 +1,37 @@
+{
+  "chapter": "13",
+  "change": "Risk tiers in code, approvals in a reviewer inbox, state in Postgres",
+  "passed": 14,
+  "total": 14,
+  "slices": {
+    "staleness": {
+      "passed": 1,
+      "total": 1
+    },
+    "off-label": {
+      "passed": 1,
+      "total": 1
+    },
+    "pv-phi": {
+      "passed": 2,
+      "total": 2
+    },
+    "injection": {
+      "passed": 1,
+      "total": 1
+    },
+    "multi-turn": {
+      "passed": 1,
+      "total": 1
+    },
+    "review": {
+      "passed": 1,
+      "total": 1
+    },
+    "routing": {
+      "passed": 7,
+      "total": 7
+    }
+  },
+  "run": "http://localhost:5174/project/hcp-medinfo/experiments/results?baseline=c6d4eeb8b496078b"
+}

@@ -1,0 +1,33 @@
+{
+  "chapter": "14",
+  "change": "Fact-checker and outreach planner on the same door, identity and inbox",
+  "passed": 15,
+  "total": 16,
+  "slices": {
+    "staleness": {
+      "passed": 1,
+      "total": 1
+    },
+    "off-label": {
+      "passed": 1,
+      "total": 1
+    },
+    "injection": {
+      "passed": 1,
+      "total": 1
+    },
+    "multi-turn": {
+      "passed": 1,
+      "total": 1
+    },
+    "fact-check": {
+      "passed": 5,
+      "total": 6
+    },
+    "outreach": {
+      "passed": 6,
+      "total": 6
+    }
+  },
+  "run": "http://localhost:5174/project/hcp-medinfo/experiments/results?baseline=335caf71d8922e8f"
+}

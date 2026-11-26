@@ -294,9 +294,11 @@ function sentenceProblems(file: string, sentences: string[]): Problem[] {
 
 // The YAML front matter is for the site, not the reader.
 export const withoutFrontMatter = (markdown: string) => markdown.replace(/^---\n[\s\S]*?\n---\n/, "");
+// A from-comment (scripts/page-numbers.ts) is a pointer for a check, not words for a reader.
+const withoutComments = (markdown: string) => markdown.replace(/ ?<!--[\s\S]*?-->/g, "");
 
 export function problemsIn(file: string, page: string, gradeLimit: number): Problem[] {
-  const markdown = withoutFrontMatter(page);
+  const markdown = withoutComments(withoutFrontMatter(page));
   const prose = proseOf(markdown);
   const sentences = sentencesOf(prose);
   const problems = [
@@ -411,7 +413,7 @@ export function paragraphsOfPage(markdown: string): string[] {
 }
 
 export function teachProblems(file: string, page: string, gradeLimit: number): Problem[] {
-  const markdown = withoutFrontMatter(page);
+  const markdown = withoutComments(withoutFrontMatter(page));
   const problems: Problem[] = [];
   for (const paragraph of paragraphsOfPage(markdown)) {
     const count = sentencesOf(paragraph.replace(/`[^`]*`/g, "it")).length;
