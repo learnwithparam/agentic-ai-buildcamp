@@ -1,9 +1,9 @@
 ---
-title: "Workshop: 4.1 Error Analysis"
+title: "Workshop: Error Analysis"
 description: "Replay 20 real traces, annotate them in a queue, cluster the notes into failure modes, chart how often each one appears, and write the prompt that answers them."
 ---
 
-# 4.1 Error analysis
+# Error analysis
 
 ## Why error analysis
 
@@ -154,7 +154,7 @@ Keep it short and clear.
 
 Leave the running prompt as it is for now. In [07 Evaluate a change](../07-evaluation.md) you publish this version. You then measure it against the current one on the dataset.
 
-[Section 4.2 Capturing signals](./capturing-signals.md) is next. It scores disagreement and all-caps frustration as those turns arrive. Then the rows worth reading stand out.
+[Capturing signals](./capturing-signals.md) is next. It scores disagreement and all-caps frustration as those turns arrive. Then the rows worth reading stand out.
 
 ### Short on time
 

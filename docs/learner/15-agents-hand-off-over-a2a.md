@@ -3,7 +3,7 @@ title: "Workshop: Hand Work Between Agents Without Losing Who Asked"
 description: "Put the fact-checker and the outreach planner behind A2A servers with public agent cards and sign-in. Tasks live in the database, and a task can wait for a person. One trace follows the whole handoff."
 ---
 
-# 15 Hand work between agents without losing who asked
+# Hand work between agents without losing who asked
 
 ## The problem
 

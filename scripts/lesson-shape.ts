@@ -65,7 +65,9 @@ export function shapeProblems(file: string, page: string): string[] {
   const headings = headingsOf(markdown);
   const number = file.match(/(\d\d)-[^/]*\.md$/)?.[1];
   const title = headings[0] ?? "";
-  if (!number || !title.startsWith(`# ${number} `)) problems.push(`${file}: the first heading must be "# ${number ?? "NN"} <what the reader can do>"`);
+  // The file name and the README's Step column carry the number; the title is only what the reader can do.
+  if (!number || !/^# \S/.test(title)) problems.push(`${file}: the first heading must be "# <what the reader can do>"`);
+  else if (/^# \d/.test(title)) problems.push(`${file}: the title starts with a number; the file name carries it`);
 
   // The shape's headings must appear in order. Others (### Step 1, ...) may sit between them.
   const shaped = headings.filter((line) => SHAPE.some((part) => part.heading === line));
@@ -100,7 +102,7 @@ export function shapeProblems(file: string, page: string): string[] {
 export function readmeProblems(readme: string, pages: Array<{ file: string; page: string }>): string[] {
   const problems: string[] = [];
   for (const { file, page } of pages) {
-    const title = headingsOf(withoutFrontMatter(page))[0]?.replace(/^# \d\d /, "") ?? "";
+    const title = headingsOf(withoutFrontMatter(page))[0]?.replace(/^# /, "") ?? "";
     const links = [...readme.matchAll(new RegExp(`\\[([^\\]]+)\\]\\(\\./${file.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\)`, "g"))];
     if (links.length !== 1) problems.push(`README.md: links ${file} ${links.length} times; link it once in the lesson table`);
     else if (links[0][1] !== title) problems.push(`README.md: ${file} is linked as "${links[0][1]}", but its title is "${title}"`);

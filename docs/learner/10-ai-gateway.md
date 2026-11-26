@@ -3,7 +3,7 @@ title: "Workshop: Put Every Model Call Behind One Door With a Daily Budget"
 description: "Give each service its own key, its own model list and a daily budget, stop a request that needs no model at the door, and record the cost of every call, even the ones your code forgot to trace."
 ---
 
-# 10 Put every model call behind one door with a daily budget
+# Put every model call behind one door with a daily budget
 
 ## The problem
 

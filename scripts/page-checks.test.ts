@@ -12,7 +12,7 @@ import { problemsIn } from "./plain-english";
 const fence = "```";
 const lesson = (parts: Partial<Record<string, string>> = {}) =>
   [
-    "# 21 Check every citation",
+    "# Check every citation",
     "## The problem", parts.problem ?? "A doctor reads a dose that was never approved.",
     "## What you build", "A check.",
     "## How it works", "The idea.",
@@ -40,7 +40,12 @@ test("the shape check fails a missing heading, a wrong order and a product in Th
   const swapped = lesson().replace("## Results", "## TMP").replace("## What to watch for", "## Results").replace("## TMP", "## What to watch for");
   assert.match(shapeProblems(FILE, swapped).join("\n"), /out of order/);
   assert.match(shapeProblems(FILE, lesson({ problem: "Langfuse shows the trace." })).join("\n"), /"The problem" names Langfuse/);
-  assert.match(shapeProblems(FILE, lesson().replace("# 21 Check every citation", "# 21 Check citations in Langfuse")).join("\n"), /names Langfuse/);
+  assert.match(shapeProblems(FILE, lesson().replace("# Check every citation", "# Check citations in Langfuse")).join("\n"), /names Langfuse/);
+});
+
+test("a title that starts with a number fails: the file name carries it", () => {
+  assert.match(shapeProblems(FILE, lesson().replace("# Check every citation", "# 21 Check every citation")).join("\n"), /starts with a number/);
+  assert.deepEqual(shapeProblems(FILE, lesson()), []);
 });
 
 test("the README links each lesson once, by the page's own title", () => {

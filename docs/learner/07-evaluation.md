@@ -3,7 +3,7 @@ title: "Workshop: Compare Two Runs to See If a Change Helped"
 description: "Publish the prompt from error analysis, rerun the same 28 cases, and compare the two runs item by item. Keep the gains, find what broke, and write the regression down."
 ---
 
-# 07 Compare two runs to see if a change helped
+# Compare two runs to see if a change helped
 
 ## The problem
 

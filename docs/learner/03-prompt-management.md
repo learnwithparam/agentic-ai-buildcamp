@@ -3,7 +3,7 @@ title: "Workshop: Change an Agent's Behavior Without a Deploy"
 description: "Move the agent's system prompt into a prompt store, fetch it on every call, and change how the agent behaves by publishing a new prompt version, with no deploy."
 ---
 
-# 03 Change an agent's behavior without a deploy
+# Change an agent's behavior without a deploy
 
 ## The problem
 

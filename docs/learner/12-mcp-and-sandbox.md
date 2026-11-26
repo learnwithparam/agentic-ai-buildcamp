@@ -3,7 +3,7 @@ title: "Workshop: Open a Second Door With the Same Walls and Run Untrusted Code 
 description: "Let a coding agent search the label library over MCP with the doctor's own token, teach it the desk's procedure with a skill, and run code evaluators in a sandbox instead of next to your secrets."
 ---
 
-# 12 Open a second door with the same walls and run untrusted code in a sandbox
+# Open a second door with the same walls and run untrusted code in a sandbox
 
 ## The problem
 

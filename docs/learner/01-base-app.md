@@ -3,7 +3,7 @@ title: "Workshop: Follow One Chat Turn Through an Agent"
 description: "Tour the medical information agent before tracing it: an agent with two tools, a pause for drafted replies, and a streaming chat."
 ---
 
-# 01 Follow one chat turn through an agent
+# Follow one chat turn through an agent
 
 ## The problem
 

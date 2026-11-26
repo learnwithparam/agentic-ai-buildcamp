@@ -3,7 +3,7 @@ title: "Workshop: Check Every Sales Email Against Approved Claims"
 description: "Add two staff agents that reuse the gateway, sign-in, permissions and review inbox. A fact check marks each sentence of an email in code, and an outreach planner holds duplicate sends and opt-outs until a sales rep decides."
 ---
 
-# 14 Check every sales email against approved claims
+# Check every sales email against approved claims
 
 ## The problem
 

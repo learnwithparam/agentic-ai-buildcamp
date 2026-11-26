@@ -3,7 +3,7 @@ title: "Workshop: Let an Agent Work Alone Inside Limits Code Enforces"
 description: "Run an agent on a nightly schedule inside three limits. It only drafts and plans, it stops at a daily spend limit read before every step, and an off switch stops it mid-run. Every run is traced."
 ---
 
-# 17 Let an agent work alone inside limits code enforces
+# Let an agent work alone inside limits code enforces
 
 ## The problem
 

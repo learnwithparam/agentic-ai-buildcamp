@@ -3,7 +3,7 @@ title: "Workshop: Check a Judge Against People Before You Trust It"
 description: "Label 21 answers by hand, measure a model judge against your labels with Cohen's kappa, and let the judge into the pass only above a bar you set first."
 ---
 
-# 09 Check a judge against people before you trust it
+# Check a judge against people before you trust it
 
 ## The problem
 

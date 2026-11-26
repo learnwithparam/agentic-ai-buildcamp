@@ -3,7 +3,7 @@ title: "Workshop: Score Your Agent on Every Case"
 description: "Run the medical information agent across the whole dataset, score every item with three evaluators, and write the first row of the scoreboard."
 ---
 
-# 06 Score your agent on every case
+# Score your agent on every case
 
 ## The problem
 

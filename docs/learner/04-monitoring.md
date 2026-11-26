@@ -3,7 +3,7 @@ title: "Workshop: Find What Goes Wrong in Production"
 description: "Read failures by hand, name them, count them, and score the turns that look wrong, so the turns worth a closer look stand out from thousands of traces."
 ---
 
-# 04 Find what goes wrong in production
+# Find what goes wrong in production
 
 ## The problem
 
@@ -107,13 +107,13 @@ Cost and time are logged on every trace. In Langfuse, open **Home**. You see the
 
 ### Step 2: Do structured error analysis
 
-Error analysis is run by people, often the domain experts. Repeat it as the app changes. Follow [section 4.1 Error analysis](./04-monitoring/error-analysis.md). You replay 20 traces, note what went wrong on each, and group the notes. Then you chart how often each failure category appears.
+Error analysis is run by people, often the domain experts. Repeat it as the app changes. Follow [Error analysis](./04-monitoring/error-analysis.md). You replay 20 traces, note what went wrong on each, and group the notes. Then you chart how often each failure category appears.
 
 ![Failure categories, one bar per failure mode.](../images/monitoring/failure-categories.png)
 
 ### Step 3: Capture signals
 
-A signal is something the user does or says that shows how the turn went. It is stored on the trace as a score. Follow [section 4.2 Capturing signals](./04-monitoring/capturing-signals.md). You start with two signals: the clinician disagrees, and the clinician writes in capital letters.
+A signal is something the user does or says that shows how the turn went. It is stored on the trace as a score. Follow [Capturing signals](./04-monitoring/capturing-signals.md). You start with two signals: the clinician disagrees, and the clinician writes in capital letters.
 
 ![Conversation signals on a dashboard, one bar per signal score.](../images/monitoring/user-frustration-dashboard.png)
 
@@ -155,7 +155,7 @@ The failing traces are the best source for lesson 05. They become test cases the
 
 ## Where to go next
 
-- Read [section 4.1 Error analysis](./04-monitoring/error-analysis.md), then [section 4.2 Capturing signals](./04-monitoring/capturing-signals.md).
+- Read [Error analysis](./04-monitoring/error-analysis.md), then [Capturing signals](./04-monitoring/capturing-signals.md).
 - Read the Academy page on [error analysis](https://langfuse.com/academy/monitoring/error-analysis).
 - Read the Academy page on [capturing signals](https://langfuse.com/academy/monitoring/capturing-signals).
 - Lesson 05 turns the traces you caught into [eval datasets](./05-dataset.md).

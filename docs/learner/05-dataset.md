@@ -3,7 +3,7 @@ title: "Workshop: Write Down What Your Agent Must Get Right"
 description: "Decide what your eval dataset should cover, design the item shape, and seed it into Langfuse for experiments."
 ---
 
-# 05 Write down what your agent must get right
+# Write down what your agent must get right
 
 ## The problem
 

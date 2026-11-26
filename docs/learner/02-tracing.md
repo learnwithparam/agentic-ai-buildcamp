@@ -3,7 +3,7 @@ title: "Workshop: See Every Step an Agent Takes"
 description: "Turn each chat turn into one trace with every model call, graph node and tool call inside it, plus the chat session, so a wrong answer can be traced to the step that caused it."
 ---
 
-# 02 See every step an agent takes
+# See every step an agent takes
 
 ## The problem
 

@@ -3,7 +3,7 @@ title: "Workshop: Route Each Request by Risk and Keep Approvals When the Server 
 description: "Sort every message into a risk tier in code, send drafts and adverse events to a review inbox, record each decision as a score, and resume a paused thread after a server restart."
 ---
 
-# 13 Route each request by risk and keep approvals when the server restarts
+# Route each request by risk and keep approvals when the server restarts
 
 ## The problem
 

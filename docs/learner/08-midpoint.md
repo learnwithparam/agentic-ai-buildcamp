@@ -3,7 +3,7 @@ title: "Workshop: Read Your Scoreboard as One Improvement Loop"
 description: "Read the 06 and 07 rows slice by slice, name the lesson that fixes each failure still left, and plan the same loop for your own app by writing the first three cases."
 ---
 
-# 08 Read your scoreboard as one improvement loop
+# Read your scoreboard as one improvement loop
 
 ## The problem
 
