@@ -36,6 +36,10 @@ A prompt cannot keep a secret. The fix has to come before the model sees any tex
 
 A **token** is a signed note from the sign-in service. It says who the doctor is, which company they belong to and where they practise. The server checks its signature, issuer, audience and expiry. The browser never sees it.
 
+![Sign in and limit what each doctor reads: the parts this lesson adds.](../images/diagrams/checkpoint-11.svg)
+
+Step through it one part at a time in the [live drawing](https://canvas.learnwithparam.com/case.html#buildcamp/13).
+
 A **tenant** is one company on the desk. Each doctor belongs to one tenant, and one tenant's text must never reach another's doctor.
 
 A **permission check** asks one question. May this doctor read this document? A doctor may read it when their company owns it. It must also be approved where they practise. Our rule is one line in `infra/openfga/model.fga`.

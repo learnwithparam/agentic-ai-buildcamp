@@ -33,6 +33,10 @@ For example, a colleague removes the bracket citations from the prompt because t
 
 A gate turns the cases you already keep green into a rule. Nothing reaches production unless they all pass. For a prompt, the gate tests one pinned version and moves the label only on green. For code, the hook runs the same cases on push.
 
+![Gate the release: the parts this lesson adds.](../images/diagrams/checkpoint-18.svg)
+
+Step through it one part at a time in the [live drawing](https://canvas.learnwithparam.com/case.html#buildcamp/20).
+
 ### The flow
 
 This follows one staging prompt version from edit to promotion.
