@@ -38,6 +38,10 @@ A doctor cannot tell these from a good answer. So code must check the answer bef
 
 The model writes the answer, and code decides if it goes out. The check reads only what the doctor asked and what the search returned. So it needs no second model, and a right answer costs nothing.
 
+![Check every citation: the parts this lesson adds.](../images/diagrams/checkpoint-21.svg)
+
+Step through it one part at a time in the [live drawing](https://canvas.learnwithparam.com/case.html#buildcamp/23).
+
 ### The flow
 
 This follows one real question from the doctor to the answer they see. Here the first answer cites the expired draft.
