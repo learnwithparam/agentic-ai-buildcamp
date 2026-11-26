@@ -200,9 +200,10 @@ test("a document not in force on the day is never searched", async () => {
 });
 
 test("search_labels with no index connected fails instead of answering from word counts", async () => {
-  const { executeTool } = await import("../tools");
-  const user = { id: "u", email: "", name: "", tenantId: "pharma_a", country: "US", roles: [] } as never;
-  await assert.rejects(executeTool("search_labels", { query: "CardioNex dose" }, user), /no label index/);
+  // The default search, before connectLabelIndex. Called directly: executeTool asks OpenFGA first,
+  // and CI has no OpenFGA.
+  const { noLabelIndex } = await import("../tools");
+  await assert.rejects(noLabelIndex("CardioNex dose", new Set(["cardionex-uspi-v2"]), 5, "2026-11-26"), /no label index/);
 });
 
 test("a long section becomes passages of whole paragraphs, and a table is never cut", () => {

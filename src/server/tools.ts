@@ -88,9 +88,11 @@ export type LabelSearch = (query: string, readable: ReadonlySet<string>, limit: 
 // Lessons 1 to 19 search this way, and the tests with no database use it by name.
 export const wordSearch: LabelSearch = async (query, readable, limit, today) => searchLabels(query, readable, limit, today);
 
-let search: LabelSearch = async () => {
+// Until the server connects the index, search_labels fails: it never answers from word counts.
+export const noLabelIndex: LabelSearch = async () => {
   throw new Error("search_labels has no label index. The server connects it at start (connectLabelIndex); run npm run rag:ingest first.");
 };
+let search: LabelSearch = noLabelIndex;
 
 export function useLabelSearch(next: LabelSearch) {
   search = next;
