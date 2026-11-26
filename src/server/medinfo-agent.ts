@@ -34,6 +34,8 @@ import type { ReviewItem } from "./reviews";
 import { scriptUser, type Identity } from "./users";
 import { DESK_PROMPT, deskFacts, fillDeskPrompt } from "./desk-prompt";
 import { claimCheckWith } from "./citations.claims";
+import { measureTurn } from "./ops/meter";
+import { scoreTurn } from "./ops/metrics";
 import { answerRun } from "../shared/run";
 
 // Lesson 01's prompt. The variants in scripts/prompt-variants.ts grow from it; since fix 3 the app
@@ -231,6 +233,7 @@ export function createMedinfoAgent(checkpointer: BaseCheckpointSaver, options: {
     async (turn: Turn, emit: (event: StreamEvent) => void) => {
       const vault = vaultFor(turn.threadId);
       const cleaned = { ...turn, messages: await scrubbed(turn.messages, vault, options.phiFinder) };
+      const traceId = getActiveTraceId();
       // Lesson 11: the trace records who asked by id, company and country only. The doctor's
       // name and email stay in Keycloak; the trace input is the thread and the new messages.
       updateActiveObservation({ input: { threadId: turn.threadId, messages: cleaned.messages, resume: turn.resume } });
@@ -245,7 +248,8 @@ export function createMedinfoAgent(checkpointer: BaseCheckpointSaver, options: {
           traceName: turn.resume ? "hcp-medinfo-review-decision" : "hcp-medinfo-chat-turn",
           tags: ["langfuse-workshop", "hcp-medinfo"]
         },
-        () => runGraph(graph, cleaned, emitRestored)
+        // Lesson 23: latency, cost and structured-output failures of this turn, as scores on its trace.
+        () => measureTurn(() => runGraph(graph, cleaned, emitRestored), (metrics) => scoreTurn(langfuse, traceId, metrics))
       );
       return result;
     },

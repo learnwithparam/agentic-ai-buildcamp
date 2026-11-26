@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { resolveToday } from "./ops/today";
 
 // The label library: the dataset repo's HCP documents, copied into data/hcp by
 // scripts/sync-dataset.ts. Each document is read from its full label in data/hcp/labels, the
@@ -65,9 +66,10 @@ export const LABEL_SECTIONS: LabelSection[] = readdirSync(DOCS_DIR)
     return parseLabelDoc(readFileSync(existsSync(full) ? full : path.join(DOCS_DIR, name), "utf8"));
   });
 
-// The dataset fixes "today" so every run sees the same labels in force. An event can name
-// another day (lesson 16: a label comes into force), and the status below follows that day.
-export const TODAY = "2026-11-23";
+// "Today" is the real date. Tests and the dataset runner set MEDINFO_TODAY (src/server/ops/today.ts)
+// so every run sees the same labels in force. An event can name another day (lesson 16: a label
+// comes into force), and the status below follows that day.
+export const TODAY = resolveToday();
 
 // Lesson 16. Which label text is in force is a fact about a day, not a fixed word in a file.
 // A file's "approved" label comes into force on its effective date, and from that day the older

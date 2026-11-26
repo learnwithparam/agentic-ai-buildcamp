@@ -1,4 +1,5 @@
 import type pg from "pg";
+import { ESCALATE_SQL } from "../ops/review-events";
 
 // The 24 hour safety clock. Every adverse event item has a due_at (reviews.ts sets it from
 // SAFETY_HOURS). When one is still waiting after it, this job escalates it: the item's status
@@ -7,7 +8,8 @@ import type pg from "pg";
 //
 // Only adverse events are touched. An escalated item stays in the inbox and a reviewer still
 // decides it. Running the job twice escalates nothing twice: it looks only at 'waiting' items,
-// and the notification pair (item, kind) is unique.
+// and the notification pair (item, kind) is unique. Each escalation also writes a review_events
+// row by the system (src/server/ops/review-events.ts), so the audit trail holds it.
 
 export const CLOCK_INTERVAL_MS = 60_000;
 
@@ -18,9 +20,7 @@ export async function escalateOverdue(pool: pg.Pool, now: Date = new Date()): Pr
   try {
     await client.query("BEGIN");
     const { rows } = await client.query<{ id: string; tenant_id: string; due_at: Date; escalated_at: Date }>(
-      `UPDATE review_items SET status = 'escalated', escalated_at = $1
-       WHERE kind = 'adverse_event' AND status = 'waiting' AND due_at < $1
-       RETURNING id, tenant_id, due_at, escalated_at`,
+      ESCALATE_SQL,
       [now]
     );
     if (rows.length) {
