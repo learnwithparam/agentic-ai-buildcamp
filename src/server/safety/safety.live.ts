@@ -34,8 +34,12 @@ test("ae-001: the criteria are read from the words, and the unnamed product is m
   assert.deepEqual(safety.missing, ["product"]);
 });
 
-test("ae-003: coded terms come from the dictionary and match the labelled preferred terms", async () => {
-  const gold = pick("ae-003")[0]!;
+// Not ae-003: its gold codes "respiratory rate was 8" as Respiratory depression, while the
+// dictionary files the LLT "respiratory rate of 8" under Bradypnoea, so the two disagree and a
+// right answer by the dictionary fails the gold. The measure keeps that row; this proof needs a
+// row with one reading: a rash and itching, two terms.
+test("ae-014: coded terms come from the dictionary and match the labelled preferred terms", async () => {
+  const gold = pick("ae-014")[0]!;
   const safety = await extractCase(modelClient(), env.openaiModel, gold.message);
   const found = new Set(safety.events.flatMap((event) => (event.coded ? [event.coded.pt.code] : [])));
   for (const m of gold.meddra) assert.ok(found.has(m.pt), `PT ${m.pt} not found in ${[...found].join(", ")}`);
