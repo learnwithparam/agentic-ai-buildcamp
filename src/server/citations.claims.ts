@@ -13,7 +13,7 @@ export type Claim = { text: string; quote: string; docId: string; section: strin
 export type Verdict = "supported" | "unsupported";
 // The support judge: does the quote support the claim? The real one is judgeWithModel; a test
 // passes a plain function.
-export type Judge = (claim: Pick<Claim, "text" | "quote">) => Promise<Verdict>;
+export type Judge = (claim: Claim) => Promise<Verdict>;
 
 export type ClaimContext = {
   // The sections search_labels returned this turn. null skips that one rule (the measure over
@@ -71,10 +71,21 @@ export async function reviewClaims(claims: Claim[], context: ClaimContext, judge
 
 // --- The two model calls. Both go through the gateway client the caller passes (modelClient()).
 
-export const JUDGE_PROMPT = `You judge whether a quote from a medicine label supports a claim.
-Answer "supported" only when the quote, read on its own, states what the claim says: the same fact, for the same subject, in the same direction.
+// The judge reads the quote inside its section, as a reviewer checks a citation. Measured on
+// 2026-11-26 with the quote alone: 27 of 45 supported claims were judged unsupported, because a
+// quote such as "raised to 40mg after 4 weeks" does not name the trial, the medicine or the
+// country its document is about.
+export const JUDGE_PROMPT = `You judge whether a quote from a medicine document supports a claim.
+You get the claim, the quote, and the section the quote comes from, with its document. The document and the section say what the quote is about: which medicine, trial, country or patient group.
+Answer "supported" only when the quote, read in that section, states what the claim says: the same fact, for the same subject, in the same direction.
 Answer "unsupported" when the quote is about something else, says the opposite, says less than the claim (the claim adds a condition, a dose, a group or a result the quote lacks), or only shares words with it.
 Do not use anything you know about the medicine. Judge the quote and the claim only.`;
+
+// What the judge reads around the quote: the document, its country, the section title and text.
+export function sourceOf(claim: Pick<Claim, "docId" | "section">): string {
+  const found = sectionText(claim.docId, claim.section);
+  return found ? `Section it comes from: ${found.docId} (${found.country}) ${found.section} ${found.title}\n${found.text}` : `Section it comes from: ${claim.docId} ${claim.section}, not found.`;
+}
 
 export function judgeWithModel(client: OpenAI): Judge {
   const openai = observeOpenAI(client, { generationName: "claim-support-judge" });
@@ -84,7 +95,7 @@ export function judgeWithModel(client: OpenAI): Judge {
       temperature: 0,
       messages: [
         { role: "system", content: JUDGE_PROMPT },
-        { role: "user", content: `Claim: ${claim.text}\n\nQuote: ${claim.quote}` }
+        { role: "user", content: `Claim: ${claim.text}\n\nQuote: ${claim.quote}\n\n${sourceOf(claim)}` }
       ],
       response_format: {
         type: "json_schema",

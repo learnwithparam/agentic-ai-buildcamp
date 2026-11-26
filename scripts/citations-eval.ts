@@ -54,7 +54,7 @@ export async function runRow(row: GoldClaim, judge: Judge): Promise<RowResult> {
   // No search ran for a gold row, so the "a search returned it" rule is skipped; the row names the
   // country the asker is in when it matters.
   const code = checkClaim(claim, { retrieved: null, today: row.as_of, country: row.country });
-  return { id: row.id, label: row.label, code, verbatim: quoteIsVerbatim(claim), judge: await judge({ text: row.claim, quote: row.quote }) };
+  return { id: row.id, label: row.label, code, verbatim: quoteIsVerbatim(claim), judge: await judge(claim) };
 }
 
 const round = (value: number) => Math.round(value * 1000) / 1000;

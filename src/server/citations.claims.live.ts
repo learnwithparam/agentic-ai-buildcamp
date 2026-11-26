@@ -13,8 +13,8 @@ test("the judge says supported for a supported gold row and unsupported for one 
   const judge = judgeWithModel(modelClient());
   const supported = gold.find((r) => r.id === "c-005")!;
   const opposite = gold.find((r) => r.id === "c-003")!;
-  assert.equal(await judge({ text: supported.claim, quote: supported.quote }), "supported");
-  assert.equal(await judge({ text: opposite.claim, quote: opposite.quote }), "unsupported");
+  assert.equal(await judge({ text: supported.claim, quote: supported.quote, docId: supported.doc_id, section: supported.section }), "supported");
+  assert.equal(await judge({ text: opposite.claim, quote: opposite.quote, docId: opposite.doc_id, section: opposite.section }), "unsupported");
 });
 
 test("every claim listed from an answer names a section that was given, and a copied quote passes the verbatim check", async () => {

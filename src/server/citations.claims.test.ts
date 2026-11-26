@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { CLAIM_REASONS, describeProblem } from "./citations";
-import { checkClaim, quoteIsVerbatim, reviewClaims, sectionText, type Claim, type Judge } from "./citations.claims";
+import { checkClaim, quoteIsVerbatim, reviewClaims, sectionText, type Claim, type Judge, sourceOf } from "./citations.claims";
 import { noModelCall } from "../../scripts/no-model-call";
 import { readGold, type GoldClaim } from "../../scripts/citations-eval";
 
@@ -92,4 +92,11 @@ test("a claim whose quote passes is judged, and an unsupported verdict is a prob
   assert.deepEqual(await reviewClaims([claimOf(row)], { retrieved: null, today: row.as_of }, async () => "supported"), []);
   assert.match(describeProblem(problem!), /the quote does not support the claim/);
   assert.ok(Object.keys(CLAIM_REASONS).length >= 7);
+});
+
+test("the judge reads the quote inside its section: the document, its country and the section text", () => {
+  const source = sourceOf({ docId: "neurovex-jp-label", section: "2.1" });
+  assert.match(source, /neurovex-jp-label \(JP\) 2\.1/);
+  assert.match(source, /25mg twice daily/);
+  assert.match(sourceOf({ docId: "nope", section: "9" }), /not found/);
 });
