@@ -16,7 +16,7 @@ A row is "pending" until a real run writes its number to a file in `docs/runs/`.
 | Adverse events | ae.recall | ICH E2D(R1) reporting | >= 0.98 | 1 | [ae.json](runs/ae.json) |
 | Adverse events | ae.precision | ICH E2D(R1) reporting | >= 0.9 | 0.968 | [ae.json](runs/ae.json) |
 | Adverse events | ae.criteria_accuracy | ICH E2D(R1) four minimum criteria | >= 0.9 | 0.965 | [ae.json](runs/ae.json) |
-| Adverse events | ae.coding_accuracy | MedDRA preferred term coding | >= 0.85 | 0.858 | [ae.json](runs/ae.json) |
+| Adverse events | ae.coding_accuracy | MedDRA preferred term coding | >= 0.85 | 0.875 | [ae.json](runs/ae.json) |
 | Adverse events | ae.overdue_escalated | 24-hour safety clock | = 1 | 1 | [ae.json](runs/ae.json) |
 | Evals | evals.pass_rate | Groundwork frozen floor | >= 0.9 | pending | |
 | Evals | evals.pass_hat_5 | Groundhog pass^5 | >= 0.8 | pending | |
