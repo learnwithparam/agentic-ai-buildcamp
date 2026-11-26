@@ -30,11 +30,12 @@ import type pg from "pg";
 import { createPool, migrate } from "../src/server/db";
 import { env } from "../src/server/env";
 import { modelClient, useService } from "../src/server/gateway";
-import { LABEL_SECTIONS } from "../src/server/labels";
+import { LABEL_SECTIONS, TODAY } from "../src/server/labels";
 import { scrubPhi } from "../src/server/phi";
 import { detectEvent } from "../src/server/safety/detect";
 import { escalateOverdue } from "../src/server/safety/clock";
 import { extractCase, type Criteria } from "../src/server/safety/extract";
+import { labelLimits, limitsText } from "../src/server/safety/reference";
 import { approvedUses, routeRequest } from "../src/server/tiers";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -126,7 +127,8 @@ async function predictWithModel(gold: Gold): Promise<Prediction> {
   const [route, seen, extracted] = await Promise.all([
     routeRequest(openai, env.openaiModel, [{ id: gold.id, type: "human", content: text }], approvedUses(readable, LABEL_SECTIONS)),
     detectEvent(openai, env.openaiModel, text),
-    extractCase(openai, env.openaiModel, text)
+    // The rows are reports to each company's US desk, on the day the measure pins.
+    extractCase(openai, env.openaiModel, text, limitsText(labelLimits(readable, "US", TODAY)))
   ]);
   return {
     router_safety: route.tier === "safety",

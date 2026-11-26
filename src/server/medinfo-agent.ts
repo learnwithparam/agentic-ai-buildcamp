@@ -25,6 +25,7 @@ import {
 import { LABEL_SECTIONS } from "./labels";
 import { readableDocuments } from "./permissions";
 import { reviewerDraft } from "./safety/draft";
+import { labelLimits, limitsText } from "./safety/reference";
 import { scrubPhi } from "./phi";
 import { approvedUses, reportingProcedure, routeRequest, routerInput, safetyReply, stopReply, withFloor, withSecondPass } from "./tiers";
 import type { Turn as SearchTurn } from "./rag/rewrite";
@@ -192,7 +193,7 @@ export function createMedinfoAgent(checkpointer: BaseCheckpointSaver) {
             procedure: reportingProcedure(readable, LABEL_SECTIONS)
           });
           // A failed extraction never stops the report: the reviewer then reads the doctor's words alone.
-          const draft = await reviewerDraft(observeOpenAI(modelClient(), { generationName: "safety-extract" }), env.openaiModel, latestQuestion(state.messages), `ae-${String(config.configurable?.thread_id ?? "unknown")}`).catch((error: Error) => `CASE DRAFT NOT MADE: ${error.message}`);
+          const draft = await reviewerDraft(observeOpenAI(modelClient(), { generationName: "safety-extract" }), env.openaiModel, latestQuestion(state.messages), `ae-${String(config.configurable?.thread_id ?? "unknown")}`, limitsText(labelLimits(readable, userOf(config).country, state.today))).catch((error: Error) => `CASE DRAFT NOT MADE: ${error.message}`);
           await submitAdverseEvent(state, config, `${reply}\n\n${draft}`, getActiveTraceId());
           return withRun(state, fixedReply(state, reply));
         },
