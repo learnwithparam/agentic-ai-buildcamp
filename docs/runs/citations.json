@@ -1,0 +1,57 @@
+{
+  "measures": {
+    "citations.hallucination_precision": 1,
+    "citations.hallucination_recall": 1,
+    "citations.quote_verbatim_rate": 1
+  },
+  "commit": "a7112ac",
+  "at": "2026-11-26T18:38:12.670Z",
+  "rows": 116,
+  "judge": "gateway model",
+  "judge_agreement": 0.862,
+  "judge_by_label": {
+    "fabricated_quote": {
+      "rows": 18,
+      "flagged": 18,
+      "flagged_by_code": 18,
+      "judge_agrees": 14,
+      "judge_agreement": 0.778
+    },
+    "supported": {
+      "rows": 45,
+      "flagged": 0,
+      "flagged_by_code": 0,
+      "judge_agrees": 45,
+      "judge_agreement": 1
+    },
+    "unsupported": {
+      "rows": 17,
+      "flagged": 17,
+      "flagged_by_code": 1,
+      "judge_agrees": 17,
+      "judge_agreement": 1
+    },
+    "wrong_country": {
+      "rows": 9,
+      "flagged": 9,
+      "flagged_by_code": 9,
+      "judge_agrees": 9,
+      "judge_agreement": 1
+    },
+    "wrong_number": {
+      "rows": 17,
+      "flagged": 17,
+      "flagged_by_code": 16,
+      "judge_agrees": 15,
+      "judge_agreement": 0.882
+    },
+    "wrong_version": {
+      "rows": 10,
+      "flagged": 10,
+      "flagged_by_code": 10,
+      "judge_agrees": 0,
+      "judge_agreement": 0
+    }
+  },
+  "misses": []
+}

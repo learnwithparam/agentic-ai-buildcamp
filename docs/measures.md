@@ -10,9 +10,9 @@ A row is "pending" until a real run writes its number to a file in `docs/runs/`.
 | Search | search.mrr | PaperQA2 hybrid retrieval | >= 0.85 | 0.933 | [search.json](runs/search.json) |
 | Search | search.ndcg_at_10 | PaperQA2 hybrid retrieval | >= 0.85 | 0.922 | [search.json](runs/search.json) |
 | Search | search.out_of_label_empty | PaperQA2 "cannot answer" | >= 0.95 | 0.95 | [search.json](runs/search.json) |
-| Citations | citations.hallucination_precision | LitRAG, F1 0.986 | >= 0.95 | pending | |
-| Citations | citations.hallucination_recall | LitRAG, F1 0.986 | >= 0.95 | pending | |
-| Citations | citations.quote_verbatim_rate | PubCrawl, 255 of 255 | = 1 | pending | |
+| Citations | citations.hallucination_precision | LitRAG, F1 0.986 | >= 0.95 | 1 | [citations.json](runs/citations.json) |
+| Citations | citations.hallucination_recall | LitRAG, F1 0.986 | >= 0.95 | 1 | [citations.json](runs/citations.json) |
+| Citations | citations.quote_verbatim_rate | PubCrawl, 255 of 255 | = 1 | 1 | [citations.json](runs/citations.json) |
 | Adverse events | ae.recall | ICH E2D(R1) reporting | >= 0.98 | pending | |
 | Adverse events | ae.precision | ICH E2D(R1) reporting | >= 0.9 | pending | |
 | Adverse events | ae.criteria_accuracy | ICH E2D(R1) four minimum criteria | >= 0.9 | pending | |

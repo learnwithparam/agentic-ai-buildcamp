@@ -15,6 +15,7 @@ import {
   type ToolMessage
 } from "../shared/messages";
 import { answerRun, type AnswerRun } from "../shared/run";
+import type { ClaimCheck } from "./citations.claims";
 import { checkCitations, describeProblem, evidenceOf, EVIDENCE_TOOLS, WITHHELD_REPLY, type CitationProblem } from "./citations";
 import { env } from "./env";
 import { streamModelTurn, toOpenAIMessages } from "./stream-model";
@@ -120,12 +121,15 @@ export async function citeStep(
   system: string,
   state: GraphState,
   config: LangGraphRunnableConfig,
-  onChecked: (result: CitationOutcome) => void = () => {}
+  onChecked: (result: CitationOutcome) => void = () => {},
+  claimCheck?: ClaimCheck
 ): Promise<Partial<GraphState>> {
   const answer = last(state, "ai");
   if (!answer) return {};
   const { retrieved, asked } = evidenceOf(state.messages);
-  const problems = checkCitations(aiText(answer), retrieved, asked);
+  // The number check, then each claim's quote and the support judge (citations.claims.ts).
+  const checked = async (text: string) => [...checkCitations(text, retrieved, asked), ...((await claimCheck?.(text, retrieved, asked, state.today)) ?? [])];
+  const problems = await checked(aiText(answer));
   if (!problems.length) return (onChecked({ outcome: "passed", problems, afterRewrite: [] }), {});
   const feedback = rewriteFeedback(problems);
   const rewrite = await streamModelTurn(
@@ -138,7 +142,7 @@ export async function citeStep(
     },
     (partial) => config.writer?.({ ...partial, id: answer.id })
   );
-  const afterRewrite = checkCitations(aiText(rewrite), retrieved, asked);
+  const afterRewrite = await checked(aiText(rewrite));
   if (!afterRewrite.length) {
     onChecked({ outcome: "rewritten", problems, afterRewrite, rewrite: aiText(rewrite) });
     return { messages: [{ ...rewrite, id: answer.id, tool_calls: [] }] };

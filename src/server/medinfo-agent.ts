@@ -31,6 +31,7 @@ import { executeTool, TOOL_DEFINITIONS } from "./tools";
 import type { ReviewItem } from "./reviews";
 import { scriptUser, type Identity } from "./users";
 import { DESK_PROMPT, deskFacts, fillDeskPrompt } from "./desk-prompt";
+import { claimCheckWith } from "./citations.claims";
 import { answerRun } from "../shared/run";
 
 // Lesson 01's prompt. The variants in scripts/prompt-variants.ts grow from it; since fix 3 the app
@@ -117,7 +118,7 @@ export const citeNode = observe(
     const openai = observeOpenAI(modelClient(), { generationName: "citation-rewrite", ...(langfusePrompt ? { langfusePrompt } : {}) });
     let outcome: CitationOutcome | undefined;
     const system = fillDeskPrompt(langfusePrompt?.prompt ?? DESK_PROMPT, deskFacts(userOf(config), state.today));
-    const update = await citeStep(openai, system, state, config, (result) => (outcome = result));
+    const update = await citeStep(openai, system, state, config, (result) => (outcome = result), claimCheckWith(modelClient()));
     updateActiveObservation({ output: outcome });
     const traceId = getActiveTraceId();
     if (traceId && outcome) {
