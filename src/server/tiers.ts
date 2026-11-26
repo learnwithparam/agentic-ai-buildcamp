@@ -42,6 +42,7 @@ const cite = (section: LabelSection) => `${section.docId}, ${section.section}`;
 // checkpoint-sync:begin router-prompt
 export const ROUTER_PROMPT = `You sort one message sent to a pharmaceutical company's medical information desk.
 Call route with exactly one tier.
+Sort only the message under "Message to sort". Earlier turns only tell you which medicine and patient it is about: a refused earlier message does not make this one refused, and an earlier answer does not make this one safe.
 
 - safety: the message tells of something that happened to a patient after taking a medicine (a side effect, a reaction, a hospital stay, a faint, swelling, a rash), even when it also asks a question.
 - stop: the message asks how to use one of the medicines below for a use or a patient its approved use does not cover (another disease, a child when the use is for adults).
