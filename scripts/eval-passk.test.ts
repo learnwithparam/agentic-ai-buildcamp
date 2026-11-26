@@ -5,8 +5,7 @@ import path from "node:path";
 import { test } from "node:test";
 import { scriptedAgent, SCRIPTED_FLAKY } from "./eval-agents";
 import { demoCaseIds } from "./eval-release";
-import { floor, K, measure, passHatK, summarize, type Agent, type CaseRun } from "./eval-passk";
-import { checkMeasures, parseRows } from "./measures";
+import { measure, passHatK, summarize, type Agent, type CaseRun } from "./eval-passk";
 import { loadAllCases } from "./hcp-cases";
 
 test("pass^k is the chance that k runs drawn from n all passed", () => {
@@ -89,11 +88,3 @@ test("a run that loses a case, or an agent the sabotage does not turn red, shows
   assert.equal(blind.measures["evals.sabotage_caught"], 0);
 });
 
-test("the floor equals the targets in docs/measures.md, so lowering one without the other fails", () => {
-  const rows = parseRows(readFileSync(path.join(path.dirname(new URL(import.meta.url).pathname), "../docs/measures.md"), "utf8"));
-  const target = (measure: string) => rows.find((row) => row.measure === measure)!.target;
-  assert.equal(target("evals.pass_rate"), `>= ${floor()["evals.pass_rate"]}`);
-  assert.equal(target("evals.pass_hat_5"), `>= ${floor()["evals.pass_hat_5"]}`);
-  assert.equal(K, 5);
-  assert.deepEqual(checkMeasures().filter((problem) => /evals/.test(problem)), []);
-});

@@ -1,9 +1,10 @@
 import assert from "node:assert/strict";
-import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { test } from "node:test";
-import { checkMeasures, meets } from "./measures";
+import { floor, K } from "./eval-passk";
+import { checkMeasures, meets, parseRows } from "./measures";
 
 const HEAD = "| Part | Measure | Bar | Target | Measured | Run |\n| --- | --- | --- | --- | --- | --- |\n";
 
@@ -42,4 +43,13 @@ test("a value must match its run file and meet its target", () => {
 test("a value with no run file fails", () => {
   const text = `${HEAD}| Search | recall@5 | PaperQA2 | >= 0.95 | 0.97 | |\n`;
   assert.match(checkMeasures({ text })[0], /no run file link/);
+});
+
+test("the eval floor equals the targets in docs/measures.md, so lowering one without the other fails", () => {
+  const rows = parseRows(readFileSync(path.join(path.dirname(new URL(import.meta.url).pathname), "../docs/measures.md"), "utf8"));
+  const target = (measure: string) => rows.find((row) => row.measure === measure)!.target;
+  assert.equal(target("evals.pass_rate"), `>= ${floor()["evals.pass_rate"]}`);
+  assert.equal(target("evals.pass_hat_5"), `>= ${floor()["evals.pass_hat_5"]}`);
+  assert.equal(K, 5);
+  assert.deepEqual(checkMeasures().filter((problem) => /evals/.test(problem)), []);
 });
