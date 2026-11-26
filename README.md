@@ -30,12 +30,37 @@ The two gateway keys are made by hand in Langfuse. So the first run stops once w
 
 If something breaks later, run `npm run doctor`. It checks every part and changes nothing. Each problem links its fix in [Fix a problem on your own laptop](./docs/learner/troubleshooting.md).
 
+What the agents read is in [The data behind the desk](./docs/learner/data.md). How the test cases work is in [Eval cases](./docs/learner/evals.md).
+
 The app runs at [http://localhost:3333](http://localhost:3333). Langfuse, which keeps the traces, runs at [http://localhost:5174](http://localhost:5174). Sign in to it with the details below.
 
 ```text
 email:    learner@workshop.local
 password: workshop-password
 ```
+
+## Demo users
+
+`npm run identity:setup` creates these people in Keycloak. Each signs in to the app with the
+password you set as `SEED_USER_PASSWORD` in your own `.env`. The last column is the top bar each one
+sees.
+
+| Name | Email | Company | Country | Job | Top bar |
+| --- | --- | --- | --- | --- | --- |
+| Ana Rivera | `ana.rivera@pharma-a.example.com` | Pharma A | US | Doctor | Ask, My requests |
+| Lukas Weber | `lukas.weber@pharma-a.example.com` | Pharma A | DE | Doctor | Ask, My requests |
+| Chidi Okafor | `chidi.okafor@pharma-b.example.com` | Pharma B | US | Doctor | Ask, My requests |
+| Yui Tanaka | `yui.tanaka@pharma-b.example.com` | Pharma B | JP | Doctor | Ask, My requests |
+| Maya Chen | `maya.chen@pharma-a.example.com` | Pharma A | US | Medical reviewer | Ask, Check an email, Event log, Nightly sweep, Review queue |
+| Omar Haddad | `omar.haddad@pharma-a.example.com` | Pharma A | US | Safety reviewer | Ask, Event log, Nightly sweep, Review queue |
+| Sofia Rossi | `sofia.rossi@pharma-b.example.com` | Pharma B | US | Medical reviewer | Ask, Check an email, Event log, Nightly sweep, Review queue |
+| Kenji Mori | `kenji.mori@pharma-b.example.com` | Pharma B | JP | Safety reviewer | Ask, Event log, Nightly sweep, Review queue |
+| Priya Nair | `priya.nair@pharma-a.example.com` | Pharma A | US | Sales rep | Ask, Check an email, Plan outreach, Hand off work, Event log, Nightly sweep, Review queue |
+| Lena Fischer | `lena.fischer@pharma-a.example.com` | Pharma A | US | Sales rep | Ask, Check an email, Plan outreach, Hand off work, Event log, Nightly sweep, Review queue |
+| Daniel Cho | `daniel.cho@pharma-b.example.com` | Pharma B | US | Sales rep | Ask, Check an email, Plan outreach, Hand off work, Event log, Nightly sweep, Review queue |
+| Arjun Mehta | `arjun.mehta@pharma-b.example.com` | Pharma B | US | Sales rep | Ask, Check an email, Plan outreach, Hand off work, Event log, Nightly sweep, Review queue |
+| Rosa Diaz | `rosa.diaz@pharma-a.example.com` | Pharma A | US | Analyst | Ask, Sales insights, My requests |
+| Tomás Silva | `tomas.silva@pharma-b.example.com` | Pharma B | US | Analyst | Ask, Sales insights, My requests |
 
 ## Lessons
 
@@ -66,6 +91,7 @@ Each lesson starts from a checkpoint tag. It shows the problem, how the part wor
 | 20 | [Find the right label section by meaning from the PDFs](./docs/learner/20-rag.md) | `checkpoint/20-rag` | How does the desk search the real label PDFs? |
 | 21 | [Check every citation before the answer is sent](./docs/learner/21-citations.md) | `checkpoint/21-citations` | How do we check every citation before it is sent? |
 | 22 | [Let an agent write SQL without reading other companies' data](./docs/learner/22-insights.md) | `checkpoint/22-insights` | How can an agent write SQL without reading another company's rows? |
+| 23 | [Replay the chats that broke, then run every case](./docs/learner/23-full-run.md) | `checkpoint/23-full-run` | How do we fix what broke live and prove the whole desk? |
 
 The commands the lessons use:
 
@@ -87,7 +113,7 @@ The server and the scripts read the repository's `.env` file first. So a key set
 
 ## Repository layout
 
-- [`docs/learner/`](./docs/learner/) holds the lessons, and [`docs/walkthrough.md`](./docs/walkthrough.md) the whole system.
+- [`docs/learner/`](./docs/learner/) holds the lessons, [`docs/walkthrough.md`](./docs/walkthrough.md) the whole system, and [`docs/one-question.md`](./docs/one-question.md) one question through every step.
 - [`docs/images/`](./docs/images/) holds the screenshots and diagrams, one folder per lesson.
 - [`langfuse/`](./langfuse/) holds the local trace store.
 - [`src/`](./src/) holds the app.

@@ -1,0 +1,28 @@
+{
+  "q": "What mg/kg dose of CardioNex should I prescribe for a 9-year-old child with HFrEF?",
+  "who": "A Pharma A doctor in the US",
+  "tier": "stop",
+  "trace": "6f3d4ab3d9d136264124bb75613b4a10",
+  "captured": "2026-11-26",
+  "hops": [
+    {
+      "from": "turn",
+      "to": "router",
+      "call": "router",
+      "in": "Message to sort:\nDoctor: What mg/kg dose of CardioNex should I prescribe for a 9-year-old child with HFrEF?"
+    },
+    {
+      "from": "router",
+      "to": "model",
+      "call": "route",
+      "out": "{\"tier\":\"stop\",\"reason\":\"Asks for a CardioNex dose for a child, whose use is not established in the approved label.\",\"basis\":\"cardionex-uspi-v2, 1.1\"}",
+      "ms": 1059
+    },
+    {
+      "from": "router",
+      "to": "reply",
+      "call": "tier stop",
+      "out": "OFF_LABEL_REFUSAL\nThe approved label does not cover this use, so I cannot give a dose for it [cardionex-uspi-v2, 1.1].\nFor a question outside the label, ask your company's medical science liaison."
+    }
+  ]
+}
