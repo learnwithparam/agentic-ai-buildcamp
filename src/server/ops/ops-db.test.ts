@@ -9,6 +9,7 @@ import { createPool, migrate } from "../db";
 import { env } from "../env";
 import { ReviewStore } from "../reviews";
 import type { SessionStore } from "../sessions";
+import { escalateOverdue } from "../safety/clock";
 import { testDesk } from "../test-desk";
 import type { Identity } from "../users";
 import { ChatLimiter, LIMIT_MESSAGE } from "./limits";
@@ -53,7 +54,7 @@ test("a decision writes one event with the state before and after, who decided a
   assert.equal(rest.length, 0);
   assert.equal(event!.actor, "kc-chen");
   assert.equal(event!.action, "approved");
-  assert.deepEqual(event!.before, { status: "waiting", decided_by: null, decided_at: null, note: null });
+  assert.deepEqual(event!.before, { status: "waiting", decided_by: null, decided_at: null, note: null, escalated_at: null });
   assert.equal(event!.after.status, "approved");
   assert.equal(event!.after.decided_by, "kc-chen");
   assert.equal(event!.after.note, "matches section 2.2");
@@ -80,6 +81,19 @@ test("reopening keeps the decision in the trail and adds a row by the system", a
   // The item can be decided again, and that is a third row, not a rewrite of the first.
   await store.decide(id, reviewer("kc-chen"), "approved", "");
   assert.deepEqual((await events(id)).map((e) => e.action), ["rejected", "reopened", "approved"]);
+});
+
+test("the safety clock's escalation is in the trail, by the system, and a reviewer still decides the item", async () => {
+  const id = await waitingItem();
+  await pool.query("UPDATE review_items SET kind = 'adverse_event', due_at = now() - interval '1 hour' WHERE id = $1", [id]);
+  const now = new Date();
+  assert.ok((await escalateOverdue(pool, now)).some((item) => item.id === id));
+  const [escalation] = await events(id);
+  assert.deepEqual([escalation!.actor, escalation!.action, escalation!.before.status, escalation!.after.status], ["system", "escalated", "waiting", "escalated"]);
+  assert.equal(escalation!.before.escalated_at, null);
+  assert.equal(new Date(String(escalation!.after.escalated_at)).getTime(), now.getTime());
+  await store.decide(id, reviewer("kc-chen"), "approved", "reported");
+  assert.deepEqual((await events(id)).map((e) => [e.action, e.before.status]), [["escalated", "waiting"], ["approved", "escalated"]]);
 });
 
 test("Postgres refuses to change, remove or empty the trail", async () => {
