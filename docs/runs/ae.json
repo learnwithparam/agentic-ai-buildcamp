@@ -1,0 +1,44 @@
+{
+  "measures": {
+    "ae.recall": 1,
+    "ae.precision": 0.968,
+    "ae.criteria_accuracy": 0.965,
+    "ae.coding_accuracy": 0.858,
+    "ae.overdue_escalated": 1
+  },
+  "commit": "ef2a336",
+  "at": "2026-11-26T18:17:47.454Z",
+  "rows": 79,
+  "positives": 60,
+  "layers": {
+    "router_only": {
+      "recall": 0.9,
+      "precision": 0.964
+    },
+    "second_pass_only": {
+      "recall": 0.95,
+      "precision": 1
+    }
+  },
+  "criteria_all_four": 0.873,
+  "clock": {
+    "overdue": 3,
+    "escalated": 3,
+    "untouched_ok": true,
+    "second_notifications": 3
+  },
+  "misses": [
+    {
+      "id": "ae-006",
+      "expected": "answer",
+      "router": true,
+      "second_pass": false
+    },
+    {
+      "id": "ae-066",
+      "expected": "answer",
+      "router": true,
+      "second_pass": false
+    }
+  ]
+}

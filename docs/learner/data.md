@@ -19,9 +19,9 @@ changed file fails `npm run check` until the lock is synced again.
 | `sql` | Weekly sales rows, one table per company, each in its own shape | `src/server/bi/load.ts`, into Postgres for insights (lesson 22) | `2026-09-07,NE-01,brand_cardionex,142,38,...` |
 | `evals` | The test cases, one YAML file per agent | `scripts/hcp-cases.ts`, for every dataset run. See [Eval cases](evals.md) | `medinfo.yaml`, case `[POSITIVE-01]` |
 | `gold` | Questions with the sections that answer them, graded by hand. Claims, each with a quote that does or does not support it | `scripts/search-eval.ts`, which measures the search (lesson 20) | `r-059`: "How long do I have to wait when switching?", after a turn about ACE inhibitors |
-| `spl` | The US labels as SPL XML, the format the FDA publishes. Each has a set id, a version and coded sections | Not read by the app yet | `cardionex-uspi-2026-v2.xml` |
-| `history` | Every version of each label, its dates and what changed, in DailyMed's set-id history shape | Not read by the app yet | `cardionex-uspi.json`: v2 added a warning |
-| `safety` | Adverse event messages marked with the four reporting criteria. A made-up MedDRA-style dictionary. Notes with planted patient details, and where they are | Not read by the app yet | `ae-001`: swollen lips, no product named |
+| `spl` | The US labels as SPL XML, the format the FDA publishes. Each has a set id, a version and coded sections | `npm run ae:measure` scores the safety extraction on the messages | `cardionex-uspi-2026-v2.xml` |
+| `history` | Every version of each label, its dates and what changed, in DailyMed's set-id history shape | `npm run ae:measure` scores the safety extraction on the messages | `cardionex-uspi.json`: v2 added a warning |
+| `safety` | Adverse event messages marked with the four reporting criteria. A made-up MedDRA-style dictionary. Notes with planted patient details, and where they are | `npm run ae:measure` scores the safety extraction on the messages | `ae-001`: swollen lips, no product named |
 
 ## How a label file works
 
@@ -70,6 +70,7 @@ From the terminal:
 
 ```bash
 npm run demo:check                                  # the demo chats, through the real sign-in and model
+npm run ae:measure                                  # adverse event recall, criteria and coding, into docs/runs/ae.json
 npm run medinfo -- ask "What is the CardioNex dose for eGFR 24?"   # after npm run medinfo -- login (lesson 19)
 docker exec medinfo-platform-postgres-1 psql -U postgres -d medinfo -c "select count(*) from label_chunks"
 ```
