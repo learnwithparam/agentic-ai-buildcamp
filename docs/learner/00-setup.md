@@ -208,7 +208,7 @@ A correct run has the chat on port 3333 and Langfuse on port 5174. After the fir
 
 For anything else, run `npm run doctor`. It names each problem and links its fix in [the troubleshooting page](./troubleshooting.md).
 
-Two guides sit beside the lessons. [The data behind the desk](./data.md) says what each folder in `data/hcp` holds and who reads it. [Eval cases](./evals.md) shows how to read a test case and how it becomes a score.
+[The demo users](../../README.md#demo-users) lists who you can sign in as and what each one sees. Two guides sit beside the lessons. [The data behind the desk](./data.md) says what each folder in `data/hcp` holds and who reads it. [Eval cases](./evals.md) shows how to read a test case and how it becomes a score.
 
 ## What to watch for
 

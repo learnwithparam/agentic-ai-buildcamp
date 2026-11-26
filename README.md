@@ -39,6 +39,29 @@ email:    learner@workshop.local
 password: workshop-password
 ```
 
+## Demo users
+
+`npm run identity:setup` creates these people in Keycloak. Each signs in to the app with the
+password you set as `SEED_USER_PASSWORD` in your own `.env`. The last column is the top bar each one
+sees.
+
+| Name | Email | Company | Country | Job | Top bar |
+| --- | --- | --- | --- | --- | --- |
+| Ana Rivera | `ana.rivera@pharma-a.example.com` | Pharma A | US | Doctor | Ask, My requests |
+| Lukas Weber | `lukas.weber@pharma-a.example.com` | Pharma A | DE | Doctor | Ask, My requests |
+| Chidi Okafor | `chidi.okafor@pharma-b.example.com` | Pharma B | US | Doctor | Ask, My requests |
+| Yui Tanaka | `yui.tanaka@pharma-b.example.com` | Pharma B | JP | Doctor | Ask, My requests |
+| Maya Chen | `maya.chen@pharma-a.example.com` | Pharma A | US | Medical reviewer | Ask, Check an email, Event log, Nightly sweep, Review queue |
+| Omar Haddad | `omar.haddad@pharma-a.example.com` | Pharma A | US | Safety reviewer | Ask, Event log, Nightly sweep, Review queue |
+| Sofia Rossi | `sofia.rossi@pharma-b.example.com` | Pharma B | US | Medical reviewer | Ask, Check an email, Event log, Nightly sweep, Review queue |
+| Kenji Mori | `kenji.mori@pharma-b.example.com` | Pharma B | JP | Safety reviewer | Ask, Event log, Nightly sweep, Review queue |
+| Priya Nair | `priya.nair@pharma-a.example.com` | Pharma A | US | Sales rep | Ask, Check an email, Plan outreach, Hand off work, Event log, Nightly sweep, Review queue |
+| Lena Fischer | `lena.fischer@pharma-a.example.com` | Pharma A | US | Sales rep | Ask, Check an email, Plan outreach, Hand off work, Event log, Nightly sweep, Review queue |
+| Daniel Cho | `daniel.cho@pharma-b.example.com` | Pharma B | US | Sales rep | Ask, Check an email, Plan outreach, Hand off work, Event log, Nightly sweep, Review queue |
+| Arjun Mehta | `arjun.mehta@pharma-b.example.com` | Pharma B | US | Sales rep | Ask, Check an email, Plan outreach, Hand off work, Event log, Nightly sweep, Review queue |
+| Rosa Diaz | `rosa.diaz@pharma-a.example.com` | Pharma A | US | Analyst | Ask, Sales insights, My requests |
+| Tomás Silva | `tomas.silva@pharma-b.example.com` | Pharma B | US | Analyst | Ask, Sales insights, My requests |
+
 ## Lessons
 
 Each lesson starts from a checkpoint tag. It shows the problem, how the part works, how to build it and how to prove it. [The walkthrough](./docs/walkthrough.md) shows the whole system on one page, with every new word defined once.
