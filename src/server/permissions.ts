@@ -9,8 +9,15 @@ import type { Identity, Role } from "./users";
 // so text the agent never receives, it cannot leak.
 
 let client: OpenFgaClient | undefined;
+let override: OpenFgaClient | undefined;
+
+// The fault layer (src/server/faults/api.ts) points the server at an OpenFGA that does not answer.
+export function useFgaClient(next: OpenFgaClient | undefined) {
+  override = next;
+}
 
 export function fga() {
+  if (override) return override;
   if (!env.fgaStoreId || !env.fgaModelId || !env.fgaApiToken) {
     throw new Error("OpenFGA is not configured. Run npm run identity:setup (lesson 11).");
   }

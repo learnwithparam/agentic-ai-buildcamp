@@ -98,6 +98,11 @@ export function useLabelSearch(next: LabelSearch) {
   search = next;
 }
 
+// The search in use now, so a wrapper (src/server/faults/inject.ts) can put it back afterwards.
+export function currentLabelSearch(): LabelSearch {
+  return search;
+}
+
 // How many sections a search returns. The gold questions need up to five sections for one answer
 // (a dose table, its renal row, a warning); docs/measures.md scores the search at five.
 export const SEARCH_RESULTS = 5;
@@ -227,9 +232,21 @@ const lookupTools = Object.fromEntries(
 
 const isLookup = (name: string): name is Lookup => (LOOKUPS as readonly string[]).includes(name);
 
+export type ToolRunner = (name: string, input: Record<string, unknown>, user: Identity, today: string, earlier: Turn[]) => Promise<ToolResult>;
+
+// The fault layer (src/server/faults/inject.ts) wraps the tool runner here; nothing else does.
+let wrapTools: ((run: ToolRunner) => ToolRunner) | undefined;
+export function useToolWrapper(wrap: ((run: ToolRunner) => ToolRunner) | undefined) {
+  wrapTools = wrap;
+}
+
 // earlier: what the doctor and the desk said before the latest question, so a follow-up search
 // knows which medicine it is about. A caller with no conversation (MCP, a handoff) passes none.
-export async function executeTool(name: string, input: Record<string, unknown>, user: Identity, today = TODAY, earlier: Turn[] = []): Promise<ToolResult> {
+export function executeTool(name: string, input: Record<string, unknown>, user: Identity, today = TODAY, earlier: Turn[] = []): Promise<ToolResult> {
+  return (wrapTools ? wrapTools(runTool) : runTool)(name, input, user, today, earlier);
+}
+
+async function runTool(name: string, input: Record<string, unknown>, user: Identity, today: string, earlier: Turn[]): Promise<ToolResult> {
   switch (name) {
     case "search_labels":
       return searchLabelsTool({ query: String(input.query ?? ""), ...(input.country ? { country: String(input.country) } : {}) }, user, today, earlier);
