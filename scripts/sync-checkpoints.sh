@@ -167,7 +167,7 @@ CITE_FILES="docs/scoreboard.md package.json scripts/citations-audit.ts scripts/c
 # npm run setup (scripts/setup.ts) runs every lesson's scripts, so it exists only from lesson 22 on.
 # npm run doctor (scripts/doctor.ts) checks the stack setup builds, so it follows setup.
 BI_FILES=".github/start-test-services.sh docs/scoreboard.md infra/docker-compose.yml
-  infra/openfga/model.fga infra/postgres/init/02-bi-roles.sh package-lock.json package.json
+  infra/openfga/model.fga infra/openfga/model.fga.yaml infra/postgres/init/02-bi-roles.sh package-lock.json package.json
   scripts/bi-setup.ts scripts/experiment.ts scripts/fga-model.ts scripts/hcp-cases.ts
   scripts/identity-setup.ts scripts/identity-smoke.ts scripts/setup.ts scripts/setup.test.ts scripts/doctor.ts scripts/doctor.test.ts src/client/App.tsx src/client/chat/api.ts
   src/client/insights/Insights.tsx src/client/styles/app.css src/server/a2a/a2a-harness.ts
