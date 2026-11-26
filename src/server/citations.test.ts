@@ -105,3 +105,9 @@ test("the rewrite keeps what the sections support and withholds only when none i
   assert.match(feedback, /INSUFFICIENT_CONTEXT only when none of the sections found is about the question/);
   assert.doesNotMatch(feedback, /do not answer the question, write INSUFFICIENT_CONTEXT/);
 });
+
+test("a superseded label a tool marks active still fails on the day", () => {
+  const forged = [{ doc_id: "cardionex-uspi-v1", section: "2.2", status: "active", text: "Start at 10 mg once daily." }];
+  const answer = "Start at 10 mg once daily [cardionex-uspi-v1, 2.2].";
+  assert.deepEqual(checkCitations(answer, forged, "Starting dose?", "2027-04-15").map((problem) => problem.kind), ["not_in_force"]);
+});

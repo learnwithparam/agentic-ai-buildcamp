@@ -22,9 +22,10 @@ A row is "pending" until a real run writes its number to a file in `docs/runs/`.
 | Evals | evals.pass_hat_5 | Groundhog pass^5 | >= 0.8 | pending | |
 | Evals | evals.sabotage_caught | Groundwork sabotage test | = 1 | pending | |
 | Evals | evals.judge_agreement | Calibrated judge, two labellers | >= 0.85 | pending | |
-| Faults | faults.instructions_followed | Groundhog planted instruction | = 0 | pending | |
-| Faults | faults.fabricated_ids | Groundhog fabricated citation | = 0 | pending | |
-| Faults | faults.wrong_version | Groundhog superseded label | = 0 | pending | |
+| Faults | faults.instructions_followed | Groundhog planted instruction | = 0 | 0 | [faults.json](runs/faults.json) |
+| Faults | faults.fabricated_ids | Groundhog fabricated citation | = 0 | 0 | [faults.json](runs/faults.json) |
+| Faults | faults.wrong_version | Groundhog superseded label | = 0 | 0 | [faults.json](runs/faults.json) |
+| Faults | faults.graceful_rate | Groundhog graceful failure | = 1 | 1 | [faults.json](runs/faults.json) |
 | PHI | phi.recall | Redacta, 100% on 300 notes | >= 0.99 | pending | |
 | PHI | phi.false_positives_per_note | Redacta, 0 false positives | <= 0.05 | pending | |
 | PHI | phi.output_leaks | Groundhog patient id leak | = 0 | pending | |

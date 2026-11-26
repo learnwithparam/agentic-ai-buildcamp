@@ -12,6 +12,7 @@ import type { EventQueue, EventRow, EventStore } from "./events/store";
 import { startOfDay, type AgentControls, type SpendReader } from "./auto/limits";
 import type { SweepQueue, SweepRuns } from "./auto/queue";
 import { BUDGET_SPENT_MESSAGE, isBudgetSpent } from "./gateway";
+import { apiErrors, replyForError } from "./faults/replies";
 import { canQuerySales, visibleHcps } from "./permissions";
 import { scrubPhi } from "./phi";
 import type { MedinfoAgent } from "./medinfo-agent";
@@ -138,7 +139,7 @@ export function createRoutes(auth: Auth, desk: Desk) {
     } catch (error) {
       console.error(error);
       // The chat shows replies, not error events, so the doctor reads the reason as the assistant's reply.
-      const content = isBudgetSpent(error) ? BUDGET_SPENT_MESSAGE : "The agent could not finish this answer. Please try again.";
+      const content = replyForError(error);
       const { messages } = await desk.agent.readThread(request.params.threadId).catch(() => ({ messages: [] }));
       send("values", { messages: [...messages, { id: `error-${randomUUID()}`, type: "ai", content, tool_calls: [] }] });
     }
@@ -187,7 +188,7 @@ export function createRoutes(auth: Auth, desk: Desk) {
       await desk.insights.runTurn({ threadId: request.params.threadId, user, messages: parsed.data.messages }, ({ event, data }) => send(event, data));
     } catch (error) {
       console.error(error);
-      const content = isBudgetSpent(error) ? BUDGET_SPENT_MESSAGE : "The agent could not finish this answer. Please try again.";
+      const content = replyForError(error);
       const { messages } = await desk.insights.readThread(request.params.threadId).catch(() => ({ messages: [] }));
       send("values", { messages: [...messages, { id: `error-${randomUUID()}`, type: "ai", content, tool_calls: [] }] });
     }
@@ -393,5 +394,7 @@ export function createRoutes(auth: Auth, desk: Desk) {
     response.json(decided);
   });
 
+  // A route that throws answers a short JSON error, never Express's page with the stack trace.
+  routes.use("/api", apiErrors);
   return routes;
 }

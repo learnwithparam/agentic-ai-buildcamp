@@ -128,7 +128,7 @@ export async function citeStep(
   if (!answer) return {};
   const { retrieved, asked } = evidenceOf(state.messages);
   // The number check, then each claim's quote and the support judge (citations.claims.ts).
-  const checked = async (text: string) => [...checkCitations(text, retrieved, asked), ...((await claimCheck?.(text, retrieved, asked, state.today)) ?? [])];
+  const checked = async (text: string) => [...checkCitations(text, retrieved, asked, state.today), ...((await claimCheck?.(text, retrieved, asked, state.today)) ?? [])];
   const problems = await checked(aiText(answer));
   if (!problems.length) return (onChecked({ outcome: "passed", problems, afterRewrite: [] }), {});
   const feedback = rewriteFeedback(problems);
