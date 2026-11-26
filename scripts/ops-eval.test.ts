@@ -34,3 +34,23 @@ test("--fake writes the run file shape from fixed turns", async () => {
   assert.equal(run.fake, true);
   assert.equal(run.questions, 20);
 });
+
+test("a turn with no model call stops the run: a desk answer always calls the model", () => {
+  const turns = fixedTurns();
+  turns[2] = { ...turns[2]!, calls: 0, costUsd: 0, structuredCalls: 0 };
+  assert.throws(() => toRun(turns, { commit: "x", at: "y", fake: true }), /no model call/);
+  const none = fixedTurns().map((turn) => ({ ...turn, calls: 0, costUsd: 0, structuredCalls: 0 }));
+  assert.throws(() => toRun(none, { commit: "x", at: "y", fake: true }), /no model call/);
+});
+
+test("the run file keeps each turn's stage timings and a median and p95 per stage", () => {
+  const turns = fixedTurns().map((turn, i) => ({
+    ...turn,
+    stages: [{ stage: "router", seconds: i + 1, startedAt: 0 }, { stage: "answer", seconds: 10, startedAt: 1 }]
+  }));
+  const run = toRun(turns, { commit: "x", at: "y", fake: true });
+  assert.equal(run.turns.length, 20);
+  assert.deepEqual(run.turns[0]!.stages.map((s) => s.stage), ["router", "answer"]);
+  assert.deepEqual(run.stage_summary["router"], { count: 20, median_seconds: 10, p95_seconds: 19, total_seconds: 210 });
+  assert.equal(run.stage_summary["answer"]!.total_seconds, 200);
+});

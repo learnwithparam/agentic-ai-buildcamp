@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 import { startActiveObservation } from "@langfuse/tracing";
 import { env } from "./env";
-import { meteredFetch } from "./ops/meter";
+import { meteredFetch, timed } from "./ops/meter";
 
 // The one door for every model call (lesson 10). No other file creates a model client or
 // calls a model URL; scripts/check-repo.test.ts fails if one does.
@@ -54,13 +54,18 @@ export function modelClient(): OpenAI {
 export const EMBEDDING_MODEL = process.env.EMBEDDING_MODEL ?? "openai/text-embedding-3-small";
 export const EMBEDDING_DIMENSIONS = 1536;
 
+// The most a stage that gives a short answer may write. A cap only stops a runaway answer; each is
+// several times what a good answer needs (30 grades and a best list are about 150 tokens). They
+// sit here, beside the one door, so a reader sees every cap together.
+export const OUTPUT_CAP = { router: 800, rewrite: 400, grade: 1500, judge: 300 } as const;
+
 export async function embed(texts: string[]): Promise<number[][]> {
   if (!texts.length) return [];
   return startActiveObservation(
     "embed",
     async (span) => {
       span.update({ model: EMBEDDING_MODEL, input: { count: texts.length } });
-      const response = await modelClient().embeddings.create({ model: EMBEDDING_MODEL, input: texts, encoding_format: "float" });
+      const response = await timed("embedding", () => modelClient().embeddings.create({ model: EMBEDDING_MODEL, input: texts, encoding_format: "float" }));
       const vectors = [...response.data].sort((a, b) => a.index - b.index).map((item) => item.embedding);
       if (vectors.length !== texts.length || vectors.some((vector) => vector.length !== EMBEDDING_DIMENSIONS)) {
         throw new Error(`The embedding model did not return one ${EMBEDDING_DIMENSIONS}-number vector per text.`);
@@ -111,6 +116,10 @@ const withConnection: typeof fetch = meteredFetch(
   retryingOn504((url, init) => fetch(url, typeof init?.body === "string" ? { ...init, body: withConnectionName(init.body) } : init))
 );
 
+// The behavior decision is a model call that does not go through the gateway, so it is counted
+// here, in the same file and by the same meter, instead of being missed.
+const decisionsFetch: typeof fetch = meteredFetch((url, init) => fetch(url, init));
+
 // --- The input check. The gateway has no guardrails yet (they are on its roadmap), so the
 //     check runs here, before any model call. Each rule is narrow and named; the dataset test
 //     proves no real question trips one.
@@ -141,7 +150,7 @@ export async function decide<T>(request: DecisionsRequest): Promise<T> {
     "behavior-decision",
     async (generation) => {
       generation.update({ model: env.decisionModel, input: request });
-      const response = await fetch(env.decisionsUrl, {
+      const response = await decisionsFetch(env.decisionsUrl, {
         method: "POST",
         headers: { Authorization: `Bearer ${env.openaiApiKey}`, "Content-Type": "application/json" },
         body: JSON.stringify({ model: env.decisionModel, ...request }),

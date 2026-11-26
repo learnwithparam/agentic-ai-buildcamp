@@ -98,7 +98,7 @@ test("a turn's model calls are summed through the gateway's fetch, and nothing i
 test("a turn's numbers become scores on its trace, and a turn with an unpriced call gets no cost", () => {
   const sent: Array<{ traceId: string; name: string; value: number; dataType: string }> = [];
   const langfuse = { score: { create: (score: (typeof sent)[number]) => void sent.push(score), flush: async () => {} } };
-  const metrics = { seconds: 12.3456, calls: 3, costUsd: 0.0123456789, callsWithoutCost: 0, structuredCalls: 2, parseFailures: 1 };
+  const metrics = { seconds: 12.3456, calls: 3, costUsd: 0.0123456789, callsWithoutCost: 0, structuredCalls: 2, parseFailures: 1, stages: [] };
   scoreTurn(langfuse, "trace-1", metrics);
   assert.deepEqual(
     sent.map(({ name, value }) => [name, value]),
