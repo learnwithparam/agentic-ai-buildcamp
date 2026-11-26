@@ -66,6 +66,7 @@ Each lesson starts from a checkpoint tag. It shows the problem, how the part wor
 | 20 | [Find the right label section by meaning from the PDFs](./docs/learner/20-rag.md) | `checkpoint/20-rag` | How does the desk search the real label PDFs? |
 | 21 | [Check every citation before the answer is sent](./docs/learner/21-citations.md) | `checkpoint/21-citations` | How do we check every citation before it is sent? |
 | 22 | [Let an agent write SQL without reading other companies' data](./docs/learner/22-insights.md) | `checkpoint/22-insights` | How can an agent write SQL without reading another company's rows? |
+| 23 | [Replay the chats that broke, then run every case](./docs/learner/23-full-run.md) | `checkpoint/23-full-run` | How do we fix what broke live and prove the whole desk? |
 
 The commands the lessons use:
 

@@ -353,6 +353,12 @@ Each word below has one short meaning. The lessons link here.
 <a id="c-small-group"></a>
 **Small group.** A total built from fewer than 11 prescribers. It is left out, so no number points at one doctor.
 
+<a id="c-repro-set"></a>
+**Repro set.** A script that plays chats that broke, on the real model. It fails until each one is fixed.
+
+<a id="c-run-record"></a>
+**Run record.** The steps behind one answer: how it was sorted, what was looked up, what the check found.
+
 ## The lessons
 
 The [lesson list](../README.md#lessons) gives each lesson's checkpoint and the question it answers.
