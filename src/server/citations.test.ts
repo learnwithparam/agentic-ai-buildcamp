@@ -4,7 +4,7 @@ import { test } from "node:test";
 import { MemorySaver } from "@langchain/langgraph";
 import { aiText, type AiMessage, type ChatMessage } from "../shared/messages";
 import { checkCitations, evidenceOf, parseCitations, quantities, WITHHELD_REPLY, type RetrievedSection } from "./citations";
-import { buildGraph, runGraph } from "./graph";
+import { buildGraph, rewriteFeedback, runGraph } from "./graph";
 import { scriptUser } from "./users";
 
 // Lesson 21. The fixtures are four answers the agent really gave, read from Langfuse with the
@@ -95,3 +95,13 @@ for (const tier of ["answer", "review"] as const) {
     assert.equal(aiText(result.messages.at(-1) as AiMessage), WITHHELD_REPLY);
   });
 }
+
+// Fix 5. A rewrite that may withhold whenever the sections "do not answer" threw away a follow-up
+// answer that lacked one fact. It keeps what the sections support and withholds only as a last step.
+test("the rewrite keeps what the sections support and withholds only when none is about the question", () => {
+  const feedback = rewriteFeedback([]);
+  assert.match(feedback, /found so far in this conversation/);
+  assert.match(feedback, /say which fact the label sections found do not cover/);
+  assert.match(feedback, /INSUFFICIENT_CONTEXT only when none of the sections found is about the question/);
+  assert.doesNotMatch(feedback, /do not answer the question, write INSUFFICIENT_CONTEXT/);
+});
