@@ -12,7 +12,18 @@ export type CitationProblem =
   | { kind: "not_retrieved"; citation: string }
   | { kind: "not_in_force"; citation: string; status: string }
   | { kind: "uncited"; quantity: string; sentence: string }
-  | { kind: "unsupported"; quantity: string; citations: string[]; sentence: string };
+  | { kind: "unsupported"; quantity: string; citations: string[]; sentence: string }
+  // A claim (src/server/citations.claims.ts) whose quote failed a check or the support judge.
+  | { kind: "claim"; reason: ClaimReason; citation: string; claim: string };
+
+export type ClaimReason =
+  | "unknown_section"
+  | "not_retrieved"
+  | "not_in_force"
+  | "wrong_country"
+  | "quote_not_in_section"
+  | "number_not_in_quote"
+  | "quote_does_not_support";
 
 const BRACKET = /\[([^\]]+)\]/g;
 const CITATION = /^\s*([a-z0-9][a-z0-9-]*)\s*,\s*(\d+(?:\.\d+)?)/;
@@ -100,8 +111,21 @@ export function describeProblem(problem: CitationProblem): string {
       return `"${problem.quantity}" has no citation: "${problem.sentence}". Cite the section that states it.`;
     case "unsupported":
       return `"${problem.quantity}" is not in ${problem.citations.map((citation) => `[${citation}]`).join(" ")}: "${problem.sentence}". Cite the section that states it, or leave the number out.`;
+    case "claim":
+      return `The claim "${problem.claim}" cites [${problem.citation}] but ${CLAIM_REASONS[problem.reason].model}. Quote the section word for word, or leave the claim out.`;
   }
 }
+
+// One sentence per reason: what the model is told, and what the doctor reads in the run panel.
+export const CLAIM_REASONS: Record<ClaimReason, { model: string; plain: string }> = {
+  unknown_section: { model: "no such section exists", plain: "names a section that does not exist" },
+  not_retrieved: { model: "no search in this conversation returned that section", plain: "cites a section no search in this chat found" },
+  not_in_force: { model: "that document is not in force today", plain: "cites a document that is not in force today" },
+  wrong_country: { model: "that document is for another country", plain: "cites a document for another country" },
+  quote_not_in_section: { model: "the quote is not in that section's text", plain: "gives a quote that is not in the section" },
+  number_not_in_quote: { model: "a number in the claim is not in the quote", plain: "gives a number that is not in its quote" },
+  quote_does_not_support: { model: "the quote does not support the claim", plain: "gives a quote that does not support it" }
+};
 
 // The sections search_labels returned in this conversation, and every question the doctor asked
 // in it. A follow-up ("and if she is on dialysis?") is often answered from the sections the first
