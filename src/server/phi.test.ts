@@ -162,3 +162,10 @@ test("the notes file is the pinned dataset copy, with its gold spans where the t
   for (const note of readNotes()) for (const span of note.spans) assert.equal(note.text.slice(span.start, span.end), span.text, note.id);
   assert.ok(readFileSync(new URL("../../data/hcp/safety/phi-notes.jsonl", import.meta.url), "utf8").length > 0);
 });
+
+// Measured on 2026-11-26: the sweep's picker was sent "[record number removed]" for HCP-1001, so it
+// planned no doctor. HCP-1234 is the desk's own id for a doctor in its CRM, never a patient's.
+test("a doctor's CRM id is the desk's own, not a patient's record number", () => {
+  assert.equal(scrubPhi("Clear the pending sample requests for HCP-1001 and HCP-1004.").text, "Clear the pending sample requests for HCP-1001 and HCP-1004.");
+  assert.equal(scrubPhi("Follow up with HCP-1001 on MRN-77310.").text, "Follow up with HCP-1001 on [record number removed].");
+});

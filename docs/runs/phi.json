@@ -4,8 +4,8 @@
     "phi.false_positives_per_note": 0.01,
     "phi.output_leaks": 0
   },
-  "commit": "26d09cd",
-  "at": "2026-11-26T20:14:10.230Z",
+  "commit": "e7a466a",
+  "at": "2026-11-26T21:53:18.544Z",
   "notes": 100,
   "spans": 201,
   "model": "gateway",

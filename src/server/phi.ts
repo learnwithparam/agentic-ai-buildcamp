@@ -80,7 +80,9 @@ function mrnSpans(text: string): PhiSpan[] {
     out.push({ start, end, type: "mrn", text: text.slice(start, end) });
   }
   // A record number in a list with no label: two or three capitals, a hyphen, three or more digits (HV-2209).
-  for (const match of text.matchAll(/(?<![\w-])[A-Z]{2,3}-\d{3,}(?:-\d+)?(?![\w-])/g)) {
+  // HCP-1001 has that shape too, but it is the desk's own id for a doctor in its CRM (readHcpId in
+  // content/outreach.ts), and removing it left the sweep unable to name any doctor.
+  for (const match of text.matchAll(/(?<![\w-])(?!HCP-\d{4}(?![\w-]))[A-Z]{2,3}-\d{3,}(?:-\d+)?(?![\w-])/g)) {
     out.push({ start: match.index!, end: match.index! + match[0].length, type: "mrn", text: match[0] });
   }
   return out;
