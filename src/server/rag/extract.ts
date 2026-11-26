@@ -12,6 +12,7 @@ export type ExtractedSection = { section: string; title: string; text: string };
 // section it belongs to.
 const SECTION = /^##\s+(\d+(?:\.\d+)?)\s+(.+?)\s*$/;
 const HEADING = /^#{1,6}\s+(.+?)\s*$/;
+const STRAY_BEFORE_SECTION = /^(?:[\d.,%]+\s+)+(?=\d+(?:\.\d+)?\s+[A-Za-z])/;
 const ENTITIES: Record<string, string> = { "&lt;": "<", "&gt;": ">", "&amp;": "&", "&quot;": '"', "&#39;": "'" };
 
 function cleanLine(line: string): string {
@@ -92,7 +93,10 @@ function render(item: DoclingText | DoclingTable): string {
     const rows = item.data.grid.map((row) => `| ${row.map((cell) => cell.text.replace(/\|/g, "/")).join(" | ")} |`);
     return [rows[0], `|${" --- |".repeat(item.data.grid[0]?.length ?? 0)}`, ...rows.slice(1)].join("\n");
   }
-  if (item.label === "section_header" || item.label === "title") return `## ${item.text}`;
+  // Docling can glue a table cell that sits beside a heading onto its front: on the full
+  // CLARION-HF summary, "0.001 3.4 Potassium and Kidney Results". Only the last number before
+  // the title is the section; missingFromExtraction still checks that no word went missing.
+  if (item.label === "section_header" || item.label === "title") return `## ${item.text.replace(STRAY_BEFORE_SECTION, "")}`;
   if (item.label === "list_item") return `- ${item.text}`;
   return item.text;
 }
