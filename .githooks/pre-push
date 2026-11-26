@@ -2,4 +2,5 @@
 # Lesson 18: the release gate runs before a push that changes an agent, the runner or the dataset.
 # `npm install` turns this folder on (the prepare script sets core.hooksPath to .githooks).
 # git passes the pushed refs on stdin; the gate reads them to see what the push changes.
-exec npx tsx scripts/release-gate.ts --pre-push
+# The gate runs on the pinned day (src/server/ops/today.ts), so a case does not change with the calendar.
+MEDINFO_TODAY="${MEDINFO_TODAY:-2026-11-23}" exec npx tsx scripts/release-gate.ts --pre-push

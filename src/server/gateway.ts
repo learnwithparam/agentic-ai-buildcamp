@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 import { startActiveObservation } from "@langfuse/tracing";
 import { env } from "./env";
+import { meteredFetch } from "./ops/meter";
 
 // The one door for every model call (lesson 10). No other file creates a model client or
 // calls a model URL; scripts/check-repo.test.ts fails if one does.
@@ -105,8 +106,9 @@ export function retryingOn504(send: typeof fetch, waits = [1000, 3000]): typeof 
   };
 }
 
-const withConnection: typeof fetch = retryingOn504((url, init) =>
-  fetch(url, typeof init?.body === "string" ? { ...init, body: withConnectionName(init.body) } : init)
+// meteredFetch counts a turn's cost and structured-output failures while a turn runs (src/server/ops/meter.ts).
+const withConnection: typeof fetch = meteredFetch(
+  retryingOn504((url, init) => fetch(url, typeof init?.body === "string" ? { ...init, body: withConnectionName(init.body) } : init))
 );
 
 // --- The input check. The gateway has no guardrails yet (they are on its roadmap), so the

@@ -19,6 +19,7 @@ import { langfuseSpend, PostgresAgentControls } from "./auto/limits";
 import { PostgresSweepRuns, startSweepQueue } from "./auto/queue";
 import { createSweep } from "./auto/sweep";
 import { eventSecrets } from "./events/webhook";
+import { ChatLimiter } from "./ops/limits";
 import { ReviewStore } from "./reviews";
 import { PostgresSessionStore } from "./sessions";
 import { TENANTS } from "./users";
@@ -80,7 +81,7 @@ const auth = createAuth({
   sessions: new PostgresSessionStore(pool)
 });
 
-const server = createApp(auth, desk).listen(env.port, "127.0.0.1", () => {
+const server = createApp(auth, desk, new ChatLimiter(pool)).listen(env.port, "127.0.0.1", () => {
   console.log(`HCP Medical Information Agent server listening on http://127.0.0.1:${env.port}`);
 });
 
