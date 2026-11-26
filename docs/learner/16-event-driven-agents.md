@@ -37,6 +37,10 @@ Each of these arrives as an event from another system. Wire it straight into the
 
 An event is work nobody asked for in a chat. It needs the same rules a chat has. A signed event says who sent it. The company in the URL must match the company in the body.
 
+![React to events: the parts this lesson adds.](../images/diagrams/checkpoint-16.svg)
+
+Step through it one part at a time in the [live drawing](https://canvas.learnwithparam.com/case.html#buildcamp/18).
+
 A queue delivers at least once. So the store and each handler must be safe to run twice. That is idempotency.
 
 The webhook answers before any model runs, and the queue holds the slow part with retries. The handlers start the same graphs as before. So every event still stops at the review and safety tiers.
