@@ -33,6 +33,10 @@ A script that needs a password is a leak waiting to happen. So is a token copied
 
 The terminal client adds no rule. Sign-in is Keycloak's page with PKCE. The token is the same kind the browser gets. Every permission is decided by the server and OpenFGA.
 
+![Use the desk from a command line: the parts this lesson adds.](../images/diagrams/checkpoint-19.svg)
+
+Step through it one part at a time in the [live drawing](https://canvas.learnwithparam.com/case.html#buildcamp/21).
+
 ### The flow
 
 This follows one sign-in and one question.

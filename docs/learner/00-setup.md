@@ -34,6 +34,10 @@ Every later lesson builds on this one. So we start with a check that proves your
 
 Everything runs on your laptop. The chat page talks to a small API server. The server runs the agent, and the agent calls a model through OpenRouter. Langfuse starts in Docker now, but the app does not send it anything yet. You connect them in lesson 02.
 
+![Start the local desk: the parts this lesson adds.](../images/diagrams/checkpoint-00.svg)
+
+Step through it one part at a time in the [live drawing](https://canvas.learnwithparam.com/case.html#buildcamp/4).
+
 ### The flow
 
 This follows the first suggested question in the chat. The second path shows a bad model key.
