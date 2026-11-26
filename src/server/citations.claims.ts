@@ -1,7 +1,7 @@
 import { observeOpenAI } from "@langfuse/openai";
 import type OpenAI from "openai";
 import { env } from "./env";
-import { OUTPUT_CAP } from "./gateway";
+import { shortStage } from "./gateway";
 import { timed } from "./ops/meter";
 import { inForceDocuments, LABEL_SECTIONS } from "./labels";
 import type { CitationProblem, ClaimReason, RetrievedSection } from "./citations";
@@ -95,7 +95,7 @@ export function judgeWithModel(client: OpenAI): Judge {
     const completion = await openai.chat.completions.create({
       model: env.openaiModel,
       temperature: 0,
-      max_tokens: OUTPUT_CAP.judge,
+      ...shortStage("judge"),
       messages: [
         { role: "system", content: JUDGE_PROMPT },
         { role: "user", content: `Claim: ${claim.text}\n\nQuote: ${claim.quote}\n\n${sourceOf(claim)}` }

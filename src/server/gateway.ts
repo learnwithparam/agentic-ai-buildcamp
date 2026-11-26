@@ -59,6 +59,12 @@ export const EMBEDDING_DIMENSIONS = 1536;
 // sit here, beside the one door, so a reader sees every cap together.
 export const OUTPUT_CAP = { router: 800, rewrite: 400, grade: 1500, judge: 300 } as const;
 
+// The settings every short structured stage sends. The chat model reasons before it answers, and
+// that thinking counts against max_tokens: measured on 2026-11-27, the grader spent all 1500 on
+// reasoning for "Is CardioNex approved in Japan for HFrEF?" and returned no JSON, three runs in a
+// row. With low effort asked for, the same question graded on the next run. Spread into the request.
+export const shortStage = (stage: keyof typeof OUTPUT_CAP) => ({ max_tokens: OUTPUT_CAP[stage], ...({ reasoning: { effort: "low" } } as object) });
+
 export async function embed(texts: string[]): Promise<number[][]> {
   if (!texts.length) return [];
   return startActiveObservation(

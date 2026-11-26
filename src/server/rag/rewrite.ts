@@ -1,6 +1,6 @@
 import { observeOpenAI } from "@langfuse/openai";
 import { env } from "../env";
-import { modelClient, OUTPUT_CAP } from "../gateway";
+import { modelClient, shortStage } from "../gateway";
 import { timed } from "../ops/meter";
 
 // Lesson 20. "How long do I have to wait when switching?" means nothing to a search on its own:
@@ -24,7 +24,7 @@ export async function standaloneQuery(query: string, earlier: Turn[]): Promise<s
   const completion = await timed("query_rewrite", () => openai.chat.completions.create({
     model: env.openaiModel,
     temperature: 0,
-    max_tokens: OUTPUT_CAP.rewrite,
+    ...shortStage("rewrite"),
     messages: [
       { role: "system", content: REWRITE_PROMPT },
       {
