@@ -135,6 +135,8 @@ You add these files. No new package and no new container.
 - `src/server/medinfo-agent.ts`: the `cite` span and the `citations` score.
 - `scripts/citations-audit.ts`: the check over stored answers.
 - `scripts/citations-replay.ts`: the `cite` node on those answers, with the real model.
+- `src/server/citations.claims.ts`: the claim check. Code finds each quote in its section. A judge call asks if the quote backs the claim.
+- `scripts/citations-eval.ts`: `npm run citations:measure` runs 116 claim and quote pairs through that check and writes `docs/runs/citations.json`. Add `-- --fake` to run it with no model.
 
 Once the files are in place, start the parts this lesson needs:
 

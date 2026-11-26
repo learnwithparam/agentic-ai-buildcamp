@@ -1,4 +1,4 @@
-import type { CitationProblem } from "../server/citations";
+import { CLAIM_REASONS, type CitationProblem } from "../server/citations";
 import type { ChatMessage, ToolMessage } from "./messages";
 
 // Step 2B. The record of how one answer was made, the same steps the trace holds: the tier the
@@ -23,6 +23,8 @@ export function plainProblem(problem: CitationProblem): string {
       return `gave ${problem.quantity} with no citation`;
     case "unsupported":
       return `gave ${problem.quantity}, which ${problem.citations.map((citation) => `[${citation}]`).join(" ")} does not say`;
+    case "claim":
+      return `claim "${problem.claim}" ${CLAIM_REASONS[problem.reason].plain}`;
   }
 }
 
