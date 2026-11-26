@@ -3,7 +3,7 @@ title: "Workshop: Let an Agent Write SQL Without Reading Other Companies' Data"
 description: "An analyst asks a sales question, the model writes the SQL, and three layers decide what runs: a parser allow-list, one database login per company, and a row rule in Postgres. Small groups are left out, so no total points at one doctor."
 ---
 
-# 22 Let an agent write SQL without reading other companies' data
+# Let an agent write SQL without reading other companies' data
 
 ## The problem
 

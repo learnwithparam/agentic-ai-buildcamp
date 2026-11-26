@@ -3,7 +3,7 @@ title: "Workshop: Check Every Citation Before the Answer Is Sent"
 description: "Check each answer in code against the sections the search found. Every citation must be found and in force, and every dose must be in the section it cites. A failing answer is rewritten once, then held back, and each outcome is counted on the trace."
 ---
 
-# 21 Check every citation before the answer is sent
+# Check every citation before the answer is sent
 
 ## The problem
 

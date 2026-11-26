@@ -3,7 +3,7 @@ title: "Workshop: Check Who Is Asking and What They May Read Before the Model Se
 description: "Take who is asking from a signed token, let a permission check decide which label text each doctor may read, and keep the doctor's name and email out of the trace."
 ---
 
-# 11 Check who is asking and what they may read before the model sees anything
+# Check who is asking and what they may read before the model sees anything
 
 ## The problem
 

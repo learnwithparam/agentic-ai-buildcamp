@@ -3,7 +3,7 @@ title: "Workshop: Run the Whole Course on Your Own Laptop"
 description: "Start the trace store in Docker, put your keys in one file, and confirm the medical information desk answers a question. Nothing leaves your machine."
 ---
 
-# 00 Run the whole course on your own laptop
+# Run the whole course on your own laptop
 
 ## The problem
 

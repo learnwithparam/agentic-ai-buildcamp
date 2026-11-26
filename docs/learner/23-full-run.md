@@ -3,7 +3,7 @@ title: "Workshop: Replay the Chats That Broke, Then Run Every Case"
 description: "Replay the chats that failed in a live demo on the real model, fix each cause, show the doctor how each answer was made, then run all 70 cases at once and read what still fails."
 ---
 
-# 23 Replay the chats that broke, then run every case
+# Replay the chats that broke, then run every case
 
 ## The problem
 

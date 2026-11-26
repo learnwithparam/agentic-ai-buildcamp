@@ -3,7 +3,7 @@ title: "Workshop: Ask and Review From the Terminal With the Same Permissions"
 description: "Build medinfo, a terminal client for the same agent. It signs in through the browser with PKCE, keeps its tokens in the system keychain, streams cited answers, and lets a reviewer approve drafts."
 ---
 
-# 19 Ask and review from the terminal with the same permissions
+# Ask and review from the terminal with the same permissions
 
 ## The problem
 

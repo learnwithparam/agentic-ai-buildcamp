@@ -3,7 +3,7 @@ title: "Workshop: Block a Bad Prompt or Code Change Before It Ships"
 description: "Turn the scoreboard into a release gate. A prompt version reaches production only when every release case passes, and a push that changes an agent runs the same cases first."
 ---
 
-# 18 Block a bad change before it ships
+# Block a bad change before it ships
 
 ## The problem
 

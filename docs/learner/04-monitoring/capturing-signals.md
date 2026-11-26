@@ -1,9 +1,9 @@
 ---
-title: "Workshop: 4.2 Capturing Signals"
+title: "Workshop: Capturing Signals"
 description: "Score user disagreement and all-caps frustration on production traces so the turns worth reading stand out."
 ---
 
-# 4.2 Capturing signals
+# Capturing signals
 
 ## Why capture signals
 
@@ -151,7 +151,7 @@ Decision models need a direct OpenAI, Google AI Studio or TypeSafe connection. T
 
 ## Wrap-up
 
-The scores tell you which traces to open. [Section 4.1 Error analysis](./error-analysis.md) helps you pick which signals to add next. You read what goes wrong and name it. [Dashboards](https://langfuse.com/docs/metrics/features/custom-dashboards) turn a score into a trend over time.
+The scores tell you which traces to open. [Error analysis](./error-analysis.md) helps you pick which signals to add next. You read what goes wrong and name it. [Dashboards](https://langfuse.com/docs/metrics/features/custom-dashboards) turn a score into a trend over time.
 
 The traces these monitors catch are real examples of behavior to lock in or fix. They are the best source for [05 Build eval datasets](../05-dataset.md).
 

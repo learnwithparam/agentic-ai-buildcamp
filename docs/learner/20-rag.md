@@ -3,7 +3,7 @@ title: "Workshop: Find the Right Label Section by Meaning From the PDFs"
 description: "Read the tagged label PDFs and prove no word was lost. Search by meaning and by words inside the documents OpenFGA lets the doctor read, let the model grade what came back, and measure it on graded questions."
 ---
 
-# 20 Find the right label section by meaning from the PDFs
+# Find the right label section by meaning from the PDFs
 
 ## The problem
 

@@ -3,7 +3,7 @@ title: "Workshop: Start Agents From Events and Handle Each Once"
 description: "Start the agents from signed events instead of chats. A webhook answers at once, a queue holds the work, and each event is handled once however often it arrives. Every event still stops at review and safety."
 ---
 
-# 16 Start agents from events and handle each one once
+# Start agents from events and handle each one once
 
 ## The problem
 
