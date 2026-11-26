@@ -150,6 +150,10 @@ async function main() {
     mkdirSync(path.dirname(CALIBRATION_FILE), { recursive: true });
     writeFileSync(CALIBRATION_FILE, `${JSON.stringify({ rubric: FAITHFULNESS_RUBRIC, items: labelled }, null, 2)}\n`);
     console.log(`\nSaved ${path.relative(process.cwd(), CALIBRATION_FILE)}.`);
+    // The lesson quotes these numbers with a from-comment (scripts/page-numbers.ts).
+    const run = path.resolve("docs/runs/faithfulness.json");
+    writeFileSync(run, `${JSON.stringify({ answers: labelled.length, agreed: labelled.filter((p) => p.human === p.judge).length, kappa: kappa, bar: KAPPA_BAR }, null, 2)}\n`);
+    console.log(`Saved ${path.relative(process.cwd(), run)}.`);
   }
   if (kappa < KAPPA_BAR) {
     console.log(`\nBelow the bar: read each disagreement, tighten the rubric, run the batch evaluation again, then npm run judge:calibrate -- --since 15m.`);

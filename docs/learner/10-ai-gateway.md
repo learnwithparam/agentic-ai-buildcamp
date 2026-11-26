@@ -9,7 +9,7 @@ description: "Give each service its own key, its own model list and a daily budg
 
 One key sits in the app's `.env`. The web app, the eval runner and the judge all use it. A runaway script can call any model and spend without limit. Nobody can tell which service spent what.
 
-Some calls are also invisible. The behavior decision in `dataset:run` is a plain `fetch`. Each of the 28 cases in the 07 run made one. None of them is in the traces. So their cost is missing too.
+Some calls are also invisible. The behavior decision in `dataset:run` is a plain `fetch`. Each of the 28<!-- from: docs/runs/scoreboard-07.json#total --> cases in the 07 run made one. None of them is in the traces. So their cost is missing too.
 
 Some requests should never reach a model at all. For example, GUARDRAIL-01 asks for a Python script. The agent refuses, but only after a model call it did not need. That call costs money and time, and it can only say no.
 
@@ -281,8 +281,8 @@ When we ran the guard set and GUARDRAIL-01, the rows were these. They are also i
 
 | Chapter | Change | Passed | staleness | off-label | guardrail | injection | multi-turn |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 07 | The error-analysis prompt | 22/28 | 3/3 | 3/3 | 1/1 | 2/2 | 1/1 |
-| 10 | Every model call through the gateway, the input check at the door | 5/5 | 1/1 | 1/1 | 1/1 | 1/1 | 1/1 |
+| 07 | The error-analysis prompt | 22/28 | 3/3 | 3/3 | 1/1 | 2/2 | 1/1 | <!-- from-row: docs/runs/scoreboard-07.json -->
+| 10 | Every model call through the gateway, the input check at the door | 5/5 | 1/1 | 1/1 | 1/1 | 1/1 | 1/1 | <!-- from-row: docs/runs/scoreboard-10.json -->
 
 - **What stayed.** The four guard cases pass as before. Moving every call behind a new door changed no answer.
 - **What changed.** GUARDRAIL-01 passed in 07 too, but after a model call. It now passes with none.

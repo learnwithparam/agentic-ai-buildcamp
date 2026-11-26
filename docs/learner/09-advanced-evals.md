@@ -57,7 +57,7 @@ sequenceDiagram
     H->>K: npm run judge:calibrate
     K->>K: Compare labels with scores, work out kappa
     alt kappa is 0.6 or more
-        K-->>H: Agreement 19/21, kappa 0.81
+        K-->>H: Agreement and kappa, above the bar
         H->>R: Judge joins the pass on three slices
     else kappa is below the bar
         K-->>H: Exit 1, the judge is not trusted
@@ -174,17 +174,7 @@ npm run judge:calibrate
 
 It reads your labels and the judge's scores from Langfuse. It prints the confusion matrix, Cohen's kappa and a link to each answer you disagree on. It makes no model calls. It exits 1 when kappa is below the bar.
 
-Our final measurement:
-
-```text
-21 answers with a label and a judge score.
-
-                     judge: faithful   judge: unfaithful
-you: faithful                     10                   2
-you: unfaithful                    0                   9
-
-Agreement 19/21, Cohen's kappa 0.81 (bar 0.6).
-```
+Our final measurement: the judge agreed with us on 19<!-- from: docs/runs/faithfulness.json#agreed --> of 21<!-- from: docs/runs/faithfulness.json#answers --> answers. Cohen's kappa was 0.81<!-- from: docs/runs/faithfulness.json#kappa --> against a bar of 0.6<!-- from: docs/runs/faithfulness.json#bar -->. Both disagreements were faithful answers the judge marked unfaithful. The script also prints the confusion matrix, and a link to each answer you disagree on.
 
 Langfuse shows the same comparison in **Scores → Analytics**. Pick `faithfulness` from the annotation source and `faithfulness` from the eval source.
 
@@ -219,10 +209,10 @@ Our six batches:
 
 The rubric in `scripts/judge/faithfulness.ts` is v4. Its list of "not faithfulness failures" is where the fixes went.
 
-What the table teaches:
+What it teaches:
 
-- **A new rule can hurt.** Rubric v2 flagged four faithful answers. Kappa fell to 0.61, just over the bar. Measure every change.
-- **The same rubric moves between runs.** Batches 3, 4 and 5 used the same v3 text and scored 0.80, 0.80 and 0.90. They were wrong on different answers each time. One batch is one sample, so leave room above the bar.
+- **A new rule can hurt.** Rubric v2 flagged four faithful answers. Kappa fell, to just over the bar. Measure every change.
+- **The same rubric moves between runs.** Batches 3, 4 and 5 used the same v3 text. Each scored a little differently. They were wrong on different answers each time. One batch is one sample, so leave room above the bar.
 - **The judge never called an unfaithful answer faithful,** in any batch. Every miss was a false alarm on a faithful answer. That is the safe direction for a check in the pass. It costs a rerun, never a wrong dose shipped.
 
 Batch 6 came from the reference run in step 7. The judge flagged a REVIEW-01 draft for this sentence:
@@ -309,7 +299,7 @@ In a correct run, `npm run judge:calibrate` prints a kappa of 0.6 or more for yo
 
 - **A judge nobody measured.** Its score is an opinion. Our `npm run check` fails when the rubric changed since it was measured. It also fails when the measurement is below the bar.
 - **A judge tested on good answers only.** It could say yes to everything. Ten of our 21 answers are edited copies with a known fault. A test fails if the set has only one kind.
-- **One batch taken as the truth.** The same rubric scored 0.80, 0.80 and 0.90. Leave room above the bar, and measure each change.
+- **One batch taken as the truth.** The same rubric scored a little differently each time. Leave room above the bar, and measure each change.
 - **A judge on every trace.** You pay for each call. The runner gives the judge to three slices only, and step 8 limits the live rule.
 - **A rubric bent to pass one case.** The judge drifts from your labels. Add the answer to the calibration set first, and measure the whole set again.
 
@@ -319,13 +309,13 @@ When we ran step 7, the rows were these. They are also in [docs/scoreboard.md](.
 
 | Chapter | Change | Passed | staleness | footnote | multi-hop | off-label | injection | multi-turn | review |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 07 | The error-analysis prompt | 22/28 | 3/3 | 3/3 | 1/1 | 3/3 | 2/2 | 1/1 | 1/1 |
-| 09 | The calibrated faithfulness judge on the judged slices | 9/9 | 1/1 | 3/3 | 1/1 | 1/1 | 1/1 | 1/1 | 1/1 |
+| 07 | The error-analysis prompt | 22/28 | 3/3 | 3/3 | 1/1 | 3/3 | 2/2 | 1/1 | 1/1 | <!-- from-row: docs/runs/scoreboard-07.json -->
+| 09 | The calibrated faithfulness judge on the judged slices | 9/9 | 1/1 | 3/3 | 1/1 | 1/1 | 1/1 | 1/1 | 1/1 | <!-- from-row: docs/runs/scoreboard-09.json -->
 
 The 09 row shows `-` in every slice it did not run. Read it like this:
 
 - **What stayed.** Every case that passed in 07 still passes with a stricter pass. The judge found no unfaithful answer in this run.
-- **What the first run showed.** Our first 09 run passed 7 of 9. REVIEW-01 failed on the false alarm that became batch 6.
+- **What the first run showed.** Our first 09 run did not pass every case. REVIEW-01 failed on the false alarm that became batch 6.
 - **A real failure.** POSITIVE-02 failed for real. The agent said the label gives no potassium threshold, when it says do not start above 5.0 mEq/L. All three checks caught it, the judge included.
 - **A rerun.** POSITIVE-02 passed in the rerun, because the agent's answers vary between runs.
 - **What one case means.** Most slices here hold one case. A 1/1 is a smoke test that the slice still works, not a rate. A rate needs many cases per slice, and lesson 19 runs them all once.

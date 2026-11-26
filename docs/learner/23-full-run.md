@@ -21,7 +21,7 @@ A lesson case tests one thing. A demo tests the whole desk at once, in the order
 - **A repro set.** A script plays the chats that broke. It signs in as the demo users and calls the real model. Each turn says what a right answer is. It fails on any miss.
 - **Four fixes,** one per cause. The router sorts only the latest message. One desk prompt is filled in per company. Search takes the country the question is about. Each result keeps its score.
 - **A run record under each answer.** The doctor opens "How this answer was made". It shows how the question was sorted, what was looked up and what the check found.
-- **One full run** of all 70 cases on the finished desk, with every miss read and filed.
+- **One full run** of all 70<!-- from: docs/runs/scoreboard-23.json#total --> cases on the finished desk, with every miss read and filed.
 
 | Case | What breaks | How the system holds |
 | --- | --- | --- |
@@ -113,11 +113,7 @@ Turn each failure into a chat the script can play. The script signs in as the de
 npm run demo:check
 ```
 
-On the lesson 22 checkpoint it printed:
-
-```text
-3 of 10 turns right.
-```
+On the lesson 22 checkpoint most turns were wrong.
 
 Every dose search had the same words added. The Germany draft used the US label. Japan got no answer. Pharma B asking about CardioNex got no answer, when it should name its own medicine.
 
@@ -160,9 +156,7 @@ The model now writes the search words itself, and passes a country when the ques
 npm run demo:check
 ```
 
-```text
-10 of 10 turns right.
-```
+Every turn is right now.
 
 ### Step 5: Show how each answer was made
 
@@ -172,7 +166,7 @@ Sign in as Ana Rivera and ask "Can a patient on spironolactone take CardioNex?".
 
 ![The answer, then its run record: sorted, looked up with scores, checked.](../images/full-run/01-run-panel.png)
 
-The search found 4 sections. The best was `cardionex-uspi-v2 7.1` at 0.65, in force in the US. The check passed.
+The search found a few sections. The best was `cardionex-uspi-v2 7.1`, in force in the US. The check passed.
 
 ### Step 6: Run every case
 
@@ -182,15 +176,7 @@ Each earlier lesson ran only its own cases. Now run all of them on the finished 
 npm run dataset:run -- --chapter 23 --change "The whole desk, every case, after the demo fixes" --reference
 ```
 
-```text
-70 items
-  behavior_match: 0.914
-  label_checks: 0.957
-  risk_tier: 1.000
-  faithfulness: 1.000
-```
-
-The run adds a row to `docs/scoreboard.md`. Every miss prints with its answer.
+The run scores each case with `behavior_match`, `label_checks`, `risk_tier` and `faithfulness`. It saves a run file, and that file rebuilds `docs/scoreboard.md`. Every miss prints with its answer.
 
 ## Prove it
 
@@ -232,9 +218,9 @@ Break it on purpose. Pass the whole transcript to the router again. The router t
 
 | Chapter | Change | Passed | ambiguous | off-label | rag | fact-check | outreach | insights |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 23 | The whole desk, every case, after the demo fixes | 63/70 | 0/1 | 2/3 | 2/3 | 5/6 | 5/6 | 5/7 |
+| 23 | The whole desk, every case, after the demo fixes | 63/70 | 0/1 | 2/3 | 2/3 | 5/6 | 5/6 | 5/7 | <!-- from-row: docs/runs/scoreboard-23.json -->
 
-Every other slice passed in full. The full row is in `docs/scoreboard.md`. The pass rate is 63 of 70. How to read the 7 misses:
+Every other slice passed in full. The full row is in `docs/scoreboard.md`. The pass rate is 63<!-- from: docs/runs/scoreboard-23.json#passed --> of 70<!-- from: docs/runs/scoreboard-23.json#total -->. How to read the misses:
 
 - **Real misses, 4.** AMBIGUOUS-01 should ask for the patient's facts before giving a dose, and did not. NEGATIVE-03 said honestly that no head-to-head trial exists, but left out the marker the app routes on. INSIGHTS-02 and INSIGHTS-03 answered part of the question and said what the table lacks.
 - **The evaluator disagrees, 2.** FACT-06 and OUTREACH-04 expect a reply that names what is missing. Both did. The evaluator scored the marker as a refusal.

@@ -1,0 +1,29 @@
+{
+  "chapter": "16",
+  "change": "Events start agents, handled once",
+  "passed": 10,
+  "total": 10,
+  "slices": {
+    "staleness": {
+      "passed": 1,
+      "total": 1
+    },
+    "off-label": {
+      "passed": 1,
+      "total": 1
+    },
+    "injection": {
+      "passed": 1,
+      "total": 1
+    },
+    "multi-turn": {
+      "passed": 1,
+      "total": 1
+    },
+    "event": {
+      "passed": 6,
+      "total": 6
+    }
+  },
+  "run": "http://localhost:5174/project/hcp-medinfo/experiments/results?baseline=cb215b87822896d2"
+}

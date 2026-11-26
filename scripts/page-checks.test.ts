@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { test } from "node:test";
 import { glossaryProblems } from "./glossary";
 import { readmeProblems, shapeProblems } from "./lesson-shape";
 import { declaredStates, diagramProblems } from "./mermaid";
-import { problemsIn } from "./plain-english";
+import { problemsIn, teachProblems } from "./plain-english";
 
 // Each page check is fed one bad page and must fail on it, so a check that stops biting is red.
 // The pages here are small, made-up lessons; the real pages run in CI with `npm run check:pages`.
@@ -102,5 +102,22 @@ test("CI runs check:pages, and check:pages runs every page check", (t) => {
   if (!existsSync(".github/workflows/check.yml")) return t.skip("a checkpoint tag has no CI");
   assert.match(readFileSync(".github/workflows/check.yml", "utf8"), /run: npm run check:pages/);
   const scripts = JSON.parse(readFileSync("package.json", "utf8")).scripts as Record<string, string>;
-  for (const check of ["plain-english", "lesson-shape", "glossary", "mermaid"]) assert.match(scripts["check:pages"] ?? "", new RegExp(`scripts/${check}\\.ts`));
+  for (const check of ["plain-english", "lesson-shape", "glossary", "mermaid", "page-numbers"]) assert.match(scripts["check:pages"] ?? "", new RegExp(`scripts/${check}\\.ts`));
+});
+
+test("the prose check does not read a from-comment as words or sentences", () => {
+  const cite = (n: number, key: string) => `${n}<!-- from: docs/runs/search.json#configs.graded.all.${key} -->`;
+  const para = `Fusion alone barely moves the averages. It finds some exact words. The grader does the work. It lifts recall from ${cite(0.749 as never, "a")} to ${cite(0.952 as never, "b")}. It turns nothing into ${cite(0.95 as never, "c")}.\n`;
+  assert.deepEqual(problemsIn(FILE, para, 6), []);
+  assert.deepEqual(teachProblems(FILE, para, 6), []);
+  assert.deepEqual(problemsIn(FILE, "| Row | Result |\n| --- | --- |\n| 07 | 22/28 | <!-- from-row: docs/runs/scoreboard-07.json -->\n", 6), []);
+});
+
+test("every `npm run` a page names is a script in package.json", (t) => {
+  if (!existsSync("docs/learner")) return t.skip("no lessons here");
+  const scripts = JSON.parse(readFileSync("package.json", "utf8")).scripts as Record<string, string>;
+  const pages = ["README.md", "docs/walkthrough.md", ...readdirSync("docs/learner", { recursive: true, encoding: "utf8" }).filter((name) => name.endsWith(".md")).map((name) => `docs/learner/${name}`)];
+  for (const file of pages) {
+    for (const [, name] of readFileSync(file, "utf8").matchAll(/npm run ([a-z][\w:-]*)/g)) assert.ok(name in scripts, `${file} names npm run ${name}, which package.json lacks`);
+  }
 });

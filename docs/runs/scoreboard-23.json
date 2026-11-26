@@ -1,0 +1,97 @@
+{
+  "chapter": "23",
+  "change": "The whole desk, every case, after the demo fixes",
+  "passed": 63,
+  "total": 70,
+  "slices": {
+    "staleness": {
+      "passed": 1,
+      "total": 1
+    },
+    "footnote": {
+      "passed": 2,
+      "total": 2
+    },
+    "multi-hop": {
+      "passed": 1,
+      "total": 1
+    },
+    "off-label": {
+      "passed": 2,
+      "total": 3
+    },
+    "tenancy": {
+      "passed": 4,
+      "total": 4
+    },
+    "pv-phi": {
+      "passed": 2,
+      "total": 2
+    },
+    "guardrail": {
+      "passed": 1,
+      "total": 1
+    },
+    "country": {
+      "passed": 4,
+      "total": 4
+    },
+    "future-label": {
+      "passed": 1,
+      "total": 1
+    },
+    "injection": {
+      "passed": 2,
+      "total": 2
+    },
+    "multi-turn": {
+      "passed": 1,
+      "total": 1
+    },
+    "ambiguous": {
+      "passed": 0,
+      "total": 1
+    },
+    "pushback": {
+      "passed": 1,
+      "total": 1
+    },
+    "review": {
+      "passed": 1,
+      "total": 1
+    },
+    "routing": {
+      "passed": 7,
+      "total": 7
+    },
+    "rag": {
+      "passed": 2,
+      "total": 3
+    },
+    "fact-check": {
+      "passed": 5,
+      "total": 6
+    },
+    "outreach": {
+      "passed": 5,
+      "total": 6
+    },
+    "a2a": {
+      "passed": 5,
+      "total": 5
+    },
+    "event": {
+      "passed": 6,
+      "total": 6
+    },
+    "auto": {
+      "passed": 5,
+      "total": 5
+    },
+    "insights": {
+      "passed": 5,
+      "total": 7
+    }
+  },
+  "run": "http://localhost:5174/project/hcp-medinfo/experiments/results?baseline=b64c408f9e027233"
+}

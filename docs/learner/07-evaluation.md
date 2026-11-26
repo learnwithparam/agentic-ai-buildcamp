@@ -1,22 +1,22 @@
 ---
 title: "Workshop: Compare Two Runs to See If a Change Helped"
-description: "Publish the prompt from error analysis, rerun the same 28 cases, and compare the two runs item by item. Keep the gains, find what broke, and write the regression down."
+description: "Publish the prompt from error analysis, rerun the same cases, and compare the two runs item by item. Keep the gains, find what broke, and write the regression down."
 ---
 
 # Compare two runs to see if a change helped
 
 ## The problem
 
-After the first run, the desk passed 5 of 28 cases. Error analysis then found three kinds of failure. Someone writes a prompt that answers each one. They try two questions, and both look better. So the prompt ships.
+After the first run, the desk passed 5<!-- from: docs/runs/scoreboard-06.json#passed --> of 28<!-- from: docs/runs/scoreboard-06.json#total --> cases. Error analysis then found three kinds of failure. Someone writes a prompt that answers each one. They try two questions, and both look better. So the prompt ships.
 
-Nobody checks the other 26 cases. For example, the new prompt says "if the question is about another company's medicine, write INSUFFICIENT_CONTEXT". That helps a Pharma A doctor who asks about a Pharma B drug. It also makes the desk refuse a Pharma B doctor who asks about their own trial. That case passed before, and it fails now.
+Nobody checks the other cases. For example, the new prompt says "if the question is about another company's medicine, write INSUFFICIENT_CONTEXT". That helps a Pharma A doctor who asks about a Pharma B drug. It also makes the desk refuse a Pharma B doctor who asks about their own trial. That case passed before, and it fails now.
 
 Reading a few answers feels like a test, but it is not one. A change that fixes three cases can break one that worked. You only see it if you run the same cases before and after, and compare them.
 
 ## What you build
 
 - **A new prompt version.** It holds the rules from error analysis. Langfuse, which keeps every prompt and trace, serves it by label.
-- **A second run of the same 28 cases.** Nothing else changes, so a score moves for one reason.
+- **A second run of the same cases.** Nothing else changes, so a score moves for one reason.
 - **A 07 row** in `my-scoreboard.md`, under your 06 row.
 - **A side-by-side view** of the two runs, item by item.
 
@@ -59,7 +59,7 @@ sequenceDiagram
     else the answer is wrong
         V-->>R: FAIL, got defer_question
     end
-    R->>S: Row 07, 22 of 28 passed
+    R->>S: Row 07 added
     E->>S: Read what went up, stayed and went down
 ```
 
@@ -79,7 +79,7 @@ flowchart LR
     lf[("Traces, datasets, scores")]
     board["my-scoreboard.md"]
     compare["Compare view"]
-    runner -->|"same 28 cases"| agent
+    runner -->|"same cases"| agent
     prompts -->|"prompt by label"| agent
     agent -->|"query"| search
     agent -->|"model calls"| models
@@ -166,14 +166,14 @@ Either way, the `production` label now points at the new version.
 npm run dataset:run -- --chapter 07 --change "The error-analysis prompt"
 ```
 
-It runs the same cases with the same three evaluators as lesson 06. Our rows ran on 28 cases, and yours runs all 38. It prints a FAIL line for each failing case. It adds the 07 row to `my-scoreboard.md`, under your 06 row.
+It runs the same cases with the same three evaluators as lesson 06. Our rows ran on 28<!-- from: docs/runs/scoreboard-07.json#total --> cases, and yours runs every case in the dataset. It prints a FAIL line for each failing case. It adds the 07 row to `my-scoreboard.md`, under your 06 row.
 
 When we ran it, the two rows were these. They are also in [docs/scoreboard.md](../scoreboard.md).
 
 | Chapter | Change | Passed | staleness | footnote | multi-hop | off-label | tenancy | pv-phi | guardrail | country | future-label | injection | multi-turn | ambiguous | pushback | review |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 06 | The agent as lesson 03 left it | 5/28 | 0/3 | 1/3 | 1/1 | 0/3 | 1/4 | 0/2 | 0/1 | 0/4 | 1/1 | 1/2 | 0/1 | 0/1 | 0/1 | 0/1 |
-| 07 | The error-analysis prompt | 22/28 | 3/3 | 3/3 | 1/1 | 3/3 | 2/4 | 2/2 | 1/1 | 0/4 | 1/1 | 2/2 | 1/1 | 1/1 | 1/1 | 1/1 |
+| 06 | The agent as lesson 03 left it | 5/28 | 0/3 | 1/3 | 1/1 | 0/3 | 1/4 | 0/2 | 0/1 | 0/4 | 1/1 | 1/2 | 0/1 | 0/1 | 0/1 | 0/1 | <!-- from-row: docs/runs/scoreboard-06.json -->
+| 07 | The error-analysis prompt | 22/28 | 3/3 | 3/3 | 1/1 | 3/3 | 2/4 | 2/2 | 1/1 | 0/4 | 1/1 | 2/2 | 1/1 | 1/1 | 1/1 | 1/1 | <!-- from-row: docs/runs/scoreboard-07.json -->
 
 Your numbers can differ by a case or two, because the agent's answers vary between runs. Read them in three groups.
 
@@ -250,7 +250,7 @@ npm run dataset:run -- --chapter 07 --change "The error-analysis prompt"
 
 The rows are in step 2. Read them like this:
 
-- **22 of 28 passed,** up from 5. Every case due by lesson 07 passes.
+- **22<!-- from: docs/runs/scoreboard-07.json#passed --> of 28<!-- from: docs/runs/scoreboard-07.json#total --> passed,** up from 5<!-- from: docs/runs/scoreboard-06.json#passed -->. Every case due by lesson 07 passes.
 - **Six cases fail,** and all six are chapter 11 cases: four country cases, and two tenancy cases.
 - **TENANCY-04 went down.** You wrote it down, and lesson 11 fixes it.
 

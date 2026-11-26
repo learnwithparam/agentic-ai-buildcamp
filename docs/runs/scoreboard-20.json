@@ -1,0 +1,29 @@
+{
+  "chapter": "20",
+  "change": "search_labels reads the tagged label PDFs into pgvector",
+  "passed": 6,
+  "total": 7,
+  "slices": {
+    "staleness": {
+      "passed": 1,
+      "total": 1
+    },
+    "pv-phi": {
+      "passed": 1,
+      "total": 1
+    },
+    "injection": {
+      "passed": 1,
+      "total": 1
+    },
+    "multi-turn": {
+      "passed": 1,
+      "total": 1
+    },
+    "rag": {
+      "passed": 2,
+      "total": 3
+    }
+  },
+  "run": "http://localhost:5174/project/hcp-medinfo/experiments/results?baseline=aa7f83b9a750e60e"
+}

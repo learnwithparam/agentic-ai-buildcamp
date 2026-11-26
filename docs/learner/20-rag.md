@@ -257,7 +257,7 @@ Fusion alone can drop the best section. Take "Can a mother who is nursing her ba
 
 Fusion finds what is near the question. It cannot tell a section that answers from one that only shares its words. A fixed similarity floor cannot either.
 
-Take "Can my patient drink alcohol while taking CardioNex?". It scores 0.60 on the boxed warning. That section is about CardioNex, but says nothing about alcohol.
+Take "Can my patient drink alcohol while taking CardioNex?". It scores high on the boxed warning. That section is about CardioNex, but says nothing about alcohol.
 
 So the search reranks them. `gradePassages` sends the question and all 30 sections to the chat model, in one gateway call.
 
@@ -298,9 +298,9 @@ The script runs every question three ways, so you can see what each step is wort
 
 | Run | recall@5 | MRR | nDCG@10 | Out of label |
 | --- | --- | --- | --- | --- |
-| Vectors only (pgvector) | 0.745 | 0.757 | 0.723 | 0.05 |
-| Vectors and BM25, fused | 0.749 | 0.743 | 0.717 | 0.05 |
-| Fused, then graded by the model | 0.952 | 0.933 | 0.922 | 0.95 |
+| Vectors only (pgvector) | 0.745<!-- from: docs/runs/search.json#configs.dense.all.recall_at_5 --> | 0.757<!-- from: docs/runs/search.json#configs.dense.all.mrr --> | 0.723<!-- from: docs/runs/search.json#configs.dense.all.ndcg_at_10 --> | 0.05<!-- from: docs/runs/search.json#configs.dense.all.out_of_label_empty --> |
+| Vectors and BM25, fused | 0.749<!-- from: docs/runs/search.json#configs.hybrid.all.recall_at_5 --> | 0.743<!-- from: docs/runs/search.json#configs.hybrid.all.mrr --> | 0.717<!-- from: docs/runs/search.json#configs.hybrid.all.ndcg_at_10 --> | 0.05<!-- from: docs/runs/search.json#configs.hybrid.all.out_of_label_empty --> |
+| Fused, then graded by the model | 0.952<!-- from: docs/runs/search.json#configs.graded.all.recall_at_5 --> | 0.933<!-- from: docs/runs/search.json#configs.graded.all.mrr --> | 0.922<!-- from: docs/runs/search.json#configs.graded.all.ndcg_at_10 --> | 0.95<!-- from: docs/runs/search.json#configs.graded.all.out_of_label_empty --> |
 | Target | 0.95 | 0.85 | 0.85 | 0.95 |
 
 - **recall@5** is the share of answering sections in the top 5.
@@ -308,21 +308,21 @@ The script runs every question three ways, so you can see what each step is wort
 - **nDCG@10** rewards the right order, using the gold grades.
 - **Out of label** is the share of unanswerable questions that got no result.
 
-Fusion on its own barely moves the averages. It finds the exact-word questions vectors miss, and loses a few others. The grader is what does the work. It lifts recall@5 from 0.749 to 0.952, and it turns "nothing answers this" from 0.05 into 0.95.
+Fusion on its own barely moves the averages. It finds the exact-word questions vectors miss, and loses a few others. The grader is what does the work. It lifts recall@5 from 0.749<!-- from: docs/runs/search.json#configs.hybrid.all.recall_at_5 --> to 0.952<!-- from: docs/runs/search.json#configs.graded.all.recall_at_5 -->, and it turns "nothing answers this" from 0.05<!-- from: docs/runs/search.json#configs.hybrid.all.out_of_label_empty --> into 0.95<!-- from: docs/runs/search.json#configs.graded.all.out_of_label_empty -->.
 
 The grader came to that number over several runs, and each run found one cause:
 
-- **It did not know the medicine.** Each passage showed only "2.5 Discontinuation". So CardioNex's section passed as the answer to "How should NeuroVex be stopped?". Out of label was 0.75. The passage now names its document, medicine and country, and out of label went to 0.95.
-- **Nearly everything got a 3.** Of the 30 answers missing from the top 5, 25 had been graded, and most had a 3. They lost on order alone. So the grader now also lists the answers most direct first, in the same call. Recall@5 went from 0.924 to 0.958 on that run.
+- **It did not know the medicine.** Each passage showed only "2.5 Discontinuation". So CardioNex's section passed as the answer to "How should NeuroVex be stopped?". Out of label was low. The passage now names its document, medicine and country, and out of label went to 0.95<!-- from: docs/runs/search.json#configs.graded.all.out_of_label_empty -->.
+- **Nearly everything got a 3.** Many answers missing from the top 5 had been graded, and most had a 3. They lost on order alone. So the grader now also lists the answers most direct first, in the same call. Recall@5 went up on that run.
 - **Old doses from secondary documents.** The March 2027 label halved the renal dose. On 2027-04-15 the FAQ and the 2026 formulary still gave the old dose, and they ranked first. Each passage now also shows the date its document is in force from.
-- **Labels win.** Two passages can give different values for one instruction. Then the label wins, and the newest label wins over older ones. A first wording of that rule also marked down trial and payer passages, and recall@5 fell to 0.933. It now applies only when the values disagree.
-- **A miscounted list.** Once, the grader returned 32 grades for 30 passages, and the whole search failed. Now the schema fixes the length, and the request states it. The search asks once more before it fails.
+- **Labels win.** Two passages can give different values for one instruction. Then the label wins, and the newest label wins over older ones. A first wording of that rule also marked down trial and payer passages, and recall@5 fell. It now applies only when the values disagree.
+- **A miscounted list.** Once, the grader returned more grades than it had passages, and the whole search failed. Now the schema fixes the length, and the request states it. The search asks once more before it fails.
 
-The grader is a model. So the same code can score 0.015 higher or lower on the next run. This run sits on the target, not above it.
+The grader is a model. So the same code can score a little higher or lower on the next run. This run sits on the target, not above it.
 
-Follow-ups show what the rewriter is worth. Asked as written, they score 0.878 recall@5. Written out in full first, they score 0.955.
+Follow-ups show what the rewriter is worth. Asked as written, they score 0.878<!-- from: docs/runs/search.json#follow_ups.as_asked.recall_at_5 --> recall@5. Written out in full first, they score 0.955<!-- from: docs/runs/search.json#follow_ups.rewritten.recall_at_5 -->.
 
-Two slices are weakest. Questions that need two documents at once score 0.788 recall@5. Questions about which version is in force score 0.917. `misses` in `docs/runs/search.json` lists every question that lost a section.
+Two slices are weakest. Questions that need two documents at once score 0.788<!-- from: docs/runs/search.json#configs.graded.by_kind.cross_doc.recall_at_5 --> recall@5. Questions about which version is in force score 0.917<!-- from: docs/runs/search.json#configs.graded.by_kind.version.recall_at_5 -->. `misses` in `docs/runs/search.json` lists every question that lost a section.
 
 The numbers are written to `docs/runs/search.json`. `docs/measures.md` holds the targets, from PaperQA2's hybrid retrieval. `check-repo` fails when a row there disagrees with the run file.
 
@@ -412,7 +412,7 @@ In a correct run, `npm run rag:ingest` prints "unchanged" for all 13 PDFs on its
 
 | Chapter | Change | Passed | rag |
 | --- | --- | --- | --- |
-| 20 | search_labels reads the tagged label PDFs into pgvector | 6/7 | 2/3 |
+| 20 | search_labels reads the tagged label PDFs into pgvector | 6/7 | 2/3 | <!-- from-row: docs/runs/scoreboard-20.json -->
 
 The full row is in `docs/scoreboard.md`. How to read it:
 

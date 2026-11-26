@@ -323,7 +323,7 @@ This lesson adds no dataset behavior. The chat agent, its prompt and its search 
 
 | Chapter | Change | Passed | staleness | off-label | tenancy | country | injection | multi-turn |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 11 | Sign-in with Keycloak, permissions from OpenFGA | 12/12 | 1/1 | 1/1 | 4/4 | 4/4 | 1/1 | 1/1 |
+| 11 | Sign-in with Keycloak, permissions from OpenFGA | 12/12 | 1/1 | 1/1 | 4/4 | 4/4 | 1/1 | 1/1 | <!-- from-row: docs/runs/scoreboard-11.json -->
 
 What this lesson proves instead is in the tests above. To check you are done:
 

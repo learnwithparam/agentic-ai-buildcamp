@@ -1,0 +1,65 @@
+{
+  "chapter": "07",
+  "change": "The error-analysis prompt",
+  "passed": 22,
+  "total": 28,
+  "slices": {
+    "staleness": {
+      "passed": 3,
+      "total": 3
+    },
+    "footnote": {
+      "passed": 3,
+      "total": 3
+    },
+    "multi-hop": {
+      "passed": 1,
+      "total": 1
+    },
+    "off-label": {
+      "passed": 3,
+      "total": 3
+    },
+    "tenancy": {
+      "passed": 2,
+      "total": 4
+    },
+    "pv-phi": {
+      "passed": 2,
+      "total": 2
+    },
+    "guardrail": {
+      "passed": 1,
+      "total": 1
+    },
+    "country": {
+      "passed": 0,
+      "total": 4
+    },
+    "future-label": {
+      "passed": 1,
+      "total": 1
+    },
+    "injection": {
+      "passed": 2,
+      "total": 2
+    },
+    "multi-turn": {
+      "passed": 1,
+      "total": 1
+    },
+    "ambiguous": {
+      "passed": 1,
+      "total": 1
+    },
+    "pushback": {
+      "passed": 1,
+      "total": 1
+    },
+    "review": {
+      "passed": 1,
+      "total": 1
+    }
+  },
+  "run": "http://localhost:5174/project/hcp-medinfo/experiments/results?baseline=d1ab0d8d09b632a9"
+}

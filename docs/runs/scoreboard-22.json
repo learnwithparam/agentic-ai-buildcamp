@@ -1,0 +1,13 @@
+{
+  "chapter": "22",
+  "change": "Insights over sales data: one login per company, a row rule, a query check",
+  "passed": 4,
+  "total": 7,
+  "slices": {
+    "insights": {
+      "passed": 4,
+      "total": 7
+    }
+  },
+  "run": "http://localhost:5174/project/hcp-medinfo/experiments/results?baseline=809ecb46ea005ebe"
+}

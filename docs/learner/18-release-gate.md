@@ -185,7 +185,7 @@ Three cases fail on `label_checks`. The answers and the doses are right. What is
 - **STALENESS-01** and **MULTITURN-01** answer 5 mg for an eGFR of 24. They name the label in words, with no bracket citation to section 2.2 of `cardionex-uspi-v2`.
 - **AUTO-01** redrafts the stale answer with no bracket citation to section 2.2 of `cardionex-uspi-v3`.
 
-`release_pass_rate` is 0.625, the gate throws `RegressionError`, and the command exits 1. Promotion runs only after green. So `production` still points at the version from step 2.
+`release_pass_rate` is below 1, the gate throws `RegressionError`, and the command exits 1. Promotion runs only after green. So `production` still points at the version from step 2.
 
 A missing citation is a failed release, not a style choice. A reviewer checks each fact against the section it cites. The sweep in lesson 17 finds stale answers by the label they cite.
 
@@ -215,9 +215,9 @@ The app reads the `production` label, so its next answer uses the new version. N
 
 In Langfuse, open **Experiments**. Choose the red run as the baseline and add the green run to compare.
 
-![The red run against the green run: label_checks goes from 0.63 to 1.00, three cases better, none worse](../images/release-gate/04-red-vs-green.png)
+![The red run against the green run: label_checks goes up, three cases better, none worse](../images/release-gate/04-red-vs-green.png)
 
-`behavior_match` is 1.00 on both, so the agent did the right kind of thing each time. `label_checks` goes from 0.63 to 1.00, with three cases up and none down. That is the whole difference between the two versions.
+`behavior_match` is the same on both, so the agent did the right kind of thing each time. `label_checks` goes up, with three cases up and none down. That is the whole difference between the two versions.
 
 ### Step 8: See which generations used the version
 
@@ -309,11 +309,11 @@ In a correct run, `npm run release:gate` is green on your production prompt. The
 
 | Chapter | Change | Passed | staleness | off-label | tenancy | pv-phi | injection | multi-turn | fact-check | auto |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 18 | A release gate on every prompt promotion and agent push | 8/8 | 1/1 | 1/1 | 1/1 | 1/1 | 1/1 | 1/1 | 1/1 | 1/1 |
+| 18 | A release gate on every prompt promotion and agent push | 8/8 | 1/1 | 1/1 | 1/1 | 1/1 | 1/1 | 1/1 | 1/1 | 1/1 | <!-- from-row: docs/runs/scoreboard-18.json -->
 
 How to read it:
 
-- **8/8, one case per column.** Each column is one thing an earlier lesson fixed. The row is the green run of the fixed version, the one that was promoted.
+- **8<!-- from: docs/runs/scoreboard-18.json#passed -->/8<!-- from: docs/runs/scoreboard-18.json#total -->, one case per column.** Each column is one thing an earlier lesson fixed. The row is the green run of the fixed version, the one that was promoted.
 - **The red run has no row.** Its numbers are in step 4 and in Langfuse. With `--chapter`, a red run still writes a row before the verdict. So a failure is on the scoreboard too.
 - **One run went red for another reason.** A provider error skipped one case, so only 7 of 8 ran. Every case that ran passed, and the gate was still red. A case that did not run is never a pass. Run it again.
 

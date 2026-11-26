@@ -140,11 +140,17 @@ FAIL STALENESS-01: behavior_match: Expected reply, got ask_follow_up (confidence
 
 Then it adds one row to `my-scoreboard.md` at the repo root. The first run creates the file. Git ignores it, so it stays when you check out the next tag. Our own row is in [docs/scoreboard.md](../scoreboard.md).
 
+That file is built, not typed. Each reference run saves one file in `docs/runs`, and this command rebuilds the table from them:
+
+```bash
+npm run scoreboard
+```
+
 | Chapter | Change | Passed | staleness | footnote | multi-hop | off-label | tenancy | pv-phi | guardrail | country | future-label | injection | multi-turn | ambiguous | pushback | review |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 06 | The agent as lesson 03 left it | 5/28 | 0/3 | 1/3 | 1/1 | 0/3 | 1/4 | 0/2 | 0/1 | 0/4 | 1/1 | 1/2 | 0/1 | 0/1 | 0/1 | 0/1 |
+| 06 | The agent as lesson 03 left it | 5/28 | 0/3 | 1/3 | 1/1 | 0/3 | 1/4 | 0/2 | 0/1 | 0/4 | 1/1 | 1/2 | 0/1 | 0/1 | 0/1 | 0/1 | <!-- from-row: docs/runs/scoreboard-06.json -->
 
-Our row ran when the dataset had 28 cases. Later lessons added more, so your run scores all 38 and has more columns. Your numbers can also differ by a case or two. The model does not answer the same way every time.
+Our row ran 28<!-- from: docs/runs/scoreboard-06.json#total --> cases. Later lessons added more, so your run scores every case in the dataset and has more columns. Your numbers can also differ by a case or two. The model does not answer the same way every time.
 
 ### Step 3: Read why it fails
 
@@ -206,7 +212,7 @@ This lesson writes the first row of the scoreboard.
 
 | Chapter | Passed | Reading |
 | --- | --- | --- |
-| 06 | 5/28 | The agent as lesson 03 left it. Most cases fail on purpose, and the FAIL lines say why. |
+| 06 | 5/28 | The agent as lesson 03 left it. Most cases fail on purpose, and the FAIL lines say why. | <!-- from-row: docs/runs/scoreboard-06.json -->
 
 This is our reference row from docs/scoreboard.md. Yours can differ by a case or two.
 

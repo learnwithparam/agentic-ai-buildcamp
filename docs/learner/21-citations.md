@@ -7,11 +7,11 @@ description: "Check each answer in code against the sections the search found. E
 
 ## The problem
 
-A doctor asks the desk a short question. "Was CardioNex approved at 50mg twice daily?" The agent answers with a citation, and the answer looks sure. But it cites a 2024 draft that expired. We found this in 6 of 9 stored answers to that question.
+A doctor asks the desk a short question. "Was CardioNex approved at 50mg twice daily?" The agent answers with a citation, and the answer looks sure. But it cites a 2024 draft that expired. We found this in stored answers to that question.
 
 The desk rules already say "answer only from label text the search returned". They also say "cite every fact". A rule in a prompt is a request. The model follows it most of the time. When it does not, the answer looks just as sure as a good one.
 
-We checked 405 stored answers. 13 broke a rule, and each one went to a doctor. They broke it in three ways:
+We checked every stored answer. Some broke a rule, and each one went to a doctor. They broke it in three ways:
 
 - **A citation to a document not in force.** For example, the expired draft above.
 - **A dose with no citation.** One answer said "5 mg once daily" for a patient with weak kidneys. Nothing said where 5 mg came from.
@@ -144,10 +144,10 @@ npm run citations:audit
 ```
 
 ```text
-405 answers checked, 13 would be stopped.
-  uncited: 3
-  unsupported: 4
-  not_in_force: 6
+<N> answers checked, <M> would be stopped.
+  uncited: <n>
+  unsupported: <n>
+  not_in_force: <n>
 
 uncited "5 mg": What is the CardioNex dose for a patient with eGFR of 24 mL/min who is not on dialysis?
   http://localhost:5174/project/<project>/traces/d534f966f3fefed09a0cabd913307f5d
@@ -209,14 +209,14 @@ For example, this is what the model reads about the expired draft:
 [cardionex-draft-2024, 2.1] is expired, not in force today. Do not cite it or state its doses.
 ```
 
-Now run the node on the 13 stored answers that fail. Each one is rebuilt as the thread the model saw. The app's own `cite` node then runs on it, with the real model:
+Now run the node on the stored answers that fail. Each one is rebuilt as the thread the model saw. The app's own `cite` node then runs on it, with the real model:
 
 ```bash
 npm run citations:replay
 ```
 
 ```text
-428 stored answers, 13 fail the check. Replaying each on the model.
+<N> stored answers, <M> fail the check. Replaying each on the model.
 
 withheld (uncited): What is the CardioNex dose for a patient with eGFR of 24 mL/min who is not on dialysis?
   http://localhost:5174/project/<project>/traces/9dac043e611d252d4debdee6638cbada
@@ -224,7 +224,7 @@ withheld (uncited): What is the CardioNex dose for a patient with eGFR of 24 mL/
 rewritten (not_in_force): Was CardioNex approved at 50mg twice daily?
   http://localhost:5174/project/<project>/traces/bd2604f7949c01b32a6d295635b00140
 
-13 replayed: 12 rewritten, 1 withheld.
+<M> replayed: <a> rewritten, <b> withheld.
 ```
 
 Twelve rewrites passed the check. All six that cited the expired draft now cite only sections in force. One rewrite still gave a dose with no citation. So that doctor would get the held reply. Each run is a trace tagged `citations-replay`, and the script writes `data/evidence/citations-replay.json`.
@@ -295,7 +295,7 @@ npm run dataset:run -- --chapter 21 --cases STALENESS-01,STALENESS-02,STALENESS-
 
 | Chapter | Change | Passed | staleness | rag |
 | --- | --- | --- | --- | --- |
-| 21 | Every answer's citations are checked against the search before it is sent | 11/11 | 3/3 | 3/3 |
+| 21 | Every answer's citations are checked against the search before it is sent | 11/11 | 3/3 | 3/3 | <!-- from-row: docs/runs/scoreboard-21.json -->
 
 The full row is in `docs/scoreboard.md`. How to read it:
 

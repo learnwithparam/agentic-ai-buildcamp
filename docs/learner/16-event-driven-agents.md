@@ -317,11 +317,11 @@ In a correct run, `npm run events:send -- EVT-01` answers 202, and the event sho
 
 | Chapter | Change | Passed | staleness | off-label | injection | multi-turn | event |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| 16 | Events start agents, handled once | 10/10 | 1/1 | 1/1 | 1/1 | 1/1 | 6/6 |
+| 16 | Events start agents, handled once | 10/10 | 1/1 | 1/1 | 1/1 | 1/1 | 6/6 | <!-- from-row: docs/runs/scoreboard-16.json -->
 
 How to read it:
 
-- **event 6/6.** The label in force redrafts A-01 to 2.5mg for review. The emailed adverse event goes to safety in 24 hours without MRN-77310. The German draft is flagged, and the opt-out holds the email. The second delivery is a duplicate, and Pharma B's event is refused.
+- **event passes in full.** The label in force redrafts A-01 to 2.5mg for review. The emailed adverse event goes to safety in 24 hours without MRN-77310. The German draft is flagged, and the opt-out holds the email. The second delivery is a duplicate, and Pharma B's event is refused.
 - **EVENT-04 failed first.** The handler asked the planner for "the next step". A phone step for a doctor who prefers phone is a fair answer, so nothing was held. The event is about email, so the handler now asks for the next email. The opt-out rule holds it every time.
 - **The guard set held.** Staleness still passes on today's date. The new way to work out a label's status did not move which label is in force today.
 
