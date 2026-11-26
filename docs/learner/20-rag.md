@@ -298,9 +298,9 @@ The script runs every question three ways, so you can see what each step is wort
 
 | Run | recall@5 | MRR | nDCG@10 | Out of label |
 | --- | --- | --- | --- | --- |
-| Vectors only (pgvector) | 0.751 | 0.764 | 0.728 | 0.05 |
-| Vectors and BM25, fused | 0.754 | 0.749 | 0.722 | 0.05 |
-| Fused, then graded by the model | 0.958 | 0.933 | 0.925 | 0.95 |
+| Vectors only (pgvector) | 0.748 | 0.761 | 0.725 | 0.05 |
+| Vectors and BM25, fused | 0.754 | 0.751 | 0.724 | 0.05 |
+| Fused, then graded by the model | 0.952 | 0.926 | 0.916 | 1 |
 | Target | 0.95 | 0.85 | 0.85 | 0.95 |
 
 - **recall@5** is the share of answering sections in the top 5.
@@ -308,16 +308,16 @@ The script runs every question three ways, so you can see what each step is wort
 - **nDCG@10** rewards the right order, using the gold grades.
 - **Out of label** is the share of unanswerable questions that got no result.
 
-Fusion on its own barely moves the averages. It finds the exact-word questions vectors miss, and loses a few others. The grader is what does the work. It lifts recall@5 from 0.754 to 0.958, and it turns "nothing answers this" from 0.05 into 0.95.
+Fusion on its own barely moves the averages. It finds the exact-word questions vectors miss, and loses a few others. The grader is what does the work. It lifts recall@5 from 0.754 to 0.952, and it turns "nothing answers this" from 0.05 into 1.
 
-The grader came to that number in three runs, and each run found one cause:
+The grader came to that number over several runs, and each run found one cause:
 
 - **It did not know the medicine.** Each passage showed only "2.5 Discontinuation". So CardioNex's section passed as the answer to "How should NeuroVex be stopped?". Out of label was 0.75. The passage now names its document, medicine and country, and out of label went to 0.95.
-- **Nearly everything got a 3.** Of the 30 answers missing from the top 5, 25 had been graded, and most had a 3. They lost on order alone. So the grader now also lists the answers most direct first, in the same call. Recall@5 went from 0.924 to 0.958.
+- **Nearly everything got a 3.** Of the 30 answers missing from the top 5, 25 had been graded, and most had a 3. They lost on order alone. So the grader now also lists the answers most direct first, in the same call. Recall@5 went from 0.924 to 0.958 on that run.
 
-Follow-ups show what the rewriter is worth. Asked as written, they score 0.875 recall@5. Written out in full first, they score 0.978.
+Follow-ups show what the rewriter is worth. Asked as written, they score 0.862 recall@5. Written out in full first, they score 0.96.
 
-Two slices are weakest. Questions that need two documents at once score 0.818. Questions about which version is in force score 0.813. `misses` in `docs/runs/search.json` lists every question that lost a section.
+Two slices are weakest. Questions that need two documents at once score 0.788 recall@5. Questions about which version is in force score 0.833. `misses` in `docs/runs/search.json` lists every question that lost a section.
 
 The numbers are written to `docs/runs/search.json`. `docs/measures.md` holds the targets, from PaperQA2's hybrid retrieval. `check-repo` fails when a row there disagrees with the run file.
 
