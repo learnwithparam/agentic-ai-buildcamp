@@ -127,7 +127,8 @@ EVENT_FILES="docs/scoreboard.md package-lock.json package.json scripts/events-ru
   src/client/App.tsx src/client/chat/api.ts src/client/content/Events.tsx src/server/a2a/a2a.test.ts
   src/server/app.ts src/server/content/records.ts src/server/events/events.test.ts src/server/events/events.ts
   src/server/events/handlers.ts src/server/events/send.ts src/server/events/store.ts src/server/events/webhook.ts
-  src/server/graph.ts src/server/inbox.test.ts src/server/index.ts src/server/labels.ts src/server/medinfo-agent.ts
+  src/server/graph.ts src/server/inbox.test.ts src/server/index.ts
+  src/server/medinfo-agent.ts
   src/server/migrations/006_events.sql src/server/reviews.ts src/server/routes.ts src/server/test-desk.ts
   src/server/tools.ts src/server/trace-identity.test.ts src/server/users.ts"
 # Lesson 17 adds the nightly sweep with its budget and kill switch; the files it changes and adds
@@ -166,7 +167,7 @@ CITE_FILES="docs/scoreboard.md package.json scripts/citations-audit.ts scripts/c
 # npm run setup (scripts/setup.ts) runs every lesson's scripts, so it exists only from lesson 22 on.
 # npm run doctor (scripts/doctor.ts) checks the stack setup builds, so it follows setup.
 BI_FILES=".github/start-test-services.sh docs/scoreboard.md infra/docker-compose.yml
-  infra/openfga/model.fga infra/postgres/init/02-bi-roles.sh package-lock.json package.json
+  infra/openfga/model.fga infra/openfga/model.fga.yaml infra/postgres/init/02-bi-roles.sh package-lock.json package.json
   scripts/bi-setup.ts scripts/experiment.ts scripts/fga-model.ts scripts/hcp-cases.ts
   scripts/identity-setup.ts scripts/identity-smoke.ts scripts/setup.ts scripts/setup.test.ts scripts/doctor.ts scripts/doctor.test.ts src/client/App.tsx src/client/chat/api.ts
   src/client/insights/Insights.tsx src/client/styles/app.css src/server/a2a/a2a-harness.ts
@@ -177,8 +178,10 @@ BI_FILES=".github/start-test-services.sh docs/scoreboard.md infra/docker-compose
 # The demo fixes after lesson 23 (DESK_FILES): one prompt per company, a router that sorts the latest
 # message, search by country, the run record under each answer and in the review queue. They use
 # lesson 21's citation check and lesson 22's roles, so tags before 22 keep their own copies.
-# labels.ts is not in the list: every tag reads the new label data, and only main's copy reads it right.
+# labels.ts is in no list from lesson 11 on: every tag reads the new label data, and only main's copy reads it right.
+# The same holds from lesson 20 on for rag/extract.ts and the Docling fixtures: they read the new label PDFs.
 DESK_FILES=".claude/skills/hcp-labels/SKILL.md scripts/citations-replay.ts scripts/demo-turns.ts
+  scripts/demo-users.test.ts scripts/flows-capture.ts scripts/flows.test.ts scripts/flows.ts
   scripts/identity-setup.ts scripts/identity-smoke.ts scripts/open-questions.ts
   scripts/prompt-variants.test.ts scripts/prompt-variants.ts scripts/rag-fixtures.ts scripts/setup.ts
   scripts/sign-in.ts src/cli/cli.test.ts src/cli/turn.test.ts src/cli/turn.ts src/client/App.tsx
@@ -188,10 +191,7 @@ DESK_FILES=".claude/skills/hcp-labels/SKILL.md scripts/citations-replay.ts scrip
   src/server/desk-prompt.test.ts src/server/desk-prompt.ts src/server/gateway.test.ts
   src/server/gateway.ts src/server/graph.ts src/server/inbox.test.ts
   src/server/mcp.test.ts src/server/mcp.ts src/server/medinfo-agent.ts
-  src/server/migrations/010_review_run.sql src/server/permissions.ts src/server/rag/extract.ts
-  src/server/rag/fixtures/cardionex-clarion-hf-trial.docling.json
-  src/server/rag/fixtures/cardionex-clarion-hf-trial.docling.md
-  src/server/rag/fixtures/cardionex-uspi-v2.docling.json src/server/rag/rag.test.ts
+  src/server/migrations/010_review_run.sql src/server/permissions.ts src/server/rag/rag.test.ts
   src/server/rag/search.ts src/server/reviews.ts src/server/tiers.test.ts src/server/tiers.ts
   src/server/tools.ts src/server/trace-identity.test.ts src/server/trace-shape.test.ts
   src/shared/run.test.ts src/shared/run.ts"
