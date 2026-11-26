@@ -4,6 +4,7 @@ import { observeOpenAI } from "@langfuse/openai";
 import { getActiveTraceId, observe, propagateAttributes, updateActiveObservation } from "@langfuse/tracing";
 import { LangfuseClient } from "@langfuse/client";
 import { aiText, type AiMessage, type ChatMessage, type StreamEvent } from "../shared/messages";
+import { evidenceOf } from "./citations";
 import { env } from "./env";
 import { checkInput, modelClient } from "./gateway";
 import {
@@ -24,8 +25,8 @@ import {
 import { LABEL_SECTIONS } from "./labels";
 import { readableDocuments } from "./permissions";
 import { scrubPhi } from "./phi";
-import { approvedUses, reportingProcedure, routeRequest, safetyReply, stopReply, withFloor } from "./tiers";
-import { executeTool } from "./tools";
+import { approvedUses, reportingProcedure, routeRequest, routerInput, safetyReply, stopReply, withFloor } from "./tiers";
+import { executeTool, TOOL_DEFINITIONS } from "./tools";
 import type { ReviewItem } from "./reviews";
 import { scriptUser, type Identity } from "./users";
 import { DESK_PROMPT, deskFacts, fillDeskPrompt } from "./desk-prompt";
@@ -66,6 +67,8 @@ function latestQuestion(messages: ChatMessage[]) {
   return [...messages].reverse().find((message) => message.type === "human")?.content ?? "";
 }
 
+const toolName = (tool: (typeof TOOL_DEFINITIONS)[number]) => (tool.type === "function" ? tool.function.name : "");
+
 const outOfScope = (text: string): AiMessage => ({ id: `out-of-scope-${randomUUID()}`, type: "ai", content: [{ type: "text", text }], tool_calls: [] });
 
 // Lesson 13. Identifiers leave the doctor's words before the trace, the model or the checkpoint
@@ -80,7 +83,10 @@ const REMOVED = /\[(?:record number|email|ID number|phone number) removed\]/;
 // which runs this same node on answers already stored.
 export const citeNode = observe(
   async (state: Parameters<typeof citeStep>[2], config: LangGraphRunnableConfig) => {
-    updateActiveObservation({ input: state.messages.at(-1) });
+    // Fix 6: the answer and the sections it may cite, the two things the check compares.
+    const answer = state.messages.at(-1);
+    const sections = evidenceOf(state.messages).retrieved.map((hit) => `${hit.doc_id} ${hit.section}`);
+    updateActiveObservation({ input: { answer: answer?.type === "ai" ? aiText(answer) : "", sections } });
     const langfusePrompt = await getPrompt();
     const openai = observeOpenAI(modelClient(), { generationName: "citation-rewrite", ...(langfusePrompt ? { langfusePrompt } : {}) });
     let outcome: CitationOutcome | undefined;
@@ -106,7 +112,8 @@ export function createMedinfoAgent(checkpointer: BaseCheckpointSaver) {
     {
       router: observe(
         async (state, config) => {
-          updateActiveObservation({ input: state.messages.at(-1) });
+          // Fix 6: exactly what the router model is given, the latest message with earlier turns as context.
+          updateActiveObservation({ input: routerInput(state.messages) });
           // Lesson 10: a request the desk never answers gets its reply here, with no model call.
           const refusal = checkInput(latestQuestion(state.messages));
           if (refusal) return { messages: [outOfScope(refusal)] };
@@ -122,7 +129,8 @@ export function createMedinfoAgent(checkpointer: BaseCheckpointSaver) {
       agent: observe(
         async (state, config) => {
           // Lesson 11: record the conversation, not the run config, which carries the signed-in doctor.
-          updateActiveObservation({ input: state });
+          // Fix 6: the question and the tools on offer; the generation inside holds every message sent.
+          updateActiveObservation({ input: { question: latestQuestion(state.messages), tools: TOOL_DEFINITIONS.map(toolName), today: state.today } });
           const langfusePrompt = await getPrompt();
           const openai = observeOpenAI(modelClient(), langfusePrompt ? { langfusePrompt } : undefined);
           // Fix 3: the prompt is filled in for the signed-in doctor's company, country and day.
@@ -133,7 +141,9 @@ export function createMedinfoAgent(checkpointer: BaseCheckpointSaver) {
       ),
       tools: observe(
         (state, config) => {
-          updateActiveObservation({ input: state });
+          // Fix 6: the calls the model asked for, each with its arguments.
+          const calls = state.messages.at(-1)?.type === "ai" ? (state.messages.at(-1) as AiMessage).tool_calls : [];
+          updateActiveObservation({ input: calls.map((call) => ({ name: call.name, args: call.args })) });
           return toolsStep(state, (name, args) => executeTool(name, args, userOf(config), state.today));
         },
         { name: "tools", asType: "span", captureInput: false }
