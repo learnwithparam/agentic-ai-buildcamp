@@ -3,6 +3,8 @@ import { AssistantRuntimeProvider } from "@assistant-ui/react";
 import { useLangGraphRuntime } from "@assistant-ui/react-langgraph";
 import { createThread, loadMe, loadThread, signIn, signOut, streamRun, type Me } from "./chat/api";
 import { Thread } from "./chat/Thread";
+import { RunsContext } from "./chat/RunSteps";
+import type { AnswerRun } from "../shared/run";
 import { Editor } from "./content/Editor";
 import { Events } from "./content/Events";
 import { Sweep } from "./content/Sweep";
@@ -13,18 +15,30 @@ import { Insights } from "./insights/Insights";
 import { ANALYST_ROLE, REVIEWER_ROLES, STAFF_ROLES } from "../server/users";
 
 function Chat({ tenantId, medicines }: { tenantId: string; medicines: string[] }) {
+  // Step 2B: how each reply was made, from the saved thread and from each values event.
+  const [runs, setRuns] = useState<Record<string, AnswerRun>>({});
   const runtime = useLangGraphRuntime({
     create: () => createThread(),
-    load: (threadId) => loadThread(threadId),
+    load: async (threadId) => {
+      const thread = await loadThread(threadId);
+      setRuns(thread.runs ?? {});
+      return thread;
+    },
     stream: async function* (messages, config) {
       const { externalId } = await config.initialize();
       if (!externalId) throw new Error("No thread id");
-      yield* streamRun(externalId, messages, config);
+      for await (const event of streamRun(externalId, messages, config)) {
+        const values = event.event === "values" ? (event.data as { runs?: Record<string, AnswerRun> }) : undefined;
+        if (values?.runs) setRuns(values.runs);
+        yield event;
+      }
     }
   });
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <Thread tenantId={tenantId} medicines={medicines} />
+      <RunsContext.Provider value={runs}>
+        <Thread tenantId={tenantId} medicines={medicines} />
+      </RunsContext.Provider>
     </AssistantRuntimeProvider>
   );
 }

@@ -61,7 +61,7 @@ export function stateOf(turn: StoredTurn, today: string) {
     ),
     { id: "answer", type: "ai", content: [{ type: "text", text: turn.answer }], tool_calls: [] }
   ];
-  return { messages, route: null, dueAt: null, today };
+  return { messages, route: null, dueAt: null, today, runs: {} };
 }
 
 const replayOne = observe(

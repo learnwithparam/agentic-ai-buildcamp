@@ -2,6 +2,7 @@ import type { LangChainMessage, LangGraphInterruptState } from "@assistant-ui/re
 import { readEvents } from "../../shared/sse";
 
 // The browser side of the thread API in src/server/routes.ts.
+import type { AnswerRun } from "../../shared/run";
 
 export type Me = {
   user: { userId: string; name: string; email: string; tenantId: string; country: string; roles: string[] };
@@ -53,7 +54,7 @@ export async function createThread(base = "/api"): Promise<{ externalId: string 
 
 export async function loadThread(threadId: string, base = "/api") {
   const response = await api(`${base}/threads/${threadId}/state`, { signal: AbortSignal.timeout(10_000) });
-  return (await response.json()) as { messages: LangChainMessage[]; interrupts: LangGraphInterruptState[] };
+  return (await response.json()) as { messages: LangChainMessage[]; interrupts: LangGraphInterruptState[]; runs?: Record<string, AnswerRun> };
 }
 
 function textOf(message: LangChainMessage): string {

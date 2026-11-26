@@ -14,6 +14,7 @@ import {
   type StreamEvent,
   type ToolMessage
 } from "../shared/messages";
+import type { AnswerRun } from "../shared/run";
 import { checkCitations, describeProblem, evidenceOf, EVIDENCE_TOOLS, WITHHELD_REPLY, type CitationProblem } from "./citations";
 import { env } from "./env";
 import { streamModelTurn, toOpenAIMessages } from "./stream-model";
@@ -41,7 +42,10 @@ export const State = Annotation.Root({
   route: Annotation<Route | null>({ reducer: (_current, next) => next, default: () => null }),
   dueAt: Annotation<string | null>({ reducer: (_current, next) => next, default: () => null }),
   // Lesson 16: the day this turn answers for. A chat is today; an event can name its own day.
-  today: Annotation<string>({ reducer: (_current, next) => next, default: () => TODAY })
+  today: Annotation<string>({ reducer: (_current, next) => next, default: () => TODAY }),
+  // Step 2B: how each reply was made (src/shared/run.ts), keyed by the reply's message id, so the
+  // chat shows it under that answer after a reload too.
+  runs: Annotation<Record<string, AnswerRun>>({ reducer: (current, next) => ({ ...current, ...next }), default: () => ({}) })
 });
 type GraphState = typeof State.State;
 type NodeResult = Promise<Partial<GraphState>> | Partial<GraphState>;
@@ -373,6 +377,7 @@ export async function readThread(graph: Graph, threadId: string) {
   const state = await graph.getState({ configurable: { thread_id: threadId } });
   return {
     messages: ((state.values as Partial<GraphState>).messages ?? []) as ChatMessage[],
+    runs: (state.values as Partial<GraphState>).runs ?? {},
     interrupts: state.tasks.flatMap((task) =>
       task.interrupts.map((item) => ({ id: item.id, value: item.value, resumable: true }))
     )

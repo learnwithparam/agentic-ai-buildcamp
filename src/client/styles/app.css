@@ -571,3 +571,108 @@ a.button[aria-current="page"] {
 .refusal { margin: 0 0 8px; color: var(--fail); }
 .chart { margin: 0; }
 .chart-body { padding: 12px 8px 4px 0; }
+
+/* Step 2B. How this answer was made: the trace's steps, numbered because they ran in order. */
+.run {
+  border-top: 1px solid var(--line);
+  padding-top: 8px;
+  font-size: 14px;
+  color: var(--fg2);
+}
+
+.run summary {
+  cursor: pointer;
+  list-style: none;
+  color: var(--fg);
+}
+
+.run summary::-webkit-details-marker {
+  display: none;
+}
+
+.run summary::before {
+  content: "\25B8";
+  display: inline-block;
+  margin-right: 6px;
+  transition: transform 0.15s;
+}
+
+.run[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.run-steps {
+  counter-reset: step;
+  list-style: none;
+  margin: 10px 0 0;
+  padding-left: 14px;
+  display: grid;
+  gap: 10px;
+}
+
+.run-steps > li {
+  display: grid;
+  grid-template-columns: 88px 1fr;
+  gap: 8px;
+}
+
+.run-step::before {
+  counter-increment: step;
+  content: counter(step) ". ";
+}
+
+.run-step {
+  font-weight: 600;
+  color: var(--fg);
+}
+
+.run-line {
+  margin: 0;
+}
+
+.run-hits,
+.run-problems {
+  margin: 4px 0 8px;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 2px;
+}
+
+.run-hits li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.run code {
+  font-family: var(--mono);
+  color: var(--fg);
+}
+
+.run-score {
+  font-family: var(--mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.run-status-off {
+  color: var(--fail);
+}
+
+@media (max-width: 480px) {
+  .source {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .run-steps > li {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .run summary::before {
+    transition: none;
+  }
+}

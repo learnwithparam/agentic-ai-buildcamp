@@ -30,6 +30,7 @@ import { executeTool, TOOL_DEFINITIONS } from "./tools";
 import type { ReviewItem } from "./reviews";
 import { scriptUser, type Identity } from "./users";
 import { DESK_PROMPT, deskFacts, fillDeskPrompt } from "./desk-prompt";
+import { answerRun } from "../shared/run";
 
 // Lesson 01's prompt. The variants in scripts/prompt-variants.ts grow from it; since fix 3 the app
 // falls back to DESK_PROMPT (src/server/desk-prompt.ts) when Langfuse is down.
@@ -76,6 +77,19 @@ const outOfScope = (text: string): AiMessage => ({ id: `out-of-scope-${randomUUI
 function scrubbed(messages: ChatMessage[] | undefined): ChatMessage[] | undefined {
   return messages?.map((message) => (message.type === "human" ? { ...message, content: scrubPhi(message.content).text } : message));
 }
+// Step 2B. Adds the record of how the reply in this update was made, under the reply's id.
+type GraphUpdate = Partial<Parameters<typeof citeStep>[2]>;
+function withRun(state: Parameters<typeof citeStep>[2], update: GraphUpdate, route = state.route, check: CitationOutcome | null = null): GraphUpdate {
+  // The reply this update writes, else (a check that passed changes nothing) the answer just written.
+  const reply = [...state.messages, ...(update.messages ?? [])].at(-1);
+  if (reply?.type !== "ai" || reply.tool_calls.length) return update;
+  // The chat folds a turn's tool calls and reply into one bubble, named by its first message, so
+  // the record goes under every model message of the turn (seen in the browser, 26 Nov 2026).
+  const turn = [...state.messages, ...(update.messages ?? [])];
+  const ids = new Set(turn.slice(turn.map((message) => message.type).lastIndexOf("human") + 1).filter((message) => message.type === "ai").map((message) => message.id));
+  const run = answerRun(state.messages, route, check);
+  return { ...update, runs: Object.fromEntries([...ids].map((id) => [id, run])) };
+}
 const REMOVED = /\[(?:record number|email|ID number|phone number) removed\]/;
 
 // Lesson 21: the check's outcome is the span's output and a score on the trace, so Langfuse can
@@ -100,7 +114,7 @@ export const citeNode = observe(
       // dropped Langfuse connection failed the whole turn (seen 26 Nov 2026, status 0 on the flush).
       void langfuse.score.flush().catch((error: Error) => console.warn(`The citations score was not sent: ${error.message}`));
     }
-    return { update, outcome };
+    return { update: withRun(state, update, state.route, outcome ?? null), outcome };
   },
   { name: "cite", asType: "span", captureInput: false, captureOutput: false }
 );
@@ -116,7 +130,10 @@ export function createMedinfoAgent(checkpointer: BaseCheckpointSaver) {
           updateActiveObservation({ input: routerInput(state.messages) });
           // Lesson 10: a request the desk never answers gets its reply here, with no model call.
           const refusal = checkInput(latestQuestion(state.messages));
-          if (refusal) return { messages: [outOfScope(refusal)] };
+          if (refusal) {
+        const reply = outOfScope(refusal);
+        return { messages: [reply], runs: { [reply.id]: answerRun(state.messages, { tier: "stop", reason: "outside what the desk answers, refused before any model call" }, null) } };
+      }
           const readable = await readableDocuments(userOf(config));
           const openai = observeOpenAI(modelClient(), { generationName: "route" });
           const chosen = await routeRequest(openai, env.openaiModel, state.messages, approvedUses(readable, LABEL_SECTIONS));
@@ -161,11 +178,11 @@ export function createMedinfoAgent(checkpointer: BaseCheckpointSaver) {
             procedure: reportingProcedure(readable, LABEL_SECTIONS)
           });
           await submitAdverseEvent(state, config, reply, getActiveTraceId());
-          return fixedReply(state, reply);
+          return withRun(state, fixedReply(state, reply));
         },
         { name: "safety", asType: "span", captureInput: false }
       ),
-      stop: (state) => fixedReply(state, stopReply(state.route?.basis))
+      stop: (state) => withRun(state, fixedReply(state, stopReply(state.route?.basis)))
     },
     checkpointer
   );
