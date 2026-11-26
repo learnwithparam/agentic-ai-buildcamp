@@ -115,7 +115,9 @@ flowchart LR
 git checkout checkpoint/11-sign-in
 ```
 
-The checkpoint adds:
+This tag is where lesson 11 starts. It holds what the earlier lessons built and none of this lesson's own files.
+
+You add:
 
 - `infra/docker-compose.yml`: a database, the sign-in service and the permission service for the app, apart from the Langfuse stack.
 - `src/server/auth.ts`: the sign-in routes and `identityOf`, the one function that says who is asking.
@@ -281,6 +283,17 @@ Each chat turn carries the doctor's id as the Langfuse user. The company and cou
 Open a trace. The turn, the agent steps and both tools record the thread, the messages and the search query. They also record the asker's company and country. The doctor's name and email are not there. Each step turns off automatic capture, so it records only what it chooses.
 
 Older rows start with `[{"threadId"`. They are from before this change.
+
+### Check your build
+
+Run the check. Then compare your files with the next tag, which holds this lesson's finished code.
+
+```bash
+npm run check
+git diff --stat checkpoint/12-mcp-sandbox
+```
+
+The check passes, except the tests that need a service from an earlier lesson. They fail when that service is not running. The diff lists only files you wrote in your own way.
 
 ## Prove it
 

@@ -94,7 +94,9 @@ flowchart LR
 git checkout checkpoint/18-release-gate
 ```
 
-The checkpoint adds:
+This tag is where lesson 18 starts. It holds what the earlier lessons built and none of this lesson's own files.
+
+You add:
 
 - `scripts/release-gate.ts`: the gate. It lists the release cases, scores the run with the run evaluator `release_pass_rate`, and decides the verdict.
 - `scripts/experiment.ts`: how one case runs and is scored. It moved out of `scripts/run-dataset.ts`, so the dataset run and the gate share it.
@@ -265,6 +267,17 @@ Now record your row:
 ```bash
 npm run release:gate -- --label staging --promote --chapter 18 --change "A release gate on every prompt promotion and agent push"
 ```
+
+### Check your build
+
+Run the check. Then compare your files with the next tag, which holds this lesson's finished code.
+
+```bash
+npm run check
+git diff --stat checkpoint/19-cli
+```
+
+The check passes, except the tests that need a service from an earlier lesson. They fail when that service is not running. The diff lists only files you wrote in your own way.
 
 ## Prove it
 

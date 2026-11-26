@@ -127,7 +127,9 @@ A duplicate does not add a state. It only adds one to the delivery count.
 git checkout checkpoint/16-events
 ```
 
-The checkpoint adds:
+This tag is where lesson 16 starts. It holds what the earlier lessons built and none of this lesson's own files.
+
+You add:
 
 - `src/server/events/events.ts`: the four event types, checked with zod, and the reports a duplicate or a refused event gets.
 - `src/server/events/webhook.ts`: `POST /events/:tenant`. It checks the signature, stores the event and answers before any model runs.
@@ -272,6 +274,17 @@ npm run dataset:run -- --cases EVENT-01,EVENT-02,EVENT-03,EVENT-04,EVENT-05,EVEN
 ```
 
 Your row goes to `my-scoreboard.md`. The scoreboard gains an `event` column.
+
+### Check your build
+
+Run the check. Then compare your files with the next tag, which holds this lesson's finished code.
+
+```bash
+npm run check
+git diff --stat checkpoint/17-autonomy
+```
+
+The check passes, except the tests that need a service from an earlier lesson. They fail when that service is not running. The diff lists only files you wrote in your own way.
 
 ## Prove it
 

@@ -124,14 +124,11 @@ flowchart TB
 ```bash
 git checkout checkpoint/22-insights
 npm install
-npm run identity:setup
-npm run bi:setup
-npm run dev
 ```
 
-`identity:setup` makes the analyst role, two analysts and both logins' passwords. `bi:setup` makes the logins in Postgres and loads the sales data.
+This tag is where lesson 22 starts. It holds what the earlier lessons built and none of this lesson's own files.
 
-The checkpoint adds these files.
+You add these files.
 
 - `src/server/migrations/009_sales.sql`: the raw rows, the published table and the row rule.
 - `infra/postgres/init/02-bi-roles.sh`: the two logins.
@@ -139,6 +136,16 @@ The checkpoint adds these files.
 - `src/server/bi/query.ts`: the query check and the run as the company's login.
 - `src/server/bi/agent.ts`: the insights agent and its two tools.
 - `src/client/insights/Insights.tsx`: the page, with the SQL and the chart.
+
+Once the files are in place, start the parts this lesson needs:
+
+```bash
+npm run identity:setup
+npm run bi:setup
+npm run dev
+```
+
+`identity:setup` makes the analyst role, two analysts and both logins' passwords. `bi:setup` makes the logins in Postgres and loads the sales data.
 
 ### Step 1: Give each company its own login
 
@@ -195,6 +202,17 @@ Then it runs in a read-only transaction, with a 3 second limit and at most 500 r
 ### Step 5: Ask on the insights page
 
 Sign in as `rosa.diaz@pharma-a.example.com` and open `/insights`. Ask a suggested question. The SQL that ran folds under each query card, and the chart draws the rows.
+
+### Check your build
+
+Run the check. Then compare your files with the next tag, which holds this lesson's finished code.
+
+```bash
+npm run check
+git diff --stat checkpoint/23-full-run
+```
+
+The check passes, except the tests that need a service from an earlier lesson. They fail when that service is not running. The diff lists only files you wrote in your own way.
 
 ## Prove it
 

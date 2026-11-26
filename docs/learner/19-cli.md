@@ -116,13 +116,11 @@ A decided item takes no more decisions. So the keys go away once it is decided.
 ```bash
 git checkout checkpoint/19-cli
 npm install
-npm run identity:setup
-npm run dev
 ```
 
-`identity:setup` is safe to run again. This time it also creates the Keycloak client `medinfo-cli`.
+This tag is where lesson 19 starts. It holds what the earlier lessons built and none of this lesson's own files.
 
-The checkpoint adds:
+You add:
 
 - `src/cli/`: the client. `index.tsx` has the commands, and `session.ts` has the sign-in and tokens.
 - `src/cli/api.ts`, `turn.ts` and `ui.tsx`: the server calls, one question on screen, and the screens.
@@ -148,6 +146,15 @@ Two new scripts in `package.json`:
 ```
 
 `npm run medinfo -- <command>` runs the client from source. `npm run build:cli` writes `dist/cli/index.js`, and `npm run build` runs it too. The `bin` field in `package.json` names it `medinfo`. So `npm link` puts `medinfo` on your path. The rest of this page writes `medinfo`.
+
+Once the files are in place, start the parts this lesson needs:
+
+```bash
+npm run identity:setup
+npm run dev
+```
+
+`identity:setup` is safe to run again. This time it also creates the Keycloak client `medinfo-cli`.
 
 ### Step 1: Find where to sign in
 
@@ -301,6 +308,17 @@ medinfo inbox --json | jq '.items[] | select(.status == "waiting") | .id'
 Away from a terminal, `ask` and `inbox` print plain text with no colours or keys. A pipe, a file and CI all count. Errors go to stderr with exit code 1, so a script can stop on them. An error the client did not expect prints one generic line. Set `MEDINFO_DEBUG=1` to see the details.
 
 `medinfo --url https://medinfo.example.com` or `MEDINFO_URL` points the client at another desk. Each address gets its own keychain entry. So signing in to one does not sign you out of another.
+
+### Check your build
+
+Run the check. Then compare your files with the next tag, which holds this lesson's finished code.
+
+```bash
+npm run check
+git diff --stat checkpoint/20-rag
+```
+
+The check passes, except the tests that need a service from an earlier lesson. They fail when that service is not running. The diff lists only files you wrote in your own way.
 
 ## Prove it
 

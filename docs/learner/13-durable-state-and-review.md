@@ -139,7 +139,9 @@ stateDiagram-v2
 git checkout checkpoint/13-durable-review
 ```
 
-The checkpoint adds:
+This tag is where lesson 13 starts. It holds what the earlier lessons built and none of this lesson's own files.
+
+You add:
 
 - `src/server/tiers.ts`: the four tiers, the router prompt, the forced `route` call, and the fixed safety and stop replies.
 - `src/server/phi.ts`: removes record numbers, emails, phone numbers and ID numbers from the doctor's words.
@@ -328,6 +330,17 @@ npm run dataset:run -- --cases ROUTING-01,ROUTING-02,ROUTING-03,ROUTING-04,ROUTI
 ```
 
 `risk_tier` is scored only on the routing slice. The older cases use their `riskTier` field for the kind of answer. For example, "stop" means any refusal. It is not the router's tier.
+
+### Check your build
+
+Run the check. Then compare your files with the next tag, which holds this lesson's finished code.
+
+```bash
+npm run check
+git diff --stat checkpoint/14-content-agents
+```
+
+The check passes, except the tests that need a service from an earlier lesson. They fail when that service is not running. The diff lists only files you wrote in your own way.
 
 ## Prove it
 

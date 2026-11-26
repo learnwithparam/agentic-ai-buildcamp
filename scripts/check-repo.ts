@@ -15,11 +15,9 @@
 // only in tokens.css, and every CSS class is used by a component. The data/hcp copy matches its lock,
 // and docs/coverage.md maps every case in it to a promise.
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { basename, posix } from "node:path";
-import { fileURLToPath } from "node:url";
-import { checkMeasures } from "./measures";
-import { checkScoreboard } from "./scoreboard";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { verifyDatasetCopy } from "./sync-dataset";
 
 const CODE = /\.(ts|tsx|mjs|js|sh|ya?ml)$|^package\.json$/;
@@ -211,12 +209,20 @@ function coverageProblems(files: Map<string, string>): string[] {
   return problems;
 }
 
-function main() {
+// Lesson 6 adds the scoreboard and docs/scoreboard.md, and a later lesson adds the measures. A tag
+// before them has neither module, so each check runs only when its module is there.
+async function checksFrom(module: "scoreboard" | "measures", check: "checkScoreboard" | "checkMeasures"): Promise<string[]> {
+  const file = fileURLToPath(new URL(`./${module}.ts`, import.meta.url));
+  if (!existsSync(file)) return [];
+  return ((await import(pathToFileURL(file).href)) as Record<string, () => string[]>)[check]();
+}
+
+async function main() {
   const tracked = execFileSync("git", ["ls-files"], { encoding: "utf8" }).split("\n").filter(Boolean);
   const files = new Map(
     tracked.filter((path) => (TEXT.test(path) || path === NODE_PIN) && path !== "package-lock.json").map((path) => [path, readFileSync(path, "utf8")]),
   );
-  const problems = [...findProblems(files, tracked), ...verifyDatasetCopy(), ...checkScoreboard(), ...checkMeasures()];
+  const problems = [...findProblems(files, tracked), ...verifyDatasetCopy(), ...(await checksFrom("scoreboard", "checkScoreboard")), ...(await checksFrom("measures", "checkMeasures"))];
   if (problems.length > 0) {
     console.error(problems.join("\n"));
     process.exit(1);
@@ -224,4 +230,4 @@ function main() {
   console.log("check-repo: every watched file and npm script is in use, every named path exists, every dependency is pinned, the chat app is clean, data/hcp matches its lock, docs/scoreboard.md has one cell per slice, every measured row in docs/measures.md matches its run");
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) main();
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) await main();

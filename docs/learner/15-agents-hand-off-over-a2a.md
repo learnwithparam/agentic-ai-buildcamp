@@ -109,7 +109,9 @@ flowchart LR
 git checkout checkpoint/15-a2a
 ```
 
-The checkpoint adds:
+This tag is where lesson 15 starts. It holds what the earlier lessons built and none of this lesson's own files.
+
+You add:
 
 - `src/server/a2a/cards.ts`: the two agent cards, each with one skill and the sign-in.
 - `src/server/a2a/server.ts`: the A2A servers. The card is public. Work needs a token.
@@ -261,6 +263,17 @@ npm run dataset:run -- --cases A2A-01,A2A-02,A2A-03,A2A-04,A2A-05,FACT-01,OUTREA
 ```
 
 Your row goes to `my-scoreboard.md`. The scoreboard gains an `a2a` column.
+
+### Check your build
+
+Run the check. Then compare your files with the next tag, which holds this lesson's finished code.
+
+```bash
+npm run check
+git diff --stat checkpoint/16-events
+```
+
+The check passes, except the tests that need a service from an earlier lesson. They fail when that service is not running. The diff lists only files you wrote in your own way.
 
 ## Prove it
 
