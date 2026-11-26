@@ -46,11 +46,14 @@ const ZERO = /^0+$/;
 // git hands a pre-push hook one line per ref: <local ref> <local sha> <remote ref> <remote sha>.
 // Only branches are gated: a tag is cut from main, which passed the gate on its way in, and a
 // delete ships nothing. A new branch is compared with the main it started from.
+// A cloud/ branch is a draft from a cloud session, which has no model gateway, so the gate cannot
+// run there. A draft is never merged as it is: it is measured on the laptop and pushed again under
+// its own branch name, and that push runs the gate.
 export function pushedRanges(stdin: string, mergeBase: (sha: string) => string): Array<{ from: string; to: string }> {
   return stdin
     .split("\n")
     .map((line) => line.trim().split(/\s+/))
-    .filter(([localRef, localSha, remoteRef]) => localRef && remoteRef?.startsWith("refs/heads/") && !ZERO.test(localSha ?? "0"))
+    .filter(([localRef, localSha, remoteRef]) => localRef && remoteRef?.startsWith("refs/heads/") && !remoteRef.startsWith("refs/heads/cloud/") && !ZERO.test(localSha ?? "0"))
     .map(([, localSha, , remoteSha]) => ({ from: ZERO.test(remoteSha ?? "0") ? mergeBase(localSha!) : remoteSha!, to: localSha! }));
 }
 
