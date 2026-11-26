@@ -36,6 +36,10 @@ A night run over 400 doctors can spend a week of budget. Nobody is awake to see 
 
 An agent that works alone is safe when its limits sit outside it. The scope is what its identity may do. The spend limit is a number read before every step. The off switch is a row any reviewer can change.
 
+![Let the agent work at night: the parts this lesson adds.](../images/diagrams/checkpoint-17.svg)
+
+Step through it one part at a time in the [live drawing](https://canvas.learnwithparam.com/case.html#buildcamp/19).
+
 None of the three needs the model to choose to stop. Every run is a trace, even one that stopped. So you can read what it did and why it stopped.
 
 ### The flow

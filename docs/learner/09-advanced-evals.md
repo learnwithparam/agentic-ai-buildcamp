@@ -32,6 +32,10 @@ There is a second trap. Say 80 percent of your answers are faithful. A judge tha
 
 A **calibration** has five moves. You label a small set of answers by hand, and run the **LLM judge** on the same answers. Then you measure their **agreement** with Cohen's kappa, and read each disagreement. Last, you trust the judge only above a bar you set before the first measurement.
 
+![Judge the answers: the parts this lesson adds.](../images/diagrams/checkpoint-09.svg)
+
+Step through it one part at a time in the [live drawing](https://canvas.learnwithparam.com/case.html#buildcamp/11).
+
 Kappa is agreement beyond what chance gives. A judge that says "faithful" every time scores 0, however often it is right. This lesson uses a bar of 0.6, which is "substantial" on the usual scale. The course needs 0.6 or more.
 
 The property is **faithfulness**. Every claim in the answer must be supported by the tool results the agent read.
