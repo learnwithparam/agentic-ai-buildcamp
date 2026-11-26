@@ -206,7 +206,7 @@ A job that keeps failing is retried three times with growing waits. After the la
 
 ### Step 4: Open the Events page
 
-Sign in as Maya Chen, the medical reviewer, and open **Events**.
+Sign in as Maya Chen, the medical reviewer, and open **Event log**.
 
 ![The Events page with four handled events, newest first](../images/events/01-event-inbox.png)
 
