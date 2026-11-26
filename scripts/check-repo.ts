@@ -41,6 +41,25 @@ const COVERAGE_FILE = "docs/coverage.md";
 const COLOUR = /#[0-9a-f]{3,8}\b|\b(?:rgba?|hsla?|oklch)\(/i;
 const withoutBlockComments = (body: string) => body.replace(/\/\*[\s\S]*?\*\//g, "");
 const TEXT = /\.(ts|tsx|mjs|js|md|json|ya?ml|sh|html|css)$/;
+const NODE_PIN = ".node-version";
+const WORKFLOW = /^\.github\/workflows\/.+\.ya?ml$/;
+
+// CI must run one exact Node. A range lets setup-node pick a newer Node whose npm skips install
+// scripts, so puppeteer never downloads Chrome and every diagram check fails.
+function nodePinProblems(files: Map<string, string>): string[] {
+  const problems: string[] = [];
+  const pin = files.get(NODE_PIN);
+  if (pin === undefined) problems.push(`${NODE_PIN}: missing. CI needs one exact Node version, such as 24.22.3.`);
+  else if (!/^\d+\.\d+\.\d+\n?$/.test(pin)) problems.push(`${NODE_PIN}: says "${pin.trim()}". Write one exact version, such as 24.22.3.`);
+  for (const [path, body] of files) {
+    if (!WORKFLOW.test(path) || !body.includes("actions/setup-node")) continue;
+    const versions = [...body.matchAll(/^\s*(node-version(?:-file)?):\s*(\S+)/gm)].map((match) => `${match[1]}: ${match[2]}`);
+    if (versions.length === 0 || versions.some((line) => line !== `node-version-file: ${NODE_PIN}`)) {
+      problems.push(`${path}: sets up Node with "${versions.join(", ") || "no version"}". Use "node-version-file: ${NODE_PIN}", so every run gets the same Node.`);
+    }
+  }
+  return problems;
+}
 
 function stripComments(path: string, body: string): string {
   if (/\.(ts|tsx|mjs|js)$/.test(path)) return body.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:"'`])\/\/.*$/gm, "$1");
@@ -160,7 +179,7 @@ export function findProblems(files: Map<string, string>, tracked: string[]): str
       if (!names(components, className)) problems.push(path + ": class ." + className + " is not used by any component.");
     }
   }
-  problems.push(...coverageProblems(files));
+  problems.push(...coverageProblems(files), ...nodePinProblems(files));
   return problems;
 }
 
@@ -195,7 +214,7 @@ function coverageProblems(files: Map<string, string>): string[] {
 function main() {
   const tracked = execFileSync("git", ["ls-files"], { encoding: "utf8" }).split("\n").filter(Boolean);
   const files = new Map(
-    tracked.filter((path) => TEXT.test(path) && path !== "package-lock.json").map((path) => [path, readFileSync(path, "utf8")]),
+    tracked.filter((path) => (TEXT.test(path) || path === NODE_PIN) && path !== "package-lock.json").map((path) => [path, readFileSync(path, "utf8")]),
   );
   const problems = [...findProblems(files, tracked), ...verifyDatasetCopy(), ...checkScoreboard(), ...checkMeasures()];
   if (problems.length > 0) {
