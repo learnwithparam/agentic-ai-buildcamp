@@ -31,6 +31,10 @@ Reading a few answers feels like a test, but it is not one. A change that fixes 
 
 Change one thing, rerun the same dataset, and compare with the last run. The last run is the **baseline**. Without it, a score has nothing to beat. The **pass rate** only means something when both runs use the same cases.
 
+![Improve the prompt with proof: the parts this lesson adds.](../images/diagrams/checkpoint-07.svg)
+
+Step through it one part at a time in the [live drawing](https://canvas.learnwithparam.com/case.html#buildcamp/9).
+
 A run gives you a number, and it also gives you a list. The number says how many passed. The list says which ones moved. Read the list first.
 
 ### The flow

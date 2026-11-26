@@ -35,6 +35,10 @@ For example, one short evaluator can print the names of 22 secrets the worker ho
 
 **MCP** (Model Context Protocol) is a typed door for tools. A coding agent signs the doctor in, and sends their token with every call. The server applies the rules from lesson 11 to that token.
 
+![Open an MCP door and run code in a sandbox: the parts this lesson adds.](../images/diagrams/checkpoint-12.svg)
+
+Step through it one part at a time in the [live drawing](https://canvas.learnwithparam.com/case.html#buildcamp/14).
+
 A **skill** is a written procedure an agent follows. It says which tool to call first, when to stop, and how to cite. It tells the agent how to work. It is not a wall.
 
 A **sandbox** runs code you did not write. It has no access to the host, no network, and limits on time and memory. A bad evaluator can only fail inside it.

@@ -34,6 +34,10 @@ There is a second gap. The labels so far were Markdown files typed for this work
 
 Retrieval has two halves, and both can fail quietly. Reading the PDF can put a table under the wrong heading. Nothing looks wrong until a doctor gets a number from the wrong section. So ingest checks every word against the source and refuses what fails.
 
+![Search labels by meaning: the parts this lesson adds.](../images/diagrams/checkpoint-20.svg)
+
+Step through it one part at a time in the [live drawing](https://canvas.learnwithparam.com/case.html#buildcamp/22).
+
 Searching by meaning finds the section a doctor means. The permission filter goes inside the query. So search never sees what the doctor may not read.
 
 ### The flow
