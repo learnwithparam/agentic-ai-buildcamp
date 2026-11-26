@@ -31,6 +31,10 @@ A loop fixes this. You trace a request, find the failures, add cases, change one
 
 The **improvement loop** has six moves. Trace, find failures, add cases, change one thing, measure, then ship. Each turn makes the agent a bit better. The scoreboard keeps one row for each turn.
 
+![Read your scoreboard: the parts this lesson adds.](../images/diagrams/checkpoint-08.svg)
+
+Step through it one part at a time in the [live drawing](https://canvas.learnwithparam.com/case.html#buildcamp/10).
+
 You read the **scoreboard** one column at a time. A column is a slice of cases that share a failure. If it went up, a rule helped. If it stayed at zero, the fix is not a prompt. If it went down, you read both answers first.
 
 ### The flow

@@ -31,6 +31,10 @@ A doctor in Germany gets a dose for another country. A superseded label gets cit
 
 The script reads each item from the dataset. It runs the same agent code the web app uses. So every trace has the shape of a production trace. Then each evaluator scores the answer, and the score lands on that trace.
 
+![Run the first experiment: the parts this lesson adds.](../images/diagrams/checkpoint-06.svg)
+
+Step through it one part at a time in the [live drawing](https://canvas.learnwithparam.com/case.html#buildcamp/8).
+
 A case passes when `behavior_match` and `label_checks` are both 1. The `correctness` score is there to read. A judge can change its mind on the same answer. So it is not part of the pass.
 
 ### The flow

@@ -36,6 +36,10 @@ A wrong answer here is quiet. The checker would answer a Pharma B rep with a Pha
 
 A2A is an open way for agents to call each other. An agent shares a card. Work is an agent task with a state, and the caller's code can act on that state.
 
+![Hand off work over A2A: the parts this lesson adds.](../images/diagrams/checkpoint-15.svg)
+
+Step through it one part at a time in the [live drawing](https://canvas.learnwithparam.com/case.html#buildcamp/17).
+
 The caller's own token travels with the task. So the company rules from the sign-in lesson hold across the call. The task state tells the caller what to do next. Waiting for a person is a normal state, not a timeout.
 
 ### The flow
