@@ -33,6 +33,10 @@ The people who know the medicine are not the people who ship code. So the fix wa
 
 On each agent step, the app asks the store for the version that has the `production` label. The store returns the prompt text. The agent sends that text to the model. The model call is logged with a link to that version.
 
+![Keep the prompt in a store: the parts this lesson adds.](../images/diagrams/checkpoint-03.svg)
+
+Step through it one part at a time in the [live drawing](https://canvas.learnwithparam.com/case.html#buildcamp/5).
+
 To change the agent, you publish a new version and move the label. The next agent step fetches it. The SDK keeps a copy for 60 seconds, so a new version reaches the app within a minute.
 
 ### The flow
