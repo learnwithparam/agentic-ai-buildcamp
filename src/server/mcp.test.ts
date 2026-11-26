@@ -144,21 +144,20 @@ test("the metadata names this server and Keycloak as the place to sign in", asyn
   assert.deepEqual(body.authorization_servers, [ISSUER]);
 });
 
-test("a signed-in client sees the two read-only tools", async () => {
+test("a signed-in client sees the read-only label tools", async () => {
   const client = await connect(okafor);
   const { tools } = await client.listTools();
   await client.close();
-  assert.deepEqual(tools.map((tool) => tool.name).sort(), ["approval_status", "check_interaction", "get_desk_rules", "label_versions", "read_section", "search_labels", "trial_results"]);
+  assert.deepEqual(tools.map((tool) => tool.name).sort(), ["approval_status", "check_interaction", "label_versions", "read_section", "search_labels", "trial_results"]);
   assert.ok(tools.every((tool) => tool.annotations?.readOnlyHint === true));
 });
 
-test("the desk rules come from the token, not from anything the client sends", async () => {
+test("the desk facts come from the token, as the server's instructions", async () => {
   const client = await connect(okafor);
-  const result = await client.callTool({ name: "get_desk_rules", arguments: { company: "pharma_a" } });
+  const instructions = client.getInstructions() ?? "";
   await client.close();
-  const rules = JSON.parse((result.content as { text: string }[])[0].text);
-  assert.equal(rules.company, "pharma_b");
-  assert.deepEqual(rules.medicines, ["NeuroVex"]);
+  assert.match(instructions, /Pharma B: NeuroVex\. The asker is in US\./);
+  assert.doesNotMatch(instructions, /cardionex|pharma a/i);
 });
 
 test("a Pharma B doctor searching for Pharma A's medicine over MCP gets none of Pharma A's documents", async () => {

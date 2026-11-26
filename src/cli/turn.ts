@@ -16,7 +16,6 @@ export type TurnView = {
 export const START: TurnView = { text: "", activity: "Reading your question", waiting: null, done: false };
 
 export const TOOL_WORDS: Record<string, string> = {
-  get_desk_rules: "Reading the desk rules",
   search_labels: "Searching the labels",
   read_section: "Reading a label section",
   label_versions: "Checking which label version is in force",

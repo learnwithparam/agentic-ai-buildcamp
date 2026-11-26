@@ -28,10 +28,10 @@ import { approvedUses, reportingProcedure, routeRequest, safetyReply, stopReply,
 import { executeTool } from "./tools";
 import type { ReviewItem } from "./reviews";
 import { scriptUser, type Identity } from "./users";
+import { DESK_PROMPT, deskFacts, fillDeskPrompt } from "./desk-prompt";
 
-// Local fallback used when Langfuse isn't reachable or the prompt
-// isn't published yet. scripts/publish-prompt.ts pushes this same
-// string up to Langfuse.
+// Lesson 01's prompt. The variants in scripts/prompt-variants.ts grow from it; since fix 3 the app
+// falls back to DESK_PROMPT (src/server/desk-prompt.ts) when Langfuse is down.
 // checkpoint-sync:begin system-prompt
 export const SYSTEM_PROMPT = `You are the HCP Medical Information Agent for pharma_a.
 Doctors and pharmacists ask you about CardioNex.
@@ -84,7 +84,8 @@ export const citeNode = observe(
     const langfusePrompt = await getPrompt();
     const openai = observeOpenAI(modelClient(), { generationName: "citation-rewrite", ...(langfusePrompt ? { langfusePrompt } : {}) });
     let outcome: CitationOutcome | undefined;
-    const update = await citeStep(openai, langfusePrompt?.prompt ?? SYSTEM_PROMPT, state, config, (result) => (outcome = result));
+    const system = fillDeskPrompt(langfusePrompt?.prompt ?? DESK_PROMPT, deskFacts(userOf(config), state.today));
+    const update = await citeStep(openai, system, state, config, (result) => (outcome = result));
     updateActiveObservation({ output: outcome });
     const traceId = getActiveTraceId();
     if (traceId && outcome) {
@@ -122,7 +123,9 @@ export function createMedinfoAgent(checkpointer: BaseCheckpointSaver) {
           updateActiveObservation({ input: state });
           const langfusePrompt = await getPrompt();
           const openai = observeOpenAI(modelClient(), langfusePrompt ? { langfusePrompt } : undefined);
-          return agentStep(openai, langfusePrompt?.prompt ?? SYSTEM_PROMPT, state, config);
+          // Fix 3: the prompt is filled in for the signed-in doctor's company, country and day.
+          const system = fillDeskPrompt(langfusePrompt?.prompt ?? DESK_PROMPT, deskFacts(userOf(config), state.today));
+          return agentStep(openai, system, state, config);
         },
         { name: "agent", asType: "span", captureInput: false }
       ),

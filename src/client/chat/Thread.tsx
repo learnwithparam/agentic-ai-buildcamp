@@ -2,7 +2,7 @@ import { AuiIf, ComposerPrimitive, MessagePrimitive, ThreadPrimitive } from "@as
 import { useLangGraphInterruptState } from "@assistant-ui/react-langgraph";
 import { formatDue } from "../inbox/format";
 import { SUGGESTIONS } from "./suggestions";
-import { DeskRulesCard, LookupCard, MarkdownText, OtherToolCard, SearchLabelsCard, Thinking } from "./parts";
+import { LookupCard, MarkdownText, OtherToolCard, SearchLabelsCard, Thinking } from "./parts";
 
 function UserMessage() {
   return (
@@ -22,7 +22,6 @@ function AssistantMessage() {
           tools: {
             by_name: {
               search_labels: SearchLabelsCard,
-              get_desk_rules: DeskRulesCard,
               read_section: LookupCard,
               label_versions: LookupCard,
               approval_status: LookupCard,

@@ -65,7 +65,7 @@ const CONVERSATIONS: Conversation[] = [
     name: "another company's medicine, then our own",
     email: CHIDI,
     turns: [
-      { ask: "What is the CardioNex dose for a patient with eGFR 24 mL/min who is not on dialysis?", why: "Pharma B does not sell CardioNex, and Pharma A's labels stay hidden", expect: { reply: /NeuroVex/, noSection: /cardionex/, notReply: /\[cardionex|INSUFFICIENT_CONTEXT/ } },
+      { ask: "What is the CardioNex dose for a patient with eGFR 24 mL/min who is not on dialysis?", why: "Pharma B does not sell CardioNex, and Pharma A's labels stay hidden (INSUFFICIENT_CONTEXT, as eval TENANCY-02 asks)", expect: { reply: /NeuroVex/, noSection: /cardionex/, notReply: /\[cardionex/ } },
       { ask: "What is the recommended NeuroVex dose for diabetic peripheral neuropathy?", why: "Pharma B's own medicine", expect: { tier: "answer", notReply: WITHHELD, sections: /neurovex-uspi/ } }
     ]
   },

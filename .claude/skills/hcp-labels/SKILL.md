@@ -11,14 +11,15 @@ company or the country, and you never guess what a label says.
 
 ## Steps
 
-1. Call `get_desk_rules`. Note `company`, `medicines`, `asker_country`, `approved_in_asker_country` and `today`.
-2. If the question is about a medicine not in `medicines`, stop. Say this desk does not cover it and do not search.
-3. If `approved_in_asker_country` is false, stop. Say the medicine is not approved in the asker's country and do not search.
-4. Call `search_labels` once with the medicine, the patient detail and the country, for example
+1. Read the server's instructions: they name the company, its medicines, the asker's country, whether a label is in force there, and today's date.
+2. If the question is about a medicine the instructions do not name, stop. Say this desk does not cover it and do not search.
+3. If no label is in force in the asker's country, stop. Say the medicine is not approved there and do not search.
+4. Call `search_labels` once, in the doctor's own words, with the medicine, the patient detail and the country, for example
    `NeuroVex dose for a patient with moderate renal impairment, US`.
-5. Use only sections whose `status` is in force on `today`. When two versions disagree, the newer one in force wins, and say which one you used.
-6. Answer from the returned `text` only. Cite every fact as `[doc_id, section]`, for example `[neurovex-uspi-v1, 2.1]`.
-7. If no section answers the question, say that the label does not cover it. Do not fill the gap from memory.
+5. If you need more, take one more step with the lookups: `read_section`, `label_versions`, `approval_status`, `check_interaction` or `trial_results`.
+6. Use only sections whose `status` is `active`. When two versions disagree, the one in force wins, and say which one you used.
+7. Answer from the returned `text` only. Cite every fact as `[doc_id, section]`, like the example in the instructions.
+8. If no section answers the question, say that the label does not cover it. Do not fill the gap from memory.
 
 ## Never
 
