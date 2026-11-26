@@ -314,10 +314,11 @@ The grader came to that number over several runs, and each run found one cause:
 
 - **It did not know the medicine.** Each passage showed only "2.5 Discontinuation". So CardioNex's section passed as the answer to "How should NeuroVex be stopped?". Out of label was 0.75. The passage now names its document, medicine and country, and out of label went to 0.95.
 - **Nearly everything got a 3.** Of the 30 answers missing from the top 5, 25 had been graded, and most had a 3. They lost on order alone. So the grader now also lists the answers most direct first, in the same call. Recall@5 went from 0.924 to 0.958 on that run.
-- **Old doses from secondary documents.** On 2027-04-15 the March 2027 label halved the renal dose, but the FAQ and the 2026 formulary still gave the old one, and they ranked first. Each passage now also shows the date its document is in force from. When two passages give different values for the same instruction, the label wins, and the newest label among labels. A first wording of that rule also marked down trial and payer passages when the question asked about the trial or the payer, and recall@5 fell to 0.933. It now applies only when the values disagree.
-- **A miscounted list.** Once, the grader returned 32 grades for 30 passages, and the whole search failed. The schema now fixes the length, the request states it, and the search asks once more before it fails.
+- **Old doses from secondary documents.** The March 2027 label halved the renal dose. On 2027-04-15 the FAQ and the 2026 formulary still gave the old dose, and they ranked first. Each passage now also shows the date its document is in force from.
+- **Labels win.** Two passages can give different values for one instruction. Then the label wins, and the newest label wins over older ones. A first wording of that rule also marked down trial and payer passages, and recall@5 fell to 0.933. It now applies only when the values disagree.
+- **A miscounted list.** Once, the grader returned 32 grades for 30 passages, and the whole search failed. Now the schema fixes the length, and the request states it. The search asks once more before it fails.
 
-The same code scores about 0.015 higher or lower from one run to the next, because the grader is a model. This run sits on the target, not above it.
+The grader is a model. So the same code can score 0.015 higher or lower on the next run. This run sits on the target, not above it.
 
 Follow-ups show what the rewriter is worth. Asked as written, they score 0.878 recall@5. Written out in full first, they score 0.955.
 
