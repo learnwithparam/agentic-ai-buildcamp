@@ -156,6 +156,22 @@ This is not an error. The doctor says if `npm run dev` is running. Then you know
 | The first `npm run setup` is slow | Docker downloads every image once | Wait. A second run is fast. |
 | The answer differs from the lesson's example | The model words things a bit differently each time | Check that the facts and the citation match, not the wording |
 
+## Check the conversations a demo uses
+
+With `npm run dev` running, this plays real multi-turn chats as the demo users, through the real model. Each turn says what a right answer is. For each turn it prints the tier, the searches, the sections found and the reply. It fails on any miss.
+
+```bash
+npm run demo:check
+```
+
+This plays 30 questions no lesson names, half for each company. It passes when 90 percent or more get a cited answer or the right refusal.
+
+```bash
+npm run demo:open
+```
+
+Each run costs a few cents of model calls. Each chat's session id opens its traces in Langfuse.
+
 ## Still stuck
 
 Copy the full output of `npm run doctor` into your question. It has no keys in it, so it is safe to share. Add the lesson number and the command you ran.
