@@ -1,0 +1,59 @@
+{
+  "setid": "11bd9b14-3c63-4210-852b-97b35e44a364",
+  "title": "CARDIONEX (cardionexib) tablets, for oral use",
+  "tenant_id": "pharma_a",
+  "country": "US",
+  "versions": [
+    {
+      "version": 1,
+      "doc_id": "cardionex-uspi-v1",
+      "effective_date": "2025-02-01",
+      "status": "superseded",
+      "changes": []
+    },
+    {
+      "version": 2,
+      "doc_id": "cardionex-uspi-v2",
+      "effective_date": "2026-09-15",
+      "status": "active",
+      "changes": [
+        {
+          "section": "1.1",
+          "summary": "Indication now says ONLY and adds the LVEF <= 40% limit, and states that safety and efficacy are not established in pediatric patients or in HFpEF."
+        },
+        {
+          "section": "2.2",
+          "summary": "Dosing becomes a table by population: titration to 40mg after 4 weeks, 5mg once daily in severe renal impairment (eGFR < 30 mL/min, no dialysis), dialysis contraindicated, and a 5mg limit with strong CYP3A4 inhibitors."
+        },
+        {
+          "section": "5.6",
+          "summary": "New warning on hypoglycemia in patients with diabetes who take insulin or an oral antidiabetic agent."
+        },
+        {
+          "section": "8.6",
+          "summary": "Cross reference now points to the dosing table in section 2.2."
+        }
+      ]
+    },
+    {
+      "version": 3,
+      "doc_id": "cardionex-uspi-v3",
+      "effective_date": "2027-03-01",
+      "status": "approved",
+      "changes": [
+        {
+          "section": "2.2",
+          "summary": "Titration to 40mg moves to 6 weeks, severe renal impairment (eGFR < 30 mL/min, no dialysis) becomes 2.5mg once daily, and the table is replaced by a list."
+        },
+        {
+          "section": "7.3",
+          "summary": "New section: with a strong CYP3A4 inhibitor, no more than 2.5mg once daily whatever the kidney function."
+        },
+        {
+          "section": "8.6",
+          "summary": "Cross reference now points to doses by eGFR in section 2.2."
+        }
+      ]
+    }
+  ]
+}

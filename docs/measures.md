@@ -6,10 +6,10 @@ A row is "pending" until a real run writes its number to a file in `docs/runs/`.
 
 | Part | Measure | Bar | Target | Measured | Run |
 | --- | --- | --- | --- | --- | --- |
-| Search | search.recall_at_5 | PaperQA2 hybrid retrieval | >= 0.95 | pending | |
-| Search | search.mrr | PaperQA2 hybrid retrieval | >= 0.85 | pending | |
-| Search | search.ndcg_at_10 | PaperQA2 hybrid retrieval | >= 0.85 | pending | |
-| Search | search.out_of_label_empty | PaperQA2 "cannot answer" | >= 0.95 | pending | |
+| Search | search.recall_at_5 | PaperQA2 hybrid retrieval | >= 0.95 | 0.952 | [search.json](runs/search.json) |
+| Search | search.mrr | PaperQA2 hybrid retrieval | >= 0.85 | 0.933 | [search.json](runs/search.json) |
+| Search | search.ndcg_at_10 | PaperQA2 hybrid retrieval | >= 0.85 | 0.922 | [search.json](runs/search.json) |
+| Search | search.out_of_label_empty | PaperQA2 "cannot answer" | >= 0.95 | 0.95 | [search.json](runs/search.json) |
 | Citations | citations.hallucination_precision | LitRAG, F1 0.986 | >= 0.95 | pending | |
 | Citations | citations.hallucination_recall | LitRAG, F1 0.986 | >= 0.95 | pending | |
 | Citations | citations.quote_verbatim_rate | PubCrawl, 255 of 255 | = 1 | pending | |

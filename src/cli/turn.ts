@@ -17,6 +17,7 @@ export const START: TurnView = { text: "", activity: "Reading your question", wa
 
 export const TOOL_WORDS: Record<string, string> = {
   search_labels: "Searching the labels",
+  find_label_text: "Finding the exact words in the labels",
   read_section: "Reading a label section",
   label_versions: "Checking which label version is in force",
   approval_status: "Checking where it is approved",

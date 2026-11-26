@@ -64,7 +64,7 @@ const LIBRARY_EDITS: [string, string][] = [
 // check a version, an approval, an interaction or a trial result. A question about another
 // country reads that country's label through the lookups, marked as that country's.
 export const LOOKUPS_LINE =
-  "Lookups: read_section opens a whole section, label_versions says which version is in force and why, approval_status says where it is approved and for what, check_interaction reads what the label says about another drug, trial_results quotes the trial.";
+  "Lookups: read_section opens a whole section, find_label_text finds the exact words a doctor quotes from a label, label_versions says which version is in force and why, approval_status says where it is approved and for what, check_interaction reads what the label says about another drug, trial_results quotes the trial.";
 const LOOKUP_EDITS: [string, string][] = [
   [
     "Make every search you need in that one step; after it you answer.",

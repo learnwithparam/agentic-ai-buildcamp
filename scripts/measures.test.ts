@@ -33,9 +33,9 @@ test("a pending row passes on a PR but fails a release", () => {
 
 test("a value must match its run file and meet its target", () => {
   const root = rootWith({ "recall@5": 0.91 });
-  const match = `${HEAD}| Search | recall@5 | PaperQA2 | >= 0.95 | 0.97 | [run](docs/runs/search.json) |\n`;
-  assert.match(checkMeasures({ text: match, root }).join("\n"), /the page says 0.97, docs\/runs\/search.json says 0.91/);
-  const honest = `${HEAD}| Search | recall@5 | PaperQA2 | >= 0.95 | 0.91 | [run](docs/runs/search.json) |\n`;
+  const match = `${HEAD}| Search | recall@5 | PaperQA2 | >= 0.95 | 0.97 | [run](runs/search.json) |\n`;
+  assert.match(checkMeasures({ text: match, root }).join("\n"), /the page says 0.97, runs\/search.json says 0.91/);
+  const honest = `${HEAD}| Search | recall@5 | PaperQA2 | >= 0.95 | 0.91 | [run](runs/search.json) |\n`;
   assert.match(checkMeasures({ text: honest, root }).join("\n"), /misses the target/);
 });
 

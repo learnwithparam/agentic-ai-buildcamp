@@ -1,74 +1,136 @@
 import type pg from "pg";
 import { embed, EMBEDDING_MODEL } from "../gateway";
-import { statusOn, type LabelSection } from "../labels";
+import { LABEL_SECTIONS, inForceDocuments, statusOn, type LabelSection } from "../labels";
 import { useLabelSearch, type LabelSearch } from "../tools";
-import { LabelChunkStore } from "./store";
+import { gradePassages, type Grader } from "./grade";
+import { LabelChunkStore, type RankedPassage } from "./store";
 
-// Lesson 20. search_labels by meaning, not by shared words. "A mother who is nursing" shares no
-// word with section 8.2 "Lactation"; their vectors sit close together.
+// Lesson 20. search_labels in four steps, the way PaperQA2 finds evidence in papers:
+//   1. Only documents in force on the day, among those the asker may read. An old version is
+//      never a candidate, so it can never be cited (label_versions answers questions about history).
+//   2. Two searches: by meaning (pgvector) and by words (BM25). "A mother who is nursing" shares no
+//      word with 8.2 Lactation but sits close to it as a vector; "36 hours" and "CYP3A4" are words a
+//      vector blurs, and BM25 finds them exactly.
+//   3. The two rankings are fused by reciprocal rank: a passage high in either list rises.
+//   4. The model grades each search's top sections against the question. No section graded as answering
+//      means the library does not answer it, and the search says so with no results.
+// docs/measures.md holds what each step is worth on the gold questions (npm run search:measure).
 
-// Below this cosine similarity a section is not about the question at all. Measured on this
-// library with text-embedding-3-small over every dataset question: the best section for each real
-// question scores 0.48 or more, and for the request to write a scraper (GUARDRAIL-01) 0.26.
-// A floor cannot tell "about CardioNex but not in the label" from an answer: the alcohol question
-// (RAG-03) scores 0.60 on the boxed warning. Saying the label is silent stays the agent's job.
-export const MIN_SIMILARITY = 0.35;
+// How many passages each search hands to the fusion, and the RRF constant from Cormack et al.
+export const CANDIDATES = 50;
+export const RRF_K = 60;
+// How many sections the model grades: the top 15 of each search (candidatePool).
+export const GRADED = 30;
+// A section must grade at least this to be an answer (3 states it, 2 states part or the rule).
+export const ANSWERS = 2;
 
-// How many nearest sections to read for each one returned. Each version of a label has a section
-// with almost the same text, so the nearest few can all be versions no longer in force (AUTO-01:
-// v1, v2 and v2 again, with v3 2.2 just behind them). Reading more, then putting the sections in
-// force first, keeps the one the agent may cite in the results, and the old ones after it.
-export const CANDIDATES_PER_RESULT = 4;
+export type SearchStores = Pick<LabelChunkStore, "nearest" | "keyword">;
+export type SearchOptions = {
+  store: SearchStores;
+  embedQuery?: (text: string) => Promise<number[]>;
+  // Leave out to rank by fusion alone, which is how the measure shows what grading adds.
+  grade?: Grader;
+  model?: string;
+};
 
-// A document in force this short is returned whole when any of its sections is a hit. Measured on
-// this library: every document but the full US label is 150 words or less. The reporting
-// procedure's 1.2 (what a report never holds) scores below label sections on its own (ROUTING-05),
-// so the question only reaches it through 1.1, its neighbour. The other sections come as extras
-// after their hit: the nearest `limit` hits are never pushed out. Old versions bring nothing.
-export const SHORT_DOCUMENT_WORDS = 200;
+export type Candidate = { section: LabelSection; passage: RankedPassage; fused: number; dense?: number; keyword?: number };
 
-// Fix 4. No cut by score below the best hit. Measured on the 23 sections the dataset's ideal
-// answers cite: these 4 results find all 23; keeping only hits within 0.04 to 0.12 of the best
-// finds 19 to 22 (PV-01's cited section sits 0.16 below its best hit). So every result carries
-// its score instead, and the reader sees how close each one was.
+const key = (row: { docId: string; section: string }) => `${row.docId} ${row.section}`;
 
-export function vectorSearch(
-  store: Pick<LabelChunkStore, "nearest" | "shortDocuments">,
-  embedQuery: (text: string) => Promise<number[]> = async (text) => (await embed([text]))[0],
-  minSimilarity = MIN_SIMILARITY,
-  model = EMBEDDING_MODEL
-): LabelSearch {
-  return async (query, readable, limit, today) => {
-    if (!readable.size || !query.trim()) return [];
-    const hits = await store.nearest(await embedQuery(query), [...readable], limit * CANDIDATES_PER_RESULT, model);
-    const sections = hits
-      .filter((hit) => hit.similarity >= minSimilarity)
-      .map(({ similarity, ...section }): LabelSection => ({ ...section, status: statusOn(section, today), score: Math.round(similarity * 1000) / 1000 }));
-    // A stable sort: in force first, each group still nearest first.
-    const inForce = (section: LabelSection) => (section.status === "active" ? 0 : 1);
-    sections.sort((a, b) => inForce(a) - inForce(b));
-    const top = sections.slice(0, limit);
-    // Each hit in force from a short document brings the rest of that document right after it.
-    const active = [...new Set(top.filter((section) => section.status === "active").map((section) => section.docId))];
-    const whole = await store.shortDocuments(active, SHORT_DOCUMENT_WORDS, model);
-    const key = (section: LabelSection) => `${section.docId} ${section.section}`;
-    const seen = new Set(top.map(key));
-    return top.flatMap((hit) => {
-      const extras = whole
-        .filter((section) => section.docId === hit.docId && !seen.has(key(section)))
-        .map((section): LabelSection => ({ ...section, status: statusOn(section, today) }));
-      extras.forEach((section) => seen.add(key(section)));
-      return [hit, ...extras];
+// Reciprocal rank fusion over passages, then one entry per section: its best passage.
+export function fuse(dense: RankedPassage[], keyword: RankedPassage[]): Array<Omit<Candidate, "section">> {
+  const byPassage = new Map<string, Omit<Candidate, "section">>();
+  const add = (list: RankedPassage[], which: "dense" | "keyword") =>
+    list.forEach((passage, rank) => {
+      const id = `${key(passage)} ${passage.part}`;
+      const entry = byPassage.get(id) ?? { passage, fused: 0 };
+      entry.fused += 1 / (RRF_K + rank + 1);
+      entry[which] = rank + 1;
+      byPassage.set(id, entry);
     });
+  add(dense, "dense");
+  add(keyword, "keyword");
+  const best = new Map<string, Omit<Candidate, "section">>();
+  for (const entry of [...byPassage.values()].sort((a, b) => b.fused - a.fused)) {
+    if (!best.has(key(entry.passage))) best.set(key(entry.passage), entry);
+  }
+  return [...best.values()];
+}
+
+// The sections the model grades: the first n of the two searches taken in turn (vector first,
+// then BM25, then the second of each), in fused order. Fusion alone cuts the wrong ones. When
+// one search matches nearly everything (BM25 on "take" in one label), every section both lists
+// hold outscores a section only one found, even the vector search's first. Measured: "Can a
+// mother who is nursing her baby take CardioNex?" ranked 8.2 Lactation first by meaning, and
+// fusion put it 31st. The grader reranks anyway, so the pool only has to hold the answer.
+export function candidatePool(dense: RankedPassage[], keyword: RankedPassage[], n: number): Array<Omit<Candidate, "section">> {
+  const lists = [dense, keyword].map((list) => [...new Set(list.map(key))]);
+  const chosen = new Set<string>();
+  for (let rank = 0; chosen.size < n && lists.some((list) => rank < list.length); rank++) {
+    for (const list of lists) if (rank < list.length && chosen.size < n) chosen.add(list[rank]!);
+  }
+  return fuse(dense, keyword).filter((entry) => chosen.has(key(entry.passage)));
+}
+
+const round = (value: number) => Math.round(value * 10000) / 10000;
+
+export function hybridSearch(options: SearchOptions): LabelSearch {
+  const model = options.model ?? EMBEDDING_MODEL;
+  const embedQuery = options.embedQuery ?? (async (text: string) => (await embed([text]))[0]);
+  return async (query, readable, limit, today) => {
+    const docs = [...inForceDocuments(readable, today)];
+    if (!docs.length || !query.trim()) return [];
+    const [dense, keyword] = await Promise.all([
+      embedQuery(query).then((vector) => options.store.nearest(vector, docs, CANDIDATES, model)),
+      options.store.keyword(query, docs, CANDIDATES, model)
+    ]);
+    const candidates = candidatePool(dense, keyword, GRADED)
+      .map((entry): Candidate => ({ ...entry, section: sectionText(entry.passage, today) }));
+    const scores = (candidate: Candidate, grade?: number) => ({
+      fused: round(candidate.fused),
+      ...(candidate.dense ? { dense_rank: candidate.dense } : {}),
+      ...(candidate.keyword ? { keyword_rank: candidate.keyword } : {}),
+      ...(grade === undefined ? {} : { grade })
+    });
+    if (!options.grade) return candidates.slice(0, limit).map((candidate) => ({ ...candidate.section, scores: scores(candidate) }));
+    const { grades, best } = await options.grade(
+      query,
+      candidates.map(({ passage }) => ({
+        source: `${passage.docId} (${passage.brandId}, ${passage.country}, in force from ${passage.effectiveDate})`,
+        path: passage.path,
+        text: passage.text
+      }))
+    );
+    if (!grades.some((grade) => grade >= ANSWERS)) return [];
+    // The grader's best order first, then any other answer by grade, then the sections that only
+    // help; among equal places the fused order stands.
+    const place = (i: number) => {
+      const at = best.indexOf(i);
+      return at >= 0 ? at : best.length + (3 - grades[i]!);
+    };
+    return candidates
+      .map((candidate, i) => ({ candidate, grade: grades[i]!, place: place(i) }))
+      .filter(({ grade }) => grade >= 1)
+      .sort((a, b) => a.place - b.place)
+      .slice(0, limit)
+      .map(({ candidate, grade }) => ({ ...candidate.section, score: grade, scores: scores(candidate, grade) }));
   };
+}
+
+// A result is the whole section the passage came from, as the label prints it, so the agent
+// reads (and cites) the section, not a cut of it. Ingest proved the PDF holds the same words.
+function sectionText(passage: RankedPassage, today: string): LabelSection {
+  const whole = LABEL_SECTIONS.find((section) => section.docId === passage.docId && section.section === passage.section);
+  if (!whole) throw new Error(`The index holds ${passage.docId} ${passage.section}, which data/hcp does not. Run npm run rag:ingest.`);
+  return { ...whole, status: statusOn(whole, today) };
 }
 
 // The server and the dataset runner call this once at start. An empty index is a setup step
 // not yet done, so it stops here with the command that does it, rather than answering from nothing.
 export async function connectLabelIndex(pool: pg.Pool): Promise<number> {
   const store = new LabelChunkStore(pool);
-  const sections = await store.count(EMBEDDING_MODEL);
-  if (!sections) throw new Error(`The label index has no sections from ${EMBEDDING_MODEL}. Run npm run rag:ingest (lesson 20).`);
-  useLabelSearch(vectorSearch(store));
-  return sections;
+  const passages = await store.count(EMBEDDING_MODEL);
+  if (!passages) throw new Error(`The label index has no passages from ${EMBEDDING_MODEL}. Run npm run rag:ingest (lesson 20).`);
+  useLabelSearch(hybridSearch({ store, grade: gradePassages }));
+  return passages;
 }

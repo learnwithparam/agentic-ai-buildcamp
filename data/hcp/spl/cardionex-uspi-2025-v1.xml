@@ -1,0 +1,1290 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="urn:hl7-org:v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <id root="2c2e2bf6-9e91-55f2-af06-f73416e0d5a3"/>
+  <code code="34391-3" codeSystem="2.16.840.1.113883.6.1" displayName="HUMAN PRESCRIPTION DRUG LABEL"/>
+  <title>CARDIONEX (cardionexib) Prescribing Information, 2025 Edition</title>
+  <effectiveTime value="20250201"/>
+  <setId root="11bd9b14-3c63-4210-852b-97b35e44a364"/>
+  <versionNumber value="1"/>
+  <component>
+    <structuredBody>
+      <component>
+        <section ID="s0-0">
+          <id root="aba9821d-1c08-54ab-af15-4d84d4a21429"/>
+          <code code="34066-1" codeSystem="2.16.840.1.113883.6.1" displayName="BOXED WARNING SECTION"/>
+          <title>0.0 Boxed Warning and Contraindications</title>
+          <text>
+            <list listType="unordered">
+              <item><content styleCode="bold">BOXED WARNING: FETAL TOXICITY:</content> When pregnancy is detected, discontinue CardioNex as soon as possible. Drugs that act directly on the renin-angiotensin system can cause injury and death to the developing fetus.</item>
+              <item><content styleCode="bold">CONTRAINDICATIONS:</content>
+                <list listType="unordered">
+                  <item>Concomitant use with ACE inhibitors is contraindicated due to angioedema risk. Allow a strict <content styleCode="bold">36-hour washout period</content> when switching from an ACE inhibitor to CardioNex.</item>
+                  <item>Contraindicated in patients with end-stage renal disease (ESRD) requiring dialysis.</item>
+                </list>
+              </item>
+            </list>
+          </text>
+          <effectiveTime value="20250201"/>
+        </section>
+      </component>
+      <component>
+        <section ID="s1">
+          <id root="81e9952c-1fda-5c09-a2c9-2b6ec3f54ee6"/>
+          <code code="34067-9" codeSystem="2.16.840.1.113883.6.1" displayName="INDICATIONS &amp; USAGE SECTION"/>
+          <title>1 INDICATIONS &amp; USAGE SECTION</title>
+          <effectiveTime value="20250201"/>
+          <component>
+            <section ID="s1-1">
+              <id root="75f6e420-f5dd-53da-afeb-bde28338a357"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>1.1 Indications and Usage</title>
+              <text>
+                <paragraph>CardioNex is indicated to reduce the risk of cardiovascular death and hospitalization in adult patients with chronic heart failure with reduced ejection fraction (HFrEF).</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s1-2">
+              <id root="898eee42-74f1-5409-a6ac-b8aec30a667f"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>1.2 Use With Other Heart Failure Therapy</title>
+              <text>
+                <paragraph>In CLARION-HF, CardioNex was added to usual care for chronic heart failure, which included a beta blocker, a loop diuretic as needed for congestion, and in many patients a mineralocorticoid receptor antagonist. Treatment with CardioNex does not replace these therapies. Continue guideline-directed therapy that the patient already takes, and review the doses of diuretics and of potassium-raising drugs before starting CardioNex [see Dosage and Administration (2.1) and Drug Interactions (7.1)].</paragraph>
+                <paragraph>The effect of CardioNex was studied in adults with an eGFR of 30 mL/min/1.73 m2 or more at randomization. Use in patients with a lower eGFR rests on pharmacokinetic data and not on outcome data [see Use in Specific Populations (8.6) and Clinical Studies (14)].</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s1-3">
+              <id root="db17c1da-2aec-55f0-adff-05db6139ca4e"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>1.3 Limitations of Use</title>
+              <text>
+                <paragraph>CardioNex has not been shown to reduce cardiovascular death or hospitalization for heart failure in patients with a left ventricular ejection fraction above 40%. It is not a treatment for acute decompensated heart failure and should not be started as a rescue therapy during an acute episode. It has no role as a blood pressure agent: the blood pressure effect described in Clinical Pharmacology (12.2) is a pharmacodynamic observation and is not an indication.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+        </section>
+      </component>
+      <component>
+        <section ID="s2">
+          <id root="b2b43747-ea53-53ae-a4d5-0c33c16487fd"/>
+          <code code="34068-7" codeSystem="2.16.840.1.113883.6.1" displayName="DOSAGE &amp; ADMINISTRATION SECTION"/>
+          <title>2 DOSAGE &amp; ADMINISTRATION SECTION</title>
+          <effectiveTime value="20250201"/>
+          <component>
+            <section ID="s2-1">
+              <id root="813c5dbf-ab87-5053-ae90-77b0de371385"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>2.1 Important Dosing Information</title>
+              <text>
+                <paragraph>Before the first dose, confirm each of the following:</paragraph>
+                <list listType="unordered">
+                  <item>The patient has chronic heart failure with an LVEF of 40% or lower.</item>
+                  <item>The patient is not taking an ACE inhibitor. If the patient was taking one, at least 36 hours have passed since the last dose of the ACE inhibitor [see Contraindications (4)].</item>
+                  <item>The patient is not on dialysis [see Contraindications (4)].</item>
+                  <item>Serum potassium has been measured and does not exceed 5.0 mEq/L. Do not initiate CardioNex if baseline serum potassium exceeds 5.0 mEq/L [see Warnings and Precautions (5.1)].</item>
+                  <item>eGFR has been measured, so that the starting dose can be chosen from the dosing table in Dosage and Administration (2.2).</item>
+                  <item>Blood pressure has been measured, and volume depletion has been corrected [see Warnings and Precautions (5.2)].</item>
+                  <item>For a woman who could become pregnant, pregnancy has been excluded and the patient has been counseled about contraception [see Use in Specific Populations (8.3)].</item>
+                  <item>The patient's list of current medicines has been checked for strong CYP3A4 inhibitors, strong CYP3A4 inducers, potassium supplements, potassium-sparing diuretics and NSAIDs [see Drug Interactions (7)].</item>
+                </list>
+                <paragraph>The dose depends on kidney function and on concomitant medicines. Read the dosing table in section 2.2 for the dose that applies to the patient, because several rows apply at once in some patients (for example, severe renal impairment together with a strong CYP3A4 inhibitor).</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s2-2">
+              <id root="05a28e3b-87ff-5843-ae41-34c7a19120ad"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>2.2 Renal Impairment Dosing</title>
+              <text>
+                <list listType="unordered">
+                  <item><content styleCode="bold">Normal or mild-to-moderate renal impairment (eGFR &gt;= 30 mL/min):</content> Start at 20mg orally once daily; titrate to 40mg once daily after 2 weeks.</item>
+                  <item><content styleCode="bold">Severe renal impairment (eGFR &lt; 30 mL/min):</content> Administer 10mg orally once daily.</item>
+                </list>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s2-3">
+              <id root="6096e23a-255c-547b-ad77-78a8bc568900"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>2.3 Administration</title>
+              <text>
+                <paragraph>Take CardioNex once daily at about the same time each day, with or without food.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s2-4">
+              <id root="6d287419-a333-566f-a88f-7b8ea5eab2c0"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>2.4 Monitoring During Treatment</title>
+              <text>
+                <paragraph>Monitor the following while the patient takes CardioNex:</paragraph>
+                <list listType="unordered">
+                  <item>Serum potassium: before the first dose, 1 week after starting or changing the dose, and monthly for the first 3 months. After the first 3 months, continue to check potassium at intervals that suit the patient's risk, and sooner whenever a potassium-raising drug, a diuretic or a renal-active drug is started, stopped or changed [see Warnings and Precautions (5.1)].</item>
+                  <item>Serum creatinine and eGFR: at baseline and after 1 to 2 weeks, and again after any change in dose or in diuretic therapy [see Warnings and Precautions (5.4)].</item>
+                  <item>Blood pressure: at every visit, with extra attention in the first month in older patients and in patients who take high-dose diuretics [see Warnings and Precautions (5.2) and Use in Specific Populations (8.5)].</item>
+                  <item>Signs of angioedema at each contact. Ask the patient whether swelling of the face, lips, tongue or throat has occurred [see Warnings and Precautions (5.3)].</item>
+                </list>
+                <paragraph>Record the result of each check in the patient's chart. A single out-of-range value does not by itself require stopping treatment. Apply the threshold written in the matching section of this label, repeat the measurement if the result is unexpected, and look for a cause such as an interacting drug, dehydration or a recent change in diet.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s2-5">
+              <id root="621656ca-ec21-57b9-a022-9f570f2ccf8d"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>2.5 Missed Doses and Discontinuation</title>
+              <text>
+                <paragraph>If a dose is missed, take it as soon as it is remembered on the same day. If it is nearly time for the next day's dose, skip the missed dose. Do not take two doses on the same day to make up for a missed dose.</paragraph>
+                <paragraph>CardioNex can be stopped without a taper. No rebound in blood pressure or in heart failure symptoms was seen in the 2 weeks after treatment stopped in the clinical trial program, but patients may lose the benefit shown in CLARION-HF once treatment stops, so tell patients not to stop on their own. If treatment is interrupted for hyperkalemia, hypotension or worsening renal function, review the cause before restarting [see Warnings and Precautions (5.1), (5.2) and (5.4)]. Restart at the starting dose in the dosing table in section 2.2 if treatment has been interrupted for more than 7 consecutive days.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s2-6">
+              <id root="e0a52db6-fd33-57f6-a18d-9a058b13f242"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>2.6 Switching From an ACE Inhibitor</title>
+              <text>
+                <paragraph>CardioNex and an ACE inhibitor must never be taken together. When a patient is switched from an ACE inhibitor, stop the ACE inhibitor and wait at least 36 hours after its last dose before the first dose of CardioNex. The 36-hour interval applies to every ACE inhibitor, whatever its half-life or dosing schedule. Do not shorten it, because angioedema has been reported when the two drugs overlap [see Contraindications (4) and Warnings and Precautions (5.3)].</paragraph>
+                <paragraph>In the opposite direction, if CardioNex is stopped and an ACE inhibitor is to be started, the prescriber should apply the washout interval written in the labeling of that ACE inhibitor. In CLARION-HF, patients who had taken an ACE inhibitor before randomization stopped it at least 36 hours before the first dose of study drug.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s2-7">
+              <id root="07fb1929-73c6-5626-af5a-c4ff6f499bae"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>2.7 Management of Selected Adverse Reactions</title>
+              <text>
+                <paragraph>Table A lists the actions to take when one of the main laboratory or clinical findings occurs in a patient who is already taking CardioNex. The thresholds are those given in the matching Warnings and Precautions sections. Use this table with the monitoring schedule in Dosage and Administration (2.4).</paragraph>
+                <paragraph>Table A. Actions for Selected Findings During Treatment</paragraph>
+                <table>
+                  <thead><tr><th>Finding</th><th>Action</th><th>Cross reference</th></tr></thead>
+                  <tbody>
+                    <tr><td>Serum potassium above 5.5 mEq/L</td><td>Withhold CardioNex while potassium stays above 5.5 mEq/L. Restart only once it has returned to the normal range. Look for a potassium supplement, a potassium-sparing diuretic, a salt substitute that contains potassium, or a recent fall in kidney function.</td><td>5.1, 7.1</td></tr>
+                    <tr><td>Serum potassium from 5.1 to 5.5 mEq/L</td><td>Continue treatment, repeat the measurement within 1 week, and review every potassium-raising drug the patient takes.</td><td>5.1, 7.4</td></tr>
+                    <tr><td>Dizziness, fainting or low blood pressure</td><td>Correct volume depletion. Lower the dose of the diuretic first, then consider a temporary interruption of CardioNex.</td><td>5.2, 7.8</td></tr>
+                    <tr><td>Serum creatinine rise of more than 30% from baseline</td><td>Review the diuretic dose and other drugs that affect the kidneys, including NSAIDs. Repeat the measurement within 1 to 2 weeks. Consider stopping CardioNex if the rise continues.</td><td>5.4, 5.5, 7.5</td></tr>
+                    <tr><td>Swelling of the face, lips, tongue or throat</td><td>Stop CardioNex at once and do not restart it. Give emergency treatment for airway protection.</td><td>5.3</td></tr>
+                    <tr><td>Pregnancy detected</td><td>Discontinue CardioNex as soon as possible and switch to a treatment that is safe in pregnancy.</td><td>8.1</td></tr>
+                  </tbody>
+                </table>
+                <paragraph>The table does not replace clinical judgment. A patient with heart failure who is stopped from CardioNex may lose the benefit seen in CLARION-HF, so the aim is to correct the cause of the finding where that is possible and to restart treatment once the finding has resolved, except after angioedema.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+        </section>
+      </component>
+      <component>
+        <section ID="s3">
+          <id root="9539d920-dd95-5477-a513-1d50d2b519f1"/>
+          <code code="43678-2" codeSystem="2.16.840.1.113883.6.1" displayName="DOSAGE FORMS &amp; STRENGTHS SECTION"/>
+          <title>3 Dosage Forms and Strengths</title>
+          <text>
+            <paragraph>CardioNex is supplied as film-coated tablets for oral use in three strengths:</paragraph>
+            <list listType="unordered">
+              <item>5 mg: white, round, debossed with &quot;CX&quot; on one side and &quot;5&quot; on the other side.</item>
+              <item>20 mg: yellow, oval, debossed with &quot;CX&quot; on one side and &quot;20&quot; on the other side.</item>
+              <item>40 mg: pink, oval, debossed with &quot;CX&quot; on one side and &quot;40&quot; on the other side.</item>
+            </list>
+          </text>
+          <effectiveTime value="20250201"/>
+        </section>
+      </component>
+      <component>
+        <section ID="s4">
+          <id root="68c088aa-839f-55f7-ac46-aaddab842c3c"/>
+          <code code="34070-3" codeSystem="2.16.840.1.113883.6.1" displayName="CONTRAINDICATIONS SECTION"/>
+          <title>4 Contraindications</title>
+          <text>
+            <paragraph>CardioNex is contraindicated in the following situations. The boxed warning and the list of contraindications at the start of this label apply in full [see Boxed Warning and Contraindications (0.0)].</paragraph>
+            <list listType="unordered">
+              <item>Concomitant use with an ACE inhibitor, because of the risk of angioedema. A strict 36-hour washout period is required when switching from an ACE inhibitor to CardioNex [see Dosage and Administration (2.6) and Warnings and Precautions (5.3)].</item>
+              <item>End-stage renal disease (ESRD) requiring dialysis [see Dosage and Administration (2.2) and Use in Specific Populations (8.6)].</item>
+            </list>
+            <paragraph>When pregnancy is detected, discontinue CardioNex as soon as possible [see Use in Specific Populations (8.1)]. A history of angioedema of any cause is addressed in Warnings and Precautions (5.3): such patients were not studied and should not receive CardioNex.</paragraph>
+          </text>
+          <effectiveTime value="20250201"/>
+        </section>
+      </component>
+      <component>
+        <section ID="s5">
+          <id root="1a306b9c-3bf8-5a9e-a6cb-555939d428c3"/>
+          <code code="43685-7" codeSystem="2.16.840.1.113883.6.1" displayName="WARNINGS AND PRECAUTIONS SECTION"/>
+          <title>5 WARNINGS AND PRECAUTIONS SECTION</title>
+          <effectiveTime value="20250201"/>
+          <component>
+            <section ID="s5-1">
+              <id root="d7ed9fcd-c772-5e46-a059-2346684982b9"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>5.1 Hyperkalemia</title>
+              <text>
+                <paragraph>CardioNex can raise serum potassium. Check potassium before the first dose, 1 week after starting or changing the dose, and monthly for the first 3 months. Withhold treatment while serum potassium is above 5.5 mEq/L and restart only once it has returned to the normal range.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s5-2">
+              <id root="e281cb73-175b-5726-a8a6-7e8de5c9d716"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>5.2 Symptomatic Hypotension</title>
+              <text>
+                <paragraph>Low blood pressure with dizziness or fainting is most likely in patients who are volume depleted or on high-dose diuretics. Correct volume depletion before the first dose. If hypotension occurs, lower the diuretic dose first, then consider a temporary interruption of CardioNex.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s5-3">
+              <id root="0dc6c1e6-6b57-5653-a23e-ce1427be4aa9"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>5.3 Angioedema</title>
+              <text>
+                <paragraph>Swelling of the face, lips, tongue or throat has been reported. Stop CardioNex at once and do not restart it. Patients with a history of angioedema of any cause were not studied and should not receive CardioNex.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s5-4">
+              <id root="d29cf50b-3c97-5a57-a9ad-51b264c9afae"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>5.4 Worsening Renal Function</title>
+              <text>
+                <paragraph>Serum creatinine may rise in the first weeks of treatment. Measure creatinine at baseline and after 1 to 2 weeks. A rise of more than 30% from baseline calls for a review of the diuretic dose and of other drugs that affect the kidneys.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s5-5">
+              <id root="8cb6f976-9a2c-568e-aed0-9f46b6365d40"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>5.5 Renal Artery Stenosis and Obstructive Cardiac Lesions</title>
+              <text>
+                <paragraph>Drugs that act on the renin-angiotensin system can lower glomerular filtration pressure and raise serum creatinine in patients with bilateral renal artery stenosis, or with stenosis of the artery to a single functioning kidney. In these patients a fall in blood pressure can reduce renal perfusion enough to cause acute kidney injury. Patients with hemodynamically significant renal artery stenosis were excluded from CLARION-HF.</paragraph>
+                <paragraph>Measure serum creatinine and potassium within 1 to 2 weeks after starting CardioNex in any patient who is known or suspected to have renal vascular disease, for example in a patient with severe peripheral arterial disease or an unexplained difference in kidney size on imaging. If creatinine rises by more than 30% from baseline, review the diuretic dose and other drugs that affect the kidneys, and consider stopping CardioNex [see Warnings and Precautions (5.4)].</paragraph>
+                <paragraph>Use caution in patients with hemodynamically significant aortic or mitral stenosis and in patients with obstructive hypertrophic cardiomyopathy. Patients with these conditions were not enrolled in CLARION-HF, and a fall in afterload can reduce cardiac output in them. Start these patients with blood pressure monitoring at each visit during the first month.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s5-7">
+              <id root="758109af-3e11-58d7-a5c4-5911491e5891"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>5.7 Interpretation of Natriuretic Peptide, Renin and Aldosterone Tests</title>
+              <text>
+                <paragraph>Neprilysin breaks down B-type natriuretic peptide (BNP), so plasma BNP concentrations are higher in patients who take CardioNex, even when the heart failure itself has not worsened. BNP is therefore not a reliable marker in these patients, and a rise in BNP after CardioNex is started should not be read as a sign of clinical worsening. N-terminal pro-B-type natriuretic peptide (NT-proBNP) is not a neprilysin substrate and is the preferred natriuretic peptide marker for diagnosis, risk assessment and monitoring [see Clinical Pharmacology (12.2)].</paragraph>
+                <paragraph>Blockade of the AT1 receptor raises plasma renin activity and angiotensin II concentrations and lowers plasma aldosterone. In a patient who takes CardioNex, the aldosterone-to-renin ratio used to screen for primary aldosteronism can be falsely negative, and a high renin value does not by itself indicate renovascular disease.</paragraph>
+                <paragraph>When such a test is needed, tell the laboratory and the requesting physician that the patient takes CardioNex, and interpret the result with that in mind. Withholding CardioNex for the test should be decided by the physician in charge, who should weigh it against the loss of benefit in heart failure.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s5-8">
+              <id root="5a6348a0-7e4d-5dcc-acdd-f06bd1213152"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>5.8 Surgery and Anesthesia</title>
+              <text>
+                <paragraph>During major surgery or anesthesia, drugs that act on the renin-angiotensin system can block the compensatory response to the release of renin and so cause hypotension that is hard to treat. Tell the anesthesiologist that the patient takes CardioNex. In a planned operation under general anesthesia, consider holding CardioNex on the morning of surgery, and restart it once the patient is eating, is hemodynamically stable and has a normal serum potassium. If hypotension occurs during anesthesia, correct volume first; a vasopressor may be needed when volume correction fails.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s5-9">
+              <id root="a6a7bd33-64c3-592d-aeb0-a68a50492e9d"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>5.9 Hepatic Impairment</title>
+              <text>
+                <paragraph>Exposure to cardionexib is higher in hepatic impairment [see Clinical Pharmacology (12.5)]. No dose change is needed in mild or moderate hepatic impairment (Child-Pugh A or B). CardioNex has not been studied in severe hepatic impairment (Child-Pugh C) and is not recommended in these patients [see Use in Specific Populations (8.7)]. In CLARION-HF, elevations of alanine aminotransferase above 3 times the upper limit of normal were similar on CardioNex and on placebo, and no case of drug-induced liver injury was identified [see Adverse Reactions (6.4)].</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s5-10">
+              <id root="f38399c4-d4c8-571f-a49f-60741bf0c691"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>5.10 Effects on Ability to Drive and Use Machines</title>
+              <text>
+                <paragraph>CardioNex can cause dizziness, fatigue and low blood pressure, most often in the first weeks of treatment and after a dose of a diuretic is raised. In CLARION-HF, dizziness was reported in 6.3% of patients on CardioNex and 3.9% on placebo. Advise patients not to drive or use machines until they know how CardioNex affects them, and to sit or lie down at the first sign of lightheadedness [see Warnings and Precautions (5.2) and Adverse Reactions (6.1)].</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s5-11">
+              <id root="99474d0f-4b46-595f-aa0e-e71413f10e52"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>5.11 Concomitant Hyperkalemia Risk Factors</title>
+              <text>
+                <paragraph>Several conditions raise the risk of hyperkalemia in a patient on CardioNex and call for closer potassium monitoring than the minimum schedule in Dosage and Administration (2.4): an eGFR below 60 mL/min/1.73 m2, use of a mineralocorticoid receptor antagonist or another potassium-raising drug, age of 75 years or more, a recent episode of dehydration or acute illness with vomiting or diarrhea, and a diet that is rich in potassium or that uses a salt substitute. In CLARION-HF, patients with a baseline eGFR of 30 to 59 mL/min and patients who took a mineralocorticoid receptor antagonist had higher rates of hyperkalemia than the trial as a whole [see Adverse Reactions (6.5)].</paragraph>
+                <paragraph>A patient with one or more of these risk factors does not need a lower dose because of the risk factor alone. The dose is chosen from the dosing table in Dosage and Administration (2.2), and the response of serum potassium decides whether treatment is continued.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+        </section>
+      </component>
+      <component>
+        <section ID="s6">
+          <id root="7d03d5a3-2140-558b-a915-2b269f2440a8"/>
+          <code code="34084-4" codeSystem="2.16.840.1.113883.6.1" displayName="ADVERSE REACTIONS SECTION"/>
+          <title>6 ADVERSE REACTIONS SECTION</title>
+          <effectiveTime value="20250201"/>
+          <component>
+            <section ID="s6-1">
+              <id root="22a6d3b8-2b01-5f10-a0f6-b580f270a11c"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>6.1 Clinical Trials Experience</title>
+              <text>
+                <paragraph>In the placebo-controlled trial, 7.9% of patients on CardioNex and 6.1% on placebo stopped treatment because of an adverse reaction. Adverse reactions reported in at least 2% of patients and more often than placebo were dizziness (6.3% vs 3.9%), fatigue (4.4% vs 3.6%), cough (3.1% vs 2.8%) and nausea (2.5% vs 1.9%).</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s6-2">
+              <id root="5ad5292d-7c1d-5672-a231-5721afca4171"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>6.2 Postmarketing Experience</title>
+              <text>
+                <paragraph>The following adverse reactions have been identified during use of CardioNex after approval. Because these reactions are reported voluntarily from a population of uncertain size, it is not always possible to estimate their frequency reliably or to establish a causal relationship to drug exposure.</paragraph>
+                <list listType="unordered">
+                  <item>Immune system disorders: angioedema, including cases with laryngeal involvement; hypersensitivity reactions with rash and fever.</item>
+                  <item>Skin and subcutaneous tissue disorders: rash, pruritus, urticaria, photosensitivity reaction.</item>
+                  <item>Vascular disorders: symptomatic hypotension with syncope, mostly within the first week of treatment or after a diuretic dose was raised.</item>
+                  <item>Metabolism and nutrition disorders: hyperkalemia with electrocardiographic changes, hyponatremia.</item>
+                  <item>Renal and urinary disorders: acute kidney injury, mostly in patients who were volume depleted, who took an NSAID or who had renal artery stenosis.</item>
+                  <item>Nervous system disorders: dysgeusia, vertigo, paresthesia.</item>
+                  <item>Gastrointestinal disorders: diarrhea, abdominal pain, vomiting.</item>
+                  <item>Musculoskeletal and connective tissue disorders: myalgia, muscle spasm.</item>
+                  <item>Respiratory, thoracic and mediastinal disorders: dyspnea, throat irritation.</item>
+                  <item>Blood and lymphatic system disorders: thrombocytopenia (rare).</item>
+                </list>
+                <paragraph>Reports of angioedema were most often in patients who had taken an ACE inhibitor in the 36 hours before the first dose of CardioNex, in patients with a previous episode of angioedema, and in Black patients [see Warnings and Precautions (5.3)]. Reports of hyperkalemia were most often in patients who also took a potassium supplement, a potassium-sparing diuretic or a salt substitute that contains potassium [see Drug Interactions (7.1)].</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s6-3">
+              <id root="2e23d18f-7912-5f2f-a52e-b2793e84665a"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>6.3 Adverse Reactions by Treatment Arm in CLARION-HF</title>
+              <text>
+                <paragraph>Table 1 lists the adverse reactions of special interest that were collected by protocol in CLARION-HF (n=4,820; 2,410 patients on CardioNex and 2,410 on placebo, median follow-up 26 months). Table 2 lists other adverse reactions reported in at least 2% of patients on CardioNex. Because the trials were run under different conditions, rates seen in one trial cannot be compared directly with rates in another trial or in clinical practice.</paragraph>
+                <paragraph>Table 1. Adverse Reactions of Special Interest in CLARION-HF</paragraph>
+                <table>
+                  <thead><tr><th>Adverse reaction</th><th>CardioNex (n=2,410)</th><th>Placebo (n=2,410)</th></tr></thead>
+                  <tbody>
+                    <tr><td>Symptomatic hypotension</td><td>219 (9.1%)</td><td>108 (4.5%)</td></tr>
+                    <tr><td>Hyperkalemia</td><td>164 (6.8%)</td><td>82 (3.4%)</td></tr>
+                    <tr><td>Worsening renal function</td><td>101 (4.2%)</td><td>92 (3.8%)</td></tr>
+                    <tr><td>Angioedema</td><td>10 (0.4%)</td><td>3 (0.1%)</td></tr>
+                    <tr><td>Discontinuation because of an adverse reaction</td><td>190 (7.9%)</td><td>147 (6.1%)</td></tr>
+                  </tbody>
+                </table>
+                <paragraph>Table 2. Other Adverse Reactions Reported in at Least 2% of Patients in CLARION-HF</paragraph>
+                <table>
+                  <thead><tr><th>Adverse reaction</th><th>CardioNex (n=2,410)</th><th>Placebo (n=2,410)</th></tr></thead>
+                  <tbody>
+                    <tr><td>Dizziness</td><td>152 (6.3%)</td><td>94 (3.9%)</td></tr>
+                    <tr><td>Fatigue</td><td>106 (4.4%)</td><td>87 (3.6%)</td></tr>
+                    <tr><td>Cough</td><td>75 (3.1%)</td><td>67 (2.8%)</td></tr>
+                    <tr><td>Nausea</td><td>60 (2.5%)</td><td>46 (1.9%)</td></tr>
+                    <tr><td>Headache</td><td>72 (3.0%)</td><td>77 (3.2%)</td></tr>
+                    <tr><td>Upper respiratory tract infection</td><td>70 (2.9%)</td><td>72 (3.0%)</td></tr>
+                    <tr><td>Diarrhea</td><td>58 (2.4%)</td><td>60 (2.5%)</td></tr>
+                    <tr><td>Peripheral edema</td><td>53 (2.2%)</td><td>63 (2.6%)</td></tr>
+                  </tbody>
+                </table>
+                <paragraph>Adverse reactions that occurred in less than 2% of patients on CardioNex, and more often than on placebo, included hypotension with syncope (1.4% vs 0.8%), vertigo (1.2% vs 0.7%), rash (1.1% vs 0.8%), hyponatremia (1.0% vs 0.7%) and myalgia (0.9% vs 0.6%).</paragraph>
+                <paragraph>Symptomatic hypotension was the reaction that most often needed a change in other treatment: in 71% of patients with this reaction the dose of a diuretic was lowered, and CardioNex itself was interrupted in 23% of them [see Warnings and Precautions (5.2)]. Hyperkalemia led to a temporary interruption of CardioNex in 31% of the patients who had it [see Warnings and Precautions (5.1)]. Angioedema occurred in 10 patients on CardioNex and 3 on placebo; none of the cases was fatal, and 2 cases on CardioNex needed hospital care for airway observation [see Warnings and Precautions (5.3)].</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s6-4">
+              <id root="4f99b014-1dc8-5d7a-a74a-1b1dd1b999b5"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>6.4 Laboratory Abnormalities</title>
+              <text>
+                <paragraph>Table 3 shows the laboratory changes of interest in CLARION-HF. Mean serum potassium rose by 0.3 mEq/L by week 4 and then stayed level. Mean eGFR fell by 3 mL/min in the first month and did not fall further [see Clinical Studies (14.5)].</paragraph>
+                <paragraph>Table 3. Laboratory Abnormalities in CLARION-HF</paragraph>
+                <table>
+                  <thead><tr><th>Laboratory abnormality</th><th>CardioNex (n=2,410)</th><th>Placebo (n=2,410)</th></tr></thead>
+                  <tbody>
+                    <tr><td>Serum potassium above 5.5 mEq/L at any visit</td><td>4.1%</td><td>1.9%</td></tr>
+                    <tr><td>Serum creatinine rise of more than 30% from baseline</td><td>5.3%</td><td>3.1%</td></tr>
+                    <tr><td>Serum sodium below 130 mEq/L</td><td>1.4%</td><td>1.0%</td></tr>
+                    <tr><td>Hemoglobin fall of 2 g/dL or more</td><td>1.2%</td><td>0.9%</td></tr>
+                    <tr><td>Alanine aminotransferase above 3 times the upper limit of normal</td><td>0.8%</td><td>0.7%</td></tr>
+                  </tbody>
+                </table>
+                <paragraph>Among patients who also took spironolactone, serum potassium rose above 5.5 mEq/L in 7.6% of cases [see Drug Interactions (7.4)]. Elevations of alanine aminotransferase were similar on CardioNex and placebo, and no case met criteria for drug-induced liver injury.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s6-5">
+              <id root="cf32a7b4-4a28-5768-a6ba-5dd8a84dae5a"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>6.5 Adverse Reactions in Selected Subgroups</title>
+              <text>
+                <paragraph>In CLARION-HF, the rates of some adverse reactions differed by baseline characteristics. Table 10 shows the reactions in the subgroups in which the difference between CardioNex and placebo was largest. Hyperkalemia as an adverse reaction was an investigator-reported event, including a measured potassium above 5.0 mEq/L that led to an action; the laboratory rate for potassium above 5.5 mEq/L is in Adverse Reactions (6.4).</paragraph>
+                <paragraph>Table 10. Selected Adverse Reactions by Subgroup in CLARION-HF</paragraph>
+                <table>
+                  <thead><tr><th>Subgroup</th><th>Adverse reaction</th><th>CardioNex</th><th>Placebo</th></tr></thead>
+                  <tbody>
+                    <tr><td>Age 75 years or older (14% of patients)</td><td>Symptomatic hypotension</td><td>12.4%</td><td>6.0%</td></tr>
+                    <tr><td>Age 75 years or older</td><td>Dizziness</td><td>9.2%</td><td>5.3%</td></tr>
+                    <tr><td>Baseline eGFR 30 to 59 mL/min</td><td>Hyperkalemia</td><td>8.9%</td><td>4.6%</td></tr>
+                    <tr><td>Baseline eGFR 30 to 59 mL/min</td><td>Worsening renal function</td><td>6.1%</td><td>5.2%</td></tr>
+                    <tr><td>Taking a mineralocorticoid receptor antagonist</td><td>Hyperkalemia</td><td>9.7%</td><td>5.1%</td></tr>
+                    <tr><td>Taking a loop diuretic</td><td>Symptomatic hypotension</td><td>10.0%</td><td>4.9%</td></tr>
+                    <tr><td>Not taking a mineralocorticoid receptor antagonist</td><td>Hyperkalemia</td><td>4.8%</td><td>2.2%</td></tr>
+                  </tbody>
+                </table>
+                <paragraph>The differences are descriptive. They are the reason that this label advises more frequent blood pressure checks in older patients [see Use in Specific Populations (8.5)] and closer potassium checks in patients who also take a mineralocorticoid receptor antagonist [see Drug Interactions (7.4)].</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s6-6">
+              <id root="f9deafe8-ed58-5b7e-a9db-7c3be1c868a2"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>6.6 Adverse Reactions Leading to Discontinuation</title>
+              <text>
+                <paragraph>In CLARION-HF, 7.9% of patients on CardioNex and 6.1% on placebo stopped treatment because of an adverse reaction. Table 11 gives the reasons.</paragraph>
+                <paragraph>Table 11. Reasons for Discontinuation Because of an Adverse Reaction in CLARION-HF</paragraph>
+                <table>
+                  <thead><tr><th>Reason</th><th>CardioNex (n=2,410)</th><th>Placebo (n=2,410)</th></tr></thead>
+                  <tbody>
+                    <tr><td>Symptomatic hypotension or dizziness</td><td>2.6%</td><td>1.2%</td></tr>
+                    <tr><td>Hyperkalemia</td><td>1.5%</td><td>0.7%</td></tr>
+                    <tr><td>Worsening renal function</td><td>1.2%</td><td>1.0%</td></tr>
+                    <tr><td>Angioedema</td><td>0.3%</td><td>0.1%</td></tr>
+                    <tr><td>Any other reason</td><td>2.3%</td><td>3.1%</td></tr>
+                    <tr><td>Total</td><td>7.9%</td><td>6.1%</td></tr>
+                  </tbody>
+                </table>
+                <paragraph>Most discontinuations for hypotension, hyperkalemia and worsening renal function occurred in the first 3 months of treatment, which is the period in which the monitoring schedule in Dosage and Administration (2.4) is most intensive. BNP: CardioNex raises plasma BNP concentrations because BNP is a neprilysin substrate. Use NT-proBNP when a natriuretic peptide must be measured. Renin and aldosterone assays are also affected by the pharmacologic effect of CardioNex [see Warnings and Precautions (5.7)].</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s6-7">
+              <id root="63fd1a86-b257-54bb-ad21-870ad0c6ab58"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>6.7 Adverse Reactions by Time of Onset</title>
+              <text>
+                <paragraph>The timing of the main adverse reactions in CLARION-HF is summarized in Table 13. Most events related to blood pressure, potassium and kidney function appeared early, and the rates of new events in later years were lower.</paragraph>
+                <paragraph>Table 13. Time of Onset of Selected Adverse Reactions on CardioNex in CLARION-HF</paragraph>
+                <table>
+                  <thead><tr><th>Adverse reaction</th><th>First onset within 4 weeks</th><th>First onset from 4 weeks to 6 months</th><th>First onset after 6 months</th></tr></thead>
+                  <tbody>
+                    <tr><td>Symptomatic hypotension</td><td>52%</td><td>31%</td><td>17%</td></tr>
+                    <tr><td>Hyperkalemia</td><td>44%</td><td>36%</td><td>20%</td></tr>
+                    <tr><td>Worsening renal function</td><td>47%</td><td>33%</td><td>20%</td></tr>
+                    <tr><td>Angioedema</td><td>30%</td><td>40%</td><td>30%</td></tr>
+                    <tr><td>Dizziness</td><td>58%</td><td>29%</td><td>13%</td></tr>
+                  </tbody>
+                </table>
+                <paragraph>Percentages are the share of patients with the reaction on CardioNex whose first event started in each interval. Because angioedema was rare (10 patients on CardioNex), its distribution should be read with care, and angioedema can occur at any time during treatment [see Warnings and Precautions (5.3)].</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s6-8">
+              <id root="2d0ed40c-3a3f-54e4-a9cc-dcac612a770a"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>6.8 Phase 2 Dose-Ranging Study</title>
+              <text>
+                <paragraph>In a 12-week, randomized, placebo-controlled Phase 2 study in 612 patients with chronic heart failure and an LVEF of 40% or lower, cardionexib was given at 5 mg, 20 mg and 40 mg once daily. The adverse reactions were of the same kind as in CLARION-HF, and their frequency rose with the dose. Dizziness was reported in 3.1% of patients on 5 mg, 5.2% on 20 mg and 6.9% on 40 mg, compared with 3.3% on placebo. A serum potassium above 5.5 mEq/L was seen in 0.7% on 5 mg, 2.0% on 20 mg and 3.4% on 40 mg, compared with 0.7% on placebo. No death was attributed to study drug.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+        </section>
+      </component>
+      <component>
+        <section ID="s7">
+          <id root="1951c271-b11f-56b0-a121-709cce84a1d2"/>
+          <code code="34073-7" codeSystem="2.16.840.1.113883.6.1" displayName="DRUG INTERACTIONS SECTION"/>
+          <title>7 DRUG INTERACTIONS SECTION</title>
+          <effectiveTime value="20250201"/>
+          <component>
+            <section ID="s7-1">
+              <id root="3bc507f6-65f7-5728-a230-45845cae3a20"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>7.1 Potassium-Raising Drugs</title>
+              <text>
+                <paragraph>Potassium supplements, potassium-sparing diuretics (spironolactone, eplerenone, amiloride) and salt substitutes that contain potassium increase the chance of hyperkalemia. Monitor serum potassium closely when any of these is used with CardioNex.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s7-2">
+              <id root="69692232-9f59-53b9-aa3b-61768e8f08ae"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>7.2 Strong CYP3A4 Inducers</title>
+              <text>
+                <paragraph>Rifampin, carbamazepine, phenytoin and St John's wort lower CardioNex exposure by about 70% and may remove its benefit. Avoid using them together.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s7-4">
+              <id root="36a3f860-fe8f-5a15-a065-43efa5160c8e"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>7.4 Mineralocorticoid Receptor Antagonists</title>
+              <text>
+                <paragraph>The combination of CardioNex with a mineralocorticoid receptor antagonist such as spironolactone or eplerenone is common in heart failure and raises the risk of hyperkalemia more than either drug alone. In CLARION-HF, patients also taking spironolactone had potassium above 5.5 mEq/L in 7.6% of cases, compared with 4.1% of all patients on CardioNex. Check potassium 1 week after adding a mineralocorticoid receptor antagonist to CardioNex, or after adding CardioNex to one, and monthly for 3 months after any change in the dose of either drug [see Dosage and Administration (2.4) and Warnings and Precautions (5.1)].</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s7-5">
+              <id root="26565902-f4ee-5271-a19c-4baf12fa6214"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>7.5 Nonsteroidal Anti-Inflammatory Drugs</title>
+              <text>
+                <paragraph>In older patients, in patients who are volume depleted (including those on diuretic therapy) and in patients with impaired kidney function, NSAIDs, including selective cyclooxygenase-2 inhibitors, given with CardioNex may worsen kidney function, including acute kidney failure, and may blunt the effect of CardioNex on heart failure outcomes. These effects are usually reversible. Monitor kidney function periodically in patients who receive CardioNex and an NSAID. Low-dose aspirin for cardiovascular protection is not expected to have a clinically relevant effect.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s7-6">
+              <id root="7157f80b-99e8-5be9-a88e-0e8f07cdf332"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>7.6 Dual Blockade of the Renin-Angiotensin System</title>
+              <text>
+                <paragraph>Giving CardioNex with an angiotensin receptor blocker or with aliskiren increases the risk of hypotension, hyperkalemia and changes in kidney function (including acute kidney failure) compared with CardioNex alone. These combinations were not allowed in CLARION-HF and have not been studied. Closely monitor blood pressure, kidney function and electrolytes in patients on CardioNex and other agents that affect the renin-angiotensin system. Concomitant use with an ACE inhibitor is contraindicated [see Contraindications (4)].</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s7-7">
+              <id root="694a1271-dace-5064-abc7-86ed5fbe1b37"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>7.7 Lithium</title>
+              <text>
+                <paragraph>Increases in serum lithium concentrations and lithium toxicity have been reported with drugs that act on the renin-angiotensin system. Monitor serum lithium concentrations during concomitant use with CardioNex.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s7-8">
+              <id root="3a2f6a46-c79e-5ba0-a543-107c11e9bc9c"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>7.8 Loop and Thiazide Diuretics</title>
+              <text>
+                <paragraph>Loop and thiazide diuretics add to the blood pressure effect of CardioNex, and a high dose of a diuretic is a risk factor for symptomatic hypotension [see Warnings and Precautions (5.2)]. In CLARION-HF, a loop diuretic was allowed and was taken by most patients. Pharmacokinetic studies showed no clinically relevant change in the exposure of furosemide, torsemide or hydrochlorothiazide when they were given with CardioNex. If hypotension occurs, lower the dose of the diuretic first.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s7-9">
+              <id root="0067525d-d2c9-5f6b-a64d-b95708a529a9"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>7.9 Drugs Without a Clinically Relevant Interaction</title>
+              <text>
+                <paragraph>In clinical pharmacology studies, no clinically relevant change in the exposure of CardioNex or of the other drug was seen when CardioNex was given with digoxin, warfarin, atorvastatin, metoprolol succinate, carvedilol or omeprazole. CardioNex did not alter the anticoagulant effect of warfarin (International Normalized Ratio) in healthy subjects. Antacids that contain aluminum or magnesium lowered the peak concentration of cardionexib by 9% without a change in the area under the curve, which is not clinically relevant.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s7-10">
+              <id root="b95b836e-33ba-5bdc-aa13-8a07d3d7ea0a"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>7.10 Summary of Clinically Relevant Interactions</title>
+              <text>
+                <paragraph>Table 4 collects the interactions described in this section and the actions to take. Doses that apply with a given interacting drug are in the dosing table in Dosage and Administration (2.2).</paragraph>
+                <paragraph>Table 4. Clinically Relevant Drug Interactions With CardioNex</paragraph>
+                <table>
+                  <thead><tr><th>Interacting drug or class</th><th>Effect</th><th>Recommendation</th></tr></thead>
+                  <tbody>
+                    <tr><td>ACE inhibitors</td><td>Angioedema</td><td>Contraindicated; 36-hour washout [see Contraindications (4)]</td></tr>
+                    <tr><td>Potassium supplements, salt substitutes containing potassium, potassium-sparing diuretics</td><td>Hyperkalemia</td><td>Monitor serum potassium closely [see 7.1]</td></tr>
+                    <tr><td>Mineralocorticoid receptor antagonists (spironolactone, eplerenone)</td><td>Hyperkalemia; potassium above 5.5 mEq/L in 7.6% of patients on spironolactone in CLARION-HF</td><td>Check potassium 1 week after a change and monthly for 3 months [see 7.4]</td></tr>
+                    <tr><td>Strong CYP3A4 inducers (rifampin, carbamazepine, phenytoin, St John's wort)</td><td>CardioNex exposure lowered by about 70%</td><td>Avoid use together [see 7.2]</td></tr>
+                    <tr><td>Strong CYP3A4 inhibitors (itraconazole, ketoconazole, clarithromycin, ritonavir)</td><td>Higher CardioNex exposure</td><td>Dose limit in the dosing table [see Dosage and Administration (2.2)]</td></tr>
+                    <tr><td>NSAIDs, including COX-2 inhibitors</td><td>Worse kidney function; blunted effect</td><td>Monitor kidney function [see 7.5]</td></tr>
+                    <tr><td>Angiotensin receptor blockers, aliskiren</td><td>Hypotension, hyperkalemia, kidney injury</td><td>Monitor blood pressure, kidney function and electrolytes [see 7.6]</td></tr>
+                    <tr><td>Lithium</td><td>Higher lithium levels</td><td>Monitor serum lithium [see 7.7]</td></tr>
+                    <tr><td>Loop and thiazide diuretics</td><td>Additive blood pressure lowering</td><td>Lower the diuretic dose first if hypotension occurs [see 7.8]</td></tr>
+                  </tbody>
+                </table>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s7-11">
+              <id root="9a2826c8-e4a5-5ae4-a850-18c0ffb96813"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>7.11 Drug and Laboratory Test Interactions</title>
+              <text>
+                <paragraph>Renin and aldosterone assays: CardioNex changes plasma renin activity and aldosterone through its pharmacologic effect and can affect the result of screening tests for primary aldosteronism [see Warnings and Precautions (5.7)].</paragraph>
+                <paragraph>Serum potassium and creatinine: CardioNex does not interfere with the laboratory methods for these two tests. The rise in potassium and creatinine that follows treatment is a pharmacologic effect and not an assay artifact. A hemolyzed blood sample can raise the measured potassium falsely; repeat a potassium that is unexpectedly high before acting on it, unless the patient has symptoms or electrocardiographic changes.</paragraph>
+                <paragraph>Urine: No effect on urine dipstick tests for protein or glucose has been seen.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s7-12">
+              <id root="b46999b8-da4d-54a9-a4ef-81398f6e4f63"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>7.12 Food, Herbal Products and Alcohol</title>
+              <text>
+                <paragraph>Food: CardioNex can be taken with or without food [see Dosage and Administration (2.3) and Clinical Pharmacology (12.4)].</paragraph>
+                <paragraph>Grapefruit juice: Large amounts of grapefruit juice are a mild to moderate CYP3A4 inhibitor and raised the area under the curve of cardionexib by about 30% in a clinical pharmacology study. Grapefruit juice is not a strong CYP3A4 inhibitor, and the dose limit for strong CYP3A4 inhibitors does not apply to it. Advise patients to avoid drinking large amounts of grapefruit juice.</paragraph>
+                <paragraph>St John's wort: St John's wort is a strong CYP3A4 inducer and lowers cardionexib exposure [see Drug Interactions (7.2)]. Ask patients specifically about herbal products, because many patients do not think of them as medicines.</paragraph>
+                <paragraph>Salt substitutes: Many salt substitutes replace sodium chloride with potassium chloride and can cause hyperkalemia during treatment with CardioNex [see Drug Interactions (7.1)].</paragraph>
+                <paragraph>Alcohol: Alcohol can add to the blood pressure lowering effect of CardioNex and to dizziness. Advise patients to limit alcohol, and to stand up slowly.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+        </section>
+      </component>
+      <component>
+        <section ID="s8">
+          <id root="b1dbc9ce-3a22-57e4-a463-53924f470333"/>
+          <code code="43684-0" codeSystem="2.16.840.1.113883.6.1" displayName="USE IN SPECIFIC POPULATIONS SECTION"/>
+          <title>8 USE IN SPECIFIC POPULATIONS SECTION</title>
+          <effectiveTime value="20250201"/>
+          <component>
+            <section ID="s8-1">
+              <id root="2e723126-6228-5112-af5b-b3aedb77ce9c"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>8.1 Pregnancy</title>
+              <text>
+                <paragraph>CardioNex can cause fetal harm when given during the second and third trimesters. Stop CardioNex as soon as pregnancy is detected and switch to a treatment that is safe in pregnancy. Women who could become pregnant should use effective contraception during treatment.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s8-2">
+              <id root="a92bb2d5-57c2-53be-ac82-ae160b5bdd29"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>8.2 Lactation</title>
+              <text>
+                <paragraph>It is not known whether cardionexib passes into human breast milk. In animal studies it was found in milk at levels close to those in plasma. Because of the risk of low blood pressure and high potassium in a breastfed infant, breastfeeding is not recommended during treatment and for 5 days after the final dose.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s8-3">
+              <id root="8c7ff2e1-94ea-579b-a95e-60d316982d05"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>8.3 Females and Males of Reproductive Potential</title>
+              <text>
+                <paragraph>Pregnancy testing: Exclude pregnancy in females of reproductive potential before starting CardioNex [see Dosage and Administration (2.1)].</paragraph>
+                <paragraph>Contraception: Females of reproductive potential should use effective contraception during treatment with CardioNex. Counsel them that fetal harm is most likely when exposure continues into the second and third trimesters, and that they should tell their prescriber at once if they become pregnant or plan to [see Use in Specific Populations (8.1)].</paragraph>
+                <paragraph>Infertility: No data on the effect of CardioNex on human fertility are available. In animal studies, cardionexib did not impair fertility at exposures well above the exposure at the highest recommended dose [see Nonclinical Toxicology (13.1)].</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s8-4">
+              <id root="a9655466-71a2-5e8e-a799-4c3e6f858a70"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>8.4 Pediatric Use</title>
+              <text>
+                <paragraph>Safety and effectiveness in patients younger than 18 years have not been established.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s8-5">
+              <id root="cee09d61-c00d-5aae-a6ab-48ac8acc6891"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>8.5 Geriatric Use</title>
+              <text>
+                <paragraph>Of the patients in the clinical trial, 38% were 65 or older and 14% were 75 or older. No overall differences in effectiveness were seen. Older patients had more dizziness and low blood pressure, so check blood pressure at each visit during the first month.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s8-6">
+              <id root="18ad2812-d727-5ed6-a7e9-81d73bf68ae9"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>8.6 Renal Impairment</title>
+              <text>
+                <paragraph>Exposure to cardionexib rises as kidney function falls. Doses by eGFR are given in section 2.2. Patients on dialysis were not studied.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s8-7">
+              <id root="2da56528-f70e-5460-a8ff-147288185a42"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>8.7 Hepatic Impairment</title>
+              <text>
+                <paragraph>No dose change is needed in mild or moderate hepatic impairment (Child-Pugh A or B). CardioNex has not been studied in severe hepatic impairment (Child-Pugh C) and is not recommended there.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s8-8">
+              <id root="ee70a946-1778-5c4f-a0f1-fd2ea2d13a45"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>8.8 Sex, Race and Body Weight</title>
+              <text>
+                <paragraph>Sex: In CLARION-HF, 27% of patients were women. The effect of CardioNex on the primary outcome was consistent in women and men, and the pharmacokinetics of cardionexib did not differ by sex after adjustment for body weight.</paragraph>
+                <paragraph>Race: The effect on the primary outcome was consistent across racial groups, although the number of Black patients (9% of the trial) was too small for a separate estimate of the hazard ratio with useful precision. Angioedema has been reported more often in Black patients treated with drugs that act on the renin-angiotensin system [see Warnings and Precautions (5.3)].</paragraph>
+                <paragraph>Body weight: Exposure to cardionexib was about 15% lower in patients above 100 kg than in patients of 60 to 80 kg. No dose change is recommended for body weight.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s8-9">
+              <id root="6dff6282-f55e-55eb-ae21-898e9ad15424"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>8.9 Patients With Heart Failure and Advanced Disease</title>
+              <text>
+                <paragraph>Patients in NYHA class IV made up 2% of CLARION-HF. The number was too small to allow a separate conclusion on efficacy or safety in this group. Patients who were hospitalized for acute heart failure were eligible only after they became clinically stable, and the effect of starting CardioNex during an acute episode has not been studied [see Indications and Usage (1.3)]. Patients with a heart transplant, a left ventricular assist device or an implantable cardioverter-defibrillator were included only if their device or graft had been stable for at least 3 months, and data in these groups are limited.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+        </section>
+      </component>
+      <component>
+        <section ID="s9">
+          <id root="c8eb9b6f-b883-5a91-ae0e-b14b6a0294a1"/>
+          <code code="42227-9" codeSystem="2.16.840.1.113883.6.1" displayName="DRUG ABUSE AND DEPENDENCE SECTION"/>
+          <title>9 Drug Abuse and Dependence</title>
+          <text>
+            <paragraph>CardioNex is not a controlled substance. In studies in animals and in humans, cardionexib showed no potential for abuse, tolerance or physical dependence, and no withdrawal syndrome was seen when treatment stopped.</paragraph>
+          </text>
+          <effectiveTime value="20250201"/>
+        </section>
+      </component>
+      <component>
+        <section ID="s10">
+          <id root="489964dc-fc6d-55b3-a19d-5290ed4cb77e"/>
+          <code code="34088-5" codeSystem="2.16.840.1.113883.6.1" displayName="OVERDOSAGE SECTION"/>
+          <title>10 Overdosage</title>
+          <text>
+            <paragraph>Low blood pressure is the most likely effect of an overdose. Give supportive care. Cardionexib is highly protein bound and is not removed by hemodialysis.</paragraph>
+          </text>
+          <effectiveTime value="20250201"/>
+          <component>
+            <section ID="s10-1">
+              <id root="3566839c-c62b-553d-a058-2138d61ef375"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>10.1 Overdose Experience</title>
+              <text>
+                <paragraph>In healthy subjects, single doses of cardionexib up to 400 mg were tolerated. The effects of doses well above the recommended dose were dizziness, low blood pressure and a small rise in serum potassium, all of which resolved without sequelae within 24 hours. There are no data on intentional overdose in patients with heart failure.</paragraph>
+                <paragraph>For an overdose, place the patient supine, give intravenous saline if there is hypotension, check serum potassium and creatinine, and monitor the electrocardiogram if potassium is raised. Cardionexib is highly protein bound and is not removed by hemodialysis, so dialysis is not a treatment for overdose. Contact a poison control center for current advice.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s10-2">
+              <id root="a0eda2e4-2d0e-5ffc-a43a-941fc598dbc1"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>10.2 Management of an Overdose With a Strong CYP3A4 Inhibitor</title>
+              <text>
+                <paragraph>An overdose taken together with a strong CYP3A4 inhibitor can produce higher and longer exposure than the dose alone, because the half-life of cardionexib is lengthened when its metabolism is blocked [see Clinical Pharmacology (12.5)]. In this setting, extend the monitoring of blood pressure and serum potassium beyond 24 hours.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+        </section>
+      </component>
+      <component>
+        <section ID="s11">
+          <id root="cdc6375a-8c14-5425-aaaf-9babdf7a0264"/>
+          <code code="34089-3" codeSystem="2.16.840.1.113883.6.1" displayName="DESCRIPTION SECTION"/>
+          <title>11 Description</title>
+          <text>
+            <paragraph>CardioNex (cardionexib) tablets contain cardionexib, a selective angiotensin II type 1 (AT1) receptor antagonist and an inhibitor of neprilysin, in a single molecule. Cardionexib is a white to off-white crystalline powder. It is practically insoluble in water at pH 7, sparingly soluble at pH 1 to 2 and freely soluble in methanol. Its molecular formula is C24H29N5O4S and its molecular weight is 483.6. It has one chiral center, and the drug substance is the single (S)-enantiomer. The partition coefficient (log P) is 3.1 at pH 7.4, and the acid dissociation constants (pKa) are 3.9 (carboxylic acid) and 5.6 (tetrazole).</paragraph>
+            <paragraph>CardioNex is supplied for oral administration as film-coated tablets in strengths of 5 mg, 20 mg and 40 mg of cardionexib. The tablets contain the following inactive ingredients: microcrystalline cellulose, lactose monohydrate, croscarmellose sodium, hypromellose, magnesium stearate, talc and titanium dioxide. The 20 mg tablet coating also contains yellow iron oxide. The 40 mg tablet coating also contains red iron oxide and yellow iron oxide.</paragraph>
+          </text>
+          <effectiveTime value="20250201"/>
+        </section>
+      </component>
+      <component>
+        <section ID="s12">
+          <id root="73667ac3-3d77-5f3e-a3d2-acf34c9ed0d8"/>
+          <code code="34090-1" codeSystem="2.16.840.1.113883.6.1" displayName="CLINICAL PHARMACOLOGY SECTION"/>
+          <title>12 CLINICAL PHARMACOLOGY SECTION</title>
+          <effectiveTime value="20250201"/>
+          <component>
+            <section ID="s12-1">
+              <id root="9373ef1d-3bdf-5184-a2ec-95b43fd02f37"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>12.1 Mechanism of Action</title>
+              <text>
+                <paragraph>Cardionexib is a single molecule with two actions, and it is not a prodrug. It blocks the angiotensin II type 1 (AT1) receptor in vascular smooth muscle and in the adrenal gland, which prevents the vasoconstriction, sodium and water retention and aldosterone release that angiotensin II produces. It also inhibits neprilysin, the enzyme that breaks down natriuretic peptides, bradykinin and other vasoactive peptides, so that levels of these peptides rise. Cardionexib does not inhibit the angiotensin-converting enzyme.</paragraph>
+                <paragraph>In heart failure, sustained activation of the renin-angiotensin-aldosterone system and the sympathetic nervous system promotes vasoconstriction, fluid retention, and remodeling of the left ventricle. Higher natriuretic peptide levels promote vasodilation, urinary sodium excretion and a lower cardiac preload, and the AT1 blockade opposes the harmful effects of angiotensin II. Both actions together are thought to account for the reduction in cardiovascular death and in hospitalization for heart failure seen in CLARION-HF [see Clinical Studies (14)].</paragraph>
+                <paragraph>Neprilysin also breaks down bradykinin. Higher bradykinin levels are the proposed reason for the angioedema that occurs when CardioNex is taken together with an ACE inhibitor, which also blocks bradykinin breakdown. This is the basis for the contraindication and for the 36-hour washout period [see Contraindications (4)].</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s12-2">
+              <id root="a40b0ed1-4f06-58e9-a68a-516d9d00e3b9"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>12.2 Pharmacodynamics</title>
+              <text>
+                <paragraph>Effects on natriuretic peptides, renin and blood pressure: In patients with heart failure, CardioNex raised plasma cyclic guanosine monophosphate (cGMP) by about 1.5-fold and lowered N-terminal pro-B-type natriuretic peptide (NT-proBNP) compared with placebo. B-type natriuretic peptide (BNP) is a neprilysin substrate and its concentration can rise with CardioNex without a worsening of heart failure, so NT-proBNP is the better marker for monitoring a patient on CardioNex. Plasma renin activity and angiotensin II concentrations rose, as expected with blockade of the AT1 receptor. Mean systolic blood pressure was lowered by 4 to 6 mm Hg in the first 4 weeks compared with placebo, with a peak effect 2 to 4 hours after a dose.</paragraph>
+                <paragraph>Effects on aldosterone and potassium: Blockade of the AT1 receptor lowered plasma aldosterone by about 20% from baseline at steady state and raised serum potassium by a mean of 0.3 mEq/L by week 4 in CLARION-HF [see Warnings and Precautions (5.1)].</paragraph>
+                <paragraph>Effects on kidney function: A small fall in eGFR (a mean of 3 mL/min in the first month) was seen and did not progress. Urinary sodium excretion rose for the first 24 hours after the first dose and returned toward baseline within 1 week.</paragraph>
+                <paragraph>Cardiac electrophysiology: In a thorough QT study in 60 healthy subjects, single doses of cardionexib of 40 mg and 200 mg did not prolong the QTc interval. The largest placebo-corrected, baseline-adjusted change in QTcF was 2.1 ms (upper bound of the one-sided 95% confidence interval 4.6 ms) at the 200 mg dose. In CLARION-HF, no pattern of increase in arrhythmia was seen, but hyperkalemia can cause conduction changes [see Warnings and Precautions (5.1)].</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s12-3">
+              <id root="0c67abbd-0dc1-51e5-a479-69508ac0a358"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>12.3 Pharmacokinetics</title>
+              <text>
+                <paragraph>Peak plasma levels are reached about 2 hours after a dose. The half-life is about 14 hours, so steady state is reached in 3 to 4 days. Cardionexib is cleared mainly by metabolism in the liver; less than 5% is excreted unchanged in urine.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s12-4">
+              <id root="c649a679-a3d8-5e69-a624-db520d4e54ae"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>12.4 Pharmacokinetic Parameters</title>
+              <text>
+                <paragraph>Table 5 gives the pharmacokinetic parameters of cardionexib in patients with heart failure after multiple doses of 40 mg once daily at steady state, and the matching values after a single dose. Exposure is proportional to dose from 5 mg to 40 mg. The parameters in Table 5 are consistent with the information in Pharmacokinetics (12.3).</paragraph>
+                <paragraph>Table 5. Pharmacokinetic Parameters of Cardionexib in Patients With Heart Failure (40 mg Once Daily)</paragraph>
+                <table>
+                  <thead><tr><th>Parameter</th><th>Single dose</th><th>Steady state (day 7)</th></tr></thead>
+                  <tbody>
+                    <tr><td>Cmax (ng/mL), geometric mean (CV%)</td><td>560 (28%)</td><td>790 (31%)</td></tr>
+                    <tr><td>Tmax (h), median (range)</td><td>2.0 (1.0 to 4.0)</td><td>2.0 (1.0 to 4.0)</td></tr>
+                    <tr><td>AUC (ng·h/mL), geometric mean (CV%): AUC0-inf after a single dose, AUC0-24 at steady state</td><td>9,750 (30%)</td><td>9,760 (33%)</td></tr>
+                    <tr><td>Terminal half-life (h), mean (SD)</td><td>14.0 (2.6)</td><td>14.2 (2.9)</td></tr>
+                    <tr><td>Accumulation ratio (AUC)</td><td>not applicable</td><td>1.45</td></tr>
+                    <tr><td>Apparent clearance, CL/F (L/h)</td><td>4.1</td><td>4.1</td></tr>
+                    <tr><td>Apparent volume of distribution, Vz/F (L)</td><td>83</td><td>83</td></tr>
+                    <tr><td>Plasma protein binding</td><td>97%</td><td>97%</td></tr>
+                    <tr><td>Fraction of dose excreted unchanged in urine</td><td>less than 5%</td><td>less than 5%</td></tr>
+                  </tbody>
+                </table>
+                <paragraph>Absorption: The absolute oral bioavailability is 71%. Peak plasma concentrations are reached about 2 hours after a dose. A high-fat, high-calorie meal lowered the peak concentration by 12% and did not change the area under the curve, so CardioNex can be taken with or without food [see Dosage and Administration (2.3)].</paragraph>
+                <paragraph>Distribution: Cardionexib is highly bound to plasma proteins (97%), mainly to albumin, and the binding does not depend on concentration over the range of 10 to 2,000 ng/mL. The blood-to-plasma ratio is 0.7. The apparent volume of distribution (Vz/F) is 83 L.</paragraph>
+                <paragraph>Metabolism: Cardionexib is cleared mainly by metabolism in the liver. CYP3A4 accounts for about 80% of the oxidative metabolism and CYP2C8 for the remainder. Glucuronidation of the carboxylic acid is a minor route. The two main circulating metabolites, M1 and M2, each account for less than 10% of the plasma exposure of the parent drug and are not pharmacologically active.</paragraph>
+                <paragraph>Elimination: About 78% of a radiolabeled dose was recovered in feces, mostly as metabolites, and 17% in urine, of which less than 5% of the dose was unchanged cardionexib. The terminal half-life is about 14 hours, so steady state is reached in 3 to 4 days.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s12-5">
+              <id root="56a534a9-3dd1-5411-ae90-6ba28ab57d04"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>12.5 Pharmacokinetics in Specific Populations and Drug Interaction Studies</title>
+              <text>
+                <paragraph>Renal impairment: Compared with subjects with normal kidney function, the area under the curve of cardionexib was 1.4 times higher in subjects with an eGFR of 30 to 59 mL/min/1.73 m2 and 2.0 times higher in subjects with an eGFR of 15 to 29 mL/min/1.73 m2. Cardionexib is highly protein bound and is not removed by hemodialysis. Patients on dialysis were not studied [see Use in Specific Populations (8.6)].</paragraph>
+                <paragraph>Hepatic impairment: The area under the curve was 18% higher in mild impairment (Child-Pugh A) and 35% higher in moderate impairment (Child-Pugh B) than in subjects with normal hepatic function. These differences do not call for a dose change. CardioNex has not been studied in severe hepatic impairment (Child-Pugh C) [see Use in Specific Populations (8.7)].</paragraph>
+                <paragraph>Age, sex, race and weight: In a population pharmacokinetic analysis of 3,120 patients in CLARION-HF, the area under the curve was about 20% higher in patients 65 years or older than in younger patients, which was not clinically relevant on its own. Sex and race had no clinically relevant effect. Exposure was about 15% lower in patients above 100 kg [see Use in Specific Populations (8.5) and (8.8)].</paragraph>
+                <paragraph>Table 6. Effect of Other Drugs on the Pharmacokinetics of Cardionexib</paragraph>
+                <table>
+                  <thead><tr><th>Coadministered drug (regimen)</th><th>Change in cardionexib AUC</th><th>Change in cardionexib Cmax</th></tr></thead>
+                  <tbody>
+                    <tr><td>Ketoconazole (400 mg once daily, strong CYP3A4 inhibitor)</td><td>increased 3.5-fold</td><td>increased 1.9-fold</td></tr>
+                    <tr><td>Clarithromycin (500 mg twice daily, strong CYP3A4 inhibitor)</td><td>increased 2.6-fold</td><td>increased 1.7-fold</td></tr>
+                    <tr><td>Rifampin (600 mg once daily, strong CYP3A4 inducer)</td><td>decreased by about 70%</td><td>decreased by about 55%</td></tr>
+                    <tr><td>Omeprazole (40 mg once daily)</td><td>no change</td><td>no change</td></tr>
+                    <tr><td>Antacid containing aluminum and magnesium hydroxide</td><td>no change</td><td>decreased by 9%</td></tr>
+                    <tr><td>Atorvastatin (80 mg once daily)</td><td>no change</td><td>no change</td></tr>
+                  </tbody>
+                </table>
+                <paragraph>Effect of cardionexib on other drugs: Cardionexib 40 mg once daily did not change the exposure of digoxin, warfarin (S-warfarin AUC or International Normalized Ratio), atorvastatin or metoprolol succinate in a clinically relevant way. Cardionexib is a weak inhibitor of OATP1B1 in vitro; the clinical effect on atorvastatin exposure was an increase of 8% in the area under the curve. Cardionexib did not inhibit or induce CYP1A2, CYP2C9, CYP2C19, CYP2D6 or CYP3A4 at clinically relevant concentrations [see Drug Interactions (7)].</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s12-6">
+              <id root="c6f0bcc7-88b9-5e4d-a706-53f8514fe028"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>12.6 In Vitro Studies</title>
+              <text>
+                <paragraph>Cardionexib is a substrate of CYP3A4, and to a minor extent of CYP2C8. In vitro, cardionexib is a substrate of P-glycoprotein but not of breast cancer resistance protein (BCRP). Cardionexib is a substrate of the hepatic uptake transporter OATP1B1. Cardionexib and its main metabolites did not inhibit CYP1A2, CYP2B6, CYP2C9, CYP2C19, CYP2D6 or CYP3A4 at concentrations up to 50 micromolar. At concentrations up to 10 micromolar, cardionexib did not induce CYP1A2, CYP2B6 or CYP3A4 in human hepatocytes. Cardionexib is a weak inhibitor of OATP1B1 and OAT3, and the clinical relevance of this effect was checked in the interaction study with atorvastatin [see Clinical Pharmacology (12.5)].</paragraph>
+                <paragraph>In human plasma, cardionexib is 97% bound to proteins. Binding was not displaced by warfarin, digoxin or furosemide at therapeutic concentrations.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s12-7">
+              <id root="493b7725-15dd-561f-a640-8254946f2eba"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>12.7 Exposure-Response Relationships</title>
+              <text>
+                <paragraph>In a population analysis of CLARION-HF, the reduction in the risk of the primary outcome rose with exposure over the range reached by doses of 20 mg and 40 mg, and the fall in systolic blood pressure, the rise in serum potassium and the rise in serum creatinine were also exposure related. The higher exposure of patients with a lower eGFR and of patients who take a strong CYP3A4 inhibitor is the reason for the dose limits in the dosing table in Dosage and Administration (2.2). Exposure above the range seen at the target dose has not been tested in an outcome trial.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s12-8">
+              <id root="a675491f-f4ab-5cef-a4ac-5de706e68572"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>12.8 Summary of Exposure in Specific Populations</title>
+              <text>
+                <paragraph>Table 14 collects the effect of intrinsic factors on the exposure of cardionexib, as the ratio of the area under the curve in the group to that in the reference group. The rows are described in Clinical Pharmacology (12.5).</paragraph>
+                <paragraph>Table 14. Effect of Intrinsic Factors on Cardionexib Exposure</paragraph>
+                <table>
+                  <thead><tr><th>Factor</th><th>Group compared</th><th>Reference group</th><th>AUC ratio</th><th>Dose change for this factor alone</th></tr></thead>
+                  <tbody>
+                    <tr><td>Kidney function</td><td>eGFR 30 to 59 mL/min/1.73 m2</td><td>eGFR 90 or more</td><td>1.4</td><td>See the dosing table in 2.2</td></tr>
+                    <tr><td>Kidney function</td><td>eGFR 15 to 29 mL/min/1.73 m2</td><td>eGFR 90 or more</td><td>2.0</td><td>See the dosing table in 2.2</td></tr>
+                    <tr><td>Liver function</td><td>Child-Pugh A</td><td>Normal</td><td>1.18</td><td>None</td></tr>
+                    <tr><td>Liver function</td><td>Child-Pugh B</td><td>Normal</td><td>1.35</td><td>None</td></tr>
+                    <tr><td>Age</td><td>65 years or older</td><td>Younger than 65 years</td><td>about 1.2</td><td>None</td></tr>
+                    <tr><td>Body weight</td><td>above 100 kg</td><td>60 to 80 kg</td><td>about 0.85</td><td>None</td></tr>
+                    <tr><td>Sex</td><td>women</td><td>men</td><td>no relevant difference after weight adjustment</td><td>None</td></tr>
+                  </tbody>
+                </table>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+        </section>
+      </component>
+      <component>
+        <section ID="s13">
+          <id root="44b93984-1cc2-59b7-af69-da7f42fc3181"/>
+          <code code="43680-8" codeSystem="2.16.840.1.113883.6.1" displayName="NONCLINICAL TOXICOLOGY SECTION"/>
+          <title>13 NONCLINICAL TOXICOLOGY SECTION</title>
+          <effectiveTime value="20250201"/>
+          <component>
+            <section ID="s13-1">
+              <id root="e2569123-2006-5f2c-a7e8-a49d106b5301"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>13.1 Carcinogenesis, Mutagenesis, Impairment of Fertility</title>
+              <text>
+                <paragraph>Carcinogenesis: Cardionexib was not carcinogenic in a 104-week study in rats at oral doses up to 60 mg/kg/day (about 14 times the human exposure at the dose of 40 mg once daily, based on the area under the curve) or in a 26-week study in transgenic mice at doses up to 150 mg/kg/day.</paragraph>
+                <paragraph>Mutagenesis: Cardionexib was not mutagenic in the bacterial reverse mutation (Ames) assay, and was not clastogenic in the in vitro chromosomal aberration assay in human lymphocytes or in the in vivo rat micronucleus assay.</paragraph>
+                <paragraph>Impairment of fertility: Cardionexib did not affect mating, fertility, or early embryonic development in male or female rats at oral doses up to 40 mg/kg/day (about 10 times the human exposure at the dose of 40 mg once daily). Sperm count, motility and testicular histology were normal.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s13-2">
+              <id root="ae09c873-88f5-56a5-a72f-8e83c3ea18b0"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>13.2 Animal Toxicology and Pharmacology</title>
+              <text>
+                <paragraph>In repeat-dose toxicity studies in rats and dogs, the main findings at exposures above the human exposure were changes in the kidney (tubular dilation and juxtaglomerular cell hyperplasia, typical of drugs that act on the renin-angiotensin system), reduced blood pressure with a rise in heart rate, and raised serum potassium. These findings reversed after a treatment-free period of 4 weeks. No findings in the liver, heart valves or bone marrow were seen in studies of up to 52 weeks in dogs.</paragraph>
+                <paragraph>In juvenile rats dosed from postnatal day 7, a dose-dependent delay in kidney maturation and a reduction in body-weight gain were seen at exposures about 3 times the human exposure. These findings support the statement that safety and effectiveness have not been established in patients younger than 18 years [see Use in Specific Populations (8.4)]. In pregnant rats and rabbits, reduced fetal weight and delayed skeletal ossification were seen at exposures that caused maternal hypotension [see Use in Specific Populations (8.1)].</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s13-3">
+              <id root="bbbdb7a1-61aa-5177-ae41-b108a29cce09"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>13.3 Reproductive and Developmental Toxicology</title>
+              <text>
+                <paragraph>In pregnant rats given cardionexib orally during organogenesis, fetal weight was reduced and ossification delayed at doses that lowered maternal blood pressure. In rabbits, the same fetal changes were seen with maternal hypotension and an increase in post-implantation loss. In a pre- and post-natal study in rats, doses from late gestation through weaning reduced pup survival and body-weight gain and delayed kidney development. These findings are consistent with the class of drugs that act on the renin-angiotensin system and with the boxed warning on fetal toxicity [see Boxed Warning and Contraindications (0.0) and Use in Specific Populations (8.1)]. Cardionexib was present in the milk of lactating rats at concentrations close to those in plasma [see Use in Specific Populations (8.2)].</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+        </section>
+      </component>
+      <component>
+        <section ID="s14">
+          <id root="d704ffab-33fd-5673-ae42-7d46889ff230"/>
+          <code code="34092-7" codeSystem="2.16.840.1.113883.6.1" displayName="CLINICAL STUDIES SECTION"/>
+          <title>14 CLINICAL STUDIES SECTION</title>
+          <effectiveTime value="20250201"/>
+          <component>
+            <section ID="s14-1">
+              <id root="8dd270e5-152c-5db0-a6f2-f329d670da77"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>14.1 CLARION-HF Trial Design</title>
+              <text>
+                <paragraph>The effect of CardioNex on cardiovascular death and heart failure hospitalization was studied in CLARION-HF, a multicenter, randomized, double-blind, placebo-controlled, event-driven Phase 3 trial in 4,820 adults with chronic heart failure.</paragraph>
+                <paragraph>Eligible patients had an LVEF of 40% or lower and an eGFR of 30 mL/min or more. Patients with a screening serum potassium above 5.2 mEq/L were excluded. Patients on dialysis, patients with an eGFR below 30 mL/min, patients with an LVEF above 40%, pregnant women and patients younger than 18 years were not enrolled. Patients who had been taking an ACE inhibitor stopped it at least 36 hours before the first dose.</paragraph>
+                <paragraph>Patients were randomized 1 to 1 to CardioNex or placebo, on top of usual care. CardioNex was started at 20 mg once daily and raised to 40 mg once daily after 4 weeks, as tolerated. The median follow-up was 26 months. The primary outcome was the first of cardiovascular death or hospitalization for heart failure. The key secondary outcomes were cardiovascular death, first hospitalization for heart failure, and death from any cause. All analyses followed the intention-to-treat principle, with a time-to-first-event analysis in a Cox proportional hazards model stratified by region and baseline eGFR category.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s14-2">
+              <id root="a2bd382e-1243-53c3-ab94-ace831b9aba4"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>14.2 Patient Characteristics in CLARION-HF</title>
+              <text>
+                <paragraph>Table 7 gives the baseline characteristics. The groups were well balanced.</paragraph>
+                <paragraph>Table 7. Baseline Characteristics in CLARION-HF</paragraph>
+                <table>
+                  <thead><tr><th>Characteristic</th><th>CardioNex (n=2,410)</th><th>Placebo (n=2,410)</th></tr></thead>
+                  <tbody>
+                    <tr><td>Age, mean (SD), years</td><td>67 (10.4)</td><td>67 (10.6)</td></tr>
+                    <tr><td>Age 65 years or older, %</td><td>38</td><td>38</td></tr>
+                    <tr><td>Age 75 years or older, %</td><td>14</td><td>14</td></tr>
+                    <tr><td>Women, %</td><td>27</td><td>27</td></tr>
+                    <tr><td>Black, %</td><td>9</td><td>9</td></tr>
+                    <tr><td>Median LVEF, %</td><td>31</td><td>31</td></tr>
+                    <tr><td>NYHA class II / III / IV, %</td><td>62 / 36 / 2</td><td>62 / 36 / 2</td></tr>
+                    <tr><td>Ischemic cause of heart failure, %</td><td>58</td><td>59</td></tr>
+                    <tr><td>Diabetes, %</td><td>38</td><td>37</td></tr>
+                    <tr><td>Mean eGFR, mL/min/1.73 m2</td><td>66</td><td>66</td></tr>
+                    <tr><td>eGFR 30 to 59 mL/min/1.73 m2, %</td><td>41</td><td>42</td></tr>
+                    <tr><td>Beta blocker, %</td><td>94</td><td>94</td></tr>
+                    <tr><td>Loop diuretic, %</td><td>82</td><td>81</td></tr>
+                    <tr><td>Mineralocorticoid receptor antagonist, %</td><td>41</td><td>41</td></tr>
+                  </tbody>
+                </table>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s14-3">
+              <id root="be688d71-c79c-5616-a79f-4a7b831e9665"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>14.3 Primary Outcome</title>
+              <text>
+                <paragraph>CardioNex lowered the risk of the first occurrence of cardiovascular death or hospitalization for heart failure compared with placebo. In the intention-to-treat population, the event rate was 14.2% on CardioNex and 19.1% on placebo (hazard ratio 0.74; 95% CI, 0.65 to 0.84; p&lt;0.001). The effect appeared within the first months of treatment and the curves continued to separate during follow-up.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s14-4">
+              <id root="08a53edf-927a-5611-a320-7d1bcdd783eb"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>14.4 Secondary Outcomes</title>
+              <text>
+                <paragraph>The components of the primary outcome and the death rate from any cause are shown in Table 8.</paragraph>
+                <paragraph>Table 8. Primary and Secondary Outcomes in CLARION-HF</paragraph>
+                <table>
+                  <thead><tr><th>Outcome</th><th>CardioNex (n=2,410)</th><th>Placebo (n=2,410)</th><th>Hazard ratio (95% CI)</th></tr></thead>
+                  <tbody>
+                    <tr><td>Primary: cardiovascular death or first hospitalization for heart failure</td><td>14.2%</td><td>19.1%</td><td>0.74 (0.65 to 0.84)</td></tr>
+                    <tr><td>Cardiovascular death</td><td>7.1%</td><td>8.9%</td><td>0.79 (0.66 to 0.95)</td></tr>
+                    <tr><td>First hospitalization for heart failure</td><td>9.0%</td><td>12.6%</td><td>0.71 (0.61 to 0.82)</td></tr>
+                    <tr><td>Death from any cause</td><td>9.8%</td><td>11.4%</td><td>0.86 (0.74 to 1.00)</td></tr>
+                  </tbody>
+                </table>
+                <paragraph>For death from any cause the upper limit of the confidence interval was 1.00, and the result should not be described as a statistically significant reduction in all-cause mortality. The effect on the primary outcome came from both of its components: the hazard ratios for cardiovascular death and for the first hospitalization for heart failure were both below 1.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s14-5">
+              <id root="192264f8-8dc4-53f4-a4b8-046f6b3aaf68"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>14.5 Potassium and Kidney Function in CLARION-HF</title>
+              <text>
+                <paragraph>Mean serum potassium rose by 0.3 mEq/L by week 4 and then stayed level. Serum potassium above 5.5 mEq/L at any visit occurred in 4.1% of patients on CardioNex and 1.9% on placebo. Among patients who also took spironolactone, 7.6% had a potassium above 5.5 mEq/L. Mean eGFR fell by 3 mL/min in the first month and did not fall further. These results are the basis for the monitoring schedule in Dosage and Administration (2.4) and for the instruction not to initiate CardioNex if baseline serum potassium exceeds 5.0 mEq/L [see Warnings and Precautions (5.1)].</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s14-6">
+              <id root="34612d49-5147-5932-a87a-771a520754f8"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>14.6 Subgroup Analyses</title>
+              <text>
+                <paragraph>The effect of CardioNex on the primary outcome was consistent across the subgroups that were prespecified. Table 9 shows hazard ratios for the primary outcome, and the event rates for the two subgroups that the label cites most often. The subgroup analyses were not adjusted for multiple comparisons and should be read as descriptive.</paragraph>
+                <paragraph>Table 9. Primary Outcome by Subgroup in CLARION-HF</paragraph>
+                <table>
+                  <thead><tr><th>Subgroup</th><th>CardioNex event rate</th><th>Placebo event rate</th><th>Hazard ratio (95% CI)</th><th>P-value</th></tr></thead>
+                  <tbody>
+                    <tr><td>Overall intention-to-treat population</td><td>14.2%</td><td>19.1%</td><td>0.74 (0.65 to 0.84)</td><td>p&lt;0.001</td></tr>
+                    <tr><td>Age 75 years or older</td><td>17.8%</td><td>21.9%</td><td>0.81 (0.68 to 0.96)</td><td>p=0.014</td></tr>
+                    <tr><td>Baseline eGFR 30 to 59 mL/min</td><td>16.0%</td><td>21.4%</td><td>0.73 (0.61 to 0.88)</td><td>p=0.001</td></tr>
+                    <tr><td>Women</td><td>not shown</td><td>not shown</td><td>0.72 (0.58 to 0.90)</td><td>not shown</td></tr>
+                    <tr><td>Men</td><td>not shown</td><td>not shown</td><td>0.75 (0.65 to 0.87)</td><td>not shown</td></tr>
+                    <tr><td>Diabetes</td><td>not shown</td><td>not shown</td><td>0.77 (0.65 to 0.91)</td><td>not shown</td></tr>
+                    <tr><td>Taking a mineralocorticoid receptor antagonist</td><td>not shown</td><td>not shown</td><td>0.76 (0.63 to 0.92)</td><td>not shown</td></tr>
+                  </tbody>
+                </table>
+                <paragraph>Patients who were 75 years or older had the highest absolute event rates, and the relative reduction in this subgroup was smaller than in the whole trial. Patients with a baseline eGFR of 30 to 59 mL/min had a relative reduction similar to that of the trial as a whole.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s14-7">
+              <id root="3f054f7b-6ccd-5dae-a84e-7a2f6f00f34f"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>14.7 Populations Not Studied in the Clinical Trial</title>
+              <text>
+                <paragraph>Patients on dialysis, patients with an eGFR below 30 mL/min, patients with an LVEF above 40%, pregnant women and patients younger than 18 years were not enrolled in CLARION-HF. No efficacy conclusion can be drawn for them from the trial. For patients with an eGFR below 30 mL/min who are not on dialysis, the dosing table in Dosage and Administration (2.2) rests on pharmacokinetic data [see Clinical Pharmacology (12.5)]. CardioNex is contraindicated in patients on dialysis [see Contraindications (4)].</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s14-8">
+              <id root="0679f539-170d-56e2-ab37-d9dae2537398"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>14.8 Effect on NT-proBNP</title>
+              <text>
+                <paragraph>In a prespecified biomarker substudy of 1,150 patients in CLARION-HF, the geometric mean NT-proBNP fell by 24% from baseline to week 8 on CardioNex and by 4% on placebo (ratio of geometric means 0.79; 95% CI, 0.72 to 0.86). The difference was maintained at 12 months. Because BNP can rise on CardioNex, NT-proBNP was used in the substudy [see Warnings and Precautions (5.7)].</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s14-9">
+              <id root="23511181-dc06-5a0f-aa36-dc3281f02fdf"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>14.9 Absolute Effect and Patient-Reported Outcomes</title>
+              <text>
+                <paragraph>Absolute effect: The absolute difference in the rate of the primary outcome was 4.9 percentage points (19.1% on placebo and 14.2% on CardioNex), over a median follow-up of 26 months. This corresponds to about 21 patients treated for the median follow-up to prevent one primary-outcome event. The number needed to treat depends on the baseline risk of the patient and on the length of treatment.</paragraph>
+                <paragraph>Patient-reported outcomes: Health status was assessed with the Kansas City Cardiomyopathy Questionnaire clinical summary score (KCCQ-CSS, range 0 to 100, higher is better). At 12 months, the mean change from baseline was +4.6 points on CardioNex and +2.5 points on placebo, a difference of 2.1 points (95% CI, 1.2 to 3.0). The difference is below the 5-point threshold usually taken as a clinically important change in an individual patient, and is reported as a group-level result.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s14-10">
+              <id root="b7e76c0f-a489-53a6-a9a3-bec08681e49b"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>14.10 Phase 2 Study Supporting the Dose</title>
+              <text>
+                <paragraph>The 20 mg and 40 mg doses used in CLARION-HF were chosen from the 12-week Phase 2 study described in Adverse Reactions (6.8). NT-proBNP fell from baseline by 9% on 5 mg, 17% on 20 mg and 22% on 40 mg, compared with 3% on placebo. Mean systolic blood pressure fell by 2, 4 and 6 mm Hg on the three doses compared with placebo, in the same order. The pattern of a dose-related fall in NT-proBNP and a dose-related rise in serum potassium supported starting at 20 mg and raising the dose to 40 mg [see Clinical Pharmacology (12.7)].</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+        </section>
+      </component>
+      <component>
+        <section ID="s16">
+          <id root="15932345-68b2-5d4c-a480-438b453ca12c"/>
+          <code code="34069-5" codeSystem="2.16.840.1.113883.6.1" displayName="HOW SUPPLIED SECTION"/>
+          <title>16 How Supplied</title>
+          <text>
+            <paragraph>Film-coated tablets of 5 mg (white, round), 20 mg (yellow, oval) and 40 mg (pink, oval), in bottles of 30 and 90.</paragraph>
+          </text>
+          <effectiveTime value="20250201"/>
+          <component>
+            <section ID="s16-1">
+              <id root="fd3408fd-34cb-5b4c-a0f4-f7eb7f20dc79"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>16.1 Storage and Handling</title>
+              <text>
+                <paragraph>Store CardioNex tablets at 20 degrees C to 25 degrees C (68 degrees F to 77 degrees F); excursions are permitted between 15 degrees C and 30 degrees C (59 degrees F and 86 degrees F) [see USP Controlled Room Temperature]. Store in the original container with the cap tightly closed to protect from moisture. Do not remove the desiccant canister from the bottle. Keep out of the reach of children. Dispose of unused tablets according to local requirements for medicine disposal.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s16-2">
+              <id root="0c05cb7f-1188-5b82-a5e0-4eaf7bd810e9"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>16.2 Package Configuration</title>
+              <text>
+                <paragraph>CardioNex tablets are supplied in high-density polyethylene bottles with a child-resistant closure and a desiccant canister, as shown in Table 12. The strengths and bottle sizes are those given in How Supplied (16).</paragraph>
+                <paragraph>Table 12. CardioNex Package Configurations</paragraph>
+                <table>
+                  <thead><tr><th>Strength</th><th>Description</th><th>Bottle of 30</th><th>Bottle of 90</th></tr></thead>
+                  <tbody>
+                    <tr><td>5 mg</td><td>white, round, debossed &quot;CX&quot; and &quot;5&quot;</td><td>NDC 70000-050-30</td><td>NDC 70000-050-90</td></tr>
+                    <tr><td>20 mg</td><td>yellow, oval, debossed &quot;CX&quot; and &quot;20&quot;</td><td>NDC 70000-200-30</td><td>NDC 70000-200-90</td></tr>
+                    <tr><td>40 mg</td><td>pink, oval, debossed &quot;CX&quot; and &quot;40&quot;</td><td>NDC 70000-400-30</td><td>NDC 70000-400-90</td></tr>
+                  </tbody>
+                </table>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+        </section>
+      </component>
+      <component>
+        <section ID="s17">
+          <id root="12f14bb8-4b16-51f6-a985-79523ac4cb90"/>
+          <code code="34076-0" codeSystem="2.16.840.1.113883.6.1" displayName="PATIENT COUNSELING INFORMATION"/>
+          <title>17 Patient Counseling Information</title>
+          <text>
+            <paragraph>Advise the patient to read the FDA-approved patient labeling (Patient Information). Counsel patients on the following points.</paragraph>
+            <paragraph>Pregnancy: Tell females of reproductive potential about the risk of fetal harm and that they should use effective contraception during treatment. Tell them to call their prescriber as soon as they think they are pregnant, because CardioNex must be stopped as soon as pregnancy is detected [see Warnings and Precautions and Use in Specific Populations (8.1)].</paragraph>
+            <paragraph>Lactation: Advise women that breastfeeding is not recommended during treatment with CardioNex and for 5 days after the final dose [see Use in Specific Populations (8.2)].</paragraph>
+            <paragraph>Angioedema: Tell patients to stop CardioNex and get medical help at once for swelling of the face, lips, tongue or throat, or for difficulty breathing or swallowing. Remind patients not to take an ACE inhibitor with CardioNex and to wait 36 hours after the last ACE inhibitor dose before starting CardioNex [see Warnings and Precautions (5.3)].</paragraph>
+            <paragraph>Hyperkalemia: Tell patients not to use potassium supplements or salt substitutes that contain potassium without talking to their prescriber, and to keep their blood-test appointments. Explain that serum potassium is checked before the first dose, 1 week after the start or after a dose change, and monthly for the first 3 months [see Warnings and Precautions (5.1)].</paragraph>
+            <paragraph>Low blood pressure: Tell patients that dizziness or fainting can occur, especially in the first weeks and in patients who take diuretics or who are dehydrated. Tell them to sit or lie down if they feel faint and to call their prescriber if symptoms continue [see Warnings and Precautions (5.2)].</paragraph>
+            <paragraph>Kidney function: Explain that a blood test for creatinine is done at the start of treatment and again after 1 to 2 weeks. Tell patients to avoid NSAIDs such as ibuprofen and naproxen unless their prescriber agrees [see Drug Interactions (7.5)].</paragraph>
+            <paragraph>Taking CardioNex: Tell patients to take CardioNex once daily at about the same time each day, with or without food, and not to stop it on their own. If a dose is missed, they should take it the same day as soon as they remember, and should not take two doses on one day [see Dosage and Administration (2.5)]. Tell patients to tell every doctor, dentist and pharmacist who treats them that they take CardioNex, and to check with their prescriber before starting any new medicine, herbal product or supplement, including St John's wort.</paragraph>
+          </text>
+          <effectiveTime value="20250201"/>
+          <component>
+            <section ID="s17-1">
+              <id root="1ebfdc5c-fa33-5bc6-a240-f36d07b58601"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>17.1 Patient Information Summary</title>
+              <text>
+                <paragraph>This is a summary of the patient leaflet that accompanies CardioNex.</paragraph>
+                <paragraph>What is CardioNex? CardioNex is a prescription medicine used in adults with long-term (chronic) heart failure with reduced ejection fraction to lower the chance of dying from heart or blood vessel causes and the chance of being admitted to hospital for heart failure. It is not known whether CardioNex is safe and effective in people younger than 18 years or in heart failure with preserved ejection fraction.</paragraph>
+                <paragraph>Who should not take CardioNex? Do not take CardioNex if you take an ACE inhibitor, or if you stopped one less than 36 hours ago, and do not take it if you are on dialysis for end-stage kidney disease. Do not take it if you have ever had swelling of the face, lips, tongue or throat of any cause without first talking to your doctor.</paragraph>
+                <paragraph>Before you take CardioNex, tell your doctor if you are pregnant or plan to become pregnant, are breastfeeding or plan to breastfeed, have kidney or liver problems, have a high blood potassium level, or take any other medicine, including potassium supplements, salt substitutes, diuretics and NSAIDs.</paragraph>
+                <paragraph>How should I take CardioNex? Take it once a day at about the same time each day, with or without food. Your doctor will tell you the dose that is right for you, and will check your blood for potassium and kidney function while you take it. Do not change your dose and do not stop taking CardioNex unless your doctor tells you to.</paragraph>
+                <paragraph>What are the possible side effects? The most common are dizziness, tiredness, cough and nausea. Serious side effects include low blood pressure, high blood potassium, kidney problems and angioedema. Stop taking CardioNex and get emergency help if your face, lips, tongue or throat swell, or if you have trouble breathing.</paragraph>
+              </text>
+              <effectiveTime value="20250201"/>
+            </section>
+          </component>
+        </section>
+      </component>
+    </structuredBody>
+  </component>
+</document>

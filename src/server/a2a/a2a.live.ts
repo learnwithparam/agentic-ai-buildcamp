@@ -12,7 +12,7 @@ import { C02, startA2aApp } from "./a2a-harness";
 
 let app: Awaited<ReturnType<typeof startA2aApp>>;
 before(async () => {
-  app = await startA2aApp(modelClient);
+  app = await startA2aApp(modelClient, { labels: true });
 });
 after(async () => {
   await app.close();

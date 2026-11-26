@@ -1,0 +1,9 @@
+{
+  "setid": "7c1e4b9a-3d52-4f86-a0b7-5e9d2c8f1a64",
+  "title": "NEUROVEX (neurovexin) capsules, for oral use",
+  "tenant_id": "pharma_b",
+  "country": "US",
+  "versions": [
+    {"version": 1, "doc_id": "neurovex-uspi-v1", "effective_date": "2026-05-01", "status": "active", "changes": []}
+  ]
+}

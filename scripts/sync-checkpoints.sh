@@ -157,13 +157,12 @@ GATE_FILES=".githooks/pre-push docs/scoreboard.md package.json scripts/experimen
 CLI_FILES="package.json package-lock.json scripts/identity-setup.ts src/server/auth.ts src/server/auth.test.ts
   src/server/inbox.test.ts src/client/chat/api.ts src/shared/sse.ts src/shared/messages.ts src/cli/api.ts
   src/cli/cli.test.ts src/cli/config.ts src/cli/index.tsx src/cli/session.ts src/cli/turn.ts src/cli/ui.tsx"
-# Lesson 20 reads the label PDFs through Docling into pgvector; the files it changes and adds
+# Lesson 20 reads the tagged label PDFs into pgvector; the files it changes and adds
 # (RAG_FILES) stay as they were on tags before it, so lesson 19 still searches by keyword.
 RAG_FILES="docs/scoreboard.md package.json package-lock.json scripts/experiment.ts scripts/rag-ingest.ts
   scripts/rag-setup.ts src/server/index.ts src/server/tools.ts src/server/migrations/008_label_chunks.sql
   src/server/rag/extract.ts src/server/rag/ingest.ts src/server/rag/rag.test.ts src/server/rag/rag.live.ts src/server/rag/search.ts
-  src/server/rag/store.ts src/server/rag/fixtures/cardionex-clarion-hf-trial.docling.json
-  src/server/rag/fixtures/cardionex-clarion-hf-trial.docling.md src/server/rag/fixtures/cardionex-uspi-v2.docling.json"
+  src/server/rag/store.ts"
 # Lesson 21 checks every answer's citations before it is sent; the files it changes and adds
 # (CITE_FILES) stay as they were on tags before it, so lesson 20's answer goes out unchecked.
 CITE_FILES="docs/scoreboard.md package.json scripts/citations-audit.ts scripts/citations-audit.test.ts
@@ -187,11 +186,11 @@ BI_FILES=".github/start-test-services.sh docs/scoreboard.md infra/docker-compose
 # message, search by country, the run record under each answer and in the review queue. They use
 # lesson 21's citation check and lesson 22's roles, so tags before 22 keep their own copies.
 # labels.ts is in no list from lesson 11 on: every tag reads the new label data, and only main's copy reads it right.
-# The same holds from lesson 20 on for rag/extract.ts and the Docling fixtures: they read the new label PDFs.
+# The same holds from lesson 20 on for rag/extract.ts: it reads the new label PDFs.
 DESK_FILES=".claude/skills/hcp-labels/SKILL.md scripts/citations-replay.ts scripts/demo-turns.ts
   scripts/demo-users.test.ts scripts/flows-capture.ts scripts/flows.test.ts scripts/flows.ts
   scripts/identity-setup.ts scripts/identity-smoke.ts scripts/open-questions.ts
-  scripts/prompt-variants.test.ts scripts/prompt-variants.ts scripts/rag-fixtures.ts scripts/setup.ts
+  scripts/prompt-variants.test.ts scripts/prompt-variants.ts scripts/setup.ts
   scripts/sign-in.ts src/cli/cli.test.ts src/cli/turn.test.ts src/cli/turn.ts src/client/App.tsx
   src/client/chat/RunSteps.tsx src/client/chat/Thread.tsx src/client/chat/api.ts
   src/client/chat/parts.tsx src/client/content/Events.tsx src/client/inbox/Inbox.tsx

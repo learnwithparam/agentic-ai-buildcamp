@@ -20,9 +20,9 @@ test("a missing, stopped or unhealthy service is named with its state", () => {
     { Service: "postgres", State: "running", Health: "healthy" },
     { Service: "keycloak", State: "running", Health: "starting" },
     { Service: "openfga", State: "exited" },
-    { Service: "docling", State: "running", Health: "" }
+    { Service: "minio", State: "running", Health: "" }
   ];
-  assert.deepEqual(unhealthy(states, ["postgres", "keycloak", "openfga", "docling", "redis"]), ["keycloak (starting)", "openfga (exited)", "redis (not started)"]);
+  assert.deepEqual(unhealthy(states, ["postgres", "keycloak", "openfga", "minio", "redis"]), ["keycloak (starting)", "openfga (exited)", "redis (not started)"]);
 });
 
 test("compose v1 is too old, v2 and later pass", () => {
@@ -33,5 +33,5 @@ test("compose v1 is too old, v2 and later pass", () => {
 
 test("only a down service's port is tried, so a running stack never blames itself", () => {
   assert.deepEqual(portsToTry([]), []);
-  assert.deepEqual(portsToTry(["infra:docling", "langfuse:redis"]), [[5001, "Docling"]]);
+  assert.deepEqual(portsToTry(["infra:openfga", "langfuse:redis"]), [[8280, "OpenFGA"]]);
 });

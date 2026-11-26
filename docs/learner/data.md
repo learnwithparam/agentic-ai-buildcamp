@@ -12,12 +12,16 @@ changed file fails `npm run check` until the lock is synced again.
 | --- | --- | --- | --- |
 | `labels` | The full text of each label, one Markdown file per version | `src/server/labels.ts`, for search and every label tool | `cardionex-uspi-2026-v2.md`, the US label, section 2.2 is the dose |
 | `docs` | Short excerpts of the same documents, plus the 2024 draft that has no full label | `src/server/labels.ts`, when a document has no full label | `cardionex-draft-2024.md` |
-| `pdf` | The labels printed as PDFs, the way a real company ships them | `scripts/rag-ingest.ts`, which reads them with Docling into pgvector (lesson 20) | `cardionex-jp-label-2025.pdf` |
+| `pdf` | The labels printed as PDFs, the way a real company ships them | `scripts/rag-ingest.ts`, which reads their tags into pgvector (lesson 20) | `cardionex-jp-label-2025.pdf` |
 | `content` | Approved claims, one sentence each, and two draft emails | `src/server/content/records.ts`, for the fact-checker (lesson 14) | `C-02,cardionex-uspi-v2,2.2,US,Start CardioNex at 20mg once daily...` |
 | `crm` | Doctor profiles, consent, emails sent, call notes, sample requests | `src/server/content/records.ts`, for the outreach planner (lesson 14) | `HCP-1003` asked to stop all email |
 | `events` | Events the desk reacts to, and the email one of them carries | `src/server/events/events.ts` (lesson 16) | `EVT-01`: label v3 comes into force and replaces v2 |
 | `sql` | Weekly sales rows, one table per company, each in its own shape | `src/server/bi/load.ts`, into Postgres for insights (lesson 22) | `2026-09-07,NE-01,brand_cardionex,142,38,...` |
 | `evals` | The test cases, one YAML file per agent | `scripts/hcp-cases.ts`, for every dataset run. See [Eval cases](evals.md) | `medinfo.yaml`, case `[POSITIVE-01]` |
+| `gold` | Questions with the sections that answer them, graded by hand. Claims, each with a quote that does or does not support it | `scripts/search-eval.ts`, which measures the search (lesson 20) | `r-059`: "How long do I have to wait when switching?", after a turn about ACE inhibitors |
+| `spl` | The US labels as SPL XML, the format the FDA publishes. Each has a set id, a version and coded sections | Not read by the app yet | `cardionex-uspi-2026-v2.xml` |
+| `history` | Every version of each label, its dates and what changed, in DailyMed's set-id history shape | Not read by the app yet | `cardionex-uspi.json`: v2 added a warning |
+| `safety` | Adverse event messages marked with the four reporting criteria. A made-up MedDRA-style dictionary. Notes with planted patient details, and where they are | Not read by the app yet | `ae-001`: swollen lips, no product named |
 
 ## How a label file works
 

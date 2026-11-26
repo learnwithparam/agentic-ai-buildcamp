@@ -10,7 +10,6 @@ import { LangfuseSpanProcessor } from "@langfuse/otel";
 import { createPool, migrate } from "../src/server/db";
 import { env } from "../src/server/env";
 import { embed, EMBEDDING_MODEL, useService } from "../src/server/gateway";
-import { convertPdf } from "../src/server/rag/extract";
 import { ingestLibrary, type ManifestDoc } from "../src/server/rag/ingest";
 import { LabelChunkStore } from "../src/server/rag/store";
 
@@ -30,7 +29,6 @@ try {
   const results = await ingestLibrary(docs, {
     root,
     store: new LabelChunkStore(pool),
-    convert: (file) => convertPdf(env.doclingUrl, file),
     embed,
     model: EMBEDDING_MODEL,
     log: (line) => console.log(line)

@@ -10,6 +10,8 @@ import { createAuth } from "../auth";
 import { createFactChecker } from "../content/fact-check";
 import { createOutreachPlanner } from "../content/outreach";
 import { createPool, migrate } from "../db";
+import type pg from "pg";
+import { connectLabelIndex } from "../rag/search";
 import { env } from "../env";
 import { InlineQueue, MemoryEventStore } from "../events/store";
 import { ReviewStore } from "../reviews";
@@ -29,7 +31,9 @@ export const C02 = "Start CardioNex at 20mg once daily in adults with HFrEF.";
 
 export type Handoff = { contextId: string; agent: string | null; tasks: Array<{ id: string; state: string }>; itemId: string | null; report: string };
 
-export async function startA2aApp(model: () => OpenAI) {
+// labels: the live hand-offs search the label index (lesson 20), as the server does at start. The
+// code-only tests refuse before any search, and CI has no index, so they leave it out.
+export async function startA2aApp(model: () => OpenAI, options: { labels?: boolean } = {}) {
   if (!env.testDatabaseUrl) throw new Error("TEST_DATABASE_URL is not set. Run npm run identity:setup (lesson 11).");
   if (!env.fgaApiToken) throw new Error("FGA_API_TOKEN is not set. Run npm run identity:setup (lesson 11).");
 
@@ -55,6 +59,12 @@ export async function startA2aApp(model: () => OpenAI) {
 
   const pool = createPool(env.testDatabaseUrl);
   await migrate(pool);
+  let labels: pg.Pool | undefined;
+  if (options.labels) {
+    if (!env.databaseUrl) throw new Error("DATABASE_URL is not set. Run npm run identity:setup (lesson 11).");
+    labels = createPool(env.databaseUrl);
+    await connectLabelIndex(labels);
+  }
   const store = await createTestStore(env.fgaApiUrl, env.fgaApiToken);
   env.fgaStoreId = store.storeId;
   env.fgaModelId = store.modelId;
@@ -123,6 +133,7 @@ export async function startA2aApp(model: () => OpenAI) {
       await pool.query("DELETE FROM threads WHERE owner_id = ANY($1)", [owners]);
       await pool.query("DELETE FROM a2a_tasks WHERE owner LIKE $1", [`%-${run}`]);
       await pool.end();
+      await labels?.end();
       await store.client.deleteStore();
     }
   };

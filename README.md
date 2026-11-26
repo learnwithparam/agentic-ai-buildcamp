@@ -22,7 +22,7 @@ npm run setup    # the first run makes .env; put your OpenRouter key in OPENAI_A
 npm run dev
 ```
 
-`npm run setup` checks Node and Docker, then starts Langfuse, Postgres, Keycloak, OpenFGA and Docling. It adds the demo users and reads the label PDFs. It loads the sales data, publishes the prompt and seeds the dataset. Last, it sends one model call through the gateway to prove it all works.
+`npm run setup` checks Node and Docker, then starts Langfuse, Postgres, Keycloak and OpenFGA. It adds the demo users and reads the label PDFs. It loads the sales data, publishes the prompt and seeds the dataset. Last, it sends one model call through the gateway to prove it all works.
 
 Run it again at any time. Each step skips what is already done, and it never prints a key or a password.
 

@@ -33,8 +33,6 @@ export const env = {
   databaseUrl: process.env.DATABASE_URL ?? "",
   // npm run check writes and deletes rows here, never in the app's database.
   testDatabaseUrl: process.env.TEST_DATABASE_URL ?? "",
-  // Lesson 20. docling-serve, which reads the label PDFs' layout (npm run rag:setup starts it).
-  doclingUrl: process.env.DOCLING_URL ?? "http://127.0.0.1:5001",
   datasetName: process.env.DATASET_NAME ?? "hcp-medinfo-workshop",
   // Lesson 22. The insights agent's login per company (npm run identity:setup writes them). The
   // host and database are the app's own; only the login differs.

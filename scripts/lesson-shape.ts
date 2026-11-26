@@ -30,7 +30,7 @@ export const SHAPE: Array<{ heading: string; optional?: true }> = [
 // products, so a title may name them.
 export const PRODUCTS = [
   "Langfuse", "LangGraph", "LangChain", "Postgres", "PostgreSQL", "pgvector", "Keycloak", "OpenFGA",
-  "Docling", "OpenRouter", "OpenAI", "Docker", "React", "Vite", "assistant-ui", "Claude"
+  "PDF.js", "OpenRouter", "OpenAI", "Docker", "React", "Vite", "assistant-ui", "Claude"
 ];
 
 const h2Or3 = /^#{2,3} /;

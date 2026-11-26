@@ -99,7 +99,7 @@ flowchart LR
     queue["Event queue"]
     sweep["Night sweep"]
     db["Postgres: threads, inbox, events, label chunks"]
-    docling["Docling: reads label PDFs"]
+    reader["PDF reader: tagged label PDFs to sections"]
     gw["AI gateway"]
     models["Models on OpenRouter"]
     lf["Langfuse: traces, prompts, datasets, scores"]
@@ -119,7 +119,7 @@ flowchart LR
     queue --> agent
     queue --> content
     sweep -- "budget and off switch" --> agent
-    docling -- "sections at ingest" --> db
+    reader -- "sections at ingest" --> db
     agent -- "model calls" --> gw --> models
     api -- "traces and scores" --> lf
     lf -- "code evaluators" --> box
@@ -318,7 +318,7 @@ Each word below has one short meaning. The lessons link here.
 **Stream.** An answer sent in small parts as it is written. The chat page and the terminal read the same stream.
 
 <a id="c-chunk"></a>
-**Chunk.** One piece of a document stored for search. Here each numbered section of a label is one chunk.
+**Chunk.** One piece of a document stored for search. Here it is a passage of at most 300 words from one numbered section.
 
 <a id="c-embedding"></a>
 **Embedding.** A list of numbers that stands for the meaning of a text. Texts with close meanings get close numbers.
@@ -326,8 +326,11 @@ Each word below has one short meaning. The lessons link here.
 <a id="c-vector-search"></a>
 **Vector search.** Finding the chunks whose numbers are closest to the question's numbers. It finds meaning, not just the same words.
 
-<a id="c-similarity-floor"></a>
-**Similarity floor.** The lowest match score a chunk needs to be used. Below it, a chunk is noise and is dropped.
+<a id="c-hybrid-search"></a>
+**Hybrid search.** Two searches, one by meaning (vectors) and one by words (BM25), with their lists merged. Each finds what the other misses.
+
+<a id="c-rerank"></a>
+**Rerank.** A second, slower look at the top results of a search. Here a model grades each one by whether it answers the question.
 
 <a id="c-citation"></a>
 **Citation.** A pointer from a fact to the place it came from, like a label section. A doctor can check it.
