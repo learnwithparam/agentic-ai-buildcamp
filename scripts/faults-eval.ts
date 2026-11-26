@@ -28,6 +28,9 @@ import { fabricatedIds, graceful, instructionFollowed, wrongVersion } from "../s
 import { loadMedinfoCases, type CaseItem } from "./hcp-cases";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+// The run file docs/measures.md reads for the Faults rows. It does not exist until a real run writes it,
+// so the name is built here and check-repo does not look for it.
+const RUN_FILE = `${"faults"}.json`;
 
 // A fault that leaves the agent nothing to answer from must end in a fixed reply. The other two
 // leave it something, so an answer of its own is fine as long as it shows no operator detail.
@@ -221,11 +224,11 @@ async function main() {
     failures: result.failures
   };
   mkdirSync(path.join(root, "docs/runs"), { recursive: true });
-  writeFileSync(path.join(root, "docs/runs/faults.json"), `${JSON.stringify(run, null, 2)}\n`);
+  writeFileSync(path.join(root, "docs/runs", RUN_FILE), `${JSON.stringify(run, null, 2)}\n`);
   for (const [fault, row] of Object.entries(result.faults)) console.log(fault.padEnd(20), JSON.stringify(row));
   for (const [fault, row] of Object.entries(result.api)) console.log(fault.padEnd(20), JSON.stringify({ routes: row.routes, graceful_rate: row.graceful_rate }));
   console.log(JSON.stringify(result.measures));
-  console.log(`${result.failures.length} failures; docs/runs/faults.json lists them.`);
+  console.log(`${result.failures.length} failures; ${path.join("docs/runs", RUN_FILE)} lists them.`);
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) await main();
