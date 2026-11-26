@@ -83,6 +83,13 @@ let base = "";
 let close = () => {};
 let dropStore = async () => {};
 const run = crypto.randomUUID().slice(0, 8);
+// Step 2B: the run record the reviewer reads beside the draft.
+const draftRun = {
+  tier: "review",
+  reason: "asks for a reply to send",
+  lookups: [{ tool: "search_labels", asked: "dose eGFR 24", hits: [{ doc_id: "cardionex-uspi-v2", section: "2.2", score: 0.71, status: "active", country: "US" }], failed: false }],
+  check: { outcome: "passed" as const, problems: [] }
+};
 const ids = { draftA: `draft-${run}-a`, draftA2: `draft-${run}-a2`, eventA: `ae-${run}-a`, draftB: `draft-${run}-b`, draftC: `draft-${run}-c`, stepA: `outreach-${run}-a`, emailA: `email-${run}-a` };
 const threads = { a: `thread-${run}-a`, b: `thread-${run}-b`, c: `thread-${run}-c`, rep: `thread-${run}-rep`, lena: `thread-${run}-lena`, maya: `thread-${run}-maya` };
 
@@ -104,7 +111,7 @@ before(async () => {
   // Maya Chen asks a question of her own: she holds the reviewer role, but this item is hers.
   await reviews.createThread(threads.c, { ...doctor, userId: "kc-chen" });
   const item = { question: "Draft a reply", body: "REVIEW_REQUIRED\n\nDraft", traceId: "trace-1" };
-  await reviews.submit({ ...item, id: ids.draftA, kind: "draft", threadId: threads.a, tenantId: "pharma_a" });
+  await reviews.submit({ ...item, id: ids.draftA, kind: "draft", threadId: threads.a, tenantId: "pharma_a", run: draftRun });
   await reviews.submit({ ...item, id: ids.draftA2, kind: "draft", threadId: threads.a, tenantId: "pharma_a" });
   await reviews.submit({ ...item, id: ids.eventA, kind: "adverse_event", threadId: threads.a, tenantId: "pharma_a" });
   await reviews.submit({ ...item, id: ids.draftB, kind: "draft", threadId: threads.b, tenantId: "pharma_b" });
@@ -143,6 +150,12 @@ test("a medical reviewer's inbox holds their company's drafts, not safety report
   assert.deepEqual(await inboxIds(chen), [ids.draftA, ids.draftA2].sort());
   assert.deepEqual(await inboxIds(haddad), [ids.eventA]);
   assert.deepEqual(await inboxIds(rossi), [ids.draftB]);
+});
+
+test("a reviewer's item carries how its answer was made; an item no chat answer made carries none", async () => {
+  const { items } = (await call(chen, "/api/inbox")).json as { items: ReviewItem[] };
+  assert.deepEqual(items.find((entry) => entry.id === ids.draftA)?.run, draftRun);
+  assert.equal((await reviews.get(ids.emailA))?.run, null);
 });
 
 test("a doctor sees what their own questions raised, and may decide none of it", async () => {

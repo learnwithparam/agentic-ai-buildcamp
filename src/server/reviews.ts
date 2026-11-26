@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { ClientWriteRequestOnDuplicateWrites, type OpenFgaClient } from "@openfga/sdk";
 import type pg from "pg";
+import type { AnswerRun } from "../shared/run";
 import type { ReviewInbox, ReviewSubmission } from "./graph";
 import { fga, reviewerTuples } from "./permissions";
 import { REVIEW_HOURS, SAFETY_HOURS } from "./tiers";
@@ -29,6 +30,7 @@ export type ReviewItem = {
   decidedBy: string | null;
   decidedAt: string | null;
   note: string | null;
+  run: AnswerRun | null;
 };
 
 // What a reviewer may answer, per kind. A draft is approved or rejected; an adverse event is
@@ -56,6 +58,7 @@ type Row = {
   decided_by: string | null;
   decided_at: Date | null;
   note: string | null;
+  run: AnswerRun | null;
 };
 
 const toItem = (row: Row): ReviewItem => ({
@@ -71,7 +74,8 @@ const toItem = (row: Row): ReviewItem => ({
   status: row.status,
   decidedBy: row.decided_by,
   decidedAt: row.decided_at?.toISOString() ?? null,
-  note: row.note
+  note: row.note,
+  run: row.run ?? null
 });
 
 
@@ -116,15 +120,15 @@ export class ReviewStore implements ReviewInbox {
     const { rows } = await this.pool.query<{ due_at: Date; status: ReviewStatus }>(
       // The item once, and this request every time: whoever asked is kept off deciding it.
       `WITH item AS (
-         INSERT INTO review_items (id, kind, thread_id, tenant_id, trace_id, question, body, due_at)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, now() + make_interval(hours => $8))
+         INSERT INTO review_items (id, kind, thread_id, tenant_id, trace_id, question, body, due_at, run)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, now() + make_interval(hours => $8), $9)
          ON CONFLICT (id) DO UPDATE SET id = EXCLUDED.id
          RETURNING id, due_at, status
        ), request AS (
          INSERT INTO review_requests (item_id, thread_id) SELECT id, $3 FROM item ON CONFLICT DO NOTHING
        )
        SELECT due_at, status FROM item`,
-      [item.id, item.kind, item.threadId, item.tenantId, item.traceId ?? null, item.question, item.body, HOURS[item.kind]]
+      [item.id, item.kind, item.threadId, item.tenantId, item.traceId ?? null, item.question, item.body, HOURS[item.kind], item.run ? JSON.stringify(item.run) : null]
     );
     return { dueAt: rows[0].due_at, status: rows[0].status };
   }

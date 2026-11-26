@@ -103,6 +103,8 @@ export type ReviewItem = {
   status: "waiting" | "approved" | "rejected" | "filed" | "dismissed";
   decidedAt: string | null;
   note: string | null;
+  // Step 2B: how the answer was made, when a chat answer made the item.
+  run: AnswerRun | null;
 };
 
 export async function loadInbox(): Promise<{ reviewer: boolean; items: ReviewItem[] }> {

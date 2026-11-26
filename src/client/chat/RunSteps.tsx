@@ -7,14 +7,14 @@ import type { AnswerRun, RunLookup } from "../../shared/run";
 // stream's values events and from the thread's saved state on a reload.
 export const RunsContext = createContext<Record<string, AnswerRun>>({});
 
-const TIER: Record<string, string> = {
+export const TIER: Record<string, string> = {
   answer: "answered from the labels",
   review: "drafted for a medical reviewer",
   safety: "treated as a possible side effect report",
   stop: "stopped with a fixed reply"
 };
 
-const CHECK: Record<string, string> = {
+export const CHECK: Record<string, string> = {
   passed: "every citation and number was found in its section",
   rewritten: "the first answer failed, so it was written again",
   withheld: "the answer failed twice, so it was not sent"
