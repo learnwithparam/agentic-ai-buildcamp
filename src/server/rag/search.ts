@@ -96,7 +96,7 @@ export function hybridSearch(options: SearchOptions): LabelSearch {
     const { grades, best } = await options.grade(
       query,
       candidates.map(({ passage }) => ({
-        source: `${passage.docId} (${passage.brandId}, ${passage.country})`,
+        source: `${passage.docId} (${passage.brandId}, ${passage.country}, in force from ${passage.effectiveDate})`,
         path: passage.path,
         text: passage.text
       }))

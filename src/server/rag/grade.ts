@@ -14,6 +14,8 @@ import { modelClient } from "../gateway";
 
 // source names the document, its medicine and its country. Without it a passage reads "2.5
 // Discontinuation", and a question about stopping NeuroVex was graded as answered by CardioNex's.
+// It also says from when the document is in force: on 2027-04-15 the March 2027 label halved the
+// renal dose, and the FAQ and the 2026 formulary, which still give the old one, were ranked first.
 // grades has one grade per passage. best lists the passages that answer (grade 2 or 3), most
 // direct first, by their index in passages. Graded one at a time, nearly every relevant section
 // got a 3, so the grade could not order them: measured, 25 of the 30 answers missing from the top
@@ -32,6 +34,7 @@ export const GRADER_PROMPT = `You grade passages from medicine labels against on
 Grade every passage on its own, from its text only. A passage that only shares words with the question, or is about a nearby subject, is 1 or 0.
 A passage about another medicine than the one the question asks about is 0.
 When the question names a condition, substance, population or situation the answer depends on (a kidney problem, pregnancy, a child, another medicine), a passage that does not speak to it, in any words, is at most 1, even when it states the general rule. A word the answer does not depend on, such as "an adult" in a question about storage, changes no grade.
+The prescribing label (a document id with uspi, smpc or label in it) is the authority. When an FAQ, a formulary or a trial report gives a different number or instruction from a label passage, the other passage is at most 1, and the label comes first in best. Among labels, the one in force from the latest date wins.
 ${GRADES}
 Return one grade per passage, in the order given. Then, in best, list the numbers of the passages you graded 2 or 3, the one a doctor should read first at the start: the one that states the answer most directly.`;
 // checkpoint-sync:end grader-prompt

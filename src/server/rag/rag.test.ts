@@ -178,7 +178,7 @@ test("among answers, the grader's best order wins over grade and search order", 
   assert.deepEqual(hits.map((hit) => hit.section), [three[2].section, three[0].section, three[1].section]);
 });
 
-test("the grader is told each passage's document, medicine and country, not only its section", async () => {
+test("the grader is told each passage's document, medicine, country and date in force, not only its section", async () => {
   const seen: string[] = [];
   const search = hybridSearch({
     store: fixedStore([real]),
@@ -186,7 +186,7 @@ test("the grader is told each passage's document, medicine and country, not only
     grade: async (_q, passages) => ({ grades: passages.map((passage) => (seen.push(passage.source), 0)), best: [] })
   });
   await search("How should NeuroVex be stopped?", new Set([real.docId]), 5, TODAY);
-  assert.deepEqual(seen, [`${real.docId} (${real.brandId}, ${real.country})`]);
+  assert.deepEqual(seen, [`${real.docId} (${real.brandId}, ${real.country}, in force from ${real.effectiveDate})`]);
 });
 
 test("a document not in force on the day is never searched", async () => {

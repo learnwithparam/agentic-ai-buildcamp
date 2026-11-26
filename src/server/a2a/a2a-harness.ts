@@ -10,6 +10,7 @@ import { createAuth } from "../auth";
 import { createFactChecker } from "../content/fact-check";
 import { createOutreachPlanner } from "../content/outreach";
 import { createPool, migrate } from "../db";
+import { connectLabelIndex } from "../rag/search";
 import { env } from "../env";
 import { InlineQueue, MemoryEventStore } from "../events/store";
 import { ReviewStore } from "../reviews";
@@ -55,6 +56,10 @@ export async function startA2aApp(model: () => OpenAI) {
 
   const pool = createPool(env.testDatabaseUrl);
   await migrate(pool);
+  // Lesson 20: the hand-off reads the label index of the ingested PDFs, as the server does at start.
+  if (!env.databaseUrl) throw new Error("DATABASE_URL is not set. Run npm run identity:setup (lesson 11).");
+  const labels = createPool(env.databaseUrl);
+  await connectLabelIndex(labels);
   const store = await createTestStore(env.fgaApiUrl, env.fgaApiToken);
   env.fgaStoreId = store.storeId;
   env.fgaModelId = store.modelId;
@@ -123,6 +128,7 @@ export async function startA2aApp(model: () => OpenAI) {
       await pool.query("DELETE FROM threads WHERE owner_id = ANY($1)", [owners]);
       await pool.query("DELETE FROM a2a_tasks WHERE owner LIKE $1", [`%-${run}`]);
       await pool.end();
+      await labels.end();
       await store.client.deleteStore();
     }
   };
