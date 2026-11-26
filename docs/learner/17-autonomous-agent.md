@@ -146,7 +146,7 @@ npm run dev
 
 ### Step 2: Open the Sweep page
 
-Sign in as Priya Nair, the sales rep, and open **Sweep**.
+Sign in as Priya Nair, the sales rep, and open **Nightly sweep**.
 
 ![The Sweep page before any run: the limits, the spend meter and the run form](../images/autonomous-agent/01-sweep-page.png)
 
@@ -205,7 +205,7 @@ Any reviewer or rep can pause. Only a sales rep or a medical reviewer can turn i
 As Priya, click **Turn the sweep back on**. Then lower the budget below what the sweep spent today:
 
 ```bash
-docker compose -f infra/docker-compose.yml exec postgres psql -U postgres -d medinfo \
+docker exec medinfo-platform-postgres-1 psql -U postgres -d medinfo \
   -c "update agent_controls set daily_budget_usd = 0.001 where tenant_id = 'pharma_a'"
 ```
 
@@ -228,7 +228,7 @@ Langfuse takes a few seconds to count a call, so the check can lag one step behi
 Set the budget back:
 
 ```bash
-docker compose -f infra/docker-compose.yml exec postgres psql -U postgres -d medinfo \
+docker exec medinfo-platform-postgres-1 psql -U postgres -d medinfo \
   -c "update agent_controls set daily_budget_usd = 0.50 where tenant_id = 'pharma_a'"
 ```
 
