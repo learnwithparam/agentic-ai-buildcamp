@@ -31,7 +31,7 @@ export const GRADES = `3 states, in its own text, what the question asks for: th
 export const GRADER_PROMPT = `You grade passages from medicine labels against one question from a doctor.
 Grade every passage on its own, from its text only. A passage that only shares words with the question, or is about a nearby subject, is 1 or 0.
 A passage about another medicine than the one the question asks about is 0.
-When the question names a condition, substance, population or situation, a passage that does not speak to it, in any words, is at most 1, even when it states the general rule.
+When the question names a condition, substance, population or situation the answer depends on (a kidney problem, pregnancy, a child, another medicine), a passage that does not speak to it, in any words, is at most 1, even when it states the general rule. A word the answer does not depend on, such as "an adult" in a question about storage, changes no grade.
 ${GRADES}
 Return one grade per passage, in the order given. Then, in best, list the numbers of the passages you graded 2 or 3, the one a doctor should read first at the start: the one that states the answer most directly.`;
 // checkpoint-sync:end grader-prompt
