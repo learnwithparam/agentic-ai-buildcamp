@@ -97,6 +97,20 @@ export type CitationOutcome = {
   rewrite?: string;
 };
 
+// Fix 5. The rewrite answers from what was found, in this turn or an earlier one, and names any
+// fact the sections lack. It withholds only when no section found is about the question: told to
+// write INSUFFICIENT_CONTEXT whenever the sections "do not answer", a follow-up that needed one
+// more fact lost the whole answer (session 071bcc7a, 25 Nov 2026).
+export function rewriteFeedback(problems: CitationProblem[]): string {
+  return [
+    "The desk's citation check stopped your answer before it reached the doctor:",
+    ...problems.map((problem) => `- ${describeProblem(problem)}`),
+    "Write the whole answer again from the active label sections found so far in this conversation, citing each fact as [doc_id, section].",
+    "Keep every fact those sections support. If the question needs a fact they do not hold, say which fact the label sections found do not cover.",
+    "Write INSUFFICIENT_CONTEXT only when none of the sections found is about the question."
+  ].join("\n");
+}
+
 export async function citeStep(
   openai: OpenAI,
   system: string,
@@ -109,11 +123,7 @@ export async function citeStep(
   const { retrieved, asked } = evidenceOf(state.messages);
   const problems = checkCitations(aiText(answer), retrieved, asked);
   if (!problems.length) return (onChecked({ outcome: "passed", problems, afterRewrite: [] }), {});
-  const feedback = [
-    "The desk's citation check stopped your answer before it reached the doctor:",
-    ...problems.map((problem) => `- ${describeProblem(problem)}`),
-    "Write the whole answer again from the active label sections already found, citing each fact as [doc_id, section]. If those sections do not answer the question, write INSUFFICIENT_CONTEXT and say why."
-  ].join("\n");
+  const feedback = rewriteFeedback(problems);
   const rewrite = await streamModelTurn(
     openai,
     {
