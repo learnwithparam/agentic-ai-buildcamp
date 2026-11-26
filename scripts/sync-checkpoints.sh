@@ -14,6 +14,9 @@
 #   ./scripts/sync-checkpoints.sh                    # update tags locally
 #   ./scripts/sync-checkpoints.sh --verify           # also run npm run check on every tag
 #   ./scripts/sync-checkpoints.sh --verify --push    # then force-push moved tags
+#
+# --push first runs scripts/measures.ts --release: no tag is published while a row in
+# docs/measures.md is pending or misses its target.
 set -euo pipefail
 
 # The run checks out each tag, which rewrites this file on disk. Bash reads a
@@ -32,6 +35,11 @@ for arg in "$@"; do
     *) echo "Unknown option: $arg" >&2; exit 1 ;;
   esac
 done
+
+if [[ "$PUSH" -eq 1 ]]; then
+  echo "==> measures (release)"
+  npx tsx scripts/measures.ts --release
+fi
 
 TAGS=(
   checkpoint/00-setup
