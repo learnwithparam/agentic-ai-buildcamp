@@ -41,7 +41,9 @@ test("a chat turn's trace names the company and country, not the doctor's name o
 });
 
 test("a tool span names the company and country it answered for, not the doctor", async () => {
-  await executeTool("approval_status", { medicine: "NeuroVex", country: "US" }, user);
+  // The span records its input before OpenFGA is asked, so CI, which has no OpenFGA, still checks
+  // it; whether the lookup itself then succeeds is not what this test is about.
+  await executeTool("approval_status", { medicine: "NeuroVex", country: "US" }, user).catch(() => undefined);
   const { spans } = await recorded();
   const tool = spans.find((span) => span.name === "approval_status")!;
   // Lesson 16: the span also names the day the labels were read for, so a trace shows which label was in force.
