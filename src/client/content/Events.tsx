@@ -73,7 +73,7 @@ export function Events() {
 
   return (
     <main className="inbox">
-      <h1>Events</h1>
+      <h1>Event log</h1>
       <p className="inbox-lead">
         What happened outside a chat, and what each event started. An event delivered twice is still handled once, and an event about another company is never taken.
       </p>

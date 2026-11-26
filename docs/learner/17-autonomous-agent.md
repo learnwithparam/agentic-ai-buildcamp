@@ -146,7 +146,7 @@ npm run dev
 
 ### Step 2: Open the Sweep page
 
-Sign in as Priya Nair, the sales rep, and open **Sweep**.
+Sign in as Priya Nair, the sales rep, and open **Nightly sweep**.
 
 ![The Sweep page before any run: the limits, the spend meter and the run form](../images/autonomous-agent/01-sweep-page.png)
 
