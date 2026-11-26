@@ -1,0 +1,1309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document xmlns="urn:hl7-org:v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <id root="5c3f6869-791f-5e8a-a32a-0ddd6f840fd7"/>
+  <code code="34391-3" codeSystem="2.16.840.1.113883.6.1" displayName="HUMAN PRESCRIPTION DRUG LABEL"/>
+  <title>NEUROVEX (neurovexin) Prescribing Information, Tenant Pharma_B Confidential</title>
+  <effectiveTime value="20260501"/>
+  <setId root="7c1e4b9a-3d52-4f86-a0b7-5e9d2c8f1a64"/>
+  <versionNumber value="1"/>
+  <component>
+    <structuredBody>
+      <component>
+        <section ID="s0-0">
+          <id root="3ad75a33-4af5-56cd-ab61-3b30feaff2c6"/>
+          <code code="34066-1" codeSystem="2.16.840.1.113883.6.1" displayName="BOXED WARNING SECTION"/>
+          <title>0.0 Warnings in Brief</title>
+          <text>
+            <list listType="unordered">
+              <item><content styleCode="bold">CNS DEPRESSION WITH OPIOIDS:</content> Taking NeuroVex with an opioid, a benzodiazepine or alcohol can slow breathing. Start with the lowest dose of each and watch for drowsiness and slow breathing.</item>
+              <item><content styleCode="bold">CONTRAINDICATIONS:</content> Known allergy to neurovexin or to any ingredient of the capsule.</item>
+            </list>
+          </text>
+          <effectiveTime value="20260501"/>
+        </section>
+      </component>
+      <component>
+        <section ID="s1">
+          <id root="0be502d0-3f5a-53ac-a906-b148595023c5"/>
+          <code code="34067-9" codeSystem="2.16.840.1.113883.6.1" displayName="INDICATIONS &amp; USAGE SECTION"/>
+          <title>1 INDICATIONS &amp; USAGE SECTION</title>
+          <effectiveTime value="20260501"/>
+          <component>
+            <section ID="s1-1">
+              <id root="34958c63-2115-5bba-ae5e-04a053449703"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>1.1 Indications and Usage</title>
+              <text>
+                <paragraph>NeuroVex is indicated for the management of neuropathic pain from diabetic peripheral neuropathy in adults.</paragraph>
+                <list listType="unordered">
+                  <item>Safety and efficacy have <content styleCode="bold">NOT</content> been established in patients younger than 18 years.</item>
+                  <item>Safety and efficacy have <content styleCode="bold">NOT</content> been established for other kinds of nerve pain, for fibromyalgia, or for the prevention or treatment of migraine.</item>
+                </list>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+        </section>
+      </component>
+      <component>
+        <section ID="s2">
+          <id root="2d031147-8428-5f6f-a900-9e55b44a023b"/>
+          <code code="34068-7" codeSystem="2.16.840.1.113883.6.1" displayName="DOSAGE &amp; ADMINISTRATION SECTION"/>
+          <title>2 DOSAGE &amp; ADMINISTRATION SECTION</title>
+          <effectiveTime value="20260501"/>
+          <component>
+            <section ID="s2-1">
+              <id root="83a4226f-8444-5ed1-ab03-9e28d6684db4"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>2.1 Recommended Dosage</title>
+              <text>
+                <paragraph>NeuroVex is indicated for the management of diabetic peripheral neuropathy in adults. The recommended starting and maintenance dose is <content styleCode="bold">50mg orally twice daily</content> with or without food.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s2-2">
+              <id root="c50d339c-ecf8-5583-a787-64ef15d3e301"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>2.2 Dose Increase and Maximum Dose</title>
+              <text>
+                <list listType="unordered">
+                  <item>The dose is not titrated. Start at 50mg twice daily and stay there.</item>
+                  <item>The maximum daily dose is <content styleCode="bold">100mg</content>. Higher doses gave no more pain relief in the trial and caused more dizziness.</item>
+                </list>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s2-3">
+              <id root="ca0f417b-dc2a-570f-a95b-1a34ebd4b688"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>2.3 Renal Impairment Dosing</title>
+              <text>
+                <table>
+                  <thead><tr><th>Creatinine clearance</th><th>Dose</th></tr></thead>
+                  <tbody>
+                    <tr><td>60 mL/min or more</td><td>50mg twice daily</td></tr>
+                    <tr><td>30 to 59 mL/min</td><td>25mg twice daily</td></tr>
+                    <tr><td>15 to 29 mL/min</td><td>25mg once daily</td></tr>
+                    <tr><td>Below 15 mL/min or on dialysis</td><td>Not recommended</td></tr>
+                  </tbody>
+                </table>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s2-4">
+              <id root="fb202bd3-646c-5b43-ad3a-0471b47addf5"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>2.4 Stopping NeuroVex</title>
+              <text>
+                <paragraph>Do not stop NeuroVex suddenly. Lower the dose to 25mg twice daily for at least <content styleCode="bold">1 week</content>, then stop. Stopping at once can cause trouble sleeping, nausea, headache and anxiety.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s2-5">
+              <id root="0addff44-ff0c-5b28-a688-ff0a618da348"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>2.5 Administration Instructions</title>
+              <text>
+                <list listType="unordered">
+                  <item>Swallow NeuroVex capsules whole with water. Do not open, crush or chew the capsules, because the contents have a bitter taste and the effect of opening the capsule on absorption has not been studied.</item>
+                  <item>NeuroVex may be taken with or without food. In the food-effect study, a high-fat meal delayed the time to peak level by about 1 hour and did not change the total exposure in a clinically relevant way [see Clinical Pharmacology (12.4)].</item>
+                  <item>Take the two daily doses about 12 hours apart, for example in the morning and in the evening. Taking the second dose at bedtime may help patients who feel sleepy during the day [see Warnings and Precautions (5.1)].</item>
+                  <item>If a dose is missed, take it as soon as it is remembered unless it is almost time for the next dose. If it is almost time for the next dose, skip the missed dose and take the next dose at the usual time. Do not take two doses at once to make up for a missed dose, and do not exceed the maximum daily dose in section 2.2.</item>
+                  <item>Before the first dose, estimate the creatinine clearance and choose the dose from the table in section 2.3. Repeat the estimate when the patient's condition changes, for example during an illness with vomiting, diarrhea or poor fluid intake.</item>
+                </list>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s2-6">
+              <id root="74872252-e164-5784-a37a-291eb9806d04"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>2.6 Dose Adjustment for Tolerability</title>
+              <text>
+                <list listType="unordered">
+                  <item>Dizziness and sleepiness are the most common reasons patients stop NeuroVex, and they are most frequent in the first 2 weeks of treatment [see Warnings and Precautions (5.1) and Adverse Reactions (6.2)].</item>
+                  <item>Because the dose is not titrated, do not add a higher dose in patients who report little pain relief in the first weeks. In the clinical program, the pain score continued to fall through week 12, and the response at week 4 did not predict a lack of response at week 12 [see Clinical Studies (14.1)].</item>
+                  <item>If dizziness or sleepiness is not tolerated, review the patient's other medicines first, in particular opioids, benzodiazepines and other medicines that slow the brain [see Drug Interactions (7.1)], and check kidney function against the table in section 2.3. Where treatment must be stopped, follow the stepwise reduction in section 2.4.</item>
+                </list>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s2-7">
+              <id root="3c34ec40-dd25-562d-a7a4-8443092cd072"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>2.7 Dosage in Specific Situations</title>
+              <text>
+                <list listType="unordered">
+                  <item><content styleCode="bold">Older patients:</content> no age-based dose is needed. Choose the dose by creatinine clearance, as in section 2.3 [see Use in Specific Populations (8.5)].</item>
+                  <item><content styleCode="bold">Hepatic impairment:</content> no dose adjustment is needed [see Use in Specific Populations (8.7)].</item>
+                  <item><content styleCode="bold">Patients on dialysis:</content> NeuroVex is not recommended, as stated in section 2.3. Hemodialysis removes about half of the drug in 4 hours, and no supplemental dose schedule has been studied.</item>
+                  <item><content styleCode="bold">Interruption of treatment:</content> if NeuroVex has been stopped for less than 1 week, restart at the dose for the patient's creatinine clearance in section 2.3. If it was stopped for longer, review the kidney function before restarting.</item>
+                  <item><content styleCode="bold">Patients who miss several doses in a row:</content> a patient who has missed doses for 2 days or longer should restart at the dose in section 2.3, not at a double dose.</item>
+                </list>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+        </section>
+      </component>
+      <component>
+        <section ID="s3">
+          <id root="16aca09f-b9a4-536b-a876-8ebd50902ad3"/>
+          <code code="43678-2" codeSystem="2.16.840.1.113883.6.1" displayName="DOSAGE FORMS &amp; STRENGTHS SECTION"/>
+          <title>3 Dosage Forms and Strengths</title>
+          <text>
+            <paragraph>NeuroVex capsules are supplied as follows:</paragraph>
+            <table>
+              <thead><tr><th>Strength</th><th>Capsule description</th><th>Imprint</th></tr></thead>
+              <tbody>
+                <tr><td>25 mg</td><td>Size 3, white opaque body and white opaque cap</td><td>&quot;NVX&quot; on the cap and &quot;25&quot; on the body, in black ink</td></tr>
+                <tr><td>50 mg</td><td>Size 2, blue opaque body and blue opaque cap</td><td>&quot;NVX&quot; on the cap and &quot;50&quot; on the body, in white ink</td></tr>
+              </tbody>
+            </table>
+          </text>
+          <effectiveTime value="20260501"/>
+        </section>
+      </component>
+      <component>
+        <section ID="s4">
+          <id root="b591fd31-9f36-5c01-aa54-8c0349830586"/>
+          <code code="34070-3" codeSystem="2.16.840.1.113883.6.1" displayName="CONTRAINDICATIONS SECTION"/>
+          <title>4 Contraindications</title>
+          <text>
+            <paragraph>NeuroVex is contraindicated in patients with a known hypersensitivity to neurovexin or to any ingredient of the capsule. Reactions have included rash, urticaria and angioedema [see Warnings and Precautions (5.4) and Description (11)].</paragraph>
+            <paragraph>No other contraindication applies. A creatinine clearance below 15 mL/min, or dialysis, is not a contraindication in this label; use is not recommended in those patients, as stated in section 2.3.</paragraph>
+          </text>
+          <effectiveTime value="20260501"/>
+        </section>
+      </component>
+      <component>
+        <section ID="s5">
+          <id root="0d2ca8e5-c0a8-5fdf-a394-4e06b034d7c2"/>
+          <code code="43685-7" codeSystem="2.16.840.1.113883.6.1" displayName="WARNINGS AND PRECAUTIONS SECTION"/>
+          <title>5 WARNINGS AND PRECAUTIONS SECTION</title>
+          <effectiveTime value="20260501"/>
+          <component>
+            <section ID="s5-1">
+              <id root="d4f91518-df11-5375-aae3-292cbf0fff39"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>5.1 Dizziness and Sleepiness</title>
+              <text>
+                <paragraph>NeuroVex causes dizziness and sleepiness, most often in the first 2 weeks. Patients should not drive or use machines until they know how NeuroVex affects them.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s5-2">
+              <id root="7b22ca2f-c10b-5c5a-a7b0-940df57f4f5d"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>5.2 Breathing Problems</title>
+              <text>
+                <paragraph>Slow or shallow breathing has been reported when NeuroVex was taken with opioids or other drugs that slow the brain, and in patients with lung disease. Use the lowest dose and watch the patient closely.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s5-3">
+              <id root="e8a6e597-ec68-5314-a595-b4b888e92727"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>5.3 Swelling and Weight Gain</title>
+              <text>
+                <paragraph>Swelling of the legs and feet and weight gain can occur. Use with care in patients with heart failure.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s5-4">
+              <id root="3275f19e-0ad6-5bc8-ab1b-5e63c1a19b65"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>5.4 Hypersensitivity and Angioedema</title>
+              <text>
+                <paragraph>Hypersensitivity reactions, including rash, urticaria and angioedema of the face, lips, tongue and throat, have been reported after the first dose and after months of treatment. Most reactions began within the first 3 days of treatment. Stop NeuroVex at once and treat the patient if swelling of the face, lips, tongue or throat, difficulty swallowing or difficulty breathing occurs. Do not restart NeuroVex in a patient who has had a hypersensitivity reaction to neurovexin [see Contraindications (4)].</paragraph>
+                <paragraph>Angioedema must be told apart from the swelling of the legs and feet described in section 5.3. Leg swelling from NeuroVex is gradual, is usually on both sides, is not itchy and does not involve the face or throat. Swelling of the face or throat, or swelling that comes with hives, is a hypersensitivity reaction.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s5-5">
+              <id root="aac5431a-017e-5a7b-a34a-572e77fbc7b2"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>5.5 Withdrawal Reactions</title>
+              <text>
+                <paragraph>After stopping NeuroVex suddenly, some patients had trouble sleeping, nausea, headache and anxiety. Sweating, diarrhea and pain were also reported, and in a few patients the symptoms were severe enough that the patient asked to restart treatment. In the clinical trials the symptoms began within 1 to 3 days of the last dose and settled within 1 to 2 weeks. The risk was higher in patients who had been taking NeuroVex for more than 12 weeks. Lower the dose stepwise as described in section 2.4. Do not stop NeuroVex suddenly unless a serious reaction, such as angioedema, requires it.</paragraph>
+                <paragraph>Withdrawal reactions are not a sign of dependence on NeuroVex and are not craving for the drug [see Drug Abuse and Dependence (9.3)].</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s5-6">
+              <id root="34e262b2-042b-5c9d-a42a-9386ab6f6788"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>5.6 Suicidal Behavior and Ideation</title>
+              <text>
+                <paragraph>Antiepileptic drugs, a class that includes medicines with a similar effect on nerve signaling, increase the risk of suicidal thoughts or behavior in patients who take them for any use. NeuroVex is not an antiepileptic drug and has not been approved for epilepsy. In the NeuroVex trials in diabetic peripheral neuropathy, which lasted 12 weeks, no completed suicide occurred. Suicidal ideation was reported in 3 patients on NeuroVex and 2 patients on placebo, and the study doctors judged none of the 5 events to be caused by the drug. The trials were not designed to detect a small difference in this risk.</paragraph>
+                <paragraph>Watch all patients for new or worsening depression, suicidal thoughts or behavior, or unusual changes in mood. Tell patients, families and caregivers to report these changes at once.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s5-7">
+              <id root="a2438f1e-ffd8-5dde-ac37-d6adb40fac36"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>5.7 Accumulation in Renal Impairment</title>
+              <text>
+                <paragraph>Neurovexin is cleared mainly by the kidneys, and about 90% of a dose is excreted unchanged in urine [see Clinical Pharmacology (12.3)]. In patients with a reduced creatinine clearance, the exposure to neurovexin rises as the clearance falls, and so do dizziness, sleepiness and confusion. Choose the dose from the creatinine clearance, as in section 2.3. Patients with a creatinine clearance below 30 mL/min were not studied in NEURO-BRIDGE, and the doses for those patients come from pharmacokinetic modeling.</paragraph>
+                <paragraph>Kidney function can fall during treatment, for example with dehydration, with a new medicine that affects the kidneys, or with a worsening of diabetic kidney disease. Recheck the creatinine clearance when the patient's condition changes and adjust the dose to match.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s5-8">
+              <id root="cb949d97-9dbd-5672-a495-92646f15df0b"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>5.8 Falls and Injury in Older Patients</title>
+              <text>
+                <paragraph>Dizziness, sleepiness and, less often, blurred vision and unsteady walking can lead to falls. In NEURO-BRIDGE, dizziness was more common in patients 65 years or older than in younger patients [see Adverse Reactions (6.2) and Use in Specific Populations (8.5)]. Fractures after a fall were reported in 4 patients on NeuroVex and 3 on placebo. Advise older patients and their caregivers about the risk of falling, particularly in the first 2 weeks of treatment and after each change in other medicines that slow the brain.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s5-9">
+              <id root="1df55416-d849-570b-a3b1-db265cff6216"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>5.9 Visual Disturbances</title>
+              <text>
+                <paragraph>Blurred vision, double vision and reduced visual acuity were reported in 3.3% of patients on NeuroVex and 1.3% on placebo. The events were mild or moderate and usually went away while treatment continued. Because patients with diabetes are at risk of retinopathy, do not assume that a new visual symptom is caused by NeuroVex. Refer patients with persistent visual symptoms for an eye examination, and tell patients not to drive or use machines if their vision is blurred [see Warnings and Precautions (5.1)].</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s5-10">
+              <id root="891cbc4c-f2dc-57ae-afc2-127453fe52b4"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>5.10 Patients with Heart Failure</title>
+              <text>
+                <paragraph>Leg swelling and weight gain can occur [see Warnings and Precautions (5.3)]. In NEURO-BRIDGE, patients with New York Heart Association class III or IV heart failure were excluded, so the effect of NeuroVex in these patients is not known. In patients with class I or II heart failure, watch for new or worsening shortness of breath, a rapid weight gain and swelling that does not go away with rest. Medicines that cause fluid retention, such as thiazolidinediones, add to this effect [see Drug Interactions (7.2)].</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s5-11">
+              <id root="3a3298db-5c33-51c4-a9d8-e5d18af1e7e2"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>5.11 Patients with Lung Disease</title>
+              <text>
+                <paragraph>Slow or shallow breathing was reported in patients with lung disease [see Warnings and Precautions (5.2)]. In a study of 24 patients with moderate to severe chronic obstructive pulmonary disease, a single dose of neurovexin 100mg alone did not change the oxygen saturation by day or at night. The patients who also took an opioid had a larger fall in the oxygen saturation at night than the patients who took the opioid alone. Use the lowest dose of each medicine in these patients, and do not combine NeuroVex with an opioid or a benzodiazepine unless the benefit is clear.</paragraph>
+                <paragraph>Patients with sleep apnea and patients with a history of respiratory failure were not studied in the controlled trials. Watch these patients closely when treatment starts and when the dose of any other medicine that slows the brain is changed.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s5-12">
+              <id root="0a5f45f4-51e1-51fa-ad86-0ab8b6b48cad"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>5.12 Neurological Effects Other Than Dizziness</title>
+              <text>
+                <paragraph>Tremor, myoclonus, confusion and memory impairment were reported in less than 1% of patients in the trials and more often in patients with a reduced creatinine clearance and in older patients. In the postmarketing experience, loss of consciousness was reported [see Adverse Reactions (6.4)]. Patients with uncontrolled seizures were not studied. If a patient has fainting, new confusion or a seizure, check the creatinine clearance and review all medicines that slow the brain, and consider lowering the dose to the next step in section 2.3 only if the creatinine clearance supports it.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s5-13">
+              <id root="9501558c-4e52-5eff-ad4f-2bc3e9b77273"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>5.13 Driving and Psychomotor Performance</title>
+              <text>
+                <paragraph>In a study in 48 healthy adults, a single dose of neurovexin 50mg, and 7 days of 50mg twice daily, were compared with placebo and with a standard sedating medicine in a driving simulator and in a set of psychomotor tests. After the single dose, the lateral position in the simulator was worse than on placebo during the first 3 hours, and the reaction time was slower by 6%. After 7 days the difference from placebo was small and not statistically significant, but 2 of the 48 participants stopped the driving test because of sleepiness. The standard sedating medicine gave a larger effect than neurovexin on all tests.</paragraph>
+                <paragraph>This study does not show that it is safe to drive. Tell patients not to drive or use machines until they know how NeuroVex affects them, and to take extra care after each increase in other medicines that slow the brain [see Warnings and Precautions (5.1) and Patient Counseling Information (17)].</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s5-14">
+              <id root="fa4614ef-b9d9-5377-a3e7-fe70d24f11dd"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>5.14 Monitoring</title>
+              <text>
+                <paragraph>No routine blood test is needed for NeuroVex. Estimate the creatinine clearance before starting NeuroVex and again at least once a year, and sooner if the patient becomes ill or starts a medicine that can reduce kidney function [see Warnings and Precautions (5.7)]. At each visit, ask about dizziness, sleepiness, falls, swelling, weight change, breathing, visual symptoms and mood, and ask about alcohol and any new medicine that slows the brain. Record the pain score and the interference of pain with sleep so that the benefit can be judged. If a patient has had no useful reduction in pain after 12 weeks on the recommended dose, consider whether continuing is justified.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s5-15">
+              <id root="d9805a21-5765-5f6e-a279-e2e77256c706"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>5.15 Surgery and Anesthesia</title>
+              <text>
+                <paragraph>Neurovexin was not studied in the period around surgery. Because anesthetics, opioids and sedatives add to the sleepiness and slow breathing that NeuroVex can cause, tell the anesthesia team that the patient takes NeuroVex. Do not stop NeuroVex suddenly before an elective procedure; if the patient cannot take capsules by mouth, a doctor should decide how to lower the dose, as in section 2.4, before the procedure. Patients with a reduced creatinine clearance, who clear the drug slowly, may stay sleepy for longer after the procedure.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+        </section>
+      </component>
+      <component>
+        <section ID="s6">
+          <id root="aef4c08c-6d05-5f55-a023-0d7ccf5cf3b0"/>
+          <code code="34084-4" codeSystem="2.16.840.1.113883.6.1" displayName="ADVERSE REACTIONS SECTION"/>
+          <title>6 ADVERSE REACTIONS SECTION</title>
+          <effectiveTime value="20260501"/>
+          <component>
+            <section ID="s6-1">
+              <id root="607a3192-8edd-5ba7-a5e3-4648b4320366"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>6.1 Clinical Trials Experience</title>
+              <text>
+                <paragraph>In the NEURO-BRIDGE trial, 8.2% of patients on NeuroVex and 3.1% on placebo stopped because of dizziness. Adverse reactions in at least 5% of patients and more often than placebo were dizziness (14.1% vs 4.8%), sleepiness (9.6% vs 2.9%), leg swelling (6.0% vs 2.2%) and dry mouth (5.2% vs 1.9%).</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s6-2">
+              <id root="eb59cb70-9a08-57e1-abb1-894305ffca17"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>6.2 Common Adverse Reactions by Treatment Arm</title>
+              <text>
+                <paragraph>Table 1 shows the adverse reactions that occurred in at least 2% of patients treated with NeuroVex 50mg twice daily and more often than in patients on placebo in NEURO-BRIDGE, the 12-week, placebo-controlled trial in adults with painful diabetic peripheral neuropathy. The safety population included 630 patients in each arm. The reactions in the first four rows are the reactions that occurred in at least 5% of patients and more often than placebo, as given in section 6.1.</paragraph>
+                <paragraph>Table 1. Adverse reactions in at least 2% of patients on NeuroVex and more often than on placebo (12-week trial)</paragraph>
+                <table>
+                  <thead><tr><th>Adverse reaction</th><th>NeuroVex 50mg twice daily (%)</th><th>Placebo (%)</th></tr></thead>
+                  <tbody>
+                    <tr><td>Dizziness</td><td>14.1</td><td>4.8</td></tr>
+                    <tr><td>Sleepiness (somnolence)</td><td>9.6</td><td>2.9</td></tr>
+                    <tr><td>Leg swelling (peripheral edema)</td><td>6.0</td><td>2.2</td></tr>
+                    <tr><td>Dry mouth</td><td>5.2</td><td>1.9</td></tr>
+                    <tr><td>Weight gain</td><td>4.1</td><td>1.4</td></tr>
+                    <tr><td>Headache</td><td>3.8</td><td>2.5</td></tr>
+                    <tr><td>Constipation</td><td>3.5</td><td>1.7</td></tr>
+                    <tr><td>Blurred vision</td><td>2.7</td><td>0.8</td></tr>
+                    <tr><td>Unsteady walking (ataxia)</td><td>2.4</td><td>0.6</td></tr>
+                    <tr><td>Fatigue</td><td>2.4</td><td>1.6</td></tr>
+                    <tr><td>Nausea</td><td>2.2</td><td>1.8</td></tr>
+                  </tbody>
+                </table>
+                <paragraph>Dizziness, sleepiness and leg swelling were related to dose in the dose-ranging study described in section 14.2. Table 2 shows the reactions by age, because dizziness differed between the two age groups.</paragraph>
+                <paragraph>Table 2. Dizziness and sleepiness by age group, NeuroVex arm (12-week trial)</paragraph>
+                <table>
+                  <thead><tr><th>Adverse reaction</th><th>Under 65 years (%)</th><th>65 years or older (%)</th></tr></thead>
+                  <tbody>
+                    <tr><td>Dizziness</td><td>11.4</td><td>18.0</td></tr>
+                    <tr><td>Sleepiness</td><td>8.6</td><td>11.1</td></tr>
+                    <tr><td>Unsteady walking</td><td>1.7</td><td>3.4</td></tr>
+                  </tbody>
+                </table>
+                <paragraph>About 41% of the patients in the trial were 65 years or older.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s6-3">
+              <id root="54cc9137-369a-5664-aad2-987bece8f08d"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>6.3 Discontinuations, Serious Adverse Reactions and Laboratory Findings</title>
+              <text>
+                <paragraph><content styleCode="bold">Discontinuations.</content> In NEURO-BRIDGE, 8.2% of patients on NeuroVex and 3.1% on placebo stopped treatment because of dizziness. Table 3 shows the adverse reactions that most often led to stopping.</paragraph>
+                <paragraph>Table 3. Adverse reactions leading to discontinuation in at least 0.5% of patients on NeuroVex (12-week trial)</paragraph>
+                <table>
+                  <thead><tr><th>Adverse reaction</th><th>NeuroVex 50mg twice daily (%)</th><th>Placebo (%)</th></tr></thead>
+                  <tbody>
+                    <tr><td>Dizziness</td><td>8.2</td><td>3.1</td></tr>
+                    <tr><td>Sleepiness</td><td>2.5</td><td>0.8</td></tr>
+                    <tr><td>Leg swelling</td><td>1.0</td><td>0.3</td></tr>
+                    <tr><td>Unsteady walking</td><td>0.6</td><td>0.2</td></tr>
+                    <tr><td>Any adverse reaction</td><td>12.4</td><td>6.0</td></tr>
+                  </tbody>
+                </table>
+                <paragraph><content styleCode="bold">Serious adverse events.</content> Serious adverse events occurred in 3.0% of patients on NeuroVex and 2.7% on placebo. No serious event was reported in more than 3 patients in either arm. The most frequent were cardiac events (chest pain, atrial fibrillation) and infections of the skin and soft tissue in the foot, which are common in patients with diabetic neuropathy. There were 2 deaths in each arm, and none was judged to be related to the study drug.</paragraph>
+                <paragraph><content styleCode="bold">Laboratory findings.</content> Mean values of blood glucose, hemoglobin A1c, liver enzymes, sodium, potassium and blood counts did not change in a clinically relevant way. Creatine kinase above 3 times the upper limit of normal was seen in 1.4% of patients on NeuroVex and 0.8% on placebo; these were not accompanied by muscle symptoms in most cases. A rise in alanine aminotransferase above 3 times the upper limit of normal occurred in 0.8% of patients on NeuroVex and 0.6% on placebo. Serum creatinine rose by a mean of 0.04 mg/dL on NeuroVex and 0.02 mg/dL on placebo, and the difference was not progressive.</paragraph>
+                <paragraph><content styleCode="bold">Vital signs.</content> The mean change in systolic blood pressure from baseline to week 12 was 0.8 mmHg on NeuroVex and 0.4 mmHg on placebo. The mean weight gain was 0.9 kg on NeuroVex and 0.3 kg on placebo.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s6-4">
+              <id root="49ca8556-3aed-55bf-a970-631a65f7feed"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>6.4 Postmarketing Experience</title>
+              <text>
+                <paragraph>The following reactions were reported with neurovexin after approval, including reports from the long-term extension study. Because these reports come from a population of unknown size, it is not always possible to estimate their frequency or to establish a causal link to the drug.</paragraph>
+                <list listType="unordered">
+                  <item><content styleCode="bold">Immune system:</content> hypersensitivity, angioedema.</item>
+                  <item><content styleCode="bold">Nervous system:</content> loss of consciousness, confusion, myoclonus, tremor, memory impairment.</item>
+                  <item><content styleCode="bold">Respiratory:</content> respiratory depression, in particular when the patient was also taking an opioid, a benzodiazepine or alcohol [see Warnings and Precautions (5.2)].</item>
+                  <item><content styleCode="bold">Psychiatric:</content> agitation, hallucinations, depressed mood.</item>
+                  <item><content styleCode="bold">Eye:</content> double vision, blurred vision.</item>
+                  <item><content styleCode="bold">Musculoskeletal:</content> rhabdomyolysis, muscle pain.</item>
+                  <item><content styleCode="bold">Renal:</content> acute kidney injury, mostly in patients who were dehydrated or whose dose was not adjusted for kidney function.</item>
+                  <item><content styleCode="bold">Skin:</content> rash, urticaria.</item>
+                </list>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s6-5">
+              <id root="404fca79-9d83-5dee-a559-3898f30fb9e8"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>6.5 Characterization of Dizziness, Sleepiness and Swelling</title>
+              <text>
+                <paragraph><content styleCode="bold">Dizziness.</content> In NEURO-BRIDGE, dizziness began in the first 2 weeks in 71% of the patients on NeuroVex who had it. The median time to onset was 5 days. The median duration of the first episode was 9 days, and 52% of the episodes went away while the dose was unchanged. Most episodes were mild or moderate. Severe dizziness was reported in 1.3% of patients on NeuroVex and 0.2% on placebo. Dizziness was described as light-headedness in 63% of the patients, as a feeling that the room was spinning in 21% and as unsteadiness in 16%.</paragraph>
+                <paragraph><content styleCode="bold">Sleepiness.</content> Sleepiness began in the first 2 weeks in 64% of the patients on NeuroVex who had it. The median duration was 14 days. Of the patients with sleepiness, 38% had it throughout the 12 weeks. Sleepiness led to stopping in 2.5% of patients on NeuroVex and 0.8% on placebo [see Adverse Reactions (6.3)].</paragraph>
+                <paragraph><content styleCode="bold">Swelling.</content> Leg swelling began after a median of 6 weeks. It was graded as mild in 78% of the patients with swelling, moderate in 21% and severe in 1%. It was symmetric in all patients, was not painful and was not itchy. The mean weight gain in patients with swelling was 1.8 kg. Swelling got better after the dose of NeuroVex was reduced or stopped in most patients, and a diuretic was used in 11% of the patients with swelling.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s6-6">
+              <id root="c0888ea0-4fa8-5b0b-afc3-5af645a47ca4"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>6.6 Adverse Reactions by Dose in the Dose-Ranging Study</title>
+              <text>
+                <paragraph>Table 8 shows the adverse reactions seen at different doses in the 8-week dose-ranging study described in section 14.2, in which 412 adults were randomized to placebo or to neurovexin 25mg twice daily, 50mg twice daily or 75mg twice daily. The frequency of dizziness, sleepiness and leg swelling rose with the dose.</paragraph>
+                <paragraph>Table 8. Adverse reactions by dose in the 8-week phase 2 study (percent of patients)</paragraph>
+                <table>
+                  <thead><tr><th>Adverse reaction</th><th>Placebo</th><th>25mg twice daily</th><th>50mg twice daily</th><th>75mg twice daily</th></tr></thead>
+                  <tbody>
+                    <tr><td>Dizziness</td><td>4.9</td><td>8.7</td><td>14.6</td><td>22.3</td></tr>
+                    <tr><td>Sleepiness</td><td>2.9</td><td>5.8</td><td>9.7</td><td>15.5</td></tr>
+                    <tr><td>Leg swelling</td><td>1.9</td><td>3.9</td><td>6.8</td><td>10.7</td></tr>
+                    <tr><td>Dry mouth</td><td>1.9</td><td>3.9</td><td>5.8</td><td>7.8</td></tr>
+                    <tr><td>Blurred vision</td><td>1.0</td><td>1.9</td><td>2.9</td><td>5.8</td></tr>
+                    <tr><td>Stopped for dizziness</td><td>2.9</td><td>3.9</td><td>7.8</td><td>13.6</td></tr>
+                  </tbody>
+                </table>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s6-7">
+              <id root="6f331caf-a58a-579f-a2e0-200c39dce932"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>6.7 Adverse Reactions in the Long-Term Extension</title>
+              <text>
+                <paragraph>In the 52-week open-label extension of NEURO-BRIDGE [see Clinical Studies (14.3)], 1,046 patients took at least one dose. New adverse reactions in at least 2% of the patients were weight gain (7.9%), leg swelling (7.2%), dizziness (6.8%), sleepiness (4.9%), urinary tract infection (4.6%), headache (3.7%), diarrhea (3.4%) and cough (2.3%). Of the patients, 7.1% stopped because of an adverse event, and serious adverse events were reported in 9.8% over 52 weeks. The rate of new dizziness fell after the first 12 weeks. The mean weight gain from the start of the extension to week 52 was 1.9 kg. No case of respiratory depression requiring treatment was reported in patients who took NeuroVex without an opioid.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s6-8">
+              <id root="7d7ae869-28f3-56a8-a505-f3221f9eebf2"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>6.8 Adverse Reactions by Body System</title>
+              <text>
+                <paragraph>Table 11 lists the adverse reactions that occurred in at least 1% of patients on NeuroVex 50mg twice daily and more often than on placebo in NEURO-BRIDGE, by body system. The reactions in Table 1 are repeated here for completeness.</paragraph>
+                <paragraph>Table 11. Adverse reactions in at least 1% of patients on NeuroVex and more often than on placebo, by body system (12-week trial, percent of patients)</paragraph>
+                <table>
+                  <thead><tr><th>Body system and reaction</th><th>NeuroVex 50mg twice daily</th><th>Placebo</th></tr></thead>
+                  <tbody>
+                    <tr><td><content styleCode="bold">Nervous system</content></td><td></td><td></td></tr>
+                    <tr><td>Dizziness</td><td>14.1</td><td>4.8</td></tr>
+                    <tr><td>Sleepiness</td><td>9.6</td><td>2.9</td></tr>
+                    <tr><td>Unsteady walking</td><td>2.4</td><td>0.6</td></tr>
+                    <tr><td>Headache</td><td>3.8</td><td>2.5</td></tr>
+                    <tr><td>Tremor</td><td>1.3</td><td>0.5</td></tr>
+                    <tr><td>Disturbance in attention</td><td>1.1</td><td>0.3</td></tr>
+                    <tr><td><content styleCode="bold">Gastrointestinal</content></td><td></td><td></td></tr>
+                    <tr><td>Dry mouth</td><td>5.2</td><td>1.9</td></tr>
+                    <tr><td>Constipation</td><td>3.5</td><td>1.7</td></tr>
+                    <tr><td>Nausea</td><td>2.2</td><td>1.8</td></tr>
+                    <tr><td>Diarrhea</td><td>1.6</td><td>1.4</td></tr>
+                    <tr><td>Flatulence</td><td>1.1</td><td>0.6</td></tr>
+                    <tr><td><content styleCode="bold">General</content></td><td></td><td></td></tr>
+                    <tr><td>Leg swelling</td><td>6.0</td><td>2.2</td></tr>
+                    <tr><td>Fatigue</td><td>2.4</td><td>1.6</td></tr>
+                    <tr><td>Feeling drunk</td><td>1.0</td><td>0.2</td></tr>
+                    <tr><td><content styleCode="bold">Metabolism and investigations</content></td><td></td><td></td></tr>
+                    <tr><td>Weight gain</td><td>4.1</td><td>1.4</td></tr>
+                    <tr><td>Increased appetite</td><td>1.5</td><td>0.8</td></tr>
+                    <tr><td><content styleCode="bold">Eye</content></td><td></td><td></td></tr>
+                    <tr><td>Blurred vision</td><td>2.7</td><td>0.8</td></tr>
+                    <tr><td>Double vision</td><td>1.0</td><td>0.2</td></tr>
+                    <tr><td><content styleCode="bold">Psychiatric</content></td><td></td><td></td></tr>
+                    <tr><td>Confusion</td><td>1.4</td><td>0.5</td></tr>
+                    <tr><td>Difficulty sleeping</td><td>1.2</td><td>1.0</td></tr>
+                    <tr><td><content styleCode="bold">Respiratory</content></td><td></td><td></td></tr>
+                    <tr><td>Cough</td><td>1.5</td><td>1.2</td></tr>
+                    <tr><td><content styleCode="bold">Musculoskeletal</content></td><td></td><td></td></tr>
+                    <tr><td>Muscle pain</td><td>1.8</td><td>1.1</td></tr>
+                    <tr><td><content styleCode="bold">Infections</content></td><td></td><td></td></tr>
+                    <tr><td>Urinary tract infection</td><td>2.1</td><td>1.7</td></tr>
+                  </tbody>
+                </table>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s6-9">
+              <id root="bbdeced1-9e89-5296-a586-54f65879a7cf"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>6.9 Adverse Reactions Related to Breathing</title>
+              <text>
+                <paragraph>In the placebo-controlled trials, slow or shallow breathing was reported in 0.2% of patients on NeuroVex and in no patient on placebo, and the patient with the event also took a medicine that slows the brain. The one patient on NeuroVex with the event was taking a stable low dose of an opioid. Similar reports came in after approval [see Adverse Reactions (6.4)]. The warnings on dose and monitoring are in section 5.2.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+        </section>
+      </component>
+      <component>
+        <section ID="s7">
+          <id root="8d7c5a0d-4740-5c63-a365-9ae01d6678ae"/>
+          <code code="34073-7" codeSystem="2.16.840.1.113883.6.1" displayName="DRUG INTERACTIONS SECTION"/>
+          <title>7 DRUG INTERACTIONS SECTION</title>
+          <effectiveTime value="20260501"/>
+          <component>
+            <section ID="s7-1">
+              <id root="728e95b7-e6e2-50fd-ad63-0ee364a9f132"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>7.1 Opioids, Benzodiazepines and Alcohol</title>
+              <text>
+                <paragraph>These add to the sleepiness and the slow breathing that NeuroVex can cause. If one is needed, start it at a low dose and watch the patient closely.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s7-2">
+              <id root="561cae4d-3da9-555e-a3c0-f30fff20334d"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>7.2 Medicines That Cause Fluid Retention</title>
+              <text>
+                <paragraph>Thiazolidinediones such as pioglitazone, and other medicines that cause leg swelling, such as amlodipine, add to the swelling and weight gain seen with NeuroVex [see Warnings and Precautions (5.3) and (5.10)]. In patients with diabetes, the swelling seen with the combination was more frequent than with either medicine alone. Watch these patients for swelling, weight gain and signs of heart failure. This is a pharmacodynamic effect, and no change in the plasma level of either medicine was seen.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s7-3">
+              <id root="322cbc08-5626-5708-a807-57e2e289cc26"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>7.3 Medicines That Reduce Renal Elimination</title>
+              <text>
+                <paragraph>Neurovexin is excreted unchanged by the kidneys, in part by active tubular secretion. Medicines that block this secretion, such as cimetidine and probenecid, raised the neurovexin exposure by about 15% in healthy volunteers. This change does not call for a different dose in patients with a normal kidney function. In patients with a creatinine clearance below 60 mL/min, who already have a higher exposure, watch for dizziness and sleepiness when one of these medicines is started or stopped.</paragraph>
+                <paragraph>Medicines that can reduce kidney function, such as non-steroidal anti-inflammatory drugs, diuretics given at high doses, and contrast agents, can raise the neurovexin level indirectly. Recheck the creatinine clearance when these medicines are started [see Warnings and Precautions (5.7)].</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s7-4">
+              <id root="36ddc177-ef03-52e9-aa8b-9c4b91686f05"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>7.4 Antacids</title>
+              <text>
+                <paragraph>An antacid that contains aluminum and magnesium hydroxide, given at the same time as NeuroVex, lowered the neurovexin exposure by about 20%. Take NeuroVex at least 2 hours after such an antacid. The effect of other acid-reducing medicines, such as proton pump inhibitors and H2-receptor blockers (apart from cimetidine, see section 7.3), on the neurovexin level was not clinically relevant.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s7-5">
+              <id root="e0e07cfe-d706-51c8-afa9-4a6e34b619bd"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>7.5 Medicines with No Interaction</title>
+              <text>
+                <paragraph>Neurovexin is not metabolized by the liver in a relevant way, is not bound to plasma proteins to a relevant degree, and does not inhibit or induce the main cytochrome P450 enzymes (CYP1A2, 2C9, 2C19, 2D6 and 3A4) or the main drug transporters at the plasma levels reached with the recommended dose. In studies in healthy volunteers, NeuroVex did not change the exposure to metformin, glimepiride, insulin glargine, atorvastatin, lisinopril, warfarin or an oral contraceptive that contains ethinyl estradiol and norethindrone. No dose change is needed for these medicines when NeuroVex is added. As with any medicine in a patient with diabetes, keep checking the blood glucose as usual.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s7-6">
+              <id root="ac722a3c-423f-5231-ab3c-a61feb5ddfcc"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>7.6 Summary of Drug Interactions</title>
+              <text>
+                <paragraph>Table 4 lists the interactions described in this section and in section 7.1.</paragraph>
+                <paragraph>Table 4. Clinically relevant interactions with NeuroVex</paragraph>
+                <table>
+                  <thead><tr><th>Medicine or class</th><th>Effect</th><th>Recommendation</th></tr></thead>
+                  <tbody>
+                    <tr><td>Opioids (for example oxycodone, morphine)</td><td>More sleepiness and slow breathing; a higher plasma level of neurovexin was not seen</td><td>Start the added medicine at a low dose and watch the patient closely [see 7.1]</td></tr>
+                    <tr><td>Benzodiazepines (for example lorazepam, diazepam)</td><td>More sleepiness, dizziness and slow breathing</td><td>Start the added medicine at a low dose and watch the patient closely [see 7.1]</td></tr>
+                    <tr><td>Alcohol</td><td>More sleepiness and dizziness</td><td>Advise patients to avoid alcohol [see 7.1]</td></tr>
+                    <tr><td>Other medicines that slow the brain (for example sedating antihistamines, sleep medicines, muscle relaxants)</td><td>More sleepiness</td><td>Use the lowest dose and watch the patient closely</td></tr>
+                    <tr><td>Thiazolidinediones (for example pioglitazone) and amlodipine</td><td>More leg swelling and weight gain</td><td>Watch for swelling and signs of heart failure [see 7.2]</td></tr>
+                    <tr><td>Cimetidine, probenecid</td><td>Neurovexin exposure about 15% higher</td><td>No dose change with normal kidney function; watch patients with a lower creatinine clearance [see 7.3]</td></tr>
+                    <tr><td>Aluminum and magnesium hydroxide antacids</td><td>Neurovexin exposure about 20% lower</td><td>Take NeuroVex at least 2 hours after the antacid [see 7.4]</td></tr>
+                    <tr><td>Metformin, glimepiride, insulin glargine, atorvastatin, lisinopril, warfarin, oral contraceptives</td><td>No change in exposure</td><td>No dose change [see 7.5]</td></tr>
+                  </tbody>
+                </table>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s7-7">
+              <id root="a85a4459-df16-506e-a823-f35301f93cbf"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>7.7 Interference with Laboratory Tests</title>
+              <text>
+                <paragraph>Neurovexin does not interfere with the measurement of glucose, hemoglobin A1c, urine protein or serum creatinine. Neurovexin gave no false-positive result on the urine drug screens for amphetamines, benzodiazepines, cannabinoids, cocaine and opiates used in the clinical program.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s7-8">
+              <id root="f339d532-785d-567d-ae6f-12387bb180a9"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>7.8 Results of Drug Interaction Studies</title>
+              <text>
+                <paragraph>Table 9 gives the results of the clinical studies on which sections 7.1 to 7.5 are based. Each study used healthy volunteers who took 50mg twice daily of NeuroVex or, for single-dose studies, a single 50 mg dose.</paragraph>
+                <paragraph>Table 9. Effect of other medicines on the exposure to neurovexin, and of neurovexin on other medicines</paragraph>
+                <table>
+                  <thead><tr><th>Co-administered medicine</th><th>Effect on neurovexin AUC</th><th>Effect on the other medicine</th></tr></thead>
+                  <tbody>
+                    <tr><td>Oxycodone 10mg single dose</td><td>No change</td><td>Cmax up 7%, AUC unchanged</td></tr>
+                    <tr><td>Lorazepam 1mg single dose</td><td>No change</td><td>No change</td></tr>
+                    <tr><td>Alcohol (0.7 g/kg)</td><td>No change</td><td>No change in blood alcohol</td></tr>
+                    <tr><td>Cimetidine 400mg twice daily</td><td>Up 15%</td><td>Not applicable</td></tr>
+                    <tr><td>Probenecid 500mg four times daily</td><td>Up 14%</td><td>Not applicable</td></tr>
+                    <tr><td>Aluminum and magnesium hydroxide antacid</td><td>Down 20%</td><td>Not applicable</td></tr>
+                    <tr><td>Metformin 1,000mg</td><td>No change</td><td>No change</td></tr>
+                    <tr><td>Glimepiride 4mg</td><td>No change</td><td>No change</td></tr>
+                    <tr><td>Atorvastatin 40mg</td><td>No change</td><td>No change</td></tr>
+                    <tr><td>Warfarin 5mg</td><td>No change</td><td>No change in INR or in the exposure</td></tr>
+                    <tr><td>Ethinyl estradiol and norethindrone</td><td>No change</td><td>No change</td></tr>
+                  </tbody>
+                </table>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+        </section>
+      </component>
+      <component>
+        <section ID="s8">
+          <id root="da305be8-ae6a-5428-a813-0266c7eec1ff"/>
+          <code code="43684-0" codeSystem="2.16.840.1.113883.6.1" displayName="USE IN SPECIFIC POPULATIONS SECTION"/>
+          <title>8 USE IN SPECIFIC POPULATIONS SECTION</title>
+          <effectiveTime value="20260501"/>
+          <component>
+            <section ID="s8-1">
+              <id root="25e98c27-d65e-5c26-a5db-0f2897d2a69f"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>8.1 Pregnancy</title>
+              <text>
+                <paragraph>There are no adequate studies in pregnant women. In animal studies, high doses caused harm to the developing young. Use NeuroVex in pregnancy only if the benefit justifies the risk to the fetus.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s8-2">
+              <id root="66f740db-bc9b-55c4-addf-fb9c137cd2eb"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>8.2 Lactation</title>
+              <text>
+                <paragraph>Neurovexin passes into human breast milk. Weigh the benefit of breastfeeding against the risk of sleepiness in the infant.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s8-3">
+              <id root="79697b44-4291-5a84-aa03-7cfbecf83a11"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>8.3 Females and Males of Reproductive Potential</title>
+              <text>
+                <paragraph>Because animal studies showed harm to the developing young at high doses [see Use in Specific Populations (8.1)], advise women who can become pregnant to tell their doctor if they are or plan to become pregnant. A pregnancy exposure registry monitors the outcomes of women who take NeuroVex during pregnancy; doctors can enroll patients through the company's Medical Information department.</paragraph>
+                <paragraph>In fertility studies in animals, neurovexin did not change mating or fertility at doses up to 12 times the human exposure at the maximum recommended dose. A study of 40 healthy men who took NeuroVex 50mg twice daily for 90 days showed no change in sperm count, motility or form.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s8-4">
+              <id root="e4b57aa8-48dc-5d14-a0cf-01640f7afd74"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>8.4 Pediatric Use</title>
+              <text>
+                <paragraph>Safety and effectiveness in patients younger than 18 years have not been established.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s8-5">
+              <id root="ff7f81a1-0a07-5827-a0d8-7fc591e5029d"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>8.5 Geriatric Use</title>
+              <text>
+                <paragraph>Older patients are more likely to have reduced kidney function. Choose the dose by creatinine clearance, as in section 2.3. Age alone does not change the dose.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s8-6">
+              <id root="af6996e5-941b-5cbf-a41c-6cb9e05fd95b"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>8.6 Renal Impairment</title>
+              <text>
+                <paragraph>Neurovexin is cleared mainly by the kidneys. Doses by creatinine clearance are given in section 2.3.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s8-7">
+              <id root="d9c4ffa3-d52c-5f73-af43-75d3fe93b54f"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>8.7 Hepatic Impairment</title>
+              <text>
+                <paragraph>Neurovexin is not metabolized by the liver in a relevant way. In a study of 8 patients with moderate hepatic impairment (Child-Pugh class B) and 8 matched healthy volunteers, the plasma levels of neurovexin were within 10% of each other. No dose adjustment is needed on account of hepatic impairment. Choose the dose by creatinine clearance, because patients with a liver disease often have a reduced kidney function.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s8-8">
+              <id root="7b825aba-0d1b-524d-a793-c35f93b40c4d"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>8.8 Patients with Diabetic Kidney Disease</title>
+              <text>
+                <paragraph>Most patients with diabetic peripheral neuropathy have diabetes for many years, and many have some degree of diabetic kidney disease. In NEURO-BRIDGE, 22% of the patients had a creatinine clearance of 30 to 59 mL/min at the start of the trial. All patients in the trial took 50mg twice daily, because all had a creatinine clearance of 30 mL/min or more. The pain score drop was similar in these patients and in patients with a higher clearance, and dizziness was more common (18.7% versus 12.8% on NeuroVex) [see Clinical Studies (14.1)]. Use the doses in section 2.3 in clinical practice, which are lower for patients with a creatinine clearance below 60 mL/min.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s8-9">
+              <id root="a9c87f53-c776-5226-a62d-207eaea06ba2"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>8.9 Patients with Diabetes</title>
+              <text>
+                <paragraph>NeuroVex is used in adults with diabetes. In NEURO-BRIDGE, the mean hemoglobin A1c at the start was 7.8% and did not change in a clinically relevant way over 12 weeks in either arm. The rate of hypoglycemia was 2.9% on NeuroVex and 2.7% on placebo, and the rate did not depend on the use of insulin or a sulfonylurea. NeuroVex can cause dizziness and sleepiness, and these effects may be mistaken for hypoglycemia or may hide its early symptoms. Advise patients to keep checking the blood glucose as their diabetes care team recommends.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s8-10">
+              <id root="5373d32d-9397-571e-ac28-edf926cb6fcd"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>8.10 Patients Who Are Underweight or Who Have Had Gastrointestinal Surgery</title>
+              <text>
+                <paragraph>Patients with a body weight below 45 kg were few in the trials, and the effect of a low body weight on the exposure to neurovexin was not clinically relevant after adjustment for the creatinine clearance. Neurovexin is absorbed in the upper small intestine through an amino-acid transporter, so a large resection of the small intestine can lower absorption. The effect of bariatric surgery on the exposure to neurovexin has not been studied. If a patient who has had this kind of surgery reports a lack of effect, check the dose against the creatinine clearance first, and do not give more than the maximum daily dose in section 2.2.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+        </section>
+      </component>
+      <component>
+        <section ID="s9">
+          <id root="d93a737f-25e4-5591-a1fa-6055b0c18b72"/>
+          <code code="42227-9" codeSystem="2.16.840.1.113883.6.1" displayName="DRUG ABUSE AND DEPENDENCE SECTION"/>
+          <title>9 Drug Abuse and Dependence</title>
+          <text>
+            <paragraph>This section describes the abuse potential and the dependence liability of neurovexin.</paragraph>
+          </text>
+          <effectiveTime value="20260501"/>
+          <component>
+            <section ID="s9-1">
+              <id root="15ee70f4-4b0a-5ddd-a9ff-c00ed12361b8"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>9.1 Controlled Substance</title>
+              <text>
+                <paragraph>NeuroVex is not a controlled substance.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s9-2">
+              <id root="d67b030d-11b9-5717-aa8c-a0fc2634400f"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>9.2 Abuse</title>
+              <text>
+                <paragraph>In a study in 36 adults with a history of recreational use of sedatives, single doses of neurovexin 100mg, 200mg and 400mg were compared with alprazolam 2mg and placebo. Neurovexin at doses above the maximum recommended single dose gave ratings of &quot;drug liking&quot; that were higher than placebo and lower than alprazolam. Euphoria was reported by 6% of the participants on neurovexin 400mg, 3% on 200mg, 3% on placebo and 42% on alprazolam. No signs of abuse, such as dose escalation or requests for early refills, were seen in the 12-week trial or in the long-term extension study. Doctors should still ask about a history of drug abuse and watch for signs of misuse, such as taking more capsules than prescribed.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s9-3">
+              <id root="e7f7e3e4-b4a0-5b22-af56-4a69804de70a"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>9.3 Dependence</title>
+              <text>
+                <paragraph>Physical dependence, shown by withdrawal reactions after the drug is stopped suddenly, can occur [see Warnings and Precautions (5.5) and Dosage and Administration (2.4)]. Neurovexin did not cause craving or drug-seeking behavior in animals or in the clinical studies. The withdrawal reactions seen in patients who stopped suddenly were mild or moderate in most patients and went away within 1 to 2 weeks.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+        </section>
+      </component>
+      <component>
+        <section ID="s10">
+          <id root="14243aa6-3e93-5a5f-aede-96259d8c3a82"/>
+          <code code="34088-5" codeSystem="2.16.840.1.113883.6.1" displayName="OVERDOSAGE SECTION"/>
+          <title>10 Overdosage</title>
+          <text>
+            <paragraph>Sleepiness, confusion and agitation are the most likely effects of an overdose. Give supportive care. Hemodialysis removes about half of the drug in 4 hours.</paragraph>
+          </text>
+          <effectiveTime value="20260501"/>
+          <component>
+            <section ID="s10-1">
+              <id root="a62f5456-a3c8-586f-a0f5-ba4e65486efa"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>10.1 Overdosage Experience</title>
+              <text>
+                <paragraph>In the clinical program, the largest known single ingestion was 1,200 mg in an adult with a creatinine clearance of 85 mL/min. The patient had dizziness, sleepiness and slurred speech and recovered within 24 hours with supportive care. In patients with a reduced kidney function, the effects of an overdose last longer because neurovexin is cleared mainly by the kidneys [see Warnings and Precautions (5.7)]. If the patient has also taken an opioid, a benzodiazepine or alcohol, watch the breathing closely [see Warnings and Precautions (5.2)]. There is no specific antidote. For up-to-date advice, contact a poison control center.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s10-2">
+              <id root="9bb1424a-d2f3-5cc1-afcd-f40a2c52246c"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>10.2 Management of Overdosage</title>
+              <text>
+                <paragraph>Give supportive care and watch the breathing, the blood pressure and the level of consciousness. Gastric lavage is not routinely needed for a single ingestion that is more than 2 hours old. Activated charcoal is of limited use because neurovexin is absorbed within about 1 hour. Hemodialysis may be considered in a patient with severe symptoms or a reduced kidney function, because it removes about half of the drug in 4 hours. The fall in the plasma level after dialysis is not accompanied by a rebound in the patients who were studied. Contact a poison control center for the latest advice.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+        </section>
+      </component>
+      <component>
+        <section ID="s11">
+          <id root="43fd559a-3fbc-501b-a0ca-196991412b5d"/>
+          <code code="34089-3" codeSystem="2.16.840.1.113883.6.1" displayName="DESCRIPTION SECTION"/>
+          <title>11 Description</title>
+          <text>
+            <paragraph>NeuroVex (neurovexin) capsules are for oral use. Neurovexin is a white to off-white crystalline powder that is freely soluble in water and in methanol, and slightly soluble in ethanol. The chemical name is 1-(aminomethyl)-3-cyclopentylcyclohexane acetic acid hydrochloride, the molecular formula is C14H25NO2 . HCl and the molecular weight is 275.8. The pKa values are 3.9 and 10.2, and the log distribution coefficient at pH 7.4 is -1.2.</paragraph>
+            <paragraph>Each capsule contains 25 mg or 50 mg of neurovexin. The inactive ingredients are lactose monohydrate, pregelatinized starch, talc and magnesium stearate. The capsule shell contains gelatin, titanium dioxide and, for the 50 mg capsule, FD&amp;C Blue No. 1.</paragraph>
+          </text>
+          <effectiveTime value="20260501"/>
+        </section>
+      </component>
+      <component>
+        <section ID="s12">
+          <id root="73218bf4-427c-5df3-a3d4-715ee6aba41a"/>
+          <code code="34090-1" codeSystem="2.16.840.1.113883.6.1" displayName="CLINICAL PHARMACOLOGY SECTION"/>
+          <title>12 CLINICAL PHARMACOLOGY SECTION</title>
+          <effectiveTime value="20260501"/>
+          <component>
+            <section ID="s12-1">
+              <id root="aca9178d-8ae7-539c-ad2c-603f02ed24ab"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>12.1 Mechanism of Action</title>
+              <text>
+                <paragraph>The mechanism by which neurovexin reduces the pain of diabetic peripheral neuropathy is not fully known. Neurovexin binds with high affinity to an auxiliary subunit of voltage-gated calcium channels in the nerves that carry pain signals. In animal models of nerve injury, this binding lowered the release of excitatory neurotransmitters, including glutamate and substance P, in the spinal cord, and reduced the response of the animals to touch and heat that would normally not cause pain. Neurovexin does not bind to opioid, dopamine, serotonin or GABA receptors, and does not block the reuptake of these transmitters. The effect on pain was not linked to a change in blood glucose.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s12-2">
+              <id root="9aa49db8-3615-564f-a59a-09a2fbc4150f"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>12.2 Pharmacodynamics</title>
+              <text>
+                <paragraph><content styleCode="bold">Cardiac electrophysiology.</content> In a thorough QT study in 60 healthy volunteers, single doses of neurovexin 100mg and 400mg did not lengthen the QT interval. The largest upper bound of the two-sided 90% confidence interval for the placebo-corrected change from baseline, corrected for heart rate by the individual method, was 4.8 ms, below the 10 ms threshold of regulatory concern.</paragraph>
+                <paragraph><content styleCode="bold">Effects on the nervous system.</content> In healthy volunteers, single doses of neurovexin 100mg slowed the reaction time on a computer-based test by 6% compared with placebo, and the effect was strongest 1 to 2 hours after the dose. When neurovexin was combined with lorazepam 1mg, the slowing was 14%, more than with either medicine alone [see Drug Interactions (7.1)].</paragraph>
+                <paragraph><content styleCode="bold">Respiratory effects.</content> In 24 healthy volunteers, neurovexin 100mg alone did not change the respiratory rate or the oxygen saturation. When it was taken with oxycodone 10mg, the mean oxygen saturation fell by 2.1 percentage points more than with oxycodone alone, and 3 participants needed a pause in the study procedure because the respiratory rate fell below 8 breaths a minute [see Warnings and Precautions (5.2)].</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s12-3">
+              <id root="ce97503f-5435-57eb-a427-844c5665fa4a"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>12.3 Pharmacokinetics</title>
+              <text>
+                <paragraph>Peak plasma levels are reached about 1 hour after a dose. The half-life is about 6 hours. About 90% is excreted unchanged in urine.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s12-4">
+              <id root="c19bb99f-4808-5779-a288-107ef55c7139"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>12.4 Pharmacokinetic Parameters and Special Populations</title>
+              <text>
+                <paragraph>Table 5 shows the pharmacokinetic parameters of neurovexin after repeated doses of 50mg twice daily in healthy adults with a normal kidney function. The basic findings on absorption, half-life and excretion are in section 12.3.</paragraph>
+                <paragraph>Table 5. Mean (percent coefficient of variation) pharmacokinetic parameters at steady state, 50mg twice daily</paragraph>
+                <table>
+                  <thead><tr><th>Parameter</th><th>Value</th></tr></thead>
+                  <tbody>
+                    <tr><td>Cmax (ng/mL)</td><td>2,100 (24)</td></tr>
+                    <tr><td>Tmax, median (range)</td><td>1.0 hour (0.5 to 2.0)</td></tr>
+                    <tr><td>AUC over 12 hours (ng.h/mL)</td><td>7,900 (22)</td></tr>
+                    <tr><td>Accumulation ratio</td><td>1.3</td></tr>
+                    <tr><td>Apparent oral clearance (L/h)</td><td>6.3 (21)</td></tr>
+                    <tr><td>Apparent volume of distribution (L)</td><td>55 (19)</td></tr>
+                    <tr><td>Elimination half-life (h)</td><td>about 6</td></tr>
+                    <tr><td>Oral bioavailability (%)</td><td>about 90 at 50 mg, dose-proportional from 25 mg to 200 mg</td></tr>
+                    <tr><td>Plasma protein binding (%)</td><td>less than 3</td></tr>
+                    <tr><td>Excreted unchanged in urine (%)</td><td>about 90</td></tr>
+                    <tr><td>Renal clearance (mL/min)</td><td>90, close to the creatinine clearance</td></tr>
+                  </tbody>
+                </table>
+                <paragraph><content styleCode="bold">Absorption.</content> Steady state is reached within 2 days. A high-fat meal delayed the median time to peak level from 1 hour to 2 hours and lowered the Cmax by 9%, with no change in the AUC. NeuroVex can therefore be taken with or without food.</paragraph>
+                <paragraph><content styleCode="bold">Distribution.</content> Neurovexin crosses the blood-brain barrier through an amino-acid transporter. Neurovexin passes into breast milk [see Use in Specific Populations (8.2)].</paragraph>
+                <paragraph><content styleCode="bold">Elimination and metabolism.</content> About 90% of the dose is excreted unchanged in urine. Less than 3% is found in urine as metabolites, and the rest is recovered in feces. The elimination half-life of about 6 hours does not change with the dose or on repeated dosing.</paragraph>
+                <paragraph><content styleCode="bold">Renal impairment.</content> Table 6 shows the effect of kidney function on the exposure to a single 50 mg dose. The half-life lengthens as the creatinine clearance falls. The doses in section 2.3 were chosen to keep the exposure close to that of a patient with a normal kidney function. Hemodialysis removes about half of the drug in 4 hours.</paragraph>
+                <paragraph>Table 6. Effect of renal impairment on the exposure to neurovexin (single 50 mg dose)</paragraph>
+                <table>
+                  <thead><tr><th>Creatinine clearance</th><th>Number</th><th>AUC ratio to normal</th><th>Half-life (h)</th></tr></thead>
+                  <tbody>
+                    <tr><td>60 mL/min or more</td><td>12</td><td>1.0</td><td>about 6</td></tr>
+                    <tr><td>30 to 59 mL/min</td><td>10</td><td>2.0</td><td>about 12</td></tr>
+                    <tr><td>15 to 29 mL/min</td><td>9</td><td>4.0</td><td>about 24</td></tr>
+                    <tr><td>Below 15 mL/min, not on dialysis</td><td>6</td><td>8.0</td><td>about 48</td></tr>
+                  </tbody>
+                </table>
+                <paragraph><content styleCode="bold">Age and sex.</content> The creatinine clearance explains the difference in the exposure between older and younger adults. After adjustment for the creatinine clearance, neither age nor sex changed the exposure by more than 10%.</paragraph>
+                <paragraph><content styleCode="bold">Body weight and race.</content> In a population analysis of the trial data, body weight and race (Asian, Black, White) did not change the exposure in a clinically relevant way. The exposure to neurovexin in Japanese healthy volunteers was within 10% of that in White volunteers after adjusting for body weight and creatinine clearance.</paragraph>
+                <paragraph><content styleCode="bold">Hepatic impairment.</content> See section 8.7.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s12-5">
+              <id root="9a3df377-a155-517c-a915-7eb496d10b59"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>12.5 Exposure-Response Relationships</title>
+              <text>
+                <paragraph>In the population analysis of the NEURO-BRIDGE data, the pain score drop rose with the plasma level of neurovexin up to the level reached on 50mg twice daily in a patient with a normal kidney function, and was flat above that level. The chance of dizziness rose in a straight line with the plasma level over the whole range. Patients with an average plasma level in the top quartile (mean AUC over 12 hours above 10,500 ng.h/mL) had a rate of dizziness of 21.6% compared with 9.8% in the bottom quartile, and a pain score drop of 2.5 and 2.2 points. These findings explain why higher doses add dizziness and not benefit, and why the dose in patients with a reduced creatinine clearance is lowered [see Dosage and Administration (2.2) and (2.3)].</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s12-6">
+              <id root="2aea0eb0-3396-59be-a68d-41531acd2dca"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>12.6 Pharmacogenomics and Special Studies</title>
+              <text>
+                <paragraph>Neurovexin is not a substrate of a polymorphic enzyme, and no genetic test is needed before treatment. In a study of 14 adults on stable hemodialysis who took a single dose of 25 mg after dialysis, the half-life between sessions was about 72 hours and the plasma level fell by about half over a 4-hour session. Because no dose schedule for these patients has been shown to be safe in a controlled trial, NeuroVex is not recommended in patients on dialysis [see Dosage and Administration (2.3)].</paragraph>
+                <paragraph>In a study of 20 healthy older adults aged 70 to 85 years with a creatinine clearance of 50 to 80 mL/min, the half-life was about 8 hours and the AUC was 1.5 times that of young adults with a normal kidney function. The difference followed the difference in creatinine clearance.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+        </section>
+      </component>
+      <component>
+        <section ID="s13">
+          <id root="1b2b5e83-cf98-54f1-aaea-02f479c8fe0f"/>
+          <code code="43680-8" codeSystem="2.16.840.1.113883.6.1" displayName="NONCLINICAL TOXICOLOGY SECTION"/>
+          <title>13 NONCLINICAL TOXICOLOGY SECTION</title>
+          <effectiveTime value="20260501"/>
+          <component>
+            <section ID="s13-1">
+              <id root="e953b865-41cc-59d7-ae1e-19b4920bc316"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>13.1 Carcinogenesis, Mutagenesis, Impairment of Fertility</title>
+              <text>
+                <paragraph>In a 104-week study in rats, neurovexin was given in the diet at doses up to 10 times the human exposure at the maximum recommended dose. There was no increase in the rate of tumors. In a 104-week study in mice, doses up to 14 times the human exposure caused no increase in tumors. Neurovexin was not mutagenic in the bacterial reverse mutation assay and the mouse lymphoma assay, and did not cause chromosome damage in the rat micronucleus test. For fertility, see section 8.3.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s13-2">
+              <id root="06c24a6b-9079-589e-a42f-16a75d66af01"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>13.2 Animal Toxicology</title>
+              <text>
+                <paragraph>In rats and dogs given neurovexin for 6 and 12 months, the main findings were sedation and ataxia at high doses, and a reversible tubular change in the kidneys of rats at doses at least 25 times the human exposure. In pregnant rats, doses of 8 times the human exposure caused delayed bone formation in the pups, and doses of 20 times caused a lower pup weight and a higher rate of skeletal changes. No such findings were seen at 3 times the human exposure [see Use in Specific Populations (8.1)].</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s13-3">
+              <id root="557660c3-c96b-5fd5-a5d1-e595fd67fdb8"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>13.3 Juvenile Animal Toxicity</title>
+              <text>
+                <paragraph>In juvenile rats given neurovexin from day 7 to day 70 of life, doses at least 5 times the human exposure caused sedation and a slower weight gain. Learning and memory tests, done after the end of dosing, showed no lasting difference from the controls at any dose. The relevance of these findings for children is not known, and NeuroVex has not been established in patients younger than 18 years [see Use in Specific Populations (8.4)].</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+        </section>
+      </component>
+      <component>
+        <section ID="s14">
+          <id root="08f5e586-7102-5d93-a8ed-c409ee846e6f"/>
+          <code code="34092-7" codeSystem="2.16.840.1.113883.6.1" displayName="CLINICAL STUDIES SECTION"/>
+          <title>14 CLINICAL STUDIES SECTION</title>
+          <effectiveTime value="20260501"/>
+          <component>
+            <section ID="s14-1">
+              <id root="ade4b057-ea60-59e0-a5c5-0b9447c41f8b"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>14.1 Painful Diabetic Peripheral Neuropathy: NEURO-BRIDGE</title>
+              <text>
+                <paragraph>The effect of NeuroVex in the management of neuropathic pain from diabetic peripheral neuropathy was shown in NEURO-BRIDGE, a 12-week, randomized, double-blind, placebo-controlled, multicenter trial in 1,260 adults. Patients had a diagnosis of painful diabetic peripheral neuropathy for at least 6 months and an average daily pain score of 4 or more on a 0 to 10 scale at the start. Patients younger than 18 years and patients with a creatinine clearance below 30 mL/min were excluded. Patients were randomized 1 to 1 to NeuroVex 50mg twice daily or placebo, with no titration.</paragraph>
+                <paragraph>The mean age was 61 years, 54% of the patients were men and the mean baseline pain score was 6.5 in both arms. About 41% of the patients were 65 years or older. The primary endpoint was the change in the mean daily pain score from the start to week 12. Table 7 gives the results.</paragraph>
+                <paragraph>Table 7. Results at week 12, NEURO-BRIDGE</paragraph>
+                <table>
+                  <thead><tr><th>Outcome at week 12</th><th>NeuroVex 50mg twice daily</th><th>Placebo</th><th>Difference (95% CI)</th></tr></thead>
+                  <tbody>
+                    <tr><td>Mean drop in daily pain score (points)</td><td>2.4</td><td>1.1</td><td>1.3 (0.9 to 1.7)</td></tr>
+                    <tr><td>At least 30% less pain (%)</td><td>47</td><td>29</td><td>18 (13 to 23)</td></tr>
+                    <tr><td>At least 50% less pain (%)</td><td>28</td><td>15</td><td>13 (9 to 17)</td></tr>
+                    <tr><td>Mean drop in sleep interference score (points)</td><td>2.1</td><td>0.9</td><td>1.2 (0.8 to 1.6)</td></tr>
+                  </tbody>
+                </table>
+                <paragraph>The difference between the arms in the pain score was seen from week 1 and kept growing through week 12. The pain score drop in patients 65 years or older was the same as in younger patients. Dizziness was more common at 65 or older [see Adverse Reactions (6.2)]. Further details of the design, the statistical analysis and the subgroup results are in the trial summary.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s14-2">
+              <id root="6c0099f5-fb38-505d-a010-19b07c2b1c59"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>14.2 Dose-Ranging Study</title>
+              <text>
+                <paragraph>In an 8-week, double-blind, phase 2 study (NB-201) in 412 adults with painful diabetic peripheral neuropathy, patients were randomized to placebo or to neurovexin 25mg twice daily, 50mg twice daily or 75mg twice daily. The drop in the mean daily pain score from the start to week 8 was 1.0 points on placebo, 1.6 on 25mg twice daily, 2.3 on 50mg twice daily and 2.3 on 75mg twice daily. The 75mg twice daily dose, which is above the maximum daily dose of 100mg, gave no more pain relief than 50mg twice daily. Dizziness led to stopping in 2.9% of patients on placebo, 3.9% on 25mg twice daily, 7.8% on 50mg twice daily and 13.6% on 75mg twice daily. On the basis of this study, 50mg twice daily was chosen for the confirmatory trial, with 100mg a day as the maximum.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s14-3">
+              <id root="1d954ec9-dc00-5b78-ab5d-235600d433d5"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>14.3 Long-Term Extension</title>
+              <text>
+                <paragraph>Patients who finished NEURO-BRIDGE were offered an open-label extension in which all took NeuroVex 50mg twice daily, or a lower dose by creatinine clearance, for up to 52 weeks. Of the 1,260 patients in the trial, 83% entered the extension and 61% of those completed 52 weeks. The mean pain score was 3.9 at week 52 on the 0 to 10 scale. The adverse reactions were the same as in the 12-week trial and no new safety signal was seen, although the lack of a control group limits the interpretation of this study.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s14-4">
+              <id root="a6eeca8e-dbc9-59c0-ac57-7b2bd1f27316"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>14.4 Subgroup Results in NEURO-BRIDGE</title>
+              <text>
+                <paragraph>Table 10 shows the difference between NeuroVex and placebo in the mean drop in the daily pain score at week 12, with the 95% confidence interval, in the main subgroups of NEURO-BRIDGE. The subgroups were not powered for a comparison, and no adjustment was made for the number of subgroups.</paragraph>
+                <paragraph>Table 10. Difference from placebo in the drop in daily pain score at week 12, by subgroup</paragraph>
+                <table>
+                  <thead><tr><th>Subgroup</th><th>Number of patients</th><th>Difference (95% CI)</th></tr></thead>
+                  <tbody>
+                    <tr><td>Under 65 years</td><td>743</td><td>1.3 (0.8 to 1.8)</td></tr>
+                    <tr><td>65 years or older</td><td>517</td><td>1.3 (0.7 to 1.9)</td></tr>
+                    <tr><td>Men</td><td>680</td><td>1.2 (0.7 to 1.7)</td></tr>
+                    <tr><td>Women</td><td>580</td><td>1.4 (0.8 to 2.0)</td></tr>
+                    <tr><td>Creatinine clearance 60 mL/min or more</td><td>983</td><td>1.3 (0.9 to 1.7)</td></tr>
+                    <tr><td>Creatinine clearance 30 to 59 mL/min</td><td>277</td><td>1.3 (0.6 to 2.0)</td></tr>
+                    <tr><td>Baseline pain score below 6</td><td>468</td><td>1.1 (0.6 to 1.6)</td></tr>
+                    <tr><td>Baseline pain score 6 or more</td><td>792</td><td>1.5 (1.0 to 2.0)</td></tr>
+                  </tbody>
+                </table>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s14-5">
+              <id root="244f391a-cbb1-54b6-a3e3-bd78d03e3ddc"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>14.5 Other Endpoints</title>
+              <text>
+                <paragraph>The patient global impression of change was rated &quot;much improved&quot; or &quot;very much improved&quot; by 44% of the patients on NeuroVex and 28% on placebo. The mean daily pain score fell from the start to the end of week 1 by 0.8 points on NeuroVex and 0.5 points on placebo. Rescue pain medicine, limited to paracetamol (acetaminophen), was used on a mean of 1.9 days a week on NeuroVex and 2.6 days a week on placebo. The effects on the quality of life and the mood scores were small and were not different from placebo.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s14-6">
+              <id root="b9069224-e0da-5d14-a7b7-d81063c2e7d2"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>14.6 Pain Score over Time</title>
+              <text>
+                <paragraph>Table 12 shows the mean drop from the start in the mean daily pain score at selected weeks in NEURO-BRIDGE. The two arms separated at week 1, and the difference between them kept growing through week 12.</paragraph>
+                <paragraph>Table 12. Mean drop in the daily pain score from the start (points, 0 to 10 scale)</paragraph>
+                <table>
+                  <thead><tr><th>Week</th><th>NeuroVex 50mg twice daily</th><th>Placebo</th><th>Difference</th></tr></thead>
+                  <tbody>
+                    <tr><td>1</td><td>0.8</td><td>0.5</td><td>0.3</td></tr>
+                    <tr><td>2</td><td>1.3</td><td>0.8</td><td>0.5</td></tr>
+                    <tr><td>4</td><td>1.8</td><td>0.9</td><td>0.9</td></tr>
+                    <tr><td>8</td><td>2.2</td><td>1.0</td><td>1.2</td></tr>
+                    <tr><td>12</td><td>2.4</td><td>1.1</td><td>1.3</td></tr>
+                  </tbody>
+                </table>
+                <paragraph>The proportion of patients who had at least 30% less pain at week 12 was 47% on NeuroVex and 29% on placebo, and the proportion who had at least 50% less pain was 28% and 15%, as in Table 7.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s14-7">
+              <id root="5a636b05-078b-5b3f-a752-b336a2e37f33"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>14.7 Sleep</title>
+              <text>
+                <paragraph>The mean drop in the daily sleep interference score, measured on a 0 to 10 scale on which a higher score means that pain interferes more with sleep, was 2.1 points on NeuroVex and 0.9 points on placebo at week 12 (difference 1.2, 95% CI 0.8 to 1.6). The effect on sleep was seen in patients with and without sleepiness during the day. Patients should be told that the better sleep seen in the trial came from lower pain and that NeuroVex can still cause sleepiness during the day [see Warnings and Precautions (5.1)].</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s14-8">
+              <id root="cd2bdca2-1e97-53e1-a499-c935c2ff243a"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>14.8 Design of the Dose-Ranging Study (NB-201)</title>
+              <text>
+                <paragraph>NB-201 was a randomized, double-blind, placebo-controlled, parallel-group, phase 2 study at 38 sites in 412 adults with painful diabetic peripheral neuropathy, with an average daily pain score of 4 or more at the start. Patients were randomized in equal numbers to placebo, 25mg twice daily, 50mg twice daily or 75mg twice daily, with no titration, and were treated for 8 weeks. The patients had a mean age of 60 years, 52% were men, and the mean baseline pain score was 6.4. Patients with a creatinine clearance below 60 mL/min were excluded from NB-201, which is why the study can be read for the effect of the dose and not for the effect of kidney function. The 25mg twice daily dose gave less pain relief than 50mg twice daily, and 75mg twice daily gave more dizziness and no more relief than 50mg twice daily, as in section 14.2.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s14-9">
+              <id root="8197a28e-b3be-529b-a058-88a261434506"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>14.9 Patient Disposition in the Long-Term Extension</title>
+              <text>
+                <paragraph>Of the 1,260 patients who were randomized in NEURO-BRIDGE, 83% entered the open-label extension. Of the patients who entered, 61% completed 52 weeks. The most frequent reasons for leaving were adverse events (7.1%), withdrawal of consent (11.4%), loss to follow-up (6.2%) and lack of efficacy (5.8%), and the rest left for other reasons. The mean daily pain score at week 52 was 3.9 on the 0 to 10 scale. Patients with a creatinine clearance of 30 to 59 mL/min took a lower dose in the extension, as in section 2.3, and had a rate of dizziness that was similar to the other patients.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s14-10">
+              <id root="c672c142-0b42-5caf-a292-93f05c3670db"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>14.10 Statistical Methods Summary</title>
+              <text>
+                <paragraph>The primary analysis of NEURO-BRIDGE compared the change in the mean daily pain score from the start to week 12 between the arms, using a mixed model for repeated measures with treatment, week, the baseline pain score, the baseline score by week interaction, the use of insulin and the study site group as terms, and an unstructured covariance. The analysis included all randomized patients who took at least one dose. Missing data were handled in the model under the assumption that data were missing at random, and a sensitivity analysis in which patients who stopped because of an adverse event were given the placebo mean gave the same conclusion. The responder rates were compared with a logistic regression model with the same terms, in which patients who stopped early were counted as non-responders. The key secondary endpoints were tested in a fixed order, and a test was reported as confirmatory only if the one before it was significant at the 0.05 level. Every endpoint in Table 7 met this rule.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+        </section>
+      </component>
+      <component>
+        <section ID="s16">
+          <id root="1cf6f5d1-3c4e-5396-a702-25e8abd5b25b"/>
+          <code code="34069-5" codeSystem="2.16.840.1.113883.6.1" displayName="HOW SUPPLIED SECTION"/>
+          <title>16 How Supplied</title>
+          <text>
+            <paragraph>Capsules of 25 mg (white) and 50 mg (blue), in bottles of 60.</paragraph>
+          </text>
+          <effectiveTime value="20260501"/>
+          <component>
+            <section ID="s16-1">
+              <id root="7f8e92a8-1885-5dc0-a1e7-bb4a1088ed1f"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>16.1 Packaging and NDC Codes</title>
+              <text>
+                <table>
+                  <thead><tr><th>Strength</th><th>Package</th><th>NDC</th></tr></thead>
+                  <tbody>
+                    <tr><td>25 mg</td><td>Bottle of 60 capsules</td><td>99999-0125-60</td></tr>
+                    <tr><td>50 mg</td><td>Bottle of 60 capsules</td><td>99999-0150-60</td></tr>
+                  </tbody>
+                </table>
+                <paragraph>Each bottle has a child-resistant closure and a desiccant canister that should not be swallowed.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s16-2">
+              <id root="45681839-0c76-5e88-a9f5-4ac8757c0e5c"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>16.2 Storage and Handling</title>
+              <text>
+                <paragraph>Store NeuroVex capsules at 20 degrees C to 25 degrees C (68 degrees F to 77 degrees F), with excursions permitted from 15 degrees C to 30 degrees C. Keep the bottle tightly closed and protect from moisture. Keep the capsules in the original bottle. Keep out of the reach of children. Dispose of unused capsules as advised by the local pharmacy take-back program.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+        </section>
+      </component>
+      <component>
+        <section ID="s17">
+          <id root="4e51ea67-cf45-5fdc-a765-85befbf0823f"/>
+          <code code="34076-0" codeSystem="2.16.840.1.113883.6.1" displayName="PATIENT COUNSELING INFORMATION"/>
+          <title>17 Patient Counseling Information</title>
+          <text>
+            <paragraph>Advise the patient to read the FDA-approved patient labeling (Medication Guide) and to ask the pharmacist or doctor if anything is unclear.</paragraph>
+            <paragraph><content styleCode="bold">Dizziness and sleepiness.</content> Tell patients that NeuroVex can cause dizziness and sleepiness, most often in the first 2 weeks. Tell them not to drive, use machines or do other risky tasks until they know how the medicine affects them [see Warnings and Precautions (5.1)].</paragraph>
+            <paragraph><content styleCode="bold">Alcohol, opioids and other medicines that slow the brain.</content> Tell patients not to drink alcohol and to tell the doctor about every medicine they take, including opioid pain medicines, benzodiazepines, sleep medicines and allergy medicines that cause drowsiness. Taken together with NeuroVex, these medicines can slow the breathing. Tell patients and their families to seek urgent care if breathing becomes slow or shallow, or if the patient cannot be woken [see Warnings and Precautions (5.2)].</paragraph>
+            <paragraph><content styleCode="bold">Swelling and weight gain.</content> Tell patients to report swelling of the legs or feet, a rapid weight gain or new shortness of breath, particularly if they have heart failure [see Warnings and Precautions (5.3)].</paragraph>
+            <paragraph><content styleCode="bold">Allergic reactions.</content> Tell patients to stop NeuroVex and get urgent care if they develop swelling of the face, lips, tongue or throat, a rash with hives, or trouble breathing [see Warnings and Precautions (5.4)].</paragraph>
+            <paragraph><content styleCode="bold">Do not stop suddenly.</content> Tell patients not to stop NeuroVex suddenly, because trouble sleeping, nausea, headache and anxiety can occur, and to follow the doctor's instructions on lowering the dose [see Dosage and Administration (2.4)].</paragraph>
+            <paragraph><content styleCode="bold">Mood changes.</content> Tell patients, families and caregivers to report new or worsening depression, suicidal thoughts or unusual changes in mood or behavior at once [see Warnings and Precautions (5.6)].</paragraph>
+            <paragraph><content styleCode="bold">Kidney function.</content> Tell patients that the dose depends on how well their kidneys work, that they should tell every doctor who treats them that they take NeuroVex, and that they should report illness with vomiting, diarrhea or poor fluid intake [see Dosage and Administration (2.3)].</paragraph>
+            <paragraph><content styleCode="bold">Dose.</content> Tell patients to take NeuroVex twice daily, with or without food, and not to take more than the dose prescribed. If a dose is missed, they should follow section 2.5 and not take a double dose. Capsules should be swallowed whole.</paragraph>
+            <paragraph><content styleCode="bold">Pregnancy and breastfeeding.</content> Tell women to inform the doctor if they are pregnant, plan to become pregnant or are breastfeeding, because neurovexin passes into breast milk and can cause sleepiness in the infant [see Use in Specific Populations (8.1), (8.2) and (8.3)].</paragraph>
+            <paragraph><content styleCode="bold">Pharmacovigilance and Medical Information.</content> Tell patients that reports of side effects can be sent to the company's drug safety department or to the FDA.</paragraph>
+          </text>
+          <effectiveTime value="20260501"/>
+          <component>
+            <section ID="s17-1">
+              <id root="9cd3cc07-049f-5747-ae2e-55eb03d290ba"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>17.1 Medication Guide Summary</title>
+              <text>
+                <paragraph>The Medication Guide tells patients that NeuroVex is a prescription medicine used for nerve pain from diabetes in adults, that it is not for children or for any other kind of pain, and that they should not take it if they are allergic to neurovexin or to any ingredient of the capsule. It lists the most important side effects: dizziness, sleepiness, leg swelling and weight gain, dry mouth and slow or shallow breathing. It tells patients to take NeuroVex twice daily, to ask the doctor before taking any other medicine that causes sleepiness, to avoid alcohol and not to stop the medicine suddenly. The full text is in the pack.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+          <component>
+            <section ID="s17-2">
+              <id root="85a08b78-31a5-5a51-a23c-51a130c961d6"/>
+              <code code="42229-5" codeSystem="2.16.840.1.113883.6.1" displayName="SPL UNCLASSIFIED SECTION"/>
+              <title>17.2 Reporting Suspected Adverse Reactions</title>
+              <text>
+                <paragraph>Doctors should report any suspected adverse reaction in a patient taking NeuroVex to the drug safety department of the company and to the FDA MedWatch program. Include the patient's age band, the dose, the dates of the first and last dose, the creatinine clearance if it is known, every other medicine the patient takes, and the outcome. A report of breathing problems, loss of consciousness or angioedema is a serious adverse event and should be sent at once. Questions on the dose or on the use of NeuroVex outside its approved use should go to the Medical Information department, which answers within the approved label.</paragraph>
+              </text>
+              <effectiveTime value="20260501"/>
+            </section>
+          </component>
+        </section>
+      </component>
+    </structuredBody>
+  </component>
+</document>

@@ -54,14 +54,15 @@ test("check_interaction finds the section that names the drug, and says when non
   const spiro = checkInteraction("CardioNex", "spironolactone", "US", pharmaA);
   assert.equal(spiro.named, true);
   assert.ok(spiro.sections.some((s) => s.docId === "cardionex-uspi-v2" && s.section === "7.1"));
-  const other = checkInteraction("CardioNex", "warfarin", "US", pharmaA);
+  const other = checkInteraction("CardioNex", "metformin", "US", pharmaA);
   assert.equal(other.named, false);
-  assert.ok(other.sections.length > 0 && other.sections.every((s) => s.section.startsWith("7.")));
+  // Not named: every interaction section, so the desk can say the label does not mention it.
+  assert.ok(other.sections.length > 0 && other.sections.every((s) => s.section.startsWith("7.") || /interaction/i.test(s.title)));
 });
 
 test("trial_results quotes the trial sections about the outcome, only for the asker's company", () => {
   const potassium = trialResults("CardioNex", "potassium", pharmaA);
-  assert.ok(potassium.some((s) => s.docId === "cardionex-clarion-hf-trial" && ["3.2", "3.4"].includes(s.section)));
+  assert.equal(potassium[0]?.section, "3.4", "the section titled Potassium and Kidney Results comes first");
   assert.deepEqual(trialResults("CardioNex", "potassium", pharmaB), []);
 });
 

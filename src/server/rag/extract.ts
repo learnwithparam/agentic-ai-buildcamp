@@ -1,26 +1,25 @@
-// Lesson 20. A company sends its labels as PDFs, not as Markdown. Docling (docling-serve, in
-// infra/docker-compose.yml under the "ingest" profile) reads a PDF's layout: the two columns, the
-// headings and the dosing table with its footnote. A plain text dump of the same PDF scrambles
-// that table row by row, and so does Docling's own Markdown export when a table sits beside a
-// column of text. This file puts Docling's layout boxes in reading order, column by column, cuts
-// the result into one chunk per label section, and checks that no word of the source text was lost.
+import { getDocumentProxy } from "unpdf";
+
+// Lesson 20. A company sends its labels as PDFs, not as Markdown. A label PDF is tagged (PDF/UA,
+// the accessible PDF a screen reader needs): every heading, paragraph, list item and table cell is
+// marked, in the order it was written. PDF.js (through unpdf, in this process) reads those tags.
+// The positions on the page would not do: the leaflet has two columns, and a table cell that wraps
+// to two lines ("Study / acronym") sits between the lines of the cell beside it, so a reader that
+// sorts by position scrambles the dosing table. This file turns the tags into Markdown, cuts it
+// into one chunk per label section, and checks that no word of the source text was lost.
 
 export type ExtractedSection = { section: string; title: string; text: string };
 
-// Only "## 2.2 Title" or "## 10 Title" starts a section: that number is what a citation names.
-// Docling also makes a heading of any bold line ("CONTRAINDICATIONS:"), which stays inside the
-// section it belongs to.
-const SECTION = /^##\s+(\d+(?:\.\d+)?)\s+(.+?)\s*$/;
+// Only "## 2.2 Title", "## 4.2.1 Title" or "## 10 Title" starts a section: that number is what a citation names.
+// Any other heading ("CONTRAINDICATIONS:") stays inside the section it belongs to.
+const SECTION = /^##\s+(\d+(?:\.\d+)*)\s+(.+?)\s*$/;
 const HEADING = /^#{1,6}\s+(.+?)\s*$/;
-const STRAY_BEFORE_SECTION = /^(?:[\d.,%]+\s+)+(?=\d+(?:\.\d+)?\s+[A-Za-z])/;
 const ENTITIES: Record<string, string> = { "&lt;": "<", "&gt;": ">", "&amp;": "&", "&quot;": '"', "&#39;": "'" };
 
 function cleanLine(line: string): string {
   return (
     line
       .replace(/&(lt|gt|amp|quot|#39);/g, (entity) => ENTITIES[entity])
-      // A bullet in the leaflet's typeface ends with its own marker, which Docling keeps.
-      .replace(/\s+[·◦]\s*$/, "")
       .trimEnd()
   );
 }
@@ -65,108 +64,108 @@ export function missingFromExtraction(source: Array<{ section: string; text: str
   return problems;
 }
 
-// --- Reading order. Docling reads two headings that sit side by side, one per column, as one
-//     line: on the CLARION-HF summary it put the 3.1 table under 3.2, and missingFromExtraction
-//     caught it. Every PDF backend Docling has does the same. Its JSON keeps each block's page and
-//     box, so the order is rebuilt here the way a person reads a two-column leaflet: down the page
-//     band by band, a band ending at a block that spans both columns, the left column of a band
-//     before the right.
-type Box = { l: number; t: number; r: number; b: number; coord_origin: string };
-type Prov = { page_no: number; bbox: Box };
-type Ref = { $ref: string };
-type DoclingText = { self_ref: string; label: string; text: string; prov: Prov[] };
-type DoclingTable = { self_ref: string; label: string; prov: Prov[]; data: { grid: Array<Array<{ text: string }>> } };
-type DoclingGroup = { self_ref: string; children: Ref[] };
-export type DoclingDocument = {
-  body: { children: Ref[] };
-  groups: DoclingGroup[];
-  texts: DoclingText[];
-  tables: DoclingTable[];
-  pages: Record<string, { size: { width: number; height: number } }>;
-};
 
-type Block = { page: number; box: Box; markdown: string };
-const SKIP = new Set(["page_header", "page_footer"]);
+// --- Reading a tagged PDF. PDF.js gives each page's tag tree, whose leaves name marked runs of
+//     text, and the page's text with those marks in it. The tree is walked in order and each tag
+//     written as Markdown: a heading as "## ", a list item as "- ", a table row by row.
+type TagContent = { type: "content"; id: string };
+type TagNode = { role: string; children?: Array<TagNode | TagContent | { type: string }> };
+type TextPart = { str?: string; hasEOL?: boolean; type?: string; id?: string };
 
-function render(item: DoclingText | DoclingTable): string {
-  if ("data" in item) {
-    const rows = item.data.grid.map((row) => `| ${row.map((cell) => cell.text.replace(/\|/g, "/")).join(" | ")} |`);
-    return [rows[0], `|${" --- |".repeat(item.data.grid[0]?.length ?? 0)}`, ...rows.slice(1)].join("\n");
-  }
-  // Docling can glue a table cell that sits beside a heading onto its front: on the full
-  // CLARION-HF summary, "0.001 3.4 Potassium and Kidney Results". Only the last number before
-  // the title is the section; missingFromExtraction still checks that no word went missing.
-  if (item.label === "section_header" || item.label === "title") return `## ${item.text.replace(STRAY_BEFORE_SECTION, "")}`;
-  if (item.label === "list_item") return `- ${item.text}`;
-  return item.text;
-}
+const HEADINGS = new Set(["H", "H1", "H2", "H3", "H4", "H5", "H6", "Title"]);
+// Tags that hold one block of text. Every other tag only groups blocks.
+const TEXT = new Set(["P", "Caption", "Note", "BlockQuote", "Code"]);
+const SKIPPED = new Set(["Artifact", "Figure"]);
+const MARKER = /^\s*(?:[•◦▪‣·–-]|\d+[.)]|[a-z][.)])\s*$/i;
 
-function blocksOf(doc: DoclingDocument): Block[] {
-  const lookup = (ref: string) => {
-    const [, kind, index] = ref.split("/");
-    return (doc as unknown as Record<string, unknown[]>)[kind]?.[Number(index)] as DoclingText | DoclingTable | DoclingGroup | undefined;
-  };
-  const blocks: Block[] = [];
-  const walk = (refs: Ref[]) => {
-    for (const { $ref } of refs) {
-      const item = lookup($ref);
-      if (!item) continue;
-      // Every node has children; a group (a list) is only the ones under #/groups.
-      if ($ref.startsWith("#/groups/")) walk((item as DoclingGroup).children);
-      else if ("prov" in item && !SKIP.has(item.label) && item.prov[0]) {
-        const markdown = render(item);
-        // A bullet marker Docling read as a list item of its own.
-        if (markdown.replace(/^- /, "").trim().replace(/[·◦•]/g, "")) blocks.push({ page: item.prov[0].page_no, box: item.prov[0].bbox, markdown });
-      }
-    }
-  };
-  walk(doc.body.children);
-  return blocks;
-}
+// The marked runs of one page. A run can sit inside another (a link inside its paragraph): the
+// outer run then holds the inner one in place, and the inner one is written there, once.
+class Runs {
+  private pieces = new Map<string, Array<string | { run: string }>>();
+  private written = new Set<string>();
 
-// Top of a box, larger is higher up the page, whichever corner Docling measured from.
-const top = (box: Box, pageHeight: number) => (box.coord_origin === "BOTTOMLEFT" ? box.t : pageHeight - box.t);
-
-export function readingOrder(doc: DoclingDocument): string {
-  const blocks = blocksOf(doc);
-  const ordered: Block[] = [];
-  for (const page of [...new Set(blocks.map((block) => block.page))].sort((a, b) => a - b)) {
-    const height = doc.pages[String(page)]?.size.height ?? 0;
-    const onPage = blocks.filter((block) => block.page === page).sort((a, b) => top(b.box, height) - top(a.box, height));
-    const left = Math.min(...onPage.map((block) => block.box.l));
-    const right = Math.max(...onPage.map((block) => block.box.r));
-    // A block starts the right column when its left edge is well in from the page's left edge.
-    // The centre would not do: a wide title or table moves it, and an indented bullet is not a column.
-    const secondColumn = left + 0.3 * (right - left);
-    const spans = (block: Block) => block.box.r - block.box.l > 0.6 * (right - left);
-    let band: Block[] = [];
-    const flush = () => {
-      const column = (block: Block) => (block.box.l < secondColumn ? 0 : 1);
-      ordered.push(...band.sort((a, b) => column(a) - column(b) || top(b.box, height) - top(a.box, height)));
-      band = [];
+  constructor(parts: TextPart[]) {
+    const open: Array<string | undefined> = [];
+    const add = (piece: string | { run: string }) => {
+      const id = [...open].reverse().find((mark) => mark !== undefined);
+      if (id) this.pieces.set(id, [...(this.pieces.get(id) ?? []), piece]);
     };
-    for (const block of onPage) {
-      if (spans(block)) {
-        flush();
-        ordered.push(block);
-      } else band.push(block);
+    for (const part of parts) {
+      if (part.type === "beginMarkedContentProps" || part.type === "beginMarkedContent") {
+        if (part.id) add({ run: part.id });
+        open.push(part.id);
+      } else if (part.type === "endMarkedContent") open.pop();
+      // A line break is a space, except after a hyphen or a dash: "Co-" then "administration" on
+      // the next line is one word, as the label wrote it.
+      else if (part.str !== undefined) add(part.str + (part.hasEOL && !/[-–]$/.test(part.str) ? " " : ""));
     }
-    flush();
   }
-  return ordered.map((block) => block.markdown).join("\n\n");
+
+  // The run's text with the runs inside it, or "" when it was already written inside another.
+  text(id: string): string {
+    if (this.written.has(id)) return "";
+    this.written.add(id);
+    return (this.pieces.get(id) ?? []).map((piece) => (typeof piece === "string" ? piece : this.text(piece.run))).join("");
+  }
 }
 
-// docling-serve's synchronous endpoint: one PDF in, the layout as JSON out. OCR stays off,
-// because these PDFs carry their text; a scanned label would need it on.
-export async function convertPdf(doclingUrl: string, file: { name: string; bytes: Uint8Array }): Promise<DoclingDocument> {
-  const form = new FormData();
-  form.append("files", new Blob([Buffer.from(file.bytes)], { type: "application/pdf" }), file.name);
-  form.append("to_formats", "json");
-  form.append("do_ocr", "false");
-  const response = await fetch(`${doclingUrl}/v1/convert/file`, { method: "POST", body: form, signal: AbortSignal.timeout(300_000) });
-  if (!response.ok) throw new Error(`Docling could not convert ${file.name} (${response.status}). Is it running? npm run rag:setup (lesson 20).`);
-  const body = (await response.json()) as { status: string; document?: { json_content?: DoclingDocument } };
-  const doc = body.document?.json_content;
-  if (body.status !== "success" || !doc) throw new Error(`Docling returned ${body.status} for ${file.name}.`);
-  return doc;
+function runsOf(node: TagNode, marks: Runs): string[] {
+  return (node.children ?? []).flatMap((child) =>
+    "role" in child ? runsOf(child as TagNode, marks) : child.type === "content" ? [marks.text((child as TagContent).id)] : []
+  );
+}
+
+const textOf = (node: TagNode, marks: Runs) => runsOf(node, marks).join("").replace(/\s+/g, " ").trim();
+
+function blocksOf(node: TagNode, marks: Runs, out: string[]) {
+  if (SKIPPED.has(node.role)) return;
+  if (HEADINGS.has(node.role)) out.push(`## ${textOf(node, marks)}`);
+  else if (TEXT.has(node.role)) out.push(textOf(node, marks));
+  else if (node.role === "LI") {
+    // The list marker ("1." or a bullet) is painted after the item's text, so its run comes last
+    // inside the item. A run that is only a marker is taken out and written first.
+    const runs = runsOf(node, marks);
+    const marker = runs.findIndex((run) => MARKER.test(run));
+    const label = marker < 0 ? "-" : runs.splice(marker, 1)[0]!.trim();
+    out.push(`${/^\d/.test(label) ? label : "-"} ${runs.join("").replace(/\s+/g, " ").trim()}`);
+  } else if (node.role === "Table") {
+    const rows: string[][] = [];
+    const walkRows = (group: TagNode) => {
+      for (const child of group.children ?? []) {
+        if (!("role" in child)) continue;
+        const kid = child as TagNode;
+        if (kid.role === "TR") rows.push((kid.children ?? []).filter((cell): cell is TagNode => "role" in cell).map((cell) => textOf(cell, marks).replace(/\|/g, "/")));
+        else walkRows(kid);
+      }
+    };
+    walkRows(node);
+    if (!rows.length) return;
+    const line = (row: string[]) => `| ${row.join(" | ")} |`;
+    // A table that runs onto the next page starts there with its header again. Its rows belong to
+    // the table already written, and the repeated header is dropped.
+    const last = out.at(-1);
+    if (last?.startsWith(`${line(rows[0]!)}\n`)) out[out.length - 1] = [last, ...rows.slice(1).map(line)].join("\n");
+    else out.push([line(rows[0]!), `|${" --- |".repeat(rows[0]!.length)}`, ...rows.slice(1).map(line)].join("\n"));
+  } else for (const child of node.children ?? []) if ("role" in child) blocksOf(child as TagNode, marks, out);
+}
+
+export async function pdfToMarkdown(bytes: Uint8Array, name = "the PDF"): Promise<string> {
+  // PDF.js takes the buffer over, so it gets a copy: the caller still hashes the bytes.
+  const pdf = await getDocumentProxy(new Uint8Array(bytes));
+  try {
+    const blocks: string[] = [];
+    for (let pageNo = 1; pageNo <= pdf.numPages; pageNo++) {
+      const page = await pdf.getPage(pageNo);
+      const tree = (await page.getStructTree()) as TagNode | null;
+      // An untagged PDF has only positions, and reading a two-column label from positions loses
+      // its tables. It is refused, and the company is asked for the tagged (PDF/UA) file.
+      if (!tree) throw new Error(`${name} is not a tagged PDF (page ${pageNo} has no tags). Ask for the PDF/UA version of the label.`);
+      const content = await page.getTextContent({ includeMarkedContent: true });
+      blocksOf(tree, new Runs(content.items as TextPart[]), blocks);
+    }
+    return blocks.filter((block) => block.replace(/^(## |- )/, "").trim()).join("\n\n");
+  } finally {
+    // Frees the parsed pages and the worker the reader started.
+    await pdf.loadingTask.destroy();
+  }
 }

@@ -9,7 +9,7 @@
       "country": "US",
       "pdf": "data/hcp/pdf/cardionex-clarion-hf-trial.pdf",
       "source": "data/hcp/labels/cardionex-clarion-hf-trial.md",
-      "sha256": "4846bdb3e45d692a97c3343fd3ecdc420111a7e7b25a07a15d75c437ceb4c4ff"
+      "sha256": "fd756a16635e4e66700b21634e67f922d6e509f860faaea11e510d2db06e8a73"
     },
     {
       "doc_id": "cardionex-de-smpc",
@@ -20,7 +20,7 @@
       "country": "DE",
       "pdf": "data/hcp/pdf/cardionex-de-smpc-2026.pdf",
       "source": "data/hcp/labels/cardionex-de-smpc-2026.md",
-      "sha256": "ffc1bd740158bf1eec3445adcac5712b69a43f10ae5279c589018226b35cd5b5"
+      "sha256": "0bdc8c5f2e2197b5f3a7ddd3683a465b51a7ba92a8e470c2946254d1875b74f9"
     },
     {
       "doc_id": "cardionex-draft-2024",
@@ -43,7 +43,7 @@
       "country": "JP",
       "pdf": "data/hcp/pdf/cardionex-jp-label-2025.pdf",
       "source": "data/hcp/labels/cardionex-jp-label-2025.md",
-      "sha256": "1e26215fa173e5ec47babf1fa4e71ae4ebfd96350f8eb6e46a6423eb695292e0"
+      "sha256": "47ef3f54c2db18e5c0a8a4de5504ade50c79027a29ede2df94d6c63c7179dc74"
     },
     {
       "doc_id": "cardionex-medinfo-faq",
@@ -54,7 +54,7 @@
       "country": "US",
       "pdf": "data/hcp/pdf/cardionex-medinfo-faq.pdf",
       "source": "data/hcp/labels/cardionex-medinfo-faq.md",
-      "sha256": "48f936cb422691d0f094c58d3686dc60a0968356146092b28e7fe0859465d839"
+      "sha256": "459b954c402866c844678cebb4242a1220bd137733aad909fbc0e529357cfee2"
     },
     {
       "doc_id": "cardionex-payer-formulary-2026",
@@ -65,7 +65,7 @@
       "country": "US",
       "pdf": "data/hcp/pdf/cardionex-payer-formulary-2026.pdf",
       "source": "data/hcp/labels/cardionex-payer-formulary-2026.md",
-      "sha256": "458f8a5cafe6a3600a95e3ef1972192dd54be1221d3e7940002e3c6caa8798a6"
+      "sha256": "a9112034ba5f1e6d18e062ce58c592a47c4354af7a741519b0cc3479f39fe483"
     },
     {
       "doc_id": "cardionex-uspi-v1",
@@ -77,7 +77,7 @@
       "superseded_by": "cardionex-uspi-v2",
       "pdf": "data/hcp/pdf/cardionex-uspi-2025-v1.pdf",
       "source": "data/hcp/labels/cardionex-uspi-2025-v1.md",
-      "sha256": "db6c6e094d8e496817430fd9b5b340f4cfd3181521c697389b15b0bb43339c37"
+      "sha256": "7ddf9baac07c6d43a3cecb06008a5312a9208896a25b46af0ed9623681073ce4"
     },
     {
       "doc_id": "cardionex-uspi-v2",
@@ -88,7 +88,7 @@
       "country": "US",
       "pdf": "data/hcp/pdf/cardionex-uspi-2026-v2.pdf",
       "source": "data/hcp/labels/cardionex-uspi-2026-v2.md",
-      "sha256": "5210b032d4394440cd80694455eae30216225958221dcd0a5ce9851bc099de9a"
+      "sha256": "a312d795723233d743668550b233898ddf182ea3a60e58e77b32264daead0180"
     },
     {
       "doc_id": "cardionex-uspi-v3",
@@ -99,7 +99,7 @@
       "country": "US",
       "pdf": "data/hcp/pdf/cardionex-uspi-2027-v3.pdf",
       "source": "data/hcp/labels/cardionex-uspi-2027-v3.md",
-      "sha256": "21a218551b310614f25dc9a9dc0a04eb461999104a9f708e6916d41a72c99308"
+      "sha256": "8718281e35d881bad1b2348f1f6b4f9fdbf1cbdf2d627941e67c99232f6043c2"
     },
     {
       "doc_id": "neurovex-jp-label",
@@ -110,7 +110,7 @@
       "country": "JP",
       "pdf": "data/hcp/pdf/neurovex-jp-label-2026.pdf",
       "source": "data/hcp/labels/neurovex-jp-label-2026.md",
-      "sha256": "3af5d073fcc071da8ec64f236e1454da1920205302cf613b382b221b870995ff"
+      "sha256": "e20822136ccac563f4a30be55369ac792c8995fcf18587c42e6b163e7d2d83b5"
     },
     {
       "doc_id": "neurovex-trial-summary",
@@ -121,7 +121,7 @@
       "country": "US",
       "pdf": "data/hcp/pdf/neurovex-trial-summary.pdf",
       "source": "data/hcp/labels/neurovex-trial-summary.md",
-      "sha256": "d74cffe0cfe2e59ae219dcc83b7ecad33149e92cb3d894f6c85ecc80ad05fb14"
+      "sha256": "865487ddda03eaca5f7ae74cfaedff534feb62a433b643353cbb9fd8f5321bf0"
     },
     {
       "doc_id": "neurovex-uspi-v1",
@@ -132,7 +132,7 @@
       "country": "US",
       "pdf": "data/hcp/pdf/neurovex-uspi-2026-v1.pdf",
       "source": "data/hcp/labels/neurovex-uspi-2026-v1.md",
-      "sha256": "c76743151099422f44a95003a00ef4f9d46babda564bd517853aa31fed6b5f9c"
+      "sha256": "c742e6ff88f17b83e94a04bb2f56e8b0ea667451177ec1d7e35fe380bb1640b5"
     },
     {
       "doc_id": "pv-reporting-sop",
@@ -143,7 +143,7 @@
       "country": "US",
       "pdf": "data/hcp/pdf/pv-reporting-sop.pdf",
       "source": "data/hcp/labels/pv-reporting-sop.md",
-      "sha256": "f377eea14dd6ccbf80a640ba20c00e5e23416a6441f7e943d24bbf48bebfc895"
+      "sha256": "8802e81f52822e27c126b0ddca8976d658aaca30daf11558c9d100a85e20547c"
     }
   ]
 }

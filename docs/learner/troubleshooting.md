@@ -29,7 +29,7 @@ The app needs Node 22.18 or newer. An older Node installs without an error, then
 
 ### Docker is not running, or has too little memory
 
-The course runs Langfuse, Postgres, Keycloak, OpenFGA and Docling in Docker. Together they need about 6 GB of memory.
+The course runs Langfuse, Postgres, Keycloak and OpenFGA in Docker. Together they need about 6 GB of memory.
 
 - Start Docker Desktop and wait until it says it is running. On Linux, start the Docker service.
 - If the doctor says Docker has too little memory, open Docker's settings. Under Resources, set the memory to 6 GB or more, then apply and restart.
@@ -81,9 +81,9 @@ Langfuse is several containers. There is the web app, a worker and the AI gatewa
 
 <a id="infra-stack"></a>
 
-### A Postgres, Keycloak, OpenFGA or Docling container is not ready
+### A Postgres, Keycloak or OpenFGA container is not ready
 
-These hold the app's data, the sign-in, the permissions and the PDF reader.
+These hold the app's data, the sign-in and the permissions.
 
 - Keycloak is the slowest to start. Give it two minutes.
 - If one says "exited", run `npm run setup`.
@@ -101,7 +101,6 @@ Each container listens on a fixed port. If another program already uses that por
 | 5442 | Postgres for the app |
 | 8180 | Keycloak |
 | 8280 | OpenFGA |
-| 5001 | Docling |
 | 3333 | The app's page server |
 
 - On macOS or Linux, run this with the port the doctor named. It shows the program.

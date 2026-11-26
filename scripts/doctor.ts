@@ -36,14 +36,13 @@ export const PORTS: Array<[port: number, owner: string, service: string]> = [
   [5174, "Langfuse", "langfuse:langfuse-web"],
   [5442, "Postgres for the app", "infra:postgres"],
   [8180, "Keycloak", "infra:keycloak"],
-  [8280, "OpenFGA", "infra:openfga"],
-  [5001, "Docling", "infra:docling"]
+  [8280, "OpenFGA", "infra:openfga"]
 ];
 
 // The services each compose file must keep running. openfga-migrate runs once and exits, so it is left out.
 export const SERVICES = {
   langfuse: ["langfuse-web", "langfuse-worker", "langfuse-ai-gateway", "postgres", "clickhouse", "redis", "minio"],
-  infra: ["postgres", "keycloak", "openfga", "docling"]
+  infra: ["postgres", "keycloak", "openfga"]
 };
 
 // Every check, in the order it runs. docs/learner/troubleshooting.md has one section per id
@@ -191,12 +190,11 @@ async function checkServices(values: Record<string, string | undefined>): Promis
   const urls: Array<[string, string]> = [
     ["Langfuse", `${values.LANGFUSE_BASE_URL || "http://localhost:5174"}/api/public/health`],
     ["Keycloak", `${values.OIDC_ISSUER || "http://localhost:8180/realms/medinfo"}/.well-known/openid-configuration`],
-    ["OpenFGA", `${values.FGA_API_URL || "http://localhost:8280"}/healthz`],
-    ["Docling", "http://127.0.0.1:5001/health"]
+    ["OpenFGA", `${values.FGA_API_URL || "http://localhost:8280"}/healthz`]
   ];
   const down: string[] = [];
   for (const [name, url] of urls) if (!(await reachable(url))) down.push(name);
-  if (down.length === 0) return pass("services", "Langfuse, Keycloak, OpenFGA and Docling answer");
+  if (down.length === 0) return pass("services", "Langfuse, Keycloak and OpenFGA answer");
   return fail("services", `no answer from ${down.join(", ")}`, "Wait a minute after a start and run this again. If it stays, run npm run setup.");
 }
 

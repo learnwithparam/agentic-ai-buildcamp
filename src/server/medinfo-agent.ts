@@ -26,6 +26,7 @@ import { LABEL_SECTIONS } from "./labels";
 import { readableDocuments } from "./permissions";
 import { scrubPhi } from "./phi";
 import { approvedUses, reportingProcedure, routeRequest, routerInput, safetyReply, stopReply, withFloor } from "./tiers";
+import type { Turn as SearchTurn } from "./rag/rewrite";
 import { executeTool, TOOL_DEFINITIONS } from "./tools";
 import type { ReviewItem } from "./reviews";
 import { scriptUser, type Identity } from "./users";
@@ -66,6 +67,17 @@ async function getPrompt() {
 
 function latestQuestion(messages: ChatMessage[]) {
   return [...messages].reverse().find((message) => message.type === "human")?.content ?? "";
+}
+
+// What was said before the latest question: the doctor's words and the desk's replies, no tool
+// output. search_labels reads it to write a follow-up out in full.
+export function earlierTurns(messages: ChatMessage[]): SearchTurn[] {
+  const last = messages.map((message) => message.type).lastIndexOf("human");
+  return messages.slice(0, Math.max(last, 0)).flatMap((message): SearchTurn[] => {
+    if (message.type === "human") return [{ role: "user", content: message.content }];
+    if (message.type === "ai" && aiText(message)) return [{ role: "assistant", content: aiText(message) }];
+    return [];
+  });
 }
 
 const toolName = (tool: (typeof TOOL_DEFINITIONS)[number]) => (tool.type === "function" ? tool.function.name : "");
@@ -161,7 +173,7 @@ export function createMedinfoAgent(checkpointer: BaseCheckpointSaver) {
           // Fix 6: the calls the model asked for, each with its arguments.
           const calls = state.messages.at(-1)?.type === "ai" ? (state.messages.at(-1) as AiMessage).tool_calls : [];
           updateActiveObservation({ input: calls.map((call) => ({ name: call.name, args: call.args })) });
-          return toolsStep(state, (name, args) => executeTool(name, args, userOf(config), state.today));
+          return toolsStep(state, (name, args) => executeTool(name, args, userOf(config), state.today, earlierTurns(state.messages)));
         },
         { name: "tools", asType: "span", captureInput: false }
       ),

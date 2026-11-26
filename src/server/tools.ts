@@ -3,6 +3,7 @@ import { observe, updateActiveObservation } from "@langfuse/tracing";
 import {
   approvalStatus,
   checkInteraction,
+  findLabelText,
   LABEL_SECTIONS,
   labelVersions,
   readSection,
@@ -12,6 +13,7 @@ import {
   type LabelSection
 } from "./labels";
 import { companyDocuments, readableDocuments } from "./permissions";
+import { standaloneQuery, type Turn } from "./rag/rewrite";
 import { TENANTS, type Identity } from "./users";
 
 type ToolResult = Record<string, unknown>;
@@ -40,7 +42,10 @@ export const TOOL_DEFINITIONS: OpenAI.Chat.Completions.ChatCompletionTool[] = [
       parameters: {
         type: "object",
         properties: {
-          query: { type: "string", description: "What to look up, in the doctor's own words." },
+          query: {
+            type: "string",
+            description: "What to look up, as a question that stands alone: name the medicine and the patient, never \"what about\" or \"and her dose?\"."
+          },
           country: { type: "string", description: "Two-letter code of the country the question is about. Leave out for the asker's own country." }
         },
         required: ["query"],
@@ -48,6 +53,9 @@ export const TOOL_DEFINITIONS: OpenAI.Chat.Completions.ChatCompletionTool[] = [
       }
     }
   },
+  ...lookupTool("find_label_text", "Find the exact words in the labels in force, for example to check a quote or find a phrase such as \"36 hours\".", {
+    phrase: { type: "string", description: "The words to find, at least four letters." }
+  }),
   ...lookupTool("read_section", "Read the full text of one label section, for example to quote it.", {
     doc_id: { type: "string", description: "The document id, for example cardionex-uspi-v2." },
     section: { type: "string", description: "The section number, for example 2.2." }
@@ -72,15 +80,25 @@ export const TOOL_DEFINITIONS: OpenAI.Chat.Completions.ChatCompletionTool[] = [
 ];
 
 // Lesson 20. How search_labels finds sections. The server and the dataset runner plug in the
-// pgvector index over the label PDFs (src/server/rag/search.ts, connectLabelIndex); until then,
-// and in the tests that run with no database, it scores the Markdown excerpts by shared words.
+// hybrid search over the label PDFs (src/server/rag/search.ts, connectLabelIndex). There is no
+// quiet fallback: a desk that answers from a word count while its index is down gives a doctor
+// worse sections and no sign that anything is wrong. A test that wants word search says so.
 export type LabelSearch = (query: string, readable: ReadonlySet<string>, limit: number, today: string) => Promise<LabelSection[]>;
 
-let search: LabelSearch = async (query, readable, limit, today) => searchLabels(query, readable, limit, today);
+// Lessons 1 to 19 search this way, and the tests with no database use it by name.
+export const wordSearch: LabelSearch = async (query, readable, limit, today) => searchLabels(query, readable, limit, today);
+
+let search: LabelSearch = async () => {
+  throw new Error("search_labels has no label index. The server connects it at start (connectLabelIndex); run npm run rag:ingest first.");
+};
 
 export function useLabelSearch(next: LabelSearch) {
   search = next;
 }
+
+// How many sections a search returns. The gold questions need up to five sections for one answer
+// (a dose table, its renal row, a warning); docs/measures.md scores the search at five.
+export const SEARCH_RESULTS = 5;
 
 // Fix 4. A question about another country searches that country's documents of the doctor's own
 // company (OpenFGA can_read_abroad), so "a patient in Germany" finds the German label, not the
@@ -92,14 +110,23 @@ export function documentsIn(ids: ReadonlySet<string>, country: string): Set<stri
 
 type SearchInput = { query: string; country?: string };
 
-async function labelSearch(input: SearchInput, user: Identity, today: string): Promise<ToolResult> {
+// What search_labels runs: the question written out in full when the doctor has said things
+// before (src/server/rag/rewrite.ts), then the search. scripts/search-eval.ts measures this.
+export async function searchFor(query: string, earlier: Turn[], readable: ReadonlySet<string>, today: string) {
+  const asked = await standaloneQuery(query, earlier);
+  return { asked, hits: await search(asked, readable, SEARCH_RESULTS, today) };
+}
+
+async function labelSearch(input: SearchInput, user: Identity, today: string, earlier: Turn[]): Promise<ToolResult> {
   const country = (input.country ?? "").trim().toUpperCase() || user.country;
   const readable = country === user.country ? await readableDocuments(user) : documentsIn(await companyDocuments(user), country);
+  const { asked, hits } = await searchFor(input.query, earlier, readable, today);
   return {
     ok: true,
     country,
     asker_country: country === user.country,
-    results: (await search(input.query, readable, 4, today)).map((hit) => ({
+    ...(asked === input.query ? {} : { searched_for: asked }),
+    results: hits.map((hit) => ({
       doc_id: hit.docId,
       section: hit.section,
       title: hit.title,
@@ -107,6 +134,7 @@ async function labelSearch(input: SearchInput, user: Identity, today: string): P
       effective_date: hit.effectiveDate,
       country: hit.country,
       score: hit.score,
+      ...(hit.scores ? { scores: hit.scores } : {}),
       text: hit.text
     }))
   };
@@ -116,9 +144,9 @@ async function labelSearch(input: SearchInput, user: Identity, today: string): P
 // for. The doctor's name and email are not in the trace (src/server/trace-identity.test.ts).
 const asker = (user: Identity) => ({ tenantId: user.tenantId, country: user.country });
 const searchLabelsTool = observe(
-  (input: SearchInput, user: Identity, today: string) => {
-    updateActiveObservation({ input: { ...input, asker: asker(user), today } }, { asType: "tool" });
-    return labelSearch(input, user, today);
+  (input: SearchInput, user: Identity, today: string, earlier: Turn[]) => {
+    updateActiveObservation({ input: { ...input, asker: asker(user), today, earlier_turns: earlier.length } }, { asType: "tool" });
+    return labelSearch(input, user, today, earlier);
   },
   { name: "search_labels", asType: "tool", captureInput: false }
 );
@@ -126,7 +154,7 @@ const searchLabelsTool = observe(
 // Fix 0. The label lookups a medical information desk uses beside search. They read the
 // company's own documents in any country (OpenFGA can_read_abroad) and mark each answer with its
 // country, so the agent can say "the Japan label says". Another company's documents never appear.
-const LOOKUPS = ["read_section", "label_versions", "approval_status", "check_interaction", "trial_results"] as const;
+const LOOKUPS = ["find_label_text", "read_section", "label_versions", "approval_status", "check_interaction", "trial_results"] as const;
 type Lookup = (typeof LOOKUPS)[number];
 
 const sectionOut = (section: LabelSection, user: Identity) => ({
@@ -148,6 +176,12 @@ async function lookup(name: Lookup, input: Record<string, unknown>, user: Identi
     return { ok: true, found: false, note: `This desk has no label for ${arg("medicine")}. It covers ${TENANTS[user.tenantId]?.medicines.join(", ")}.` };
   }
   switch (name) {
+    case "find_label_text": {
+      const found = findLabelText(arg("phrase"), readable, today);
+      return found.length
+        ? { ok: true, found: true, matches: found.map((hit) => ({ ...sectionOut(hit, user), text: undefined, snippet: hit.snippet })) }
+        : { ok: true, found: false, note: `No label in force has the words "${arg("phrase")}".` };
+    }
     case "read_section": {
       const hit = readSection(arg("doc_id"), arg("section"), readable, today);
       return hit ? { ok: true, found: true, ...sectionOut(hit, user) } : { ok: true, found: false, note: `No section ${arg("section")} in ${arg("doc_id")}.` };
@@ -191,10 +225,12 @@ const lookupTools = Object.fromEntries(
 
 const isLookup = (name: string): name is Lookup => (LOOKUPS as readonly string[]).includes(name);
 
-export async function executeTool(name: string, input: Record<string, unknown>, user: Identity, today = TODAY): Promise<ToolResult> {
+// earlier: what the doctor and the desk said before the latest question, so a follow-up search
+// knows which medicine it is about. A caller with no conversation (MCP, a handoff) passes none.
+export async function executeTool(name: string, input: Record<string, unknown>, user: Identity, today = TODAY, earlier: Turn[] = []): Promise<ToolResult> {
   switch (name) {
     case "search_labels":
-      return searchLabelsTool({ query: String(input.query ?? ""), ...(input.country ? { country: String(input.country) } : {}) }, user, today);
+      return searchLabelsTool({ query: String(input.query ?? ""), ...(input.country ? { country: String(input.country) } : {}) }, user, today, earlier);
     default:
       return isLookup(name) ? lookupTools[name](input, user, today) : { ok: false, error: `Unsupported tool: ${name}` };
   }

@@ -17,9 +17,11 @@ export type LabelSection = {
   status: string;
   effectiveDate: string;
   country: string;
-  // Fix 4. The vector search's cosine similarity, so a reader can see why a section was found.
-  // Word search and a short document's extra sections have none.
+  // Fix 4. How well the section answers the question, so a reader can see why it was found:
+  // the model's grade (0 to 3) in the hybrid search, the count of shared words in word search.
   score?: number;
+  // Lesson 20. Where the hybrid search ranked it: by meaning, by words, fused, and its grade.
+  scores?: { fused: number; dense_rank?: number; keyword_rank?: number; grade?: number };
 };
 
 const DATA_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../data/hcp");
@@ -87,6 +89,14 @@ export function statusOn(section: LabelSection, today: string): string {
   return newer ? "superseded" : "active";
 }
 
+// The documents among these that are in force on that day: one version per label, no draft, no
+// expired document and none not yet in force.
+export function inForceDocuments(docIds: ReadonlySet<string>, today: string): Set<string> {
+  const first = new Map<string, LabelSection>();
+  for (const section of LABEL_SECTIONS) if (docIds.has(section.docId) && !first.has(section.docId)) first.set(section.docId, section);
+  return new Set([...first.values()].filter((doc) => statusOn(doc, today) === "active").map((doc) => doc.docId));
+}
+
 // The label a newer version replaced on that day, for example cardionex-uspi-v2 once v3 is in force.
 export function replacedBy(docId: string, today: string): string | undefined {
   const doc = LABEL_SECTIONS.find((section) => section.docId === docId);
@@ -115,6 +125,26 @@ export function searchLabels(query: string, readable: ReadonlySet<string>, limit
     .sort((a, b) => b.score - a.score)
     .slice(0, limit)
     .map((hit) => ({ ...hit.section, status: statusOn(hit.section, today) }));
+}
+
+// Lesson 20. Exact wording: the in-force sections whose text holds the phrase, ignoring case,
+// line breaks and Markdown marks. A doctor who asks "what does it say word for word" gets the
+// sentence, and a quote can be checked against the label before anyone sees it.
+export const plainText = (text: string) => text.replace(/\*\*|\*/g, "").replace(/\|/g, " ").replace(/\s+/g, " ").trim();
+
+export function findLabelText(phrase: string, readable: ReadonlySet<string>, today = TODAY) {
+  const wanted = plainText(phrase).toLowerCase();
+  if (wanted.length < 4) return [];
+  const docs = inForceDocuments(readable, today);
+  return LABEL_SECTIONS.filter((section) => docs.has(section.docId) && plainText(section.text).toLowerCase().includes(wanted)).map((section) => {
+    const text = plainText(section.text);
+    const at = text.toLowerCase().indexOf(wanted);
+    return {
+      ...section,
+      status: statusOn(section, today),
+      snippet: text.slice(Math.max(0, at - 120), at + wanted.length + 120)
+    };
+  });
 }
 
 // The countries where a company has label text in force, for the desk rules.
@@ -198,10 +228,13 @@ export function trialResults(medicine: string, endpoint: string, readable: Reado
   const asked = new Set(words(endpoint));
   return trials.flatMap((trial) => {
     const sections = sectionsOf(trial.docId, today);
+    // A section whose title names the endpoint ("3.4 Potassium and Kidney Results") is about it;
+    // one that only mentions it often may be about something else, so titles rank first.
+    const hits = (text: string) => words(text).filter((word) => asked.has(word)).length;
     const scored = sections
-      .map((section) => ({ section, score: words(`${section.title} ${section.text}`).filter((word) => asked.has(word)).length }))
-      .filter((hit) => hit.score > 0)
-      .sort((a, b) => b.score - a.score)
+      .map((section) => ({ section, title: hits(section.title), body: hits(section.text) }))
+      .filter((hit) => hit.title + hit.body > 0)
+      .sort((a, b) => b.title - a.title || b.body - a.body)
       .map((hit) => hit.section);
     return scored.length ? scored.slice(0, 3) : sections;
   });

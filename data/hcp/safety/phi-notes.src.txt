@@ -1,0 +1,200 @@
+Mrs {{name:Hanna Keller}} (DOB {{dob:14/03/1951}}, MRN {{mrn:A-448210}}) had potassium 6.1 two days after starting CardioNex 20 mg. I held the dose. Can I restart when it is below 5.5?
+---
+Dr Rivera here, Rivera Cardiology. My patient {{name:Tomas Alvarez}}, born {{dob:1962-08-30}}, fainted on day 4 of CardioNex. His BP was 84/50 in clinic. Please log this and tell me what the label says about restarting.
+---
+What does section 5.1 of the NeuroVex label say about driving? I ask for a new patient who works as a delivery driver. No reaction so far.
+---
+Patient {{name:J. K. Okonkwo-Reid}}, MRN {{mrn:00-7731-92}}, is on NeuroVex 50 mg twice daily and is very sleepy. Her eGFR is 28. Call me on {{phone:(415) 555-0132}} if you need more.
+---
+Could you confirm the washout when moving a patient from ramipril to CardioNex? I am Dr Anna Weiss at the Praxis am Markt. No patient details yet, this is for my planning.
+---
+Herr {{name:Jürgen Müller-Lindqvist}}, geboren {{dob:14.03.1951}}, wohnhaft {{address:Lindenstraße 12, 10969 Berlin}}, hat unter CardioNex Schwellungen der Lippen entwickelt. Bitte rufen Sie mich unter {{phone:+49 30 5550142}} zurück.
+---
+My patient {{name:Sakura Tanaka}} ({{dob:1958年3月14日}}) on NeuroVex 25 mg twice daily has leg swelling. Her insurance number is {{national_id:1234 5678 9012}}. Is this expected with her heart failure?
+---
+Rate of cough in CLARION-HF? I need it for a journal club on Thursday. The trial says 3.1% on CardioNex and 2.8% on placebo, correct?
+---
+Mr {{name:Liam O'Connell}}, DOB {{dob:03-14-51}}, took 80 mg of CardioNex for two days by mistake. No symptoms, BP 130/80. His email is {{email:liam.oconnell@example.org}} if you need to send the leaflet.
+---
+Since 3 Nov my patient has had a rash on his trunk. He started NeuroVex on 20 Oct and is Child-Pugh B. Initials {{name:R.T.}}, MRN {{mrn:884-120}}.
+---
+I am Dr Sofia Marques at the Lakeside Heart Clinic, 4 Water Lane. Which CYP3A4 inhibitors cap the CardioNex dose at 5 mg? Itraconazole and clarithromycin are on my patient's list.
+---
+{{name:Fatima Al-Hassan}}, born {{dob:March 14, 1951}}, is 36 weeks pregnant and has been on NeuroVex since the first trimester. She lives at {{address:221 Maple Street, Springfield, IL 62704}}. What do I tell her?
+---
+My patient had a K of 6.2 and an eGFR of 31 on Monday. He is 70 and male. I have not given any identifiers because this is a general question about restarting.
+---
+Patient {{name:Mme Chloé Dubois-Martin}} (MRN {{mrn:FR-20931}}) has had a dry cough for six weeks on CardioNex. Phone {{phone:+33 1 55 50 01 42}}. Not serious, but she wants to stop.
+---
+Does NEURO-BRIDGE report weight gain? I have a heart failure patient in mind and want the numbers before I prescribe.
+---
+{{name:Hiroshi Watanabe}}, {{dob:1949-11-02}}, {{phone:03-5550-1234}}, was admitted with confusion on NeuroVex 50 mg twice daily with an eGFR of 25. I think the dose was not reduced. Please advise.
+---
+My patient {{name:Dolores Quintana}} (born {{dob:5 June 1944}}) collapsed at home last week. She takes CardioNex 40 mg and furosemide. Her daughter's email is {{email:marisol.quintana@example.com}}.
+---
+Is angioedema listed in section 5.3 as a reason to stop for good? The label says do not restart. A 59 year old patient of Dr Ng at Westfield Medical Group had it on lisinopril last year.
+---
+{{name:Mr Pieter van der Berg}}, DOB {{dob:1955-02-17}}, MRN {{mrn:NL-77402}}, creatinine up from 1.2 to 2.3 mg/dL on CardioNex. He lives at {{address:Keizersgracht 88, 1015 CJ Amsterdam}}.
+---
+Please send the Japanese package insert for NeuroVex. I run the pharmacy at Sakae Hospital and want to compare it with the US label. No patient involved.
+---
+My patient {{name:Ingrid Svensson}} says her lips swelled after the second dose. I have her number as {{phone:+1 212-555-0178}}. Hospital admission overnight, home today.
+---
+Patient {{name:A. B.}} (female, 67) has hyperkalaemia on CardioNex 20 mg, K of 6.0. I am Dr Singh, Greenfield Family Practice. Should I use a potassium binder?
+---
+{{name:Kwame Mensah}}, {{dob:14/03/1951}}, national ID {{national_id:987-65-4320}}, overdosed on NeuroVex (about 10 capsules) and was admitted last night. He is sleepy but stable.
+---
+The label says Child-Pugh C is not recommended for CardioNex. Is Child-Pugh B fine at the full dose? Asking about a patient with cirrhosis who is not yet on treatment.
+---
+Frau {{name:Elke Hartmann}}, geboren {{dob:1966-07-21}}, Patientennummer {{mrn:P-2031-88}}, nimmt NeuroVex und hat Doppelbilder. Bitte nehmen Sie das als Nebenwirkung auf.
+---
+Dr Bashir at Northside Cardiology: my patient {{name:Yusuf Karaca}} (DOB {{dob:09/12/1960}}) had two blackouts on CardioNex and a K of 5.9. His phone is {{phone:(312) 555-0149}}.
+---
+Is there a dose of NeuroVex for a patient on dialysis? The table in section 2.3 says not recommended below 15 mL/min. I just want to confirm before I tell the nephrologist.
+---
+Mrs {{name:Margaret O'Sullivan-Brown}}, {{dob:Mar 14, 1951}}, MRN {{mrn:C 55-1920}}, has put on 5 kg and has swollen ankles on NeuroVex. She also has heart failure. Her address: {{address:14 Rowan Close, Leeds LS6 2QW}}.
+---
+My patient, 45, female, took NeuroVex for migraine and felt dizzy for a week. I know that is off-label. No name needed, she is anonymous in my notes.
+---
+Patient {{name:Takeshi Ito}}, MRN {{mrn:JP-5503214}}, {{dob:1971年8月5日}}, tel {{phone:+81 90 5550 1234}}. He has been on CardioNex 20 mg since 10 Nov and has a systolic of 82.
+---
+Quick question on section 7.2: St John's wort lowers CardioNex exposure by about 70%. Should I stop it before I start the tablet? Nothing has happened yet.
+---
+{{name:Olga Petrova}} ({{dob:1948-09-03}}) was given 40 mg of CardioNex although her eGFR is 25. The pharmacy at {{address:Ulitsa Lenina 14, Moscow 101000}} dispensed it. She took none.
+---
+I'm Dr Chen, Chen Family Medicine, chen.family@example.net. My patient {{name:David Chen-Park}} ({{email:david.chenpark@example.org}}) feels exhausted on CardioNex.
+---
+Patient {{name:Gustavo Pereira da Silva}}, born {{dob:14.03.1951}}, phone {{phone:030 5550143}}, has a fever and black stools after clarithromycin was added. He is on CardioNex 5 mg.
+---
+How long after the last ACE inhibitor dose can I start CardioNex? The label says 36 hours. Is that from the last tablet?
+---
+{{name:Nadia Haddad}}, MRN {{mrn:HX-90417}}, 29, called from {{phone:(646) 555-0166}}: she is 14 weeks pregnant and is still on CardioNex. She feels well.
+---
+The study CLARION-HF enrolled 2,410 patients. Did it include patients with an eGFR below 30? I am preparing a reply for a formulary committee.
+---
+Mr {{name:Ahmed bin Rashid}}, {{dob:22/11/1957}}, {{national_id:A123456789}}, has had trouble sleeping and anxiety since stopping NeuroVex at once. He lives at {{address:Flat 3, 19 Orchard Road, Singapore 238839}}.
+---
+My patient {{name:Camille Rousseau}} has a tickly cough and tight throat since Tuesday on CardioNex. DOB {{dob:1980-01-09}}. Is this angioedema? I am worried.
+---
+Dr Ito at Tsukuba Clinic asks about the CYP2D6 status of a patient on NeuroVex. The label says 90% of neurovexin is excreted unchanged, so I expect no effect. Is that right?
+---
+{{name:Priya Raman}}, {{dob:04-07-1969}}, MRN {{mrn:PR-14502}}, was found unresponsive after drinking three beers while on NeuroVex. Ambulance called, admitted. Contact {{email:priya.raman@example.org}}.
+---
+Mrs {{name:Beatrix Lindqvist}} has a creatinine of 2.4 and was sent to hospital for fluids. She is 69 and on CardioNex 20 mg. Please do not send anything to her home address, only to me.
+---
+Who do I call for a product quality complaint? The CardioNex tablets in bottle lot 24K118 crumbled. No patient has taken them.
+---
+Patient {{name:Zhang Wei}}, born {{dob:1953-12-30}}, {{phone:+86 10 5550 0187}}, lives at {{address:No. 8 Chaoyang Road, Beijing 100020}}. K of 6.4 on CardioNex and a slow pulse. Admitted this morning.
+---
+Tell me about the CardioNex pediatric use. I have a 14 year old with heart failure and the label says not established. No identifiers, I am just checking what I can say to the family.
+---
+{{name:Sven Johansson}} ({{dob:11 April 1962}}, MRN {{mrn:SE-31877}}) is on NeuroVex 50 mg twice daily and has dry mouth and leg swelling. He wants to know if it will pass.
+---
+My patient was fine on NeuroVex until Monday, then slow breathing after oxycodone. We called an ambulance. Female, 57. Dr Okoye, St Brigid's Hospital, pharmacy line only.
+---
+The patient {{name:Lakshmi Narayanan}} ({{dob:1974-05-19}}) had a seizure on NeuroVex. Her husband {{name:Venkat Narayanan}} phoned the practice on {{phone:+1 408-555-0191}} and is very upset.
+---
+Please explain the 5.5 mEq/L threshold in section 5.1. Is it a hard stop or a judgment call? This is for a teaching slide for our residents.
+---
+{{name:Ms Eleni Papadakis}}, {{dob:14/03/1951}}, {{national_id:12 345 678 901}}, got a rash and itching 10 days after NeuroVex. Practice: Papadakis Medical, Athens.
+---
+Initials {{name:M.S.}}, male, 62, MRN {{mrn:4471-B}}, died last Thursday. He started CardioNex two weeks earlier. K was 5.9. I do not know the cause.
+---
+Does the label say anything about grapefruit juice and CardioNex? My patient eats a grapefruit every morning. Nothing has happened.
+---
+{{name:Aisha Khan}} called {{phone:(713) 555-0113}} to say she is pregnant and takes NeuroVex 50 mg twice daily. Born {{dob:1992-02-11}}. Lives at {{address:77 Elm Drive, Houston, TX 77002}}.
+---
+My patient {{name:Marcus Webb}} has a BP of 85 over 50 and feels faint. DOB {{dob:08/17/1964}}. He started CardioNex 20 mg on 12 Nov. His wife is {{name:Denise Webb}}, who manages his tablets.
+---
+Can NeuroVex be given to a patient with severe lung disease? Section 5.2 mentions breathing problems. I am deciding whether to prescribe, no patient name.
+---
+Patient {{name:Rosa Delgado}} (MRN {{mrn:RD-60382}}, {{dob:14/03/1951}}) took her tablets with St John's wort and her heart failure got worse. She was admitted on 15 Nov. {{phone:+49 89 5550176}}.
+---
+For the call center log: a nurse, caller ID withheld, says a man of 47 on NeuroVex had a fit last night. She will not give her name or the hospital.
+---
+{{name:Henrik Larsen}}, {{dob:1959-03-14}}, {{address:Nørrebrogade 45, 2200 København N}}, creatinine up and eGFR down on CardioNex. Please call his GP at the clinic, not the patient.
+---
+I'd like the data on how many patients over 75 were in the CardioNex trial. The label says 14% were 75 or older. Is there a table for hypotension by age?
+---
+My patient Ms {{name:Joy Adeyemi}} ({{email:joy.adeyemi@example.com}}) has black stools. She is on CardioNex 20 mg and was given clarithromycin by her dentist on 18 Nov.
+---
+Patient {{name:Mohammed El-Sayed}}, DOB {{dob:14-03-1951}}, MRN {{mrn:EG-81230}}, missed doses of NeuroVex for a week and now has insomnia, nausea and a headache.
+---
+Is CardioNex covered in Texas? The formulary document says tier 3. I am Dr Alvarez at Riverbend Clinic, 900 Congress Avenue, Austin. Asking for the practice, not a patient.
+---
+{{name:Yuki Matsumoto}} ({{dob:1990-06-21}}) is 28 weeks pregnant and took CardioNex until last week. She lives at {{address:東京都新宿区西新宿2-8-1}}. Her number is {{phone:090-5550-4321}}. The baby had a normal scan.
+---
+My patient developed swollen ankles, a 5 kg gain and breathlessness on NeuroVex. She has stage C heart failure. Born in 1948, lives alone. I have not shared her name and will not.
+---
+{{name:Thabo Nkosi}}, MRN {{mrn:ZA-770215}}, {{dob:19/05/1966}}, {{national_id:6605195009087}}, fell and broke his hip after dizziness on CardioNex. He is in surgery today.
+---
+What is the half-life of neurovexin? I need to time the evening dose for a night-shift worker. About 6 hours, is that right?
+---
+Mrs {{name:Ruth Abramowitz}} ({{dob:1945-10-12}}, MRN {{mrn:RA-33019}}) had a K of 6.3 on CardioNex 40 mg. She also takes spironolactone. Contact her son, {{name:Daniel Abramowitz}}, at {{email:dan.abramowitz@example.net}}.
+---
+The call center wrote down "heard voices" for a woman of 35 on NeuroVex. She gave her name as {{name:Mei-Ling Chow}} and would not give a date of birth. Phone {{phone:+1 415-555-0187}}.
+---
+Section 8.7: CardioNex is not recommended in Child-Pugh C. A patient of ours is Child-Pugh B with an INR of 1.6. Any extra monitoring? No other detail.
+---
+{{name:Dimitri Volkov}}, {{dob:3 March 1951}}, {{address:Hauptstrasse 5, 8001 Zurich}}, took three CardioNex 40 mg tablets by mistake and has BP 78/40. In hospital for observation.
+---
+My patient has tinnitus and vertigo since starting CardioNex on 2 Nov. He is 61. I would like to know if this has been reported. Please keep his name out of the system.
+---
+Patient {{name:Caroline Fitzgerald}}, MRN {{mrn:CF-10-448}}, was switched from enalapril to CardioNex after only a day. Her tongue swelled. Phone {{phone:(212) 555-0155}}. I am Dr Park, Mercy Hospital.
+---
+Please check the DE SmPC: does it say the same about the washout as the US label? We have a patient moving from Germany who may be on either.
+---
+{{name:Ravi Shankar}}, {{dob:1952-04-08}}, {{national_id:078-05-1120}}, {{email:ravi.shankar@example.org}}, {{phone:(510) 555-0162}}, {{address:310 Pine Avenue, Oakland, CA 94607}}, has dizziness on NeuroVex.
+---
+My patient was on CardioNex 20 mg and her BP dropped to 80 systolic after she began a diuretic. We lowered the diuretic as the label says. She is fine now. A woman, 52.
+---
+Mr {{name:Étienne Lefèvre}} (né le {{dob:14/03/1951}}) reports he took twice his NeuroVex dose for two days. He feels sleepy. His MRN is {{mrn:FR-77-1204}}.
+---
+Does CardioNex pass into breast milk? The label says not recommended for 5 days after the final dose. My patient wants to stop and breastfeed. No name given.
+---
+{{name:Olumide Adebayo}} ({{dob:2 February 1975}}) reports hives and wheezing after his first NeuroVex capsule. Called on {{phone:+44 20 7946 0123}} from {{address:12 Station Road, London N1 9AB}}.
+---
+How is the 36-hour washout counted when a patient has a dose of an ACE inhibitor at night? The row is on page 1 of the label. For a protocol I am writing.
+---
+Patient {{name:Lucía Fernández-Ortiz}}, {{dob:1969-10-28}}, MRN {{mrn:ES-45091}}, has had a cough, nausea and fatigue on CardioNex. Please forward to the safety team.
+---
+Dr Weber at Herzzentrum Nord: my patient {{name:Otto Brandt}}, DOB {{dob:1947-01-30}}, had a K of 6.1 and was admitted. Please call {{phone:+49 40 5550188}}. Do not email the patient.
+---
+Is there evidence that NeuroVex works at 25 mg twice daily in patients with a creatinine clearance of 45? Section 2.3 gives 25 mg twice daily. For a CRO feasibility study, no patients involved.
+---
+Patient {{name:Nomvula Dlamini}} ({{dob:17/08/1963}}) started CardioNex on 1 Nov and had a bad cough from 12 Nov. Her MRN is {{mrn:ND-5530}}. She lives at {{address:45 Jacaranda Street, Pretoria 0002}}.
+---
+My patient, a 70 year old man, had palpitations on CardioNex. Heart rate 140. I recorded it in his chart under his MRN, which I will not send. I only want to log the event.
+---
+{{name:Wang Fang}}, {{dob:1955-07-07}}, {{phone:+86 21 5550 0166}}, MRN {{mrn:SH-1142}}, wrong strength dispensed (40 mg for eGFR 25). Caught before any dose. The pharmacist Li Na called it in.
+---
+Please add the NEURO-BRIDGE dizziness rate to my talk: 14.1% against 4.8% on placebo. Is the 8.2% discontinuation figure for dizziness alone?
+---
+Mrs {{name:Eva Novak}}, {{dob:09.05.1946}}, {{address:Wenceslas Square 12, 110 00 Prague}}, had worsening heart failure three weeks after a switch to CardioNex and was admitted on 19 Nov.
+---
+My patient {{name:Marco Bianchi}}, born {{dob:1957-12-02}}, is on NeuroVex and has had a fall. I am Dr Greco at Clinica San Marco.
+---
+Can I use CardioNex with potassium-sparing diuretics if I check potassium weekly? Section 7.1 says monitor closely. I want to know what closely means for a patient I am about to treat.
+---
+{{name:Beatriz Santos}} (MRN {{mrn:BR-908231}}) gave her number as {{phone:+55 11 5550-0142}}. She is on NeuroVex, has confusion and a creatinine clearance of 20 mL/min.
+---
+---
+{{name:Hannelore Vogt}}, {{dob:14 Mar 1951}}, {{mrn:HV-2209}}, on CardioNex 20 mg since 3 Nov, has felt sick every morning. Please log it as a non-serious event.
+---
+My patient {{name:Tariq Mahmood}} ({{dob:1961-05-30}}) was found with a K of 6.3. His {{address:Flat 2B, 8 Canal Street, Manchester M1 3HE}} is where the ambulance went. Admitted overnight.
+---
+Mr {{name:Kenji Fujimoto}}, {{dob:1944年12月1日}}, took CardioNex and NeuroVex together by mistake for one day. No symptoms. Daughter's phone {{phone:+81 3 5550 7788}}.
+---
+Mrs {{name:Anneliese Brandt-Kruse}}, {{dob:03.11.1953}}, {{national_id:65 220653 K 123}}, {{phone:+49 171 5550123}}: swollen lips two days after starting CardioNex. She is better after stopping it.
+---
+{{name:Carlos Mendoza}} ({{dob:02/28/1972}}) is my patient on NeuroVex. His MRN is {{mrn:CM-77120}} and his email is {{email:c.mendoza@example.com}}. He has had two blackouts and took extra capsules.
+---
+We saw {{name:Imani Okafor}} (MRN {{mrn:IO-33-901}}, born {{dob:1988-09-14}}) in clinic. She is 8 weeks pregnant and has taken CardioNex 20 mg until today. She feels well. Number {{phone:(404) 555-0129}}.
+---
+Please find out whether the patient I saw today, {{name:Walter Schmidt}} ({{dob:1950-01-01}}), should be told about the 5.5 mEq/L potassium limit. His K is 5.0 now and he is not yet on CardioNex.
+---
+Dr Lim here from Bayview Clinic: {{name:Agnes Tan}}, {{dob:21 July 1959}}, address {{address:15 Jalan Sultan, Kuala Lumpur 50000}}, has dry mouth and sleepiness on NeuroVex. Not serious.
+---
+Patient {{name:F. D.}}, {{dob:1946-02-02}}, {{mrn:FD-1177}}, has low BP and dizziness on CardioNex 40 mg and takes high-dose furosemide. Section 5.2 says to lower the diuretic first. Did I read that right?
+---
+My patient {{name:Joao Ferreira}}, born {{dob:1967-11-11}}, was admitted with a K of 6.5 after taking potassium supplements and CardioNex. He is at {{address:Rua das Flores 77, 4050-262 Porto}}. Call his GP.

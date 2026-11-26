@@ -1,5 +1,5 @@
 -- Lesson 20. The label library as vectors: one row per section of each PDF, with the section's
--- text as Docling read it and the vector the gateway's embedding model made of it.
+-- text as the PDF reader took it from the label and the vector the gateway's embedding model made of it.
 -- The vector extension is installed by the database owner, not this app's role: on a database made
 -- before lesson 20, npm run rag:setup does it once.
 DO $$

@@ -1,0 +1,366 @@
+{
+  "measures": {
+    "search.recall_at_5": 0.958,
+    "search.mrr": 0.933,
+    "search.ndcg_at_10": 0.925,
+    "search.out_of_label_empty": 0.95
+  },
+  "commit": "d8fdbce",
+  "at": "2026-11-26T13:37:26.297Z",
+  "questions": 178,
+  "configs": {
+    "dense": {
+      "all": {
+        "recall_at_5": 0.751,
+        "mrr": 0.764,
+        "ndcg_at_10": 0.728,
+        "out_of_label_empty": 0.05
+      },
+      "by_kind": {
+        "direct": {
+          "recall_at_5": 0.852,
+          "mrr": 0.938,
+          "ndcg_at_10": 0.847
+        },
+        "paraphrase": {
+          "recall_at_5": 0.752,
+          "mrr": 0.77,
+          "ndcg_at_10": 0.718
+        },
+        "follow_up": {
+          "recall_at_5": 0.773,
+          "mrr": 0.834,
+          "ndcg_at_10": 0.773
+        },
+        "table": {
+          "recall_at_5": 0.773,
+          "mrr": 0.65,
+          "ndcg_at_10": 0.71
+        },
+        "phrase": {
+          "recall_at_5": 1,
+          "mrr": 0.792,
+          "ndcg_at_10": 0.84
+        },
+        "other_country": {
+          "recall_at_5": 0.744,
+          "mrr": 0.809,
+          "ndcg_at_10": 0.747
+        },
+        "out_of_label": {
+          "out_of_label_empty": 0.05
+        },
+        "cross_doc": {
+          "recall_at_5": 0.417,
+          "mrr": 0.48,
+          "ndcg_at_10": 0.427
+        },
+        "version": {
+          "recall_at_5": 0.417,
+          "mrr": 0.522,
+          "ndcg_at_10": 0.5
+        }
+      }
+    },
+    "hybrid": {
+      "all": {
+        "recall_at_5": 0.754,
+        "mrr": 0.749,
+        "ndcg_at_10": 0.722,
+        "out_of_label_empty": 0.05
+      },
+      "by_kind": {
+        "direct": {
+          "recall_at_5": 0.789,
+          "mrr": 0.935,
+          "ndcg_at_10": 0.811
+        },
+        "paraphrase": {
+          "recall_at_5": 0.687,
+          "mrr": 0.742,
+          "ndcg_at_10": 0.712
+        },
+        "follow_up": {
+          "recall_at_5": 0.757,
+          "mrr": 0.812,
+          "ndcg_at_10": 0.803
+        },
+        "table": {
+          "recall_at_5": 0.843,
+          "mrr": 0.647,
+          "ndcg_at_10": 0.709
+        },
+        "phrase": {
+          "recall_at_5": 1,
+          "mrr": 0.802,
+          "ndcg_at_10": 0.848
+        },
+        "other_country": {
+          "recall_at_5": 0.783,
+          "mrr": 0.764,
+          "ndcg_at_10": 0.724
+        },
+        "out_of_label": {
+          "out_of_label_empty": 0.05
+        },
+        "cross_doc": {
+          "recall_at_5": 0.379,
+          "mrr": 0.394,
+          "ndcg_at_10": 0.345
+        },
+        "version": {
+          "recall_at_5": 0.667,
+          "mrr": 0.576,
+          "ndcg_at_10": 0.555
+        }
+      }
+    },
+    "graded": {
+      "all": {
+        "recall_at_5": 0.958,
+        "mrr": 0.933,
+        "ndcg_at_10": 0.925,
+        "out_of_label_empty": 0.95
+      },
+      "by_kind": {
+        "direct": {
+          "recall_at_5": 0.991,
+          "mrr": 1,
+          "ndcg_at_10": 0.953
+        },
+        "paraphrase": {
+          "recall_at_5": 0.945,
+          "mrr": 0.908,
+          "ndcg_at_10": 0.916
+        },
+        "follow_up": {
+          "recall_at_5": 0.978,
+          "mrr": 0.955,
+          "ndcg_at_10": 0.957
+        },
+        "table": {
+          "recall_at_5": 1,
+          "mrr": 0.931,
+          "ndcg_at_10": 0.936
+        },
+        "phrase": {
+          "recall_at_5": 1,
+          "mrr": 0.922,
+          "ndcg_at_10": 0.936
+        },
+        "other_country": {
+          "recall_at_5": 1,
+          "mrr": 1,
+          "ndcg_at_10": 0.989
+        },
+        "out_of_label": {
+          "out_of_label_empty": 0.95
+        },
+        "cross_doc": {
+          "recall_at_5": 0.818,
+          "mrr": 0.848,
+          "ndcg_at_10": 0.79
+        },
+        "version": {
+          "recall_at_5": 0.813,
+          "mrr": 0.79,
+          "ndcg_at_10": 0.805
+        }
+      }
+    }
+  },
+  "follow_ups": {
+    "rewritten": {
+      "recall_at_5": 0.978,
+      "mrr": 0.955,
+      "ndcg_at_10": 0.957
+    },
+    "as_asked": {
+      "recall_at_5": 0.875,
+      "mrr": 0.846,
+      "ndcg_at_10": 0.855
+    }
+  },
+  "misses": [
+    {
+      "id": "r-015",
+      "kind": "direct",
+      "asked": "What dose of CardioNex is used for severe renal impairment?",
+      "got": [
+        "cardionex-medinfo-faq 1.8",
+        "cardionex-uspi-v2 2.2",
+        "cardionex-medinfo-faq 2.12",
+        "cardionex-payer-formulary-2026 1.2",
+        "cardionex-clarion-hf-trial 5.1"
+      ]
+    },
+    {
+      "id": "r-033",
+      "kind": "paraphrase",
+      "asked": "Which antifungals or antibiotics put a ceiling on the CardioNex dose?",
+      "got": [
+        "cardionex-medinfo-faq 1.9",
+        "cardionex-uspi-v2 2.2",
+        "cardionex-uspi-v2 7.10",
+        "cardionex-uspi-v2 17",
+        "cardionex-uspi-v2 2.1"
+      ]
+    },
+    {
+      "id": "r-053",
+      "kind": "paraphrase",
+      "asked": "Can a patient on hemodialysis start NeuroVex?",
+      "got": [
+        "neurovex-uspi-v1 2.7",
+        "neurovex-uspi-v1 12.6",
+        "neurovex-uspi-v1 4",
+        "neurovex-uspi-v1 5.14",
+        "neurovex-uspi-v1 8.8"
+      ]
+    },
+    {
+      "id": "r-054",
+      "kind": "paraphrase",
+      "asked": "Which other medicines should a NeuroVex prescriber worry about?",
+      "got": [
+        "neurovex-uspi-v1 7.6",
+        "neurovex-uspi-v1 7.1",
+        "neurovex-uspi-v1 17",
+        "neurovex-uspi-v1 7.3",
+        "neurovex-uspi-v1 2.6"
+      ]
+    },
+    {
+      "id": "r-062",
+      "kind": "follow_up",
+      "asked": "What dose of CardioNex is used when eGFR is below 30 if the patient is on dialysis?",
+      "got": [
+        "cardionex-medinfo-faq 2.12",
+        "cardionex-uspi-v2 2.2",
+        "cardionex-medinfo-faq 1.8",
+        "cardionex-uspi-v2 17.1",
+        "cardionex-uspi-v2 4"
+      ]
+    },
+    {
+      "id": "r-063",
+      "kind": "follow_up",
+      "asked": "What should I do if I experience angioedema from CardioNex?",
+      "got": [
+        "cardionex-medinfo-faq 2.10",
+        "cardionex-uspi-v2 5.3",
+        "cardionex-uspi-v2 17.1",
+        "cardionex-uspi-v2 17",
+        "cardionex-clarion-hf-trial 4.7"
+      ]
+    },
+    {
+      "id": "r-144",
+      "kind": "out_of_label",
+      "asked": "Is it safe to use cannabis while taking CardioNex?",
+      "got": [
+        "cardionex-uspi-v2 17",
+        "cardionex-uspi-v2 17.1",
+        "cardionex-medinfo-faq 2.14",
+        "cardionex-uspi-v2 7.10",
+        "cardionex-uspi-v2 2.1"
+      ]
+    },
+    {
+      "id": "r-154",
+      "kind": "cross_doc",
+      "asked": "How was angioedema handled in CLARION-HF, and what does the label tell prescribers to do?",
+      "got": [
+        "cardionex-clarion-hf-trial 2.5",
+        "cardionex-medinfo-faq 2.10",
+        "cardionex-clarion-hf-trial 5.2",
+        "cardionex-uspi-v2 17",
+        "cardionex-uspi-v2 2.7"
+      ]
+    },
+    {
+      "id": "r-157",
+      "kind": "cross_doc",
+      "asked": "Which potassium level withholds CardioNex, and how did the CLARION-HF protocol apply that rule?",
+      "got": [
+        "cardionex-clarion-hf-trial 4.4",
+        "cardionex-medinfo-faq 2.2",
+        "cardionex-uspi-v2 5.1",
+        "cardionex-uspi-v2 14.5",
+        "cardionex-clarion-hf-trial 3.2"
+      ]
+    },
+    {
+      "id": "r-160",
+      "kind": "cross_doc",
+      "asked": "How many patients were randomized in CLARION-HF, and what hazard ratio does the label report for the primary outcome?",
+      "got": [
+        "cardionex-clarion-hf-trial 1.1",
+        "cardionex-uspi-v2 14.4",
+        "cardionex-uspi-v2 14.3",
+        "cardionex-uspi-v2 14.6",
+        "cardionex-clarion-hf-trial 3.1"
+      ]
+    },
+    {
+      "id": "r-161",
+      "kind": "cross_doc",
+      "asked": "How must a pregnancy exposure be reported to the safety team, and what does the label say to do once pregnancy is detected?",
+      "got": [
+        "pv-reporting-sop 3.1",
+        "cardionex-medinfo-faq 2.19",
+        "cardionex-uspi-v2 8.1",
+        "cardionex-medinfo-faq 2.9",
+        "cardionex-uspi-v2 2.7"
+      ]
+    },
+    {
+      "id": "r-162",
+      "kind": "cross_doc",
+      "asked": "What dose was used in NEURO-BRIDGE, and how does it compare with the label's maximum daily dose?",
+      "got": [
+        "neurovex-uspi-v1 14.1",
+        "neurovex-uspi-v1 2.2",
+        "neurovex-uspi-v1 14.2",
+        "neurovex-uspi-v1 8.8",
+        "neurovex-uspi-v1 14.6"
+      ]
+    },
+    {
+      "id": "r-170",
+      "kind": "version",
+      "asked": "How many weeks before the CardioNex dose can go to 40 mg?",
+      "got": [
+        "cardionex-medinfo-faq 1.7",
+        "cardionex-payer-formulary-2026 1.2",
+        "cardionex-clarion-hf-trial 2.5",
+        "cardionex-uspi-v2 14.1",
+        "cardionex-clarion-hf-trial 2.1"
+      ]
+    },
+    {
+      "id": "r-172",
+      "kind": "version",
+      "asked": "What is the largest CardioNex dose allowed for a patient with eGFR below 30 who is not on dialysis?",
+      "got": [
+        "cardionex-medinfo-faq 1.8",
+        "cardionex-payer-formulary-2026 1.2",
+        "cardionex-payer-formulary-2026 3.2",
+        "cardionex-medinfo-faq 2.12",
+        "cardionex-clarion-hf-trial 5.1"
+      ]
+    },
+    {
+      "id": "r-174",
+      "kind": "version",
+      "asked": "What dose does a patient with severe kidney impairment get today?",
+      "got": [
+        "cardionex-uspi-v2 2.2",
+        "cardionex-medinfo-faq 1.8",
+        "cardionex-payer-formulary-2026 1.2",
+        "cardionex-clarion-hf-trial 5.1",
+        "cardionex-clarion-hf-trial 5.3"
+      ]
+    }
+  ]
+}

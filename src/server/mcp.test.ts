@@ -13,6 +13,7 @@ import { createAuth } from "./auth";
 import { env } from "./env";
 import { createMcpRouter, MCP_PATH, MCP_PUBLIC_ROUTES, METADATA_PATH } from "./mcp";
 import type { SessionStore } from "./sessions";
+import { useLabelSearch, wordSearch } from "./tools";
 
 // Lesson 12. The MCP door, called the way Claude Code calls it: the SDK's own client over
 // streamable HTTP with a Bearer token. The test signs its tokens with a key it made and hands the
@@ -59,6 +60,8 @@ before(async () => {
   env.fgaStoreId = store.storeId;
   env.fgaModelId = store.modelId;
   dropStore = async () => void (await store.client.deleteStore());
+  // This file tests who may read what over MCP, not the search, so it searches by words, with no index.
+  useLabelSearch(wordSearch);
   const server = createApp(auth, testDesk()).listen(0, "127.0.0.1");
   await new Promise((resolve) => server.once("listening", resolve));
   base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
@@ -148,7 +151,7 @@ test("a signed-in client sees the read-only label tools", async () => {
   const client = await connect(okafor);
   const { tools } = await client.listTools();
   await client.close();
-  assert.deepEqual(tools.map((tool) => tool.name).sort(), ["approval_status", "check_interaction", "label_versions", "read_section", "search_labels", "trial_results"]);
+  assert.deepEqual(tools.map((tool) => tool.name).sort(), ["approval_status", "check_interaction", "find_label_text", "label_versions", "read_section", "search_labels", "trial_results"]);
   assert.ok(tools.every((tool) => tool.annotations?.readOnlyHint === true));
 });
 

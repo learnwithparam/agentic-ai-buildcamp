@@ -42,8 +42,9 @@ export function meets(target: string, value: number): boolean {
 }
 
 // A run file is the JSON a measure script writes: { "measures": { "<measure>": <number> }, "commit": "...", "at": "..." }.
+// The link is read as Markdown reads it, from docs/ where measures.md sits, so it also opens on GitHub.
 function runValue(runPath: string, measure: string, root: string): number | undefined {
-  const file = path.join(root, runPath);
+  const file = path.join(root, "docs", runPath);
   if (!existsSync(file)) return undefined;
   const value = JSON.parse(readFileSync(file, "utf8")).measures?.[measure];
   return typeof value === "number" ? value : undefined;
