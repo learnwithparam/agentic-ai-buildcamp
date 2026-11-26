@@ -125,7 +125,9 @@ A verdict never changes after it is set. The model may suggest a claim for the l
 git checkout checkpoint/14-content-agents
 ```
 
-The checkpoint adds:
+This tag is where lesson 14 starts. It holds what the earlier lessons built and none of this lesson's own files.
+
+You add:
 
 - `src/server/content/records.ts`: the approved claims, the draft emails and the CRM files from `data/hcp`, read once.
 - `src/server/content/fact-check.ts`: the fact-checker graph.
@@ -290,6 +292,17 @@ npm run dataset:run -- --cases FACT-01,FACT-02,FACT-03,FACT-04,FACT-05,FACT-06,O
 ```
 
 Your row goes to `my-scoreboard.md`. The scoreboard gains two columns, `fact-check` and `outreach`.
+
+### Check your build
+
+Run the check. Then compare your files with the next tag, which holds this lesson's finished code.
+
+```bash
+npm run check
+git diff --stat checkpoint/15-a2a
+```
+
+The check passes, except the tests that need a service from an earlier lesson. They fail when that service is not running. The diff lists only files you wrote in your own way.
 
 ## Prove it
 

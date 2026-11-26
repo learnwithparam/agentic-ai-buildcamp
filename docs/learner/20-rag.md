@@ -113,14 +113,11 @@ flowchart LR
 ```bash
 git checkout checkpoint/20-rag
 npm install
-npm run rag:setup
-npm run rag:ingest
-npm run dev
 ```
 
-`rag:setup` installs the `vector` extension in the app database. Both commands are safe to run again.
+This tag is where lesson 20 starts. It holds what the earlier lessons built and none of this lesson's own files.
 
-The checkpoint adds:
+You add:
 
 - `data/hcp/pdf/`: 13 tagged PDFs and `manifest.json`. The manifest names each PDF's company, medicine, status, date, country and source Markdown.
 - `src/server/rag/extract.ts`: the tags read as Markdown, cut into sections, and the word check.
@@ -133,6 +130,16 @@ The checkpoint adds:
 - `src/server/rag/rag.test.ts`, which reads every real PDF in `data/hcp/pdf`.
 
 One new npm package, `unpdf`. It wraps Mozilla's PDF.js, the reader inside Firefox, and runs in the app's own process.
+
+Once the files are in place, start the parts this lesson needs:
+
+```bash
+npm run rag:setup
+npm run rag:ingest
+npm run dev
+```
+
+`rag:setup` installs the `vector` extension in the app database. Both commands are safe to run again.
 
 ### Step 1: See keyword search miss
 
@@ -361,6 +368,17 @@ Now record your row:
 ```bash
 npm run dataset:run -- --chapter 20 --cases RAG-01,RAG-02,RAG-03,TENANCY-01,STALENESS-01,MULTITURN-01,GUARDRAIL-01
 ```
+
+### Check your build
+
+Run the check. Then compare your files with the next tag, which holds this lesson's finished code.
+
+```bash
+npm run check
+git diff --stat checkpoint/21-citations
+```
+
+The check passes, except the tests that need a service from an earlier lesson. They fail when that service is not running. The diff lists only files you wrote in your own way.
 
 ## Prove it
 

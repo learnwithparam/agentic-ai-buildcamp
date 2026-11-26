@@ -20,7 +20,10 @@ const lesson = (parts: Partial<Record<string, string>> = {}) =>
     "### Where it sits", `${fence}mermaid\nflowchart LR\n  a --> b\n${fence}`,
     ...(parts.states ? ["### The states", parts.states] : []),
     "### Concepts", parts.concepts ?? "- [Citation](../walkthrough.md#c-citation)\n- [Held answer](../walkthrough.md#c-held-answer)",
-    "## Build it", "```bash\ngit checkout checkpoint/21-citations\n```", "### Step 1", "Run it. Each citation and each held answer shows.",
+    "## Build it", "```bash\ngit checkout checkpoint/21-citations\n```",
+    parts.add ?? "You add these files.\n\n- `src/server/citations.ts`: the check itself.",
+    "### Step 1", "Run it. Each citation and each held answer shows.",
+    "### Check your build", "```bash\nnpm run check\ngit diff --stat checkpoint/22-insights\n```",
     "## Prove it", "Cases.",
     "## Stuck points", "None.",
     "## What to watch for", "Drift.",
@@ -41,6 +44,15 @@ test("the shape check fails a missing heading, a wrong order and a product in Th
   assert.match(shapeProblems(FILE, swapped).join("\n"), /out of order/);
   assert.match(shapeProblems(FILE, lesson({ problem: "Langfuse shows the trace." })).join("\n"), /"The problem" names Langfuse/);
   assert.match(shapeProblems(FILE, lesson().replace("# Check every citation", "# Check citations in Langfuse")).join("\n"), /names Langfuse/);
+});
+
+test("a build page fails when its tag already holds a file it says you add, or the end of the build is missing", () => {
+  const already = lesson({ add: "You add these files.\n\n- `src/server/auth.ts`: the sign-in." });
+  assert.match(shapeProblems(FILE, already).join("\n"), /tag 21 already holds src\/server\/auth.ts/);
+  assert.match(shapeProblems(FILE, lesson({ add: "You add these files.\n\n- `src/server/not-a-file.ts`: nothing." })).join("\n"), /names src\/server\/not-a-file.ts/);
+  assert.match(shapeProblems(FILE, lesson({ add: "No list." })).join("\n"), /needs a line "You add"/);
+  assert.match(shapeProblems(FILE, lesson().replace("npm run check\n", "")).join("\n"), /run npm run check/);
+  assert.match(shapeProblems(FILE, lesson().replace(/git diff --stat \S+/, "git diff")).join("\n"), /compare with the next tag/);
 });
 
 test("a title that starts with a number fails: the file name carries it", () => {

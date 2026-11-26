@@ -105,7 +105,9 @@ npm run dataset:run -- --chapter 07 --change "..."  # the same run, plus one row
 
 ## How the checkpoints work
 
-`main` holds the finished app. Each lesson names a tag at its top. Check out that tag, make the change the lesson asks for, and check the result.
+`main` holds the finished app. Each lesson names a tag at its top. The tag is where that lesson starts. It holds what the earlier lessons built, and none of this lesson's own files.
+
+From lesson 10 on, each lesson is a build. Check out the tag and add the files the lesson lists. Run the check. Then compare with the next tag, which holds the finished lesson.
 
 `checkpoint/00-setup` and `checkpoint/01-base-app` hold the same app, with no tracing yet. Setup uses it to check keys and ports. Tracing starts in `checkpoint/02-tracing`.
 
