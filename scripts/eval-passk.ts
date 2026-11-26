@@ -16,6 +16,7 @@
  * pass^k with n runs of a case and c passes: C(c, k) / C(n, k), the chance that k runs drawn from the n
  * all passed. With n = k that is 1 when every run passed and 0 otherwise.
  */
+import { runMain } from "./run-main";
 import { execSync } from "node:child_process";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
@@ -158,4 +159,4 @@ async function main() {
   }
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await main();
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) void runMain(main, { name: "Evals measure" });

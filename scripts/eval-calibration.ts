@@ -16,6 +16,7 @@
  *   consensus          the rows where both labellers gave the same label
  *   judge agreement    the share of consensus rows where the judge's verdict equals the label
  */
+import { runMain } from "./run-main";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -211,4 +212,4 @@ function main() {
   console.log(`Wrote ${rows.length} candidates to ${path.relative(process.cwd(), LABELS_FILE)}: two people fill labeller_a and labeller_b with pass or fail.`);
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) main();
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) void runMain(main, { name: "Rubric calibration" });
