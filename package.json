@@ -45,7 +45,9 @@
     "citations:replay": "tsx scripts/citations-replay.ts",
     "demo:check": "tsx scripts/demo-turns.ts",
     "demo:open": "tsx scripts/demo-turns.ts open",
-    "search:measure": "tsx scripts/search-eval.ts"
+    "search:measure": "tsx scripts/search-eval.ts",
+    "evals:measure": "tsx scripts/eval-passk.ts",
+    "evals:candidates": "tsx scripts/eval-calibration.ts"
   },
   "dependencies": {
     "@a2a-js/sdk": "1.3.0",

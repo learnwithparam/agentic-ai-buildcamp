@@ -38,10 +38,11 @@ test("the gate is green only when every release case passes", async () => {
   assert.doesNotThrow(() => assertReleasable(green));
 
   // One release case fails, as in the lesson's red run, and the gate turns red.
-  const red = await run(RELEASE_CASES.map((id) => row(id, id !== "STALENESS-01")));
+  const failing = RELEASE_CASES[0]!;
+  const red = await run(RELEASE_CASES.map((id) => row(id, id !== failing)));
   assert.equal(red.runEvaluations[0]?.name, METRIC);
-  assert.equal(red.runEvaluations[0]?.comment, "Failed: STALENESS-01");
-  assert.throws(() => assertReleasable(red), (error) => error instanceof RegressionError && error.value === 7 / 8);
+  assert.equal(red.runEvaluations[0]?.comment, `Failed: ${failing}`);
+  assert.throws(() => assertReleasable(red), (error) => error instanceof RegressionError && error.value === (RELEASE_CASES.length - 1) / RELEASE_CASES.length);
 });
 
 test("a gate that ran fewer cases, or none, or lost its score, is red", async () => {
@@ -49,7 +50,7 @@ test("a gate that ran fewer cases, or none, or lost its score, is red", async ()
   // A provider error makes the SDK skip a case: every case that ran passed, and the gate is still red.
   assert.throws(
     () => assertReleasable({ itemResults: RELEASE_CASES.slice(1).map((id) => row(id, true)), runEvaluations: [{ name: METRIC, value: 1 }] }),
-    (error) => error instanceof RegressionError && error.message === `only 7 of 8 release cases ran, and a case that did not run is never a pass`
+    (error) => error instanceof RegressionError && error.message === `only ${RELEASE_CASES.length - 1} of ${RELEASE_CASES.length} release cases ran, and a case that did not run is never a pass`
   );
   assert.throws(() => assertReleasable({ itemResults: RELEASE_CASES.map((id) => row(id, true)), runEvaluations: [] }), RegressionError);
   // A case whose evaluator threw has no score: it fails, it does not pass.

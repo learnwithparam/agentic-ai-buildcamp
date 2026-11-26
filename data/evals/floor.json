@@ -1,0 +1,5 @@
+{
+  "about": "The frozen floor. Lowering a number here needs the same change to the target in docs/measures.md, and scripts/eval-passk.test.ts fails when the two differ.",
+  "evals.pass_rate": 0.9,
+  "evals.pass_hat_5": 0.8
+}

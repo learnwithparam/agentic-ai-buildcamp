@@ -17,8 +17,8 @@ For example, a colleague removes the bracket citations from the prompt because t
 
 ## What you build
 
-- **A gate.** `npm run release:gate` runs 8 release cases on one prompt version.
-- **A verdict.** The gate raises Langfuse's `RegressionError` unless all 8 ran and passed.
+- **A gate.** `npm run release:gate` runs one release case per slice on one prompt version.
+- **A verdict.** The gate raises Langfuse's `RegressionError` unless every release case ran and passed.
 - **A promotion.** `--label staging --promote` moves `production` only on green.
 - **A push hook.** It runs the gate when a push changes an agent, the runner or the dataset.
 
@@ -53,10 +53,10 @@ sequenceDiagram
     G->>L: Which version has staging?
     L-->>G: Version 9
     G->>A: Pin the agent to version 9
-    G->>A: Run the 8 release cases
+    G->>A: Run the release cases
     A-->>G: Answers and scores
     G->>E: Record the run
-    alt All 8 ran and passed
+    alt All ran and passed
         G->>L: Move production to version 9
     else Any case failed or did not run
         G-->>D: RegressionError, exit 1
@@ -106,20 +106,19 @@ There is no new package. `RegressionError` comes with `@langfuse/client`.
 
 ### Step 1: Read the release cases
 
-Open `scripts/release-gate.ts`. The gate does not run the whole dataset. It runs one case for each thing an earlier lesson fixed:
+Open `scripts/eval-release.ts`. The gate does not run the whole dataset. It runs one case for each slice of the dataset, picked by a rule in code:
 
-| Case | What it guards | Fixed in |
-| --- | --- | --- |
-| STALENESS-01 | the label in force, never a superseded dose | 07 |
-| NEGATIVE-01 | a use the label does not cover is declined | 07 |
-| INJECTION-01 | an instruction inside a document is text, not an order | 07 |
-| MULTITURN-01 | a follow-up keeps the patient from the turn before | 07 |
-| TENANCY-04 | a company sees its own medicine and nothing else | 11 |
-| SAFETY-01 | an adverse event goes to safety, with the record number removed | 13 |
-| FACT-01 | the fact-checker flags a claim the company never approved | 14 |
-| AUTO-01 | the sweep redrafts an answer that cites a superseded label | 17 |
+1. the case in the `holdout` split, because no prompt was tuned on it, else
+2. the case marked `showcase`, because a lesson teaches it, else
+3. the case with the lowest id.
 
-Eight cases keep the gate fast and cheap enough to run on every promotion. The full dataset still runs when you want the whole picture.
+A new slice gets a release case with no edit to the gate. `scripts/release-gate.test.ts` fails when a slice has none. To see today's list:
+
+```bash
+npx tsx -e 'import("./scripts/release-gate").then((gate) => console.log(gate.RELEASE_CASES.join("\n")))'
+```
+
+One case per slice keeps the gate fast and cheap enough to run on every promotion. The full dataset still runs when you want the whole picture.
 
 The bar is 1. A case passes only when every score the dataset run asks for passes. That is the same rule as the scoreboard.
 
@@ -137,8 +136,8 @@ npm run release:gate
 ```
 
 ```text
-Release gate: testing prompt "hcp-medinfo-agent" version 8 (label production) on 8 release cases.
-release_pass_rate: 1. All 8 release cases passed.
+Release gate: testing prompt "hcp-medinfo-agent" version 8 (label production) on 22 release cases.
+release_pass_rate: 1. All 22 release cases passed.
 Run: http://localhost:5174/project/hcp-medinfo/experiments/results?baseline=8ff6324298ac1010
 Release gate: green.
 ```
@@ -146,9 +145,9 @@ Release gate: green.
 Your version number will differ. What happens:
 
 1. The gate asks Langfuse which version carries the label, and pins the agent to that one version.
-2. It runs the 8 cases as one experiment named `Release gate`. The prompt version goes in the run's metadata.
+2. It runs the release cases as one experiment named `Release gate`. The prompt version goes in the run's metadata.
 3. The run evaluator `release_pass_rate` scores the whole run. It gives the share of cases that passed, and a comment naming the ones that did not.
-4. `assertReleasable` throws `RegressionError` when the rate is below 1. It also throws when fewer than 8 cases ran.
+4. `assertReleasable` throws `RegressionError` when the rate is below 1. It also throws when fewer cases ran than the release list holds.
 
 A pinned prompt that Langfuse cannot return is an error. The app's built-in fallback prompt is only for a doctor when Langfuse is down. A gate must never pass on a prompt it did not test.
 
@@ -205,7 +204,7 @@ npm run release:gate -- --label staging --promote
 
 ![The gate is green and production now serves the new version](../images/release-gate/03-gate-green.png)
 
-All 8 pass. The gate moves `production` onto that version and keeps its other labels.
+Every release case passes. The gate moves `production` onto that version and keeps its other labels.
 
 ![The fixed version carries production, latest and staging](../images/release-gate/01-staging-version.png)
 
@@ -281,11 +280,11 @@ The tests make no model call:
 npx tsx --test scripts/release-gate.test.ts
 ```
 
-- **8 of 8 passed** is green.
-- **7 of 8 passed, fewer than 8 ran, or a lost score** is red.
+- **Every release case ran and passed** is green.
+- **One failed, one did not run, or a score is lost** is red.
 - **The hook** reads branch pushes and skips tags.
 
-Break it on purpose. Remove one case from `RELEASE_CASES`. The test that every release case is in the dataset, and that 8 cases run, fails.
+Break it on purpose. Make `pickReleaseCases` in `scripts/eval-release.ts` skip a slice. The test that every slice has a release case fails.
 
 ## Stuck points
 
@@ -293,7 +292,7 @@ In a correct run, `npm run release:gate` is green on your production prompt. The
 
 | What you see | Why | What to do |
 | --- | --- | --- |
-| Red, saying only 7 of 8 release cases ran | A provider error skipped one case | Run it again |
+| Red, saying only one fewer release case ran than the list holds | A provider error skipped one case | Run it again |
 | Green on a bad prompt | No case checks what changed | Add a case, as in Step 10 |
 | No Linked Generations rows | The environment filter hides gate runs | Tick `sdk-experiment` under **Environment** |
 | The hook does not run | `prepare` did not run | Run `npm install` again |
@@ -313,15 +312,18 @@ In a correct run, `npm run release:gate` is green on your production prompt. The
 
 How to read it:
 
-- **8/8, one case per column.** Each column is one thing an earlier lesson fixed. The row is the green run of the fixed version, the one that was promoted.
+- **8/8, one case per column.** This row is from the first gate, which ran 8 hand-picked cases. Each column is one thing an earlier lesson fixed. The row is the green run of the fixed version, the one that was promoted.
 - **The red run has no row.** Its numbers are in step 4 and in Langfuse. With `--chapter`, a red run still writes a row before the verdict. So a failure is on the scoreboard too.
-- **One run went red for another reason.** A provider error skipped one case, so only 7 of 8 ran. Every case that ran passed, and the gate was still red. A case that did not run is never a pass. Run it again.
+- **One run went red for another reason.** A provider error skipped one case. So one fewer than the list ran. Every case that ran passed, and the gate was still red. A case that did not run is never a pass. Run it again.
 
 The full row is in [docs/scoreboard.md](../scoreboard.md).
 
 ## Where to go next
 
-- Try the homework. Add a ninth release case for lesson 16: EVENT-06, the duplicate event handled once. Add it to `RELEASE_CASES`. Update the test that every release case is in the dataset, then run the gate.
+- Try the homework. Change what the rule in `scripts/eval-release.ts` picks. For example, prefer `showcase` over `holdout`. Read which tests fail, then undo it.
+- Run the gate on a broken prompt with `npm run release:gate -- --sabotage`. It removes the citation rule and every defer rule. It saves the result under the label `sabotage` and runs the release cases on it. It must come out red and exit 1. If it stays green it exits 3, because that gate cannot see what the prompt is for.
+- Measure the gate with `npm run evals:measure`. It runs the demo set five times and counts a case only if it passed all five (pass^5). It also runs the sabotage and writes `docs/runs/evals.json`. Add `--fake` to run it with no model.
+- Build the rubric judge's labelling file with `npm run evals:candidates`. Two people fill in the pass or fail columns. The judge's agreement with them is the last number in that file.
 - Decide whether `src/client/` belongs in `GATED_PATHS`. Write down what could break in the web client. Say which of those the cases would catch.
 - Read [Langfuse experiments in CI/CD](https://langfuse.com/docs/evaluation/experiments/experiments-ci-cd), [prompt version control and labels](https://langfuse.com/docs/prompt-management/features/prompt-version-control) and [git hooks: pre-push](https://git-scm.com/docs/githooks#_pre_push).
 - Lesson 19 starts from this checkpoint.

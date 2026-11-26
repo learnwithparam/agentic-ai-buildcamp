@@ -28,12 +28,16 @@ export type CaseInput = {
   role?: "analyst" | "doctor";
 };
 
-// The dataset repo's exact checks on the answer text. llm-rubric checks are left out:
-// the faithfulness judge (scripts/judge/faithfulness.ts) covers the slices that need one.
+// The dataset repo's exact checks on the answer text, and its llm-rubric asserts, which the
+// rubric judge (scripts/judge/rubric.ts) scores. These five are every assert type the cases may use.
+// Any other type stops the load with its file, case and type, so no check is dropped unseen
+// (scripts/eval-asserts.test.ts walks every file).
 export type TextCheck = { type: "contains" | "not-contains" | "regex" | "not-regex"; value: string };
 const TEXT_CHECKS = new Set<string>(["contains", "not-contains", "regex", "not-regex"]);
+export const RUBRIC_ASSERT = "llm-rubric";
+export const HANDLED_ASSERTS: readonly string[] = [...TEXT_CHECKS, RUBRIC_ASSERT];
 
-export type CaseExpectation = { idealAnswer: string; expectedBehavior: Behavior; checks: TextCheck[] };
+export type CaseExpectation = { idealAnswer: string; expectedBehavior: Behavior; checks: TextCheck[]; rubrics: string[] };
 
 export const AGENTS = ["medinfo", "fact-check", "outreach", "a2a", "events", "autonomy", "insights"] as const;
 export type AgentName = (typeof AGENTS)[number];
@@ -54,7 +58,7 @@ type RawCase = {
   metadata: { slice: string; chapter: string; riskTier: string; split: string; expectedBehavior: Behavior; showcase?: string; idealAnswer?: string };
 };
 
-const EVALS = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../data/hcp/evals");
+export const EVALS_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../data/hcp/evals");
 
 export function loadMedinfoCases(): CaseItem[] {
   return loadCases("medinfo");
@@ -62,11 +66,11 @@ export function loadMedinfoCases(): CaseItem[] {
 
 // Every case of every agent, in the order the scoreboard lists their slices.
 export function loadAllCases(): CaseItem[] {
-  return AGENTS.flatMap(loadCases);
+  return AGENTS.flatMap((agent) => loadCases(agent));
 }
 
-export function loadCases(agent: AgentName): CaseItem[] {
-  const config = parse(readFileSync(path.join(EVALS, `${agent}.yaml`), "utf8")) as {
+export function loadCases(agent: AgentName, dir = EVALS_DIR): CaseItem[] {
+  const config = parse(readFileSync(path.join(dir, `${agent}.yaml`), "utf8")) as {
     defaultTest: { vars: Record<string, string>; assert?: RawAssert[] };
     tests: RawCase[];
   };
@@ -75,6 +79,11 @@ export function loadCases(agent: AgentName): CaseItem[] {
     if (!caseId) throw new Error(`A case has no [ID]: ${test.description}`);
     const vars = { ...config.defaultTest.vars, ...test.vars };
     const { expectedBehavior, idealAnswer, ...tags } = test.metadata;
+    const asserts = [...(config.defaultTest.assert ?? []), ...(test.assert ?? [])];
+    const unhandled = asserts.filter((check) => !HANDLED_ASSERTS.includes(check.type));
+    if (unhandled.length) {
+      throw new Error(`${agent}.yaml, ${caseId}: no runner handles the assert type ${[...new Set(unhandled.map((check) => check.type))].join(", ")}. Handled: ${HANDLED_ASSERTS.join(", ")}.`);
+    }
     return {
       id: `hcp-${caseId.toLowerCase()}`,
       input: {
@@ -94,9 +103,8 @@ export function loadCases(agent: AgentName): CaseItem[] {
         // The two content agents' cases have no ideal answer: their codes and citations are the answer.
         idealAnswer: idealAnswer ?? "",
         expectedBehavior,
-        checks: [...(config.defaultTest.assert ?? []), ...(test.assert ?? [])].filter((check): check is TextCheck =>
-          TEXT_CHECKS.has(check.type)
-        )
+        checks: asserts.filter((check): check is TextCheck => TEXT_CHECKS.has(check.type)),
+        rubrics: asserts.filter((check) => check.type === RUBRIC_ASSERT).map((check) => check.value)
       },
       metadata: { caseId, agent, ...tags }
     };

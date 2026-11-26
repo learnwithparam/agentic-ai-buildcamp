@@ -151,7 +151,11 @@ AUTO_FILES="docs/scoreboard.md infra/openfga/model.fga infra/openfga/model.fga.y
 # Lesson 18 adds the release gate and its pre-push hook, and moves the case runner into
 # scripts/experiment.ts; the files it changes and adds (GATE_FILES) stay as they were on tags before it.
 GATE_FILES=".githooks/pre-push docs/scoreboard.md package.json scripts/experiment.ts scripts/release-gate.test.ts
-  scripts/release-gate.ts scripts/run-dataset.ts src/server/medinfo-agent.ts"
+  scripts/release-gate.ts scripts/run-dataset.ts src/server/medinfo-agent.ts
+  data/evals/floor.json data/calibration/rubric-labels.tsv scripts/judge/rubric.ts scripts/eval-agents.ts
+  scripts/eval-asserts.ts scripts/eval-asserts.test.ts scripts/eval-calibration.ts scripts/eval-calibration.test.ts
+  scripts/eval-passk.ts scripts/eval-passk.test.ts scripts/eval-release.ts scripts/eval-release.test.ts
+  scripts/eval-sabotage.ts scripts/eval-sabotage.test.ts scripts/eval-scripted.ts"
 # Lesson 19 adds the medinfo CLI, its Keycloak client and the route that says where to sign in; the
 # files it changes and adds (CLI_FILES) stay as they were on tags before it, so lesson 18 has no CLI.
 CLI_FILES="package.json package-lock.json scripts/identity-setup.ts src/server/auth.ts src/server/auth.test.ts

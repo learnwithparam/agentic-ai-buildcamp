@@ -8,7 +8,8 @@
  *     push changes the agent, the runner or the dataset. Docs and the web client skip it.
  *
  * A failed case raises Langfuse's RegressionError, so the command exits 1 and nothing moves.
- * The release cases are the ones every lesson since 07 keeps green: one per thing a change can break.
+ * The release cases are one per slice of the dataset (scripts/eval-release.ts).
+ * `--sabotage` runs them on a prompt with the citation and defer rules removed and must come out red.
  */
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
@@ -17,18 +18,14 @@ import { RegressionError, type Evaluation, type RunEvaluator } from "@langfuse/c
 import { env } from "../src/server/env";
 import { usePromptVersion } from "../src/server/medinfo-agent";
 import { failedScores, flag, reportCases, startExperiment, type CaseRow } from "./experiment";
+import { releaseCaseIds } from "./eval-release";
+import { SABOTAGE_EXIT, SABOTAGE_LABEL, sabotage, sabotageCaught } from "./eval-sabotage";
 import { appendScoreboardRow, LEARNER_SCOREBOARD_FILE, SCOREBOARD_FILE, scoreboardRow } from "./scoreboard";
 
-export const RELEASE_CASES = [
-  "STALENESS-01", // the label in force, never a superseded dose (lesson 07)
-  "NEGATIVE-01", // a use the label does not cover is declined (lesson 07)
-  "INJECTION-01", // an instruction inside a document is text, not an order (lesson 07)
-  "MULTITURN-01", // a follow-up keeps the patient from the turn before (lesson 07)
-  "TENANCY-04", // a company sees its own medicine and nothing else (lesson 11)
-  "SAFETY-01", // an adverse event goes to safety, with the record number removed (lesson 13)
-  "FACT-01", // the fact-checker flags a claim the company never approved (lesson 14)
-  "AUTO-01" // the sweep redrafts an answer that cites a superseded label (lesson 17)
-];
+// One case per slice, picked by the rule in scripts/eval-release.ts (holdout first), so a new slice
+// is covered with no edit here. The cases the lessons named, one per thing a change can break, are
+// in it because their slices are.
+export const RELEASE_CASES = releaseCaseIds();
 
 export const METRIC = "release_pass_rate";
 export const THRESHOLD = 1;
@@ -79,6 +76,20 @@ export function assertReleasable<T extends { itemResults: unknown[]; runEvaluati
   if (message) throw new RegressionError({ result: result as never, metric: METRIC, value, threshold: THRESHOLD, message });
 }
 
+type Experiment = Awaited<ReturnType<typeof startExperiment>>;
+
+// The release cases on one prompt version, scored with the release run evaluator.
+export function runReleaseCases(experiment: Experiment, prompt: { name: string; version: number }, label: string) {
+  return experiment.run({
+    items: experiment.itemsFor(RELEASE_CASES),
+    name: "Release gate",
+    runName: `release-gate-${label}-v${prompt.version}-${new Date().toISOString()}`,
+    description: `The release cases on prompt version ${prompt.version} (label ${label})`,
+    metadata: { promptName: prompt.name, promptVersion: prompt.version, promptLabel: label },
+    runEvaluators: [releasePassRate]
+  });
+}
+
 function changedFiles(stdin: string) {
   const git = (...args: string[]) => execFileSync("git", args, { encoding: "utf8" }).trim();
   const ranges = pushedRanges(stdin, (sha) => git("merge-base", sha, "origin/main"));
@@ -106,24 +117,26 @@ async function main() {
 
   const label = flag("--label") ?? "production";
   const promote = process.argv.includes("--promote");
+  const sabotaged = process.argv.includes("--sabotage");
+  if (sabotaged && promote) throw new Error("--sabotage tests a broken prompt on purpose and never promotes it.");
   if (promote && label === "production") throw new Error("--promote moves production onto another label's version; name that label with --label.");
 
   const experiment = await startExperiment();
   try {
     // The label becomes one version here, and the agent is pinned to it, so the run tests exactly
     // the version a promotion would ship, even if someone moves the label mid-run.
-    const prompt = await experiment.langfuse.prompt.get(env.langfusePromptName, { label, cacheTtlSeconds: 0 });
+    let prompt = await experiment.langfuse.prompt.get(env.langfusePromptName, { label, cacheTtlSeconds: 0 });
+    if (sabotaged) {
+      // A new version under its own label: production and staging keep their versions.
+      const broken = sabotage(prompt.prompt as string);
+      console.log(`Sabotage: removed ${broken.droppedCitation.length} citation line(s) and ${broken.droppedDefer.length} defer rule(s) from version ${prompt.version} (label ${label}).`);
+      await experiment.langfuse.prompt.create({ name: prompt.name, type: "text", prompt: broken.prompt, labels: [SABOTAGE_LABEL] });
+      prompt = await experiment.langfuse.prompt.get(env.langfusePromptName, { label: SABOTAGE_LABEL, cacheTtlSeconds: 0 });
+    }
     usePromptVersion(prompt.version);
     console.log(`Release gate: testing prompt "${prompt.name}" version ${prompt.version} (label ${label}) on ${RELEASE_CASES.length} release cases.`);
 
-    const result = await experiment.run({
-      items: experiment.itemsFor(RELEASE_CASES),
-      name: "Release gate",
-      runName: `release-gate-${label}-v${prompt.version}-${new Date().toISOString()}`,
-      description: `The release cases on prompt version ${prompt.version} (label ${label})`,
-      metadata: { promptName: prompt.name, promptVersion: prompt.version, promptLabel: label },
-      runEvaluators: [releasePassRate]
-    });
+    const result = await runReleaseCases(experiment, prompt, label);
     const cases = reportCases(result.itemResults);
     const rate = result.runEvaluations.find((evaluation) => evaluation.name === METRIC);
     console.log(`${METRIC}: ${rate?.value ?? "none"}. ${rate?.comment ?? ""}`);
@@ -137,6 +150,12 @@ async function main() {
       console.log(`Row added to ${path.relative(process.cwd(), file)}.`);
     }
 
+    if (sabotaged) {
+      const caught = sabotageCaught(() => assertReleasable(result));
+      console.error(caught ? "Release gate: red on the sabotaged prompt, as it must be." : "Release gate: GREEN on a prompt with no citation rule and no defer rules. The gate cannot see what the prompt is for.");
+      process.exitCode = caught ? SABOTAGE_EXIT.caught : SABOTAGE_EXIT.missed;
+      return;
+    }
     assertReleasable(result);
     // The cases prove the agent's answers. The real-model proofs prove what the code around the
     // model does with them (npm run check:live), so a release needs both.
