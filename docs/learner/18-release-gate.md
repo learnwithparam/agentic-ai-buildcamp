@@ -248,6 +248,12 @@ A push of docs or the web client is skipped. The hook says no agent, runner or d
 
 GitHub's runners cannot reach the Langfuse on your laptop, so the gate runs at push, not in CI. If CI could reach Langfuse, the same command would be the CI step. The exit code is the check.
 
+Before a release, walk every checkpoint the way a learner meets it. Each tag gets its own worktree, and the run writes a row to `docs/checkpoint-walk.md`:
+
+```bash
+npm run walk -- --all
+```
+
 ### Step 10: Learn from the first idea that failed
 
 Before the citation change, we tried the obvious bad edit. We added one line to the prompt that gives the old dose:

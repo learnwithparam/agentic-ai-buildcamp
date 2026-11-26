@@ -15,9 +15,10 @@
 // only in tokens.css, and every CSS class is used by a component. The data/hcp copy matches its lock,
 // and docs/coverage.md maps every case in it to a promise.
 import { execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { basename, posix } from "node:path";
 import { fileURLToPath } from "node:url";
+import { checkWalk, syncTags, WALK_FILE } from "./checkpoints-walk";
 import { checkMeasures } from "./measures";
 import { checkScoreboard } from "./scoreboard";
 import { verifyDatasetCopy } from "./sync-dataset";
@@ -211,17 +212,37 @@ function coverageProblems(files: Map<string, string>): string[] {
   return problems;
 }
 
+// Every tag the sync script publishes has a row in docs/checkpoint-walk.md at the tag's commit.
+// The sync's own `npm run check` runs on a checked-out tag, whose commit is new by then, so a tag
+// checkout skips this: the walk is checked from main.
+function walkProblems(release: boolean): string[] {
+  const git = (...args: string[]) => {
+    try {
+      return execFileSync("git", args, { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+    } catch {
+      return undefined;
+    }
+  };
+  if (git("describe", "--exact-match", "--tags", "HEAD")?.startsWith("checkpoint/")) return [];
+  return checkWalk({
+    text: existsSync(WALK_FILE) ? readFileSync(WALK_FILE, "utf8") : undefined,
+    tags: syncTags(readFileSync("scripts/sync-checkpoints.sh", "utf8")),
+    commitOf: (tag) => git("rev-parse", "--verify", "--quiet", `${tag}^{commit}`) || undefined,
+    release,
+  });
+}
+
 function main() {
   const tracked = execFileSync("git", ["ls-files"], { encoding: "utf8" }).split("\n").filter(Boolean);
   const files = new Map(
     tracked.filter((path) => (TEXT.test(path) || path === NODE_PIN) && path !== "package-lock.json").map((path) => [path, readFileSync(path, "utf8")]),
   );
-  const problems = [...findProblems(files, tracked), ...verifyDatasetCopy(), ...checkScoreboard(), ...checkMeasures()];
+  const problems = [...findProblems(files, tracked), ...verifyDatasetCopy(), ...checkScoreboard(), ...checkMeasures(), ...walkProblems(process.argv.includes("--release"))];
   if (problems.length > 0) {
     console.error(problems.join("\n"));
     process.exit(1);
   }
-  console.log("check-repo: every watched file and npm script is in use, every named path exists, every dependency is pinned, the chat app is clean, data/hcp matches its lock, docs/scoreboard.md has one cell per slice, every measured row in docs/measures.md matches its run");
+  console.log("check-repo: every watched file and npm script is in use, every named path exists, every dependency is pinned, the chat app is clean, data/hcp matches its lock, docs/scoreboard.md has one cell per slice, every measured row in docs/measures.md matches its run, every checkpoint tag has a fresh row in docs/checkpoint-walk.md");
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) main();
