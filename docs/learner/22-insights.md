@@ -246,7 +246,7 @@ npm run dataset:run -- --chapter 22 --cases INSIGHTS-01,INSIGHTS-02,INSIGHTS-03,
 
 | Chapter | Change | Passed | insights |
 | --- | --- | --- | --- |
-| 22 | Insights over sales data: one login per company, a row rule, a query check | 4/7 | 4/7 |
+| 22 | Insights over sales data: one login per company, a row rule, a query check | 4/7 | 4/7 | <!-- from-row: docs/runs/scoreboard-22.json -->
 
 The full row is in `docs/scoreboard.md`. How to read it:
 

@@ -1,0 +1,37 @@
+{
+  "chapter": "15",
+  "change": "Agents hand work over A2A, with tasks that wait for a human",
+  "passed": 11,
+  "total": 11,
+  "slices": {
+    "staleness": {
+      "passed": 1,
+      "total": 1
+    },
+    "off-label": {
+      "passed": 1,
+      "total": 1
+    },
+    "injection": {
+      "passed": 1,
+      "total": 1
+    },
+    "multi-turn": {
+      "passed": 1,
+      "total": 1
+    },
+    "fact-check": {
+      "passed": 1,
+      "total": 1
+    },
+    "outreach": {
+      "passed": 1,
+      "total": 1
+    },
+    "a2a": {
+      "passed": 5,
+      "total": 5
+    }
+  },
+  "run": "http://localhost:5174/project/hcp-medinfo/experiments/results?baseline=a520199bda043a9f"
+}

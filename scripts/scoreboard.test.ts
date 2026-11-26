@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { test } from "node:test";
 import { failedChecks, loadAllCases, loadMedinfoCases } from "./hcp-cases";
-import { appendScoreboardRow, checkScoreboard, headerRow, LEARNER_SCOREBOARD_FILE, SCOREBOARD_FILE, scoreboardRow, slices } from "./scoreboard";
+import { appendScoreboardRow, buildScoreboard, checkScoreboard, headerRow, LEARNER_SCOREBOARD_FILE, loadRuns, runRow, SCOREBOARD_FILE, scoreboardRow, slices, writeRunFile } from "./scoreboard";
 
 test("text checks read bold doses and spaced units the way the dataset writes them", () => {
   const checks = [
@@ -84,4 +84,21 @@ test("every --cases id a lesson page names is a case in the dataset", () => {
     }
   }
   assert.ok(lists > 0, "no lesson page names a --cases list; the pattern no longer matches");
+});
+
+test("the scoreboard is built from the run files, one row each, and the file on disk is that build", () => {
+  const run = { chapter: "06", change: "First", passed: 1, total: 2, slices: { [slices()[0]]: { passed: 1, total: 2 } }, run: "http://run" };
+  const built = buildScoreboard([run]);
+  assert.deepEqual(checkScoreboard(built), []);
+  assert.match(built, /\| 06 \| First \| 1\/2 \| 1\/2 \| -/);
+  assert.equal(buildScoreboard(loadRuns()), readFileSync(SCOREBOARD_FILE, "utf8"), "run npm run scoreboard");
+});
+
+test("a row is written as a run file that rebuilds into the same row", () => {
+  const dir = mkdtempSync(path.join(tmpdir(), "runs-"));
+  const cases = [{ slice: slices()[0], passed: true }, { slice: slices()[0], passed: false }];
+  const file = writeRunFile("06", "First", cases, "http://run", dir);
+  const [run] = loadRuns(dir);
+  assert.equal(path.basename(file), "scoreboard-06.json");
+  assert.equal(runRow(run), scoreboardRow("06", "First", cases, "http://run"));
 });

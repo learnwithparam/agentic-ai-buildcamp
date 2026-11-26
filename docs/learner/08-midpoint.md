@@ -7,7 +7,7 @@ description: "Read the 06 and 07 rows slice by slice, name the lesson that fixes
 
 ## The problem
 
-A team ran the desk once and got 5 of 28. They changed the prompt and got 22 of 28. The manager asks, "What do we do about the other six?" Nobody can say. Some need sign-in, and some may be a new bug.
+A team ran the desk once and got 5<!-- from: docs/runs/scoreboard-06.json#passed --> of 28<!-- from: docs/runs/scoreboard-06.json#total -->. They changed the prompt and got 22<!-- from: docs/runs/scoreboard-07.json#passed --> of 28<!-- from: docs/runs/scoreboard-07.json#total -->. The manager asks, "What do we do about the other six?" Nobody can say. Some need sign-in, and some may be a new bug.
 
 The team has five tools by now, and each has its own screen. They have no single story that joins them, so the next change is a guess. For example, they might tune the prompt for a week. It cannot fix four country cases.
 
@@ -48,7 +48,7 @@ sequenceDiagram
     participant C as Case file
     participant L as Compare view
     E->>S: Read rows 06 and 07
-    S-->>E: Country 0 of 4 in both rows
+    S-->>E: Country fails in both rows
     E->>C: Look up the chapter of a country case
     C-->>E: Chapter 11
     alt the slice went up
@@ -198,10 +198,10 @@ When we ran lesson 07, the rows were these. They are also in [docs/scoreboard.md
 
 | Chapter | Change | Passed |
 | --- | --- | --- |
-| 06 | The agent as lesson 03 left it | 5/28 |
-| 07 | The error-analysis prompt | 22/28 |
+| 06 | The agent as lesson 03 left it | 5/28 | <!-- from-row: docs/runs/scoreboard-06.json -->
+| 07 | The error-analysis prompt | 22/28 | <!-- from-row: docs/runs/scoreboard-07.json -->
 
-Read them like this. The prompt took the desk from 5 to 22. The six that fail are chapter 11 cases. So the next lessons add code, not prompt text.
+Read them like this. The prompt took the desk from 5<!-- from: docs/runs/scoreboard-06.json#passed --> to 22<!-- from: docs/runs/scoreboard-07.json#passed -->. The six that fail are chapter 11 cases. So the next lessons add code, not prompt text.
 
 ## Where to go next
 

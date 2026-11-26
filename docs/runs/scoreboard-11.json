@@ -1,0 +1,33 @@
+{
+  "chapter": "11",
+  "change": "Sign-in with Keycloak, permissions from OpenFGA",
+  "passed": 12,
+  "total": 12,
+  "slices": {
+    "staleness": {
+      "passed": 1,
+      "total": 1
+    },
+    "off-label": {
+      "passed": 1,
+      "total": 1
+    },
+    "tenancy": {
+      "passed": 4,
+      "total": 4
+    },
+    "country": {
+      "passed": 4,
+      "total": 4
+    },
+    "injection": {
+      "passed": 1,
+      "total": 1
+    },
+    "multi-turn": {
+      "passed": 1,
+      "total": 1
+    }
+  },
+  "run": "http://localhost:5174/project/hcp-medinfo/experiments/results?baseline=8b7fdd68f041f6d2"
+}

@@ -346,12 +346,12 @@ In a correct run, Priya's German draft shows one sentence approved and one flagg
 
 | Chapter | Change | Passed | staleness | off-label | injection | multi-turn | fact-check | outreach |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 14 | Fact-checker and outreach planner on the same door, identity and inbox | 15/16 | 1/1 | 1/1 | 1/1 | 1/1 | 5/6 | 6/6 |
+| 14 | Fact-checker and outreach planner on the same door, identity and inbox | 15/16 | 1/1 | 1/1 | 1/1 | 1/1 | 5/6 | 6/6 | <!-- from-row: docs/runs/scoreboard-14.json -->
 
 How to read it:
 
-- **outreach 6/6.** The duplicate is held and the opt-out gets no email. The German doctor gets German claims. Pharma A cannot see a Pharma B doctor, and the sample waits for a rep.
-- **fact-check 5/6.** Every verdict is right, including FACT-06, where Pharma B has no approved claims. FACT-06 passes its text checks but fails the behavior check. The case expects the answer kind "reply". The judge read the report as "defer". Both fit, and the case stays as the dataset wrote it.
+- **outreach passes in full.** The duplicate is held and the opt-out gets no email. The German doctor gets German claims. Pharma A cannot see a Pharma B doctor, and the sample waits for a rep.
+- **fact-check misses one case.** Every verdict is right, including FACT-06, where Pharma B has no approved claims. FACT-06 passes its text checks but fails the behavior check. The case expects the answer kind "reply". The judge read the report as "defer". Both fit, and the case stays as the dataset wrote it.
 - **The guard set held.** Staleness, off-label, injection and multi-turn pass as before. Nothing the desk does changed.
 
 The full row is in [docs/scoreboard.md](../scoreboard.md).

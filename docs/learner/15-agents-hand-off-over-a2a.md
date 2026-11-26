@@ -319,11 +319,11 @@ In a correct run, each card path returns the card with no token. A `POST` with n
 
 | Chapter | Change | Passed | staleness | off-label | injection | multi-turn | fact-check | outreach | a2a |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 15 | Agents hand work over A2A, with tasks that wait for a human | 11/11 | 1/1 | 1/1 | 1/1 | 1/1 | 1/1 | 1/1 | 5/5 |
+| 15 | Agents hand work over A2A, with tasks that wait for a human | 11/11 | 1/1 | 1/1 | 1/1 | 1/1 | 1/1 | 1/1 | 5/5 | <!-- from-row: docs/runs/scoreboard-15.json -->
 
 How to read it:
 
-- **a2a 5/5.** The clean draft cites C-02 and still needs review. The unapproved claim waits for input. The German email gets the German claim C-03 and not the US dose. The outreach question goes to the planner and waits for a rep. A Pharma B caller is rejected.
+- **a2a passes in full.** The clean draft cites C-02 and still needs review. The unapproved claim waits for input. The German email gets the German claim C-03 and not the US dose. The outreach question goes to the planner and waits for a rep. A Pharma B caller is rejected.
 - **A2A-03 passed without a revision turn.** The drafter now reads the approved claims for the country first. So its German draft used C-03 on the first try. A test in `a2a.test.ts` still forces a flagged draft. It checks the draft is revised once and goes to review.
 - **The guard set and lesson 14 held.** Staleness, off-label, injection, multi-turn, FACT-01 and OUTREACH-01 pass as before. Moving the agents behind A2A changed how they are called, not what they decide.
 

@@ -1,0 +1,37 @@
+{
+  "chapter": "21",
+  "change": "Every answer's citations are checked against the search before it is sent",
+  "passed": 11,
+  "total": 11,
+  "slices": {
+    "staleness": {
+      "passed": 3,
+      "total": 3
+    },
+    "footnote": {
+      "passed": 1,
+      "total": 1
+    },
+    "tenancy": {
+      "passed": 1,
+      "total": 1
+    },
+    "guardrail": {
+      "passed": 1,
+      "total": 1
+    },
+    "multi-turn": {
+      "passed": 1,
+      "total": 1
+    },
+    "review": {
+      "passed": 1,
+      "total": 1
+    },
+    "rag": {
+      "passed": 3,
+      "total": 3
+    }
+  },
+  "run": "http://localhost:5174/project/hcp-medinfo/experiments/results?baseline=4446b2092558f8b9"
+}

@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 import { sinceTime } from "../judge-calibrate";
 import { readSet, setProblems } from "../seed-faithfulness-calibration";
-import { CALIBRATION_FILE, calibrationProblems, cohenKappa, confusion, readCalibration, type Pair } from "./faithfulness";
+import { CALIBRATION_FILE, calibrationProblems, cohenKappa, confusion, KAPPA_BAR, readCalibration, type Pair } from "./faithfulness";
 
 const pairs = (rows: [boolean, boolean][]): Pair[] => rows.map(([human, judge]) => ({ human, judge }));
 
@@ -46,4 +46,10 @@ test("--since picks the window of the newest batch, and rejects anything else", 
   assert.equal(sinceTime("1d", now).toISOString(), "2026-11-23T12:00:00.000Z");
   assert.equal(sinceTime(undefined, now).getUTCFullYear(), 2020);
   assert.throws(() => sinceTime("15 minutes", now), /--since takes a number/);
+});
+
+test("docs/runs/faithfulness.json, which lesson 09 quotes, is the stored calibration's own numbers", () => {
+  const { items } = readCalibration();
+  const run = JSON.parse(readFileSync("docs/runs/faithfulness.json", "utf8"));
+  assert.deepEqual(run, { answers: items.length, agreed: items.filter((item) => item.human === item.judge).length, kappa: cohenKappa(items), bar: KAPPA_BAR });
 });

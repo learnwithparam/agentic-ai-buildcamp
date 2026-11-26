@@ -6,14 +6,15 @@
  *   npm run dataset:run
  *   npm run dataset:run -- --cases POSITIVE-04,REVIEW-01   (only these cases, to try a change cheaply)
  *   npm run dataset:run -- --chapter 06 --change "Naive agent"   (also adds a row to my-scoreboard.md)
- *   add --reference to write the row to docs/scoreboard.md instead (maintainers, for the rows the lessons quote)
+ *   add --reference to save the run to docs/runs and rebuild docs/scoreboard.md instead (maintainers, for the rows the lessons quote)
  *   npm run dataset:run -- --label staging --cases POSITIVE-02   (pin the agent to the version that label names)
  */
+import { writeFileSync } from "node:fs";
 import path from "node:path";
 import { env } from "../src/server/env";
 import { usePromptVersion } from "../src/server/medinfo-agent";
 import { flag, reportCases, startExperiment } from "./experiment";
-import { appendScoreboardRow, LEARNER_SCOREBOARD_FILE, SCOREBOARD_FILE, scoreboardRow } from "./scoreboard";
+import { appendScoreboardRow, buildScoreboard, LEARNER_SCOREBOARD_FILE, loadRuns, SCOREBOARD_FILE, scoreboardRow, writeRunFile } from "./scoreboard";
 
 async function main() {
   const experiment = await startExperiment();
@@ -44,10 +45,16 @@ async function main() {
     const chapter = flag("--chapter");
     if (chapter) {
       const row = scoreboardRow(chapter, flag("--change") ?? "", cases, result.datasetRunUrl ?? "");
-      const file = process.argv.includes("--reference") ? SCOREBOARD_FILE : LEARNER_SCOREBOARD_FILE;
-      appendScoreboardRow(row, file);
       console.log(row);
-      console.log(`Row added to ${path.relative(process.cwd(), file)}.`);
+      if (process.argv.includes("--reference")) {
+        // A reference row is a run file; docs/scoreboard.md is rebuilt from the run files.
+        const runFile = writeRunFile(chapter, flag("--change") ?? "", cases, result.datasetRunUrl ?? "");
+        writeFileSync(SCOREBOARD_FILE, buildScoreboard(loadRuns()));
+        console.log(`Run saved to ${path.relative(process.cwd(), runFile)}, docs/scoreboard.md rebuilt.`);
+      } else {
+        appendScoreboardRow(row, LEARNER_SCOREBOARD_FILE);
+        console.log(`Row added to ${path.relative(process.cwd(), LEARNER_SCOREBOARD_FILE)}.`);
+      }
     }
   } finally {
     await experiment.close();

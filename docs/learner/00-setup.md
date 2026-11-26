@@ -224,7 +224,7 @@ For anything else, run `npm run doctor`. It names each problem and links its fix
 
 This lesson has no scoreboard row, because no test case runs yet. The proof is what you see. The chat loads, the first question shows two tool cards, and the answer cites a label.
 
-The first scoreboard row comes in lesson 06. It scores the agent on 28 cases.
+The first scoreboard row comes in lesson 06. It scores the agent on the cases in the dataset.
 
 ## Where to go next
 
