@@ -127,7 +127,8 @@ EVENT_FILES="docs/scoreboard.md package-lock.json package.json scripts/events-ru
   src/client/App.tsx src/client/chat/api.ts src/client/content/Events.tsx src/server/a2a/a2a.test.ts
   src/server/app.ts src/server/content/records.ts src/server/events/events.test.ts src/server/events/events.ts
   src/server/events/handlers.ts src/server/events/send.ts src/server/events/store.ts src/server/events/webhook.ts
-  src/server/graph.ts src/server/inbox.test.ts src/server/index.ts src/server/labels.ts src/server/medinfo-agent.ts
+  src/server/graph.ts src/server/inbox.test.ts src/server/index.ts src/server/labels.ts src/server/labels.test.ts
+  src/server/medinfo-agent.ts
   src/server/migrations/006_events.sql src/server/reviews.ts src/server/routes.ts src/server/test-desk.ts
   src/server/tools.ts src/server/trace-identity.test.ts src/server/users.ts"
 # Lesson 17 adds the nightly sweep with its budget and kill switch; the files it changes and adds
