@@ -1,5 +1,5 @@
 /**
- * npm run evals:measure: the numbers the Evals rows of docs/measures.md need, in docs/runs/evals.json.
+ * npm run evals:measure: the numbers the Evals rows of docs/measures.md need, in evals.json under docs/runs.
  *
  *   pass_rate        share of case runs that passed, overall and per slice (the frozen floor)
  *   pass_hat_5       pass^5 (Groundhog): a case counts only if it passed on every one of 5 runs
@@ -26,7 +26,7 @@ import { loadAllCases } from "./hcp-cases";
 
 export const K = 5;
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-export const RUN_FILE = path.join(ROOT, "docs/runs/evals.json");
+export const RUN_FILE = path.join(ROOT, "docs/runs", "evals.json");
 export const FLOOR_FILE = path.join(ROOT, "data/evals/floor.json");
 
 export type CaseRun = { caseId: string; passed: boolean };
