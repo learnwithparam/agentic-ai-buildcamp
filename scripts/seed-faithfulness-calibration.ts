@@ -32,6 +32,7 @@ import { LangfuseSpanProcessor } from "@langfuse/otel";
 import { startObservation } from "@langfuse/tracing";
 import { env } from "../src/server/env";
 import { SCORE_NAME } from "./judge/faithfulness";
+import { runMain } from "./run-main";
 
 export const CALIBRATION_TAG = "faithfulness-calibration";
 export const QUEUE_NAME = "faithfulness calibration";
@@ -218,4 +219,4 @@ async function main() {
 }
 
 const isDirectRun = Boolean(process.argv[1]) && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
-if (isDirectRun) await main();
+if (isDirectRun) void runMain(main, { name: "Faithfulness calibration seed" });

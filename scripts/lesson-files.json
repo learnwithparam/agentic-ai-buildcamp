@@ -355,6 +355,8 @@
     "scripts/release-gate.test.ts": [18, 23],
     "scripts/release-gate.ts": [18, 21, 23],
     "scripts/run-dataset.ts": [6, 9, 10, 11, 13, 14, 15, 16, 17, 18, 21],
+    "scripts/run-main.test.ts": "main",
+    "scripts/run-main.ts": 0,
     "scripts/scoreboard.test.ts": [6, 9, 14, 15],
     "scripts/scoreboard.ts": [6, 9, 13, 14],
     "scripts/search-eval.test.ts": 20,

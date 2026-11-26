@@ -17,6 +17,7 @@ import { randomBytes } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { runMain } from "./run-main";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const settingsFile = path.join(root, "langfuse", ".env");
@@ -82,4 +83,4 @@ async function main() {
 }
 
 const isDirectRun = Boolean(process.argv[1]) && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
-if (isDirectRun) await main();
+if (isDirectRun) void runMain(main, { name: "Langfuse code evaluators setup" });

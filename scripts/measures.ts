@@ -11,6 +11,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { runMain } from "./run-main";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 export const MEASURES_FILE = path.join(ROOT, "docs/measures.md");
@@ -93,4 +94,4 @@ function main() {
   console.log("measures: every measured row matches its run file and meets its target");
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) main();
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) void runMain(main, { name: "Measures check" });
