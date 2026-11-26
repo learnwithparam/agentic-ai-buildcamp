@@ -36,6 +36,10 @@ For example, a doctor asks for a letter, and the server restarts that night. By 
 
 A **router** is the first step of every turn. It reads the last few messages and picks one **risk tier**: answer, review, safety or stop. The model can only pick one of the four. After that, code acts.
 
+![Route by risk and keep approvals: the parts this lesson adds.](../images/diagrams/checkpoint-13.svg)
+
+Step through it one part at a time in the [live drawing](https://canvas.learnwithparam.com/case.html#buildcamp/15).
+
 Each tier has its own path:
 
 - **answer:** a cited fact from the label goes straight to the doctor.
