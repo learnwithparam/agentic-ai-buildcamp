@@ -415,7 +415,7 @@
     "src/server/citations.claims.ts": 21,
     "src/server/citations.fixtures.json": 21,
     "src/server/citations.test.ts": [21, 23],
-    "src/server/citations.ts": [21, 23],
+    "src/server/citations.ts": 21,
     "src/server/content/content.live.ts": 21,
     "src/server/content/content.test.ts": [14, 21],
     "src/server/content/fact-check.ts": [14, 15],
