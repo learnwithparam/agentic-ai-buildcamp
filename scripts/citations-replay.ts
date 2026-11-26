@@ -25,6 +25,7 @@ import { checkCitations, type CitationProblem, type RetrievedSection } from "../
 import { citeNode } from "../src/server/medinfo-agent";
 import { scriptUser } from "../src/server/users";
 import { loadStoredTurns, traceLink, type StoredTurn } from "./citations-audit";
+import { runMain } from "./run-main";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 export const REPLAY_FILE = path.join(ROOT, "data/evidence/citations-replay.json");
@@ -114,4 +115,4 @@ async function main() {
 }
 
 const isDirectRun = Boolean(process.argv[1]) && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
-if (isDirectRun) await main();
+if (isDirectRun) void runMain(main, { name: "Citations replay" });

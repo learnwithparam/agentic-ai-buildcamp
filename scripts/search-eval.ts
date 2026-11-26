@@ -31,6 +31,7 @@ import { standaloneQuery, type Turn } from "../src/server/rag/rewrite";
 import { CANDIDATES, hybridSearch } from "../src/server/rag/search";
 import { LabelChunkStore } from "../src/server/rag/store";
 import type { LabelSearch } from "../src/server/tools";
+import { runMain } from "./run-main";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -209,4 +210,4 @@ async function main() {
   }
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) await main();
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) void runMain(main, { name: "Search measure" });

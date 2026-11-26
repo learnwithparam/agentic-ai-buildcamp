@@ -18,6 +18,7 @@ import { parse } from "dotenv";
 import { SIGN_IN_ROLES, SEED_REVIEWERS, SEED_USERS, TENANTS, type ReviewerRole } from "../src/server/users";
 import { CLI_CALLBACK_PORT, CLI_CLIENT_ID } from "../src/cli/config";
 import { modelJson, syncDocumentTuples } from "./fga-model";
+import { runMain } from "./run-main";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const envFile = path.join(root, ".env");
@@ -432,9 +433,4 @@ async function main() {
 }
 
 const isDirectRun = Boolean(process.argv[1]) && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
-if (isDirectRun) {
-  main().catch((error) => {
-    console.error(error instanceof Error ? error.message : error);
-    process.exit(1);
-  });
-}
+if (isDirectRun) void runMain(main, { name: "Identity setup" });

@@ -2,6 +2,7 @@ import "../src/server/load-env";
 import { LangfuseClient } from "@langfuse/client";
 import { env } from "../src/server/env";
 import { PROMPT_VARIANTS } from "./prompt-variants";
+import { runMain } from "./run-main";
 
 type WorkshopPromptVariant = keyof typeof PROMPT_VARIANTS;
 
@@ -51,4 +52,4 @@ async function main() {
   console.log(`Published prompt "${name}" (${variant.name} variant) with label "${label}".`);
 }
 
-void main();
+void runMain(main, { name: "Prompt publish" });

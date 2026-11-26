@@ -2,6 +2,7 @@ import "../src/server/load-env";
 import { LangfuseClient } from "@langfuse/client";
 import { env } from "../src/server/env";
 import { loadAllCases } from "./hcp-cases";
+import { runMain } from "./run-main";
 
 async function main() {
   const cases = loadAllCases();
@@ -44,4 +45,4 @@ async function main() {
   console.log(`Seeded dataset "${env.datasetName}" with ${cases.length} items.`);
 }
 
-void main();
+void runMain(main, { name: "Dataset seed" });

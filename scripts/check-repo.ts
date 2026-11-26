@@ -19,6 +19,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { basename, posix } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { verifyDatasetCopy } from "./sync-dataset";
+import { runMain } from "./run-main";
 
 const CODE = /\.(ts|tsx|mjs|js|sh|ya?ml)$|^package\.json$/;
 const RULES: Array<{ folder: string; usedBy: RegExp }> = [
@@ -230,4 +231,4 @@ async function main() {
   console.log("check-repo: every watched file and npm script is in use, every named path exists, every dependency is pinned, the chat app is clean, data/hcp matches its lock, docs/scoreboard.md has one cell per slice, every measured row in docs/measures.md matches its run");
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) await main();
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) void runMain(main, { name: "check-repo" });

@@ -23,6 +23,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { checkClaim, quoteIsVerbatim, type Judge, type Verdict } from "../src/server/citations.claims";
+import { runMain } from "./run-main";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -152,4 +153,4 @@ async function main() {
   console.log(`judge agreement ${scored.judge_agreement}; ${scored.misses.length} rows wrong; docs/runs/${file}`);
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) await main();
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) void runMain(main, { name: "Citations measure" });
