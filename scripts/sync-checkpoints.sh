@@ -57,6 +57,7 @@ TAGS=(
   checkpoint/20-rag
   checkpoint/21-citations
   checkpoint/22-insights
+  checkpoint/23-full-run
 )
 
 # Files whose code is what the next lesson changes. Add a file here when a
