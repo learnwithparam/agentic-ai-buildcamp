@@ -259,7 +259,7 @@ export function Inbox() {
       {state.items.length === 0 ? (
         <p className="inbox-empty">
           {state.reviewer
-            ? "Nothing is waiting for you."
+            ? "Nothing waits for you. Drafts to doctors, emails to check and possible side effect reports arrive here."
             : "None of your questions needed a reviewer."}
         </p>
       ) : (
