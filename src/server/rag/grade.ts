@@ -34,15 +34,30 @@ export const GRADER_PROMPT = `You grade passages from medicine labels against on
 Grade every passage on its own, from its text only. A passage that only shares words with the question, or is about a nearby subject, is 1 or 0.
 A passage about another medicine than the one the question asks about is 0.
 When the question names a condition, substance, population or situation the answer depends on (a kidney problem, pregnancy, a child, another medicine), a passage that does not speak to it, in any words, is at most 1, even when it states the general rule. A word the answer does not depend on, such as "an adult" in a question about storage, changes no grade.
-The prescribing label (a document id with uspi, smpc or label in it) is the authority. When an FAQ, a formulary or a trial report gives a different number or instruction from a label passage, the other passage is at most 1, and the label comes first in best. Among labels, the one in force from the latest date wins.
+When the question names a trial, a payer, a formulary or the FAQ, the passages from that document that answer it are graded like any other. Only when two passages give different values for the same instruction (a dose, a limit, an interval) does the prescribing label (a document id with uspi, smpc or label in it) win: the other passage is at most 1, and among labels, the one in force from the latest date wins.
 ${GRADES}
 Return one grade per passage, in the order given. Then, in best, list the numbers of the passages you graded 2 or 3, the one a doctor should read first at the start: the one that states the answer most directly.`;
 // checkpoint-sync:end grader-prompt
 
 const Graded = z.object({ grades: z.array(z.number().int().min(0).max(3)), best: z.array(z.number().int()) });
 
-export const gradePassages: Grader = async (question, passages) => {
+export class GradeCountError extends Error {}
+
+// A list of the wrong length is a broken answer, and guessing which grade belongs to which
+// passage would cite the wrong section. Measured on 2026-11-26: 32 grades for 30 passages, once,
+// 20 questions into a run. The schema pins the length and the request states it; if the model
+// still miscounts, it is asked once more, and a second miscount fails the search.
+export const retryOnMiscount = (once: Grader): Grader => async (question, passages) => {
   if (!passages.length) return { grades: [], best: [] };
+  try {
+    return await once(question, passages);
+  } catch (error) {
+    if (!(error instanceof GradeCountError)) throw error;
+    return once(question, passages);
+  }
+};
+
+const gradeOnce: Grader = async (question, passages) => {
   const openai = observeOpenAI(modelClient(), { generationName: "search-grade" });
   const list = passages.map((passage, i) => `[${i + 1}] ${passage.source} > ${passage.path}\n${passage.text}`).join("\n\n");
   const completion = await openai.chat.completions.create({
@@ -51,7 +66,7 @@ export const gradePassages: Grader = async (question, passages) => {
     temperature: 0,
     messages: [
       { role: "system", content: GRADER_PROMPT },
-      { role: "user", content: `Question: ${question}\n\nPassages:\n\n${list}` }
+      { role: "user", content: `Question: ${question}\n\n${passages.length} passages, so return exactly ${passages.length} grades:\n\n${list}` }
     ],
     response_format: {
       type: "json_schema",
@@ -61,7 +76,7 @@ export const gradePassages: Grader = async (question, passages) => {
         schema: {
           type: "object",
           properties: {
-            grades: { type: "array", items: { type: "integer", enum: [0, 1, 2, 3] } },
+            grades: { type: "array", items: { type: "integer", enum: [0, 1, 2, 3] }, minItems: passages.length, maxItems: passages.length },
             best: { type: "array", items: { type: "integer" } }
           },
           required: ["grades", "best"],
@@ -71,11 +86,11 @@ export const gradePassages: Grader = async (question, passages) => {
     }
   });
   const { grades, best } = Graded.parse(JSON.parse(completion.choices[0]?.message.content ?? "{}"));
-  // A short or long list is a broken answer, and guessing which grade belongs to which passage
-  // would cite the wrong section. It fails the search, and the trace shows why.
-  if (grades.length !== passages.length) throw new Error(`The grader returned ${grades.length} grades for ${passages.length} passages.`);
+  if (grades.length !== passages.length) throw new GradeCountError(`The grader returned ${grades.length} grades for ${passages.length} passages.`);
   // best counts from 1, as the passages were numbered. A number that names no answering passage,
   // or names one twice, is dropped: the grades alone still decide what is an answer.
   const order = [...new Set(best.map((n) => n - 1))].filter((i) => (grades[i] ?? 0) >= 2);
   return { grades, best: order };
 };
+
+export const gradePassages: Grader = retryOnMiscount(gradeOnce);

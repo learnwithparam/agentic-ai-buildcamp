@@ -10,6 +10,7 @@ import { inForceDocuments, LABEL_SECTIONS, parseLabelDoc, TODAY, type LabelSecti
 import { passages, sectionPath } from "./chunk";
 import { missingFromExtraction, pdfToMarkdown, sectionsFromMarkdown } from "./extract";
 import type { ManifestDoc } from "./ingest";
+import { GradeCountError, retryOnMiscount } from "./grade";
 import { candidatePool, fuse, hybridSearch } from "./search";
 import { LabelChunkStore, type LabelChunk } from "./store";
 
@@ -220,4 +221,22 @@ test("a question about another country searches only the company's documents fro
   assert.deepEqual([...documentsIn(company, "DE")], ["cardionex-de-smpc"]);
   assert.deepEqual([...documentsIn(company, "JP")], ["cardionex-jp-label"]);
   assert.deepEqual([...documentsIn(new Set(["neurovex-uspi-v1"]), "DE")], []);
+});
+
+test("a miscounted grade list is asked for once more, and a second miscount fails the search", async () => {
+  const passages = [{ source: "d", path: "1", text: "t" }];
+  let calls = 0;
+  const flaky = retryOnMiscount(async () => {
+    calls++;
+    if (calls === 1) throw new GradeCountError("2 grades for 1 passage");
+    return { grades: [3], best: [0] };
+  });
+  assert.deepEqual(await flaky("q", passages), { grades: [3], best: [0] });
+  assert.equal(calls, 2);
+  const broken = retryOnMiscount(async () => { throw new GradeCountError("always wrong"); });
+  await assert.rejects(broken("q", passages), GradeCountError);
+  const other = retryOnMiscount(async () => { calls++; throw new Error("gateway down"); });
+  calls = 0;
+  await assert.rejects(other("q", passages), /gateway down/);
+  assert.equal(calls, 1);
 });

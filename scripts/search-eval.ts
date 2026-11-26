@@ -101,6 +101,18 @@ async function main() {
   const spans = new LangfuseSpanProcessor();
   const sdk = new NodeSDK({ spanProcessors: [spans] });
   sdk.start();
+  // Traces are a copy for reading, not the measure. On 2026-11-26 a trace upload timed out after
+  // 160 of 178 questions and killed the run before it wrote a number. An upload failure is now a
+  // warning; any other error still stops the run.
+  const exportFailure = (error: unknown) => {
+    if (error instanceof Error && error.stack?.includes("otlp-exporter-base")) {
+      console.warn(`A trace upload failed (${error.message}); the measure goes on without that trace.`);
+      return;
+    }
+    throw error;
+  };
+  process.on("unhandledRejection", exportFailure);
+  process.on("uncaughtException", exportFailure);
   useService("eval-runner");
   const pool = createPool(env.databaseUrl);
   try {
