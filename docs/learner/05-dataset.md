@@ -31,6 +31,10 @@ A doctor in Germany gets the wrong country's text. A superseded label gets cited
 
 You write each case once, in a file. A seed script reads the file and creates one dataset item per case. The items are the same every run, so a score today and a score next week compare.
 
+![Build the dataset: the parts this lesson adds.](../images/diagrams/checkpoint-05.svg)
+
+Step through it one part at a time in the [live drawing](https://canvas.learnwithparam.com/case.html#buildcamp/7).
+
 Each case answers two questions. Is the answer correct? Does the agent behave right? It might reply, defer a question, or ask a follow-up first. A right fact with the wrong move still fails.
 
 ### The flow

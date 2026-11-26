@@ -33,6 +33,10 @@ Some requests should never reach a model at all. For example, GUARDRAIL-01 asks 
 
 A **gateway** is one door between your code and the model providers. The provider key lives in the gateway. Each service gets its own key. Every call through the door is recorded with its cost, whether your code traced it or not.
 
+![Send every call through one door: the parts this lesson adds.](../images/diagrams/checkpoint-10.svg)
+
+Step through it one part at a time in the [live drawing](https://canvas.learnwithparam.com/case.html#buildcamp/12).
+
 A **budget** is a daily limit on one key. When it is spent, the gateway refuses the call. It does not call the model. A refused call costs nothing.
 
 An **input check** is a narrow rule that runs before the agent calls a model. It stays in our code, because the gateway has no guardrails yet. Each rule is named. A rule that is too wide refuses a real doctor, which is worse than one wasted call.
