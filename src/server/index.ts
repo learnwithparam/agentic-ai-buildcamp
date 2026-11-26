@@ -10,6 +10,7 @@ import { PostgresSaver } from "@langchain/langgraph-checkpoint-postgres";
 import { createFactChecker } from "./content/fact-check";
 import { createOutreachPlanner } from "./content/outreach";
 import { createMedinfoAgent, recordDecision } from "./medinfo-agent";
+import { modelSpanFinder } from "./phi.model";
 import { createInsightsAgent } from "./bi/agent";
 import { createHandoffAgent } from "./a2a/handoff";
 import { createTaskStore, TaskReviews } from "./a2a/tasks";
@@ -38,7 +39,8 @@ await checkpointer.setup();
 // Lesson 15. A2A tasks live in the same Postgres (migration 005), so a task waiting for a
 // reviewer outlives a restart, as a waiting draft does.
 const a2aStore = createTaskStore(pool);
-const agent = createMedinfoAgent(checkpointer);
+// Lesson 13. Names and addresses the rules miss go to one model call, unless PHI_MODEL_FINDER=off.
+const agent = createMedinfoAgent(checkpointer, { phiFinder: process.env.PHI_MODEL_FINDER === "off" ? undefined : modelSpanFinder() });
 // Lesson 14: the fact-checker and the outreach planner share the inbox, the door and the sign-in.
 const factChecker = createFactChecker();
 const outreachPlanner = createOutreachPlanner();

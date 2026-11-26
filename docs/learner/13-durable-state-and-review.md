@@ -144,7 +144,7 @@ This tag is where lesson 13 starts. It holds what the earlier lessons built and 
 You add:
 
 - `src/server/tiers.ts`: the four tiers, the router prompt, the forced `route` call, and the fixed safety and stop replies.
-- `src/server/phi.ts`: removes record numbers, emails, phone numbers and ID numbers from the doctor's words.
+- `src/server/phi.ts`: swaps each patient identifier for a placeholder such as [PATIENT_1]. `src/server/phi.model.ts` asks a model for the ones the rules miss.
 - `src/server/graph.ts`: the router node first, then one path per tier, with `interrupt()` on the review path.
 - `src/server/reviews.ts` and `src/server/migrations/002_reviews.sql`: the inbox table and its deadlines.
 - `src/client/inbox/`: the `/inbox` page, for doctors and for reviewers.
@@ -214,7 +214,9 @@ If the router fails, the turn stops with an error. It never falls back to answer
 
 The safety and stop replies are fixed text in code. A reviewer approves the wording once, and it reads the same every time.
 
-Before the router sees anything, `src/server/phi.ts` removes identifiers that have a shape. `MRN-55120` becomes the marker [record number removed]. The model, the trace, the checkpoint and the inbox all get the scrubbed text. A patient's name has no shape. That is one more reason a human files every safety report.
+Before the router sees anything, `src/server/phi.ts` swaps each identifier for a placeholder. Rules find shapes such as `MRN-55120`. They also find a name or date next to a clue like "Mrs" or "born". One model call then looks for names and addresses the rules missed. It reads only text the rules already cleaned.
+
+The same person is [PATIENT_1] all through the chat. The map back stays in server memory, so the doctor reads their own words. The model, the trace, the checkpoint and the inbox only get placeholders. A model can still miss a name, so a human files every safety report.
 
 ### Step 3: Take the two rules out of the prompt
 
@@ -411,6 +413,7 @@ To check you are done:
 
 - Try the homework. Add a deadline alert. Write a query in `src/server/reviews.ts` that lists items still waiting less than 4 hours before `due_at`. Show them at the top of `/inbox` with the label "Due soon".
 - Test the homework. Add a test to `src/server/inbox.test.ts` with one item due in 2 hours and one due in 30 hours.
+- Measure the scrub. Run `npm run phi:measure`. It scores the rules and the model step on 100 marked notes. Each missed word is listed in `docs/runs/phi.json`.
 - Read the graph docs: [persistence](https://langchain-ai.github.io/langgraphjs/concepts/persistence/) and [human in the loop with interrupt](https://langchain-ai.github.io/langgraphjs/concepts/human_in_the_loop/).
 - Read the other docs: [Langfuse scores from code](https://langfuse.com/docs/evaluation/evaluation-methods/scores-via-sdk) and [OpenFGA contextual tuples](https://openfga.dev/docs/interacting/contextual-tuples).
 - Lesson 14 starts from this checkpoint. Two more agents, a fact-checker and an outreach planner, reuse the same gateway, sign-in and tiers.
