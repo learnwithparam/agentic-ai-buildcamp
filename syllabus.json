@@ -1,0 +1,646 @@
+{
+  "source": {
+    "repo": "learnwithparam/agentic-ai-buildcamp",
+    "ref": "main",
+    "sha": "fe9d8112a6289033a8ac2f8d365655cc9ee167b3"
+  },
+  "tree": {
+    "modules": [
+      {
+        "key": "w1",
+        "title": "Agentic system design",
+        "units": [
+          {
+            "key": "w1-read",
+            "title": "Read",
+            "items": [
+              {
+                "key": "w1-reading",
+                "kind": "reading",
+                "title": "Agentic system design: reading",
+                "minutes": 30,
+                "body_md": "Read the lesson map in the README and the whole-system diagrams and concepts in docs/walkthrough.md."
+              }
+            ]
+          },
+          {
+            "key": "w1-build",
+            "title": "Build",
+            "items": [
+              {
+                "key": "lab-00-setup",
+                "kind": "lab",
+                "title": "Run the whole course on your own laptop",
+                "minutes": 60,
+                "body_md": "Read [the lesson](docs/learner/00-setup.md), then build it. Jump to the finished state with `git checkout checkpoint/00-setup`.",
+                "lab": {
+                  "slug": "00-setup",
+                  "repo_path": "checkpoint/00-setup"
+                },
+                "proof": {
+                  "kind": "none"
+                },
+                "rubric_key": "cohort"
+              },
+              {
+                "key": "lab-01-base-app",
+                "kind": "lab",
+                "title": "Follow one chat turn through an agent",
+                "minutes": 60,
+                "body_md": "Read [the lesson](docs/learner/01-base-app.md), then build it. Jump to the finished state with `git checkout checkpoint/01-base-app`.",
+                "lab": {
+                  "slug": "01-base-app",
+                  "repo_path": "checkpoint/01-base-app"
+                },
+                "proof": {
+                  "kind": "none"
+                },
+                "rubric_key": "cohort"
+              },
+              {
+                "key": "lab-13-durable-state-and-review",
+                "kind": "lab",
+                "title": "Route each request by risk and keep approvals when the server restarts",
+                "minutes": 60,
+                "body_md": "Read [the lesson](docs/learner/13-durable-state-and-review.md), then build it. Jump to the finished state with `git checkout checkpoint/13-durable-review`.",
+                "lab": {
+                  "slug": "13-durable-state-and-review",
+                  "repo_path": "checkpoint/13-durable-review"
+                },
+                "proof": {
+                  "kind": "none"
+                },
+                "rubric_key": "cohort"
+              },
+              {
+                "key": "lab-14-fact-checker-and-outreach",
+                "kind": "lab",
+                "title": "Check every sales email against approved claims",
+                "minutes": 60,
+                "body_md": "Read [the lesson](docs/learner/14-fact-checker-and-outreach.md), then build it. Jump to the finished state with `git checkout checkpoint/14-content-agents`.",
+                "lab": {
+                  "slug": "14-fact-checker-and-outreach",
+                  "repo_path": "checkpoint/14-content-agents"
+                },
+                "proof": {
+                  "kind": "none"
+                },
+                "rubric_key": "cohort"
+              },
+              {
+                "key": "lab-15-agents-hand-off-over-a2a",
+                "kind": "lab",
+                "title": "Hand work between agents without losing who asked",
+                "minutes": 60,
+                "body_md": "Read [the lesson](docs/learner/15-agents-hand-off-over-a2a.md), then build it. Jump to the finished state with `git checkout checkpoint/15-a2a`.",
+                "lab": {
+                  "slug": "15-agents-hand-off-over-a2a",
+                  "repo_path": "checkpoint/15-a2a"
+                },
+                "proof": {
+                  "kind": "none"
+                },
+                "rubric_key": "cohort"
+              },
+              {
+                "key": "lab-16-event-driven-agents",
+                "kind": "lab",
+                "title": "Start agents from events and handle each one once",
+                "minutes": 60,
+                "body_md": "Read [the lesson](docs/learner/16-event-driven-agents.md), then build it. Jump to the finished state with `git checkout checkpoint/16-events`.",
+                "lab": {
+                  "slug": "16-event-driven-agents",
+                  "repo_path": "checkpoint/16-events"
+                },
+                "proof": {
+                  "kind": "none"
+                },
+                "rubric_key": "cohort"
+              }
+            ]
+          },
+          {
+            "key": "w1-live",
+            "title": "Live sessions",
+            "items": [
+              {
+                "key": "w1-live-1",
+                "kind": "live",
+                "title": "Live session 1: designing an agent system",
+                "minutes": 90
+              },
+              {
+                "key": "w1-live-2",
+                "kind": "live",
+                "title": "Live session 2: review of this week's builds",
+                "minutes": 90
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "key": "w2",
+        "title": "Search and retrieval patterns",
+        "units": [
+          {
+            "key": "w2-read",
+            "title": "Read",
+            "items": [
+              {
+                "key": "w2-reading",
+                "kind": "reading",
+                "title": "Search and retrieval patterns: reading",
+                "minutes": 30,
+                "body_md": "Read docs/measures.md for how search is scored, and docs/learner/data.md for what the agents read."
+              }
+            ]
+          },
+          {
+            "key": "w2-build",
+            "title": "Build",
+            "items": [
+              {
+                "key": "lab-20-rag",
+                "kind": "lab",
+                "title": "Find the right label section by meaning from the PDFs",
+                "minutes": 60,
+                "body_md": "Read [the lesson](docs/learner/20-rag.md), then build it. Jump to the finished state with `git checkout checkpoint/20-rag`.",
+                "lab": {
+                  "slug": "20-rag",
+                  "repo_path": "checkpoint/20-rag"
+                },
+                "proof": {
+                  "kind": "none"
+                },
+                "rubric_key": "cohort"
+              },
+              {
+                "key": "lab-21-citations",
+                "kind": "lab",
+                "title": "Check every citation before the answer is sent",
+                "minutes": 60,
+                "body_md": "Read [the lesson](docs/learner/21-citations.md), then build it. Jump to the finished state with `git checkout checkpoint/21-citations`.",
+                "lab": {
+                  "slug": "21-citations",
+                  "repo_path": "checkpoint/21-citations"
+                },
+                "proof": {
+                  "kind": "none"
+                },
+                "rubric_key": "cohort"
+              },
+              {
+                "key": "lab-22-insights",
+                "kind": "lab",
+                "title": "Let an agent write SQL without reading other companies' data",
+                "minutes": 60,
+                "body_md": "Read [the lesson](docs/learner/22-insights.md), then build it. Jump to the finished state with `git checkout checkpoint/22-insights`.",
+                "lab": {
+                  "slug": "22-insights",
+                  "repo_path": "checkpoint/22-insights"
+                },
+                "proof": {
+                  "kind": "none"
+                },
+                "rubric_key": "cohort"
+              }
+            ]
+          },
+          {
+            "key": "w2-live",
+            "title": "Live sessions",
+            "items": [
+              {
+                "key": "w2-live-1",
+                "kind": "live",
+                "title": "Live session 1: retrieval patterns",
+                "minutes": 90
+              },
+              {
+                "key": "w2-live-2",
+                "kind": "live",
+                "title": "Live session 2: review of this week's builds",
+                "minutes": 90
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "key": "w3",
+        "title": "Evals and agentic AI security",
+        "units": [
+          {
+            "key": "w3-read",
+            "title": "Read",
+            "items": [
+              {
+                "key": "w3-reading",
+                "kind": "reading",
+                "title": "Evals and agentic AI security: reading",
+                "minutes": 30,
+                "body_md": "Read docs/learner/evals.md for how eval cases work, and docs/scoreboard.md for the reference rows."
+              }
+            ]
+          },
+          {
+            "key": "w3-build",
+            "title": "Build",
+            "items": [
+              {
+                "key": "lab-05-dataset",
+                "kind": "lab",
+                "title": "Write down what your agent must get right",
+                "minutes": 60,
+                "body_md": "Read [the lesson](docs/learner/05-dataset.md), then build it. Jump to the finished state with `git checkout checkpoint/05-dataset`.",
+                "lab": {
+                  "slug": "05-dataset",
+                  "repo_path": "checkpoint/05-dataset"
+                },
+                "proof": {
+                  "kind": "none"
+                },
+                "rubric_key": "cohort"
+              },
+              {
+                "key": "lab-06-experiments",
+                "kind": "lab",
+                "title": "Score your agent on every case",
+                "minutes": 60,
+                "body_md": "Read [the lesson](docs/learner/06-experiments.md), then build it. Jump to the finished state with `git checkout checkpoint/06-experiments`.",
+                "lab": {
+                  "slug": "06-experiments",
+                  "repo_path": "checkpoint/06-experiments"
+                },
+                "proof": {
+                  "kind": "none"
+                },
+                "rubric_key": "cohort"
+              },
+              {
+                "key": "lab-07-evaluation",
+                "kind": "lab",
+                "title": "Compare two runs to see if a change helped",
+                "minutes": 60,
+                "body_md": "Read [the lesson](docs/learner/07-evaluation.md), then build it. Jump to the finished state with `git checkout checkpoint/07-evaluation`.",
+                "lab": {
+                  "slug": "07-evaluation",
+                  "repo_path": "checkpoint/07-evaluation"
+                },
+                "proof": {
+                  "kind": "none"
+                },
+                "rubric_key": "cohort"
+              },
+              {
+                "key": "lab-08-midpoint",
+                "kind": "lab",
+                "title": "Read your scoreboard as one improvement loop",
+                "minutes": 60,
+                "body_md": "Read [the lesson](docs/learner/08-midpoint.md), then build it. Jump to the finished state with `git checkout checkpoint/08-midpoint`.",
+                "lab": {
+                  "slug": "08-midpoint",
+                  "repo_path": "checkpoint/08-midpoint"
+                },
+                "proof": {
+                  "kind": "none"
+                },
+                "rubric_key": "cohort"
+              },
+              {
+                "key": "lab-09-advanced-evals",
+                "kind": "lab",
+                "title": "Check a judge against people before you trust it",
+                "minutes": 60,
+                "body_md": "Read [the lesson](docs/learner/09-advanced-evals.md), then build it. Jump to the finished state with `git checkout checkpoint/09-advanced-evals`.",
+                "lab": {
+                  "slug": "09-advanced-evals",
+                  "repo_path": "checkpoint/09-advanced-evals"
+                },
+                "proof": {
+                  "kind": "none"
+                },
+                "rubric_key": "cohort"
+              },
+              {
+                "key": "lab-11-sign-in-and-permissions",
+                "kind": "lab",
+                "title": "Check who is asking and what they may read before the model sees anything",
+                "minutes": 60,
+                "body_md": "Read [the lesson](docs/learner/11-sign-in-and-permissions.md), then build it. Jump to the finished state with `git checkout checkpoint/11-sign-in`.",
+                "lab": {
+                  "slug": "11-sign-in-and-permissions",
+                  "repo_path": "checkpoint/11-sign-in"
+                },
+                "proof": {
+                  "kind": "none"
+                },
+                "rubric_key": "cohort"
+              },
+              {
+                "key": "lab-12-mcp-and-sandbox",
+                "kind": "lab",
+                "title": "Open a second door with the same walls and run untrusted code in a sandbox",
+                "minutes": 60,
+                "body_md": "Read [the lesson](docs/learner/12-mcp-and-sandbox.md), then build it. Jump to the finished state with `git checkout checkpoint/12-mcp-sandbox`.",
+                "lab": {
+                  "slug": "12-mcp-and-sandbox",
+                  "repo_path": "checkpoint/12-mcp-sandbox"
+                },
+                "proof": {
+                  "kind": "none"
+                },
+                "rubric_key": "cohort"
+              }
+            ]
+          },
+          {
+            "key": "w3-live",
+            "title": "Live sessions",
+            "items": [
+              {
+                "key": "w3-live-1",
+                "kind": "live",
+                "title": "Live session 1: evals and security",
+                "minutes": 90
+              },
+              {
+                "key": "w3-live-2",
+                "kind": "live",
+                "title": "Live session 2: review of this week's builds",
+                "minutes": 90
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "key": "w4",
+        "title": "Agent deployment and CI/CD",
+        "units": [
+          {
+            "key": "w4-read",
+            "title": "Read",
+            "items": [
+              {
+                "key": "w4-reading",
+                "kind": "reading",
+                "title": "Agent deployment and CI/CD: reading",
+                "minutes": 30,
+                "body_md": "Read docs/learner/troubleshooting.md and the CI workflow in .github/workflows/check.yml."
+              }
+            ]
+          },
+          {
+            "key": "w4-build",
+            "title": "Build",
+            "items": [
+              {
+                "key": "lab-10-ai-gateway",
+                "kind": "lab",
+                "title": "Put every model call behind one door with a daily budget",
+                "minutes": 60,
+                "body_md": "Read [the lesson](docs/learner/10-ai-gateway.md), then build it. Jump to the finished state with `git checkout checkpoint/10-ai-gateway`.",
+                "lab": {
+                  "slug": "10-ai-gateway",
+                  "repo_path": "checkpoint/10-ai-gateway"
+                },
+                "proof": {
+                  "kind": "none"
+                },
+                "rubric_key": "cohort"
+              },
+              {
+                "key": "lab-17-autonomous-agent",
+                "kind": "lab",
+                "title": "Let an agent work alone inside limits code enforces",
+                "minutes": 60,
+                "body_md": "Read [the lesson](docs/learner/17-autonomous-agent.md), then build it. Jump to the finished state with `git checkout checkpoint/17-autonomy`.",
+                "lab": {
+                  "slug": "17-autonomous-agent",
+                  "repo_path": "checkpoint/17-autonomy"
+                },
+                "proof": {
+                  "kind": "none"
+                },
+                "rubric_key": "cohort"
+              },
+              {
+                "key": "lab-18-release-gate",
+                "kind": "lab",
+                "title": "Block a bad change before it ships",
+                "minutes": 60,
+                "body_md": "Read [the lesson](docs/learner/18-release-gate.md), then build it. Jump to the finished state with `git checkout checkpoint/18-release-gate`.",
+                "lab": {
+                  "slug": "18-release-gate",
+                  "repo_path": "checkpoint/18-release-gate"
+                },
+                "proof": {
+                  "kind": "none"
+                },
+                "rubric_key": "cohort"
+              },
+              {
+                "key": "lab-19-cli",
+                "kind": "lab",
+                "title": "Ask and review from the terminal with the same permissions",
+                "minutes": 60,
+                "body_md": "Read [the lesson](docs/learner/19-cli.md), then build it. Jump to the finished state with `git checkout checkpoint/19-cli`.",
+                "lab": {
+                  "slug": "19-cli",
+                  "repo_path": "checkpoint/19-cli"
+                },
+                "proof": {
+                  "kind": "none"
+                },
+                "rubric_key": "cohort"
+              }
+            ]
+          },
+          {
+            "key": "w4-live",
+            "title": "Live sessions",
+            "items": [
+              {
+                "key": "w4-live-1",
+                "kind": "live",
+                "title": "Live session 1: shipping an agent",
+                "minutes": 90
+              },
+              {
+                "key": "w4-live-2",
+                "kind": "live",
+                "title": "Live session 2: review of this week's builds",
+                "minutes": 90
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "key": "w5",
+        "title": "Observability, scaling and optimization",
+        "units": [
+          {
+            "key": "w5-read",
+            "title": "Read",
+            "items": [
+              {
+                "key": "w5-reading",
+                "kind": "reading",
+                "title": "Observability, scaling and optimization: reading",
+                "minutes": 30,
+                "body_md": "Read docs/one-question.md to follow one question through the system."
+              }
+            ]
+          },
+          {
+            "key": "w5-build",
+            "title": "Build",
+            "items": [
+              {
+                "key": "lab-02-tracing",
+                "kind": "lab",
+                "title": "See every step an agent takes",
+                "minutes": 60,
+                "body_md": "Read [the lesson](docs/learner/02-tracing.md), then build it. Jump to the finished state with `git checkout checkpoint/02-tracing`.",
+                "lab": {
+                  "slug": "02-tracing",
+                  "repo_path": "checkpoint/02-tracing"
+                },
+                "proof": {
+                  "kind": "none"
+                },
+                "rubric_key": "cohort"
+              },
+              {
+                "key": "lab-03-prompt-management",
+                "kind": "lab",
+                "title": "Change an agent's behavior without a deploy",
+                "minutes": 60,
+                "body_md": "Read [the lesson](docs/learner/03-prompt-management.md), then build it. Jump to the finished state with `git checkout checkpoint/03-prompt-management`.",
+                "lab": {
+                  "slug": "03-prompt-management",
+                  "repo_path": "checkpoint/03-prompt-management"
+                },
+                "proof": {
+                  "kind": "none"
+                },
+                "rubric_key": "cohort"
+              },
+              {
+                "key": "lab-04-monitoring",
+                "kind": "lab",
+                "title": "Find what goes wrong in production",
+                "minutes": 60,
+                "body_md": "Read [the lesson](docs/learner/04-monitoring.md), then build it. Jump to the finished state with `git checkout checkpoint/04-monitoring`.",
+                "lab": {
+                  "slug": "04-monitoring",
+                  "repo_path": "checkpoint/04-monitoring"
+                },
+                "proof": {
+                  "kind": "none"
+                },
+                "rubric_key": "cohort"
+              }
+            ]
+          },
+          {
+            "key": "w5-live",
+            "title": "Live sessions",
+            "items": [
+              {
+                "key": "w5-live-1",
+                "kind": "live",
+                "title": "Live session 1: observability and optimization",
+                "minutes": 90
+              },
+              {
+                "key": "w5-live-2",
+                "kind": "live",
+                "title": "Live session 2: review of this week's builds",
+                "minutes": 90
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "key": "w6",
+        "title": "Production capstone",
+        "units": [
+          {
+            "key": "w6-read",
+            "title": "Read",
+            "items": [
+              {
+                "key": "w6-reading",
+                "kind": "reading",
+                "title": "Production capstone: reading",
+                "minutes": 30,
+                "body_md": "Reread docs/walkthrough.md and your my-scoreboard.md before you start the capstone."
+              }
+            ]
+          },
+          {
+            "key": "w6-build",
+            "title": "Build",
+            "items": [
+              {
+                "key": "lab-23-full-run",
+                "kind": "lab",
+                "title": "Replay the chats that broke, then run every case",
+                "minutes": 60,
+                "body_md": "Read [the lesson](docs/learner/23-full-run.md), then build it. This lesson has no checkpoint tag; it runs on main.",
+                "lab": {
+                  "slug": "23-full-run",
+                  "repo_path": "docs/learner/23-full-run.md"
+                },
+                "proof": {
+                  "kind": "none"
+                },
+                "rubric_key": "cohort"
+              }
+            ]
+          },
+          {
+            "key": "w6-live",
+            "title": "Live sessions",
+            "items": [
+              {
+                "key": "w6-live-1",
+                "kind": "live",
+                "title": "Live session 1: capstone kickoff",
+                "minutes": 90
+              },
+              {
+                "key": "w6-live-2",
+                "kind": "live",
+                "title": "Live session 2: capstone demos",
+                "minutes": 90
+              }
+            ]
+          },
+          {
+            "key": "w6-capstone",
+            "title": "Capstone",
+            "items": [
+              {
+                "key": "w6-capstone-task",
+                "kind": "task",
+                "title": "Production capstone",
+                "minutes": 180,
+                "body_md": "Ship your agent end to end: run the full course on your laptop, pass the release gate, and submit a screenshot of your passing run and scoreboard.",
+                "proof": {
+                  "kind": "screenshot"
+                },
+                "rubric_key": "cohort"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
