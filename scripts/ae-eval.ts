@@ -132,7 +132,7 @@ async function predictWithModel(gold: Gold): Promise<Prediction> {
     router_safety: route.tier === "safety",
     second_pass_safety: seen.happened,
     criteria: extracted.criteria,
-    pts: extracted.events.flatMap((event) => (event.coded ? [event.coded.pt.code] : []))
+    pts: [...extracted.events, ...(extracted.situation ? [extracted.situation] : [])].flatMap((event) => (event.coded ? [event.coded.pt.code] : []))
   };
 }
 
