@@ -335,7 +335,7 @@ The full row is in [docs/scoreboard.md](../scoreboard.md).
 
 - Try the homework. Change what the rule in `scripts/eval-release.ts` picks. For example, prefer `showcase` over `holdout`. Read which tests fail, then undo it.
 - Run the gate on a broken prompt with `npm run release:gate -- --sabotage`. It removes the citation rule and every defer rule. It saves the result under the label `sabotage` and runs the release cases on it. It must come out red and exit 1. If it stays green it exits 3, because that gate cannot see what the prompt is for.
-- Measure the gate with `npm run evals:measure`. It runs the demo set five times and counts a case only if it passed all five (pass^5). It also runs the sabotage and writes `docs/runs/evals.json`. Add `--fake` to run it with no model.
+- Measure the gate with `npm run evals:measure`. It runs the demo set five times and counts a case only if it passed all five (pass^5). It also runs the sabotage and writes `evals.json` under `docs/runs`. Add `--fake` to run it with no model.
 - Build the rubric judge's labelling file with `npm run evals:candidates`. Two people fill in the pass or fail columns. The judge's agreement with them is the last number in that file.
 - Decide whether `src/client/` belongs in `GATED_PATHS`. Write down what could break in the web client. Say which of those the cases would catch.
 - Read [Langfuse experiments in CI/CD](https://langfuse.com/docs/evaluation/experiments/experiments-ci-cd), [prompt version control and labels](https://langfuse.com/docs/prompt-management/features/prompt-version-control) and [git hooks: pre-push](https://git-scm.com/docs/githooks#_pre_push).
