@@ -14,7 +14,7 @@ import type { Identity } from "./users";
 // stored there when the item is made, and the reviewer's role comes from their token.
 
 export type ReviewKind = ReviewSubmission["kind"];
-export type ReviewStatus = "waiting" | "approved" | "rejected" | "filed" | "dismissed";
+export type ReviewStatus = "waiting" | "escalated" | "approved" | "rejected" | "filed" | "dismissed";
 
 export type ReviewItem = {
   id: string;
@@ -31,7 +31,12 @@ export type ReviewItem = {
   decidedAt: string | null;
   note: string | null;
   run: AnswerRun | null;
+  // Set when the safety clock escalated an adverse event that passed its due time undecided.
+  escalatedAt: string | null;
 };
+
+// An item nobody has decided yet. An escalated adverse event is still open: a reviewer decides it.
+export const isOpen = (status: ReviewStatus) => status === "waiting" || status === "escalated";
 
 // What a reviewer may answer, per kind. A draft is approved or rejected; an adverse event is
 // filed with the safety database or dismissed as not one.
@@ -59,6 +64,7 @@ type Row = {
   decided_at: Date | null;
   note: string | null;
   run: AnswerRun | null;
+  escalated_at: Date | null;
 };
 
 const toItem = (row: Row): ReviewItem => ({
@@ -75,7 +81,8 @@ const toItem = (row: Row): ReviewItem => ({
   decidedBy: row.decided_by,
   decidedAt: row.decided_at?.toISOString() ?? null,
   note: row.note,
-  run: row.run ?? null
+  run: row.run ?? null,
+  escalatedAt: row.escalated_at?.toISOString() ?? null
 });
 
 
@@ -126,6 +133,9 @@ export class ReviewStore implements ReviewInbox {
          RETURNING id, due_at, status
        ), request AS (
          INSERT INTO review_requests (item_id, thread_id) SELECT id, $3 FROM item ON CONFLICT DO NOTHING
+       ), raised AS (
+         -- Only an adverse event tells the safety team; the clock job writes the second row.
+         INSERT INTO safety_notifications (item_id, kind, tenant_id) SELECT id, 'raised', $4::text FROM item WHERE $2::text = 'adverse_event' ON CONFLICT DO NOTHING
        )
        SELECT due_at, status FROM item`,
       [item.id, item.kind, item.threadId, item.tenantId, item.traceId ?? null, item.question, item.body, HOURS[item.kind], item.run ? JSON.stringify(item.run) : null]
@@ -140,7 +150,7 @@ export class ReviewStore implements ReviewInbox {
     // An item any of the reviewer's own requests raised is not theirs to decide, so it is not listed.
     const { rows } = await this.pool.query<Row>(
       `SELECT r.* FROM review_items r
-       WHERE r.id = ANY($1) AND r.status = 'waiting' AND NOT EXISTS (${ASKED_BY}) ORDER BY r.due_at`,
+       WHERE r.id = ANY($1) AND r.status IN ('waiting', 'escalated') AND NOT EXISTS (${ASKED_BY}) ORDER BY r.due_at`,
       [ids, reviewer.userId]
     );
     return rows.map(toItem);
@@ -178,7 +188,7 @@ export class ReviewStore implements ReviewInbox {
   async decide(id: string, reviewer: Identity, status: ReviewStatus, note: string): Promise<ReviewItem | null> {
     const { rows } = await this.pool.query<Row>(
       `UPDATE review_items SET status = $2, decided_by = $3, decided_at = now(), note = $4
-       WHERE id = $1 AND status = 'waiting' RETURNING *`,
+       WHERE id = $1 AND status IN ('waiting', 'escalated') RETURNING *`,
       [id, status, reviewer.userId, note || null]
     );
     return rows[0] ? toItem(rows[0]) : null;
@@ -186,7 +196,7 @@ export class ReviewStore implements ReviewInbox {
 
   // Puts a decided item back in the inbox, for when its thread could not continue.
   async reopen(id: string) {
-    await this.pool.query("UPDATE review_items SET status = 'waiting', decided_by = NULL, decided_at = NULL, note = NULL WHERE id = $1", [id]);
+    await this.pool.query("UPDATE review_items SET status = 'waiting', escalated_at = NULL, decided_by = NULL, decided_at = NULL, note = NULL WHERE id = $1", [id]);
   }
 
   private async decidable(reviewer: Identity): Promise<string[]> {
