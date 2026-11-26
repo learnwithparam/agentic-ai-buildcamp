@@ -14,10 +14,13 @@ const input: DraftInput = {
 
 const full: Extracted = {
   reporter_role: "doctor",
+  reporter_withheld: false,
   patient: { age: "70", sex: "male", initials_or_label: null },
   product: "CardioNex",
+  product_mention: "named",
   events: [{ reported_term: "lips swelled", term: "Angioedema" }],
   special_situation: null,
+  situation_term: null,
   seriousness: ["hospitalization"]
 };
 
@@ -56,7 +59,7 @@ test("the doctor's words are escaped, so they cannot add an element", () => {
 });
 
 test("a missing product, patient or event is listed, not invented", () => {
-  const bare: Extracted = { ...full, product: null, patient: { age: null, sex: null, initials_or_label: null }, events: [], seriousness: [] };
+  const bare: Extracted = { ...full, product: null, product_mention: "none", patient: { age: null, sex: null, initials_or_label: null }, events: [], seriousness: [] };
   const safety = buildCase(bare);
   assert.deepEqual(safety.criteria, { reporter: true, patient: false, product: false, event: false });
   assert.deepEqual(safety.missing, ["patient", "product", "event"]);
@@ -76,7 +79,14 @@ test("a term the dictionary lacks keeps the reporter's words and gets no code", 
 test("each criterion is decided from the fields: any one patient identifier is enough", () => {
   assert.equal(criteriaOf({ ...full, patient: { age: null, sex: "female", initials_or_label: null } }).patient, true);
   assert.equal(criteriaOf({ ...full, patient: { age: " ", sex: null, initials_or_label: null } }).patient, false);
-  assert.equal(criteriaOf({ ...full, reporter_role: null }).reporter, false);
+  assert.equal(criteriaOf({ ...full, reporter_role: null }).reporter, true);
+  assert.equal(criteriaOf({ ...full, reporter_withheld: true }).reporter, false);
+  assert.equal(criteriaOf({ ...full, product: null, product_mention: "unnamed" }).product, true);
+  assert.equal(criteriaOf({ ...full, product: null, product_mention: "unknown" }).product, false);
+  assert.equal(criteriaOf({ ...full, product: null, product_mention: "none" }).product, false);
+  const pregnant = buildCase({ ...full, events: [], special_situation: "pregnancy_exposure", situation_term: "Exposure during pregnancy" });
+  assert.equal(pregnant.criteria.event, false);
+  assert.equal(pregnant.situation?.coded?.pt.name, "Exposure during pregnancy");
   assert.equal(qualification("pharmacist"), "2");
   assert.equal(qualification("caller who is a doctor"), "1");
   assert.equal(qualification("somebody"), null);
