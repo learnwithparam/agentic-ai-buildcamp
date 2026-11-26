@@ -138,3 +138,15 @@ back. Lesson 21 builds this check.
 
 `npm run demo:check` plays this chat with the other demo chats, ten turns in all, on the real
 model. It fails on any wrong answer.
+
+## The same path as a drawing
+
+`npm run flows:capture` asks three questions through the running app. Two come from a Pharma A
+doctor: the eGFR 24 dose and the child dose. The third is the eGFR 24 dose from a Pharma B doctor.
+
+The script reads each turn's trace back from Langfuse. It writes one file per question to
+`docs/flows/main`, with the hops in order. Each hop names the part that made the call and the part
+it called. It keeps short cuts of what went in and what came out.
+
+The buildcamp drawings in lwp-canvas are made from these files. So the drawing shows the same spans
+you just clicked through.
