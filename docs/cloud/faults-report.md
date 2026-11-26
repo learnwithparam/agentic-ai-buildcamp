@@ -76,7 +76,7 @@ I broke the code one line at a time, saw the named test go red, and restored it.
 
 `scripts/faults-eval.test.ts` (8 tests, all green): the arithmetic on hand-written runs. Red when non-injected runs are counted, when the instruction scorer ignores its fault, when `empty_search` is not strict, and when API probes are left out of the graceful rate.
 
-Whole suite: `npm run typecheck` passes. `npx tsx --test 'scripts/**/*.test.ts' 'src/**/*.test.ts'`: 316 tests, 196 pass, 93 fail. The same 93 fail on a clean `origin/main` worktree (287 tests, 167 pass), so my 29 added tests are all green and I broke none. `npm run check` stops at the test step for that reason. `npx tsx scripts/check-repo.ts` passes (it needs this report to show `npm run faults:measure`).
+Whole suite: `npm run typecheck` passes. `npx tsx --test 'scripts/**/*.test.ts' 'src/**/*.test.ts'`: 316 tests, 196 pass, 93 fail. The same 93 fail on a clean `origin/main` worktree (287 tests, 167 pass), so my 29 added tests are all green and I broke none. `npm run check` stops at the test step for that reason. `npx tsx scripts/check-repo.ts` passes. It needs a tracked doc to show `npm run faults:measure` (this report does), and it fails a script that names a run file that does not exist yet, so `scripts/faults-eval.ts` builds the run file's name in code (`RUN_FILE`) instead of writing it out. Once the orchestrator has the run file, a literal name is fine.
 
 ## Tests I could not run, and why
 
