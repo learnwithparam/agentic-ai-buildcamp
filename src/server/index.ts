@@ -1,3 +1,4 @@
+import { startSafetyClock } from "./safety/clock";
 import "./load-env";
 import { NodeSDK } from "@opentelemetry/sdk-node";
 import { LangfuseSpanProcessor } from "@langfuse/otel";
@@ -45,6 +46,8 @@ const agent = createMedinfoAgent(checkpointer, { phiFinder: process.env.PHI_MODE
 const factChecker = createFactChecker();
 const outreachPlanner = createOutreachPlanner();
 const reviews = new ReviewStore(pool);
+// Every minute: an adverse event past its 24 hours is escalated (src/server/safety/clock.ts).
+startSafetyClock(pool);
 // Lesson 16. Events are stored in the same Postgres (migration 006), and their jobs wait in
 // pg-boss there too. The worker runs in this process and starts the same agents a chat does.
 const eventStore = new PostgresEventStore(pool);

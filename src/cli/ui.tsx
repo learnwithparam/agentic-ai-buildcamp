@@ -133,9 +133,10 @@ export const KEYS: Record<ReviewItem["kind"], Array<{ key: string; decision: Dec
 };
 
 function ItemRow({ item, selected }: { item: ReviewItem; selected: boolean }) {
-  const late = item.status === "waiting" && new Date(item.dueAt).getTime() < Date.now();
+  const open = item.status === "waiting" || item.status === "escalated";
+  const late = open && new Date(item.dueAt).getTime() < Date.now();
   return (
-    <Text inverse={selected} color={item.status === "waiting" ? undefined : "gray"} wrap="truncate-end">
+    <Text inverse={selected} color={open ? undefined : "gray"} wrap="truncate-end">
       {selected ? "›" : " "} {KIND_WORDS[item.kind].padEnd(14)} {item.status.padEnd(9)} <Text color={late ? "red" : undefined}>due {when(item.dueAt)}</Text>{" "}
       {item.question.replace(/\s+/g, " ")}
     </Text>
@@ -161,7 +162,7 @@ export function InboxScreen({ inbox: first, decide }: { inbox: Inbox; decide: (i
   const [selected, setSelected] = useState(0);
   const [note, setNote] = useState<{ text: string; error: boolean } | null>(null);
   const item = inbox.items[selected];
-  const keys = item && inbox.reviewer && item.status === "waiting" ? KEYS[item.kind] : [];
+  const keys = item && inbox.reviewer && (item.status === "waiting" || item.status === "escalated") ? KEYS[item.kind] : [];
   useInput((input, key) => {
     if (input === "q" || key.escape) return exit();
     if (key.upArrow) return setSelected((index) => Math.max(0, index - 1));

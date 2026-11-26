@@ -100,7 +100,7 @@ export type ReviewItem = {
   body: string;
   createdAt: string;
   dueAt: string;
-  status: "waiting" | "approved" | "rejected" | "filed" | "dismissed";
+  status: "waiting" | "escalated" | "approved" | "rejected" | "filed" | "dismissed";
   decidedAt: string | null;
   note: string | null;
   // Step 2B: how the answer was made, when a chat answer made the item.

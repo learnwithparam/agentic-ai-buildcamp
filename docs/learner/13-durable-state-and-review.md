@@ -47,6 +47,14 @@ Each tier has its own path:
 - **safety:** something happened to a patient. Identifiers are removed, and the doctor gets a fixed reply with no treatment advice. A safety reviewer has 24 hours to file the report.
 - **stop:** a use the label does not cover gets a fixed refusal and no dose.
 
+A second check backs up the router. When the router says answer, one more model call asks a single question. Did something happen to a patient after a medicine? A yes from either one sends the message to safety.
+
+A clock job in `src/server/safety/clock.ts` watches the safety deadline. If nobody has decided in 24 hours, it marks the item escalated and writes a second notice.
+
+The reviewer also sees a draft case. It lists the four facts a report needs: who reported, which patient, which medicine, and what happened. The event words are coded from a fictional teaching dictionary.
+
+A person checks the draft and files it. The assistant never does.
+
 **Pause and resume** is how a draft waits. The graph stops at one node and saves the thread. When the reviewer decides, the graph picks up where it stopped, even after a restart.
 
 The **review inbox** is the list of items waiting for a human. Each item has a deadline, a company and a kind. Only the right role in the right company may decide it.
@@ -120,6 +128,9 @@ stateDiagram-v2
     waiting --> rejected: reviewer rejects a draft
     waiting --> filed: safety reviewer files the report
     waiting --> dismissed: safety reviewer says it is not one
+    waiting --> escalated: an adverse event passes its due time
+    escalated --> filed: safety reviewer files the report
+    escalated --> dismissed: safety reviewer says it is not one
     approved --> [*]
     rejected --> [*]
     filed --> [*]

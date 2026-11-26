@@ -1,0 +1,44 @@
+{
+  "measures": {
+    "ae.recall": 1,
+    "ae.precision": 0.968,
+    "ae.criteria_accuracy": 0.965,
+    "ae.coding_accuracy": 0.875,
+    "ae.overdue_escalated": 1
+  },
+  "commit": "4735f7e",
+  "at": "2026-11-26T20:28:00.336Z",
+  "rows": 79,
+  "positives": 60,
+  "layers": {
+    "router_only": {
+      "recall": 0.917,
+      "precision": 0.982
+    },
+    "second_pass_only": {
+      "recall": 0.95,
+      "precision": 0.966
+    }
+  },
+  "criteria_all_four": 0.873,
+  "clock": {
+    "overdue": 3,
+    "escalated": 3,
+    "untouched_ok": true,
+    "second_notifications": 3
+  },
+  "misses": [
+    {
+      "id": "ae-025",
+      "expected": "answer",
+      "router": false,
+      "second_pass": true
+    },
+    {
+      "id": "ae-066",
+      "expected": "answer",
+      "router": true,
+      "second_pass": true
+    }
+  ]
+}
