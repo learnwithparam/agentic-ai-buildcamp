@@ -127,7 +127,7 @@ EVENT_FILES="docs/scoreboard.md package-lock.json package.json scripts/events-ru
   src/client/App.tsx src/client/chat/api.ts src/client/content/Events.tsx src/server/a2a/a2a.test.ts
   src/server/app.ts src/server/content/records.ts src/server/events/events.test.ts src/server/events/events.ts
   src/server/events/handlers.ts src/server/events/send.ts src/server/events/store.ts src/server/events/webhook.ts
-  src/server/graph.ts src/server/inbox.test.ts src/server/index.ts src/server/labels.ts src/server/labels.test.ts
+  src/server/graph.ts src/server/inbox.test.ts src/server/index.ts
   src/server/medinfo-agent.ts
   src/server/migrations/006_events.sql src/server/reviews.ts src/server/routes.ts src/server/test-desk.ts
   src/server/tools.ts src/server/trace-identity.test.ts src/server/users.ts"
@@ -178,7 +178,7 @@ BI_FILES=".github/start-test-services.sh docs/scoreboard.md infra/docker-compose
 # The demo fixes after lesson 23 (DESK_FILES): one prompt per company, a router that sorts the latest
 # message, search by country, the run record under each answer and in the review queue. They use
 # lesson 21's citation check and lesson 22's roles, so tags before 22 keep their own copies.
-# labels.ts is not in the list: every tag reads the new label data, and only main's copy reads it right.
+# labels.ts is in no list from lesson 11 on: every tag reads the new label data, and only main's copy reads it right.
 DESK_FILES=".claude/skills/hcp-labels/SKILL.md scripts/citations-replay.ts scripts/demo-turns.ts
   scripts/demo-users.test.ts scripts/flows-capture.ts scripts/flows.test.ts scripts/flows.ts
   scripts/identity-setup.ts scripts/identity-smoke.ts scripts/open-questions.ts
