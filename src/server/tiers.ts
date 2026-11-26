@@ -3,6 +3,7 @@ import { z } from "zod";
 import type { ChatMessage } from "../shared/messages";
 import { aiText } from "../shared/messages";
 import type { LabelSection } from "./labels";
+import { detectEvent, type Detection } from "./safety/detect";
 
 // Lesson 13. Before the agent writes a word, every message is sorted into a risk tier, and the
 // tier decides who must look before the doctor reads anything:
@@ -65,6 +66,21 @@ export const DRAFT_REQUEST = /\b(draft|write)\b[\s\S]*\b(reply|email|letter|resp
 export function withFloor(route: Route, question: string): Route {
   if (route.tier !== "answer" || !DRAFT_REQUEST.test(question)) return route;
   return { ...route, tier: "review", reason: `${route.reason} (raised to review: the message asks for a draft)` };
+}
+
+// The second layer. A message the router sent to "answer" is read once more with one question
+// only: did something happen to a patient after a medicine? A yes from either layer is safety.
+// It only raises answer to safety, never lowers a tier. Its own function (detectEvent) so it can
+// be measured alone.
+export function raiseToSafety(route: Route, seen: Detection): Route {
+  if (route.tier !== "answer" || !seen.happened) return route;
+  return { ...route, tier: "safety", reason: `${route.reason} (raised to safety by the second pass: ${seen.reason})` };
+}
+
+export async function withSecondPass(route: Route, openai: OpenAI, model: string, message: string): Promise<Route> {
+  // Only an answer is read again: every other tier already has a person or a fixed reply.
+  if (route.tier !== "answer") return route;
+  return raiseToSafety(route, await detectEvent(openai, model, message));
 }
 
 const RouteArgs = z.object({
