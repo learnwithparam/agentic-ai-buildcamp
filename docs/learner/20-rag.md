@@ -113,7 +113,7 @@ The checkpoint adds:
 - `src/server/rag/store.ts` and `src/server/migrations/008_label_chunks.sql`: the `label_chunks` table with an HNSW index.
 - `src/server/rag/search.ts`: `vectorSearch`, which `search_labels` now calls.
 - `scripts/rag-setup.ts` and `scripts/rag-ingest.ts`.
-- `src/server/rag/rag.test.ts`, with real Docling output for two PDFs as fixtures.
+- `src/server/rag/rag.test.ts`, with real Docling output for two PDFs as fixtures. When the PDFs change, `npm run rag:fixtures` writes them again from the running Docling.
 
 No new npm package. Docling runs as a pinned container, `quay.io/docling-project/docling-serve-cpu`. The pgvector part is a Postgres extension.
 
@@ -140,14 +140,21 @@ The PDF has two columns. Section 3.1, on the left, is a table of event rates. Se
 Docling reads the PDF's layout. Every heading, paragraph, list item and table comes with its page and box. It can also write the whole document as Markdown. Here is the start of that Markdown for CLARION-HF, from `src/server/rag/fixtures/cardionex-clarion-hf-trial.docling.md`. Each heading line is marked here with the word Heading:
 
 ```text
+Heading: 3.3 Secondary Outcomes
+
 Heading: 3.1 Primary and Subgroup Efficacy Outcomes
 
-Heading: 3.2 Adverse Reactions and Initiation Thresholds
+| Outcome                                 | CardioNex   | Placebo   | ...
+| Cardiovascular death                    | 7.1%        | 8.9%      | ...
 
+Heading: 0.001 3.4 Potassium and Kidney Results
+
+- Mean serum potassium rose by 0.3 mEq/L by week 4 and then stayed level.
+...
 | Population / Subgroup             | CardioNex Event Rate   | ...
 ```
 
-Both headings come first, then the table. Cut into sections, 3.1 is empty and the efficacy table belongs to 3.2. A question about the efficacy rate would cite 3.2 for a number 3.2 never states.
+Two headings come first, then a table. Cut into sections, 3.1 holds the secondary outcomes from 3.3, and the efficacy table lands under 3.4. A table cell even got glued to the front of the 3.4 heading. A question about the efficacy rate would cite 3.4 for a number 3.4 never states.
 
 You would not notice this by reading the output. So ingest does not trust it. Each PDF was printed from a Markdown label. The function `missingFromExtraction` compares the two section by section. It looks at letters and digits only, so a line break or a table border does not count:
 

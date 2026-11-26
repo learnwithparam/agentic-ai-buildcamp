@@ -23,7 +23,7 @@ A wrong answer here is quiet. The checker would answer a Pharma B rep with a Pha
 - **A server for each agent,** which takes work only with the asker's own token.
 - **A task store.** Each agent task lives in the database, so a restart loses nothing.
 - **A handoff agent.** It reads the cards and picks a skill. It sends the task with the rep's token.
-- **A Hand-offs page,** at `/handoffs`, for staff.
+- **A Hand off work page,** at `/handoffs`, for sales reps.
 
 | Case | What breaks | How the system holds |
 | --- | --- | --- |
@@ -113,7 +113,7 @@ The checkpoint adds:
 - `src/server/a2a/tasks.ts`: the task store in Postgres, and the link from a task to its inbox item.
 - `src/server/a2a/handoff.ts`: the agent a rep talks to. It reads the cards, drafts an email when asked, and sends the task with the rep's token.
 - `src/server/migrations/005_a2a_tasks.sql`: the `a2a_tasks` and `a2a_task_reviews` tables.
-- `src/client/content/Handoffs.tsx`: the Hand-offs page, at `/handoffs`, for staff.
+- `src/client/content/Handoffs.tsx`: the Hand off work page, at `/handoffs`, for sales reps.
 - `data/hcp/evals/a2a.yaml` in the dataset, and `scripts/a2a-runner.ts`, which runs those cases through real A2A servers.
 - Tests that need no model: `src/server/a2a/a2a.test.ts`.
 
@@ -148,9 +148,9 @@ The card names the skill (`check-email`), what to send and what comes back, and 
 
 The card is served in the A2A JSON form (`AgentCard.toJSON`). The SDK keeps a card in its own shape in memory. A client that follows the spec would read that shape with no sign-in scheme at all. A test reads the card back with `AgentCard.fromJSON` to keep it right.
 
-Sign in as Priya Nair, a sales rep, and open **Hand-offs**. The page lists the agents it can hand work to, read from their cards the same way.
+Sign in as Priya Nair, a sales rep, and open **Hand off work**. The page lists the agents it can hand work to, read from their cards the same way.
 
-![The Hand-offs page with both Agent Cards](../images/a2a/01-handoffs-cards.png)
+![The Hand off work page with both Agent Cards](../images/a2a/01-handoffs-cards.png)
 
 ### Step 2: Make work need the person's token
 
@@ -188,7 +188,7 @@ A second table, `a2a_task_reviews`, links a task to the inbox item it waits on. 
 
 ### Step 4: Let a flagged email wait for a person
 
-On Hand-offs, ask:
+On **Hand off work**, ask:
 
 ```text
 Draft an email to HCP-1001 saying CardioNex is the best heart failure medicine available today, and have it fact-checked.
