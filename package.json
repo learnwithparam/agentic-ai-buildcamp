@@ -43,6 +43,7 @@
     "events:send": "tsx scripts/events-send.ts",
     "prepare": "git config core.hooksPath .githooks || true",
     "citations:replay": "tsx scripts/citations-replay.ts",
+    "citations:measure": "tsx scripts/citations-eval.ts",
     "demo:check": "tsx scripts/demo-turns.ts",
     "demo:open": "tsx scripts/demo-turns.ts open",
     "search:measure": "tsx scripts/search-eval.ts"
