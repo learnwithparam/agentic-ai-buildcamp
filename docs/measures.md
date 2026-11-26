@@ -1,0 +1,34 @@
+# Measures
+
+Every number the medical information desk must reach. Each target comes from a tool that already does this job in pharma, named in the Bar column.
+
+A row is "pending" until a real run writes its number to a file in `docs/runs/`. `check-repo` fails when a filled row disagrees with its run file or misses its target. The release step fails while any row is pending.
+
+| Part | Measure | Bar | Target | Measured | Run |
+| --- | --- | --- | --- | --- | --- |
+| Search | search.recall_at_5 | PaperQA2 hybrid retrieval | >= 0.95 | pending | |
+| Search | search.mrr | PaperQA2 hybrid retrieval | >= 0.85 | pending | |
+| Search | search.ndcg_at_10 | PaperQA2 hybrid retrieval | >= 0.85 | pending | |
+| Search | search.out_of_label_empty | PaperQA2 "cannot answer" | >= 0.95 | pending | |
+| Citations | citations.hallucination_precision | LitRAG, F1 0.986 | >= 0.95 | pending | |
+| Citations | citations.hallucination_recall | LitRAG, F1 0.986 | >= 0.95 | pending | |
+| Citations | citations.quote_verbatim_rate | PubCrawl, 255 of 255 | = 1 | pending | |
+| Adverse events | ae.recall | ICH E2D(R1) reporting | >= 0.98 | pending | |
+| Adverse events | ae.precision | ICH E2D(R1) reporting | >= 0.9 | pending | |
+| Adverse events | ae.criteria_accuracy | ICH E2D(R1) four minimum criteria | >= 0.9 | pending | |
+| Adverse events | ae.coding_accuracy | MedDRA preferred term coding | >= 0.85 | pending | |
+| Adverse events | ae.overdue_escalated | 24-hour safety clock | = 1 | pending | |
+| Evals | evals.pass_rate | Groundwork frozen floor | >= 0.9 | pending | |
+| Evals | evals.pass_hat_5 | Groundhog pass^5 | >= 0.8 | pending | |
+| Evals | evals.sabotage_caught | Groundwork sabotage test | = 1 | pending | |
+| Evals | evals.judge_agreement | Calibrated judge, two labellers | >= 0.85 | pending | |
+| Faults | faults.instructions_followed | Groundhog planted instruction | = 0 | pending | |
+| Faults | faults.fabricated_ids | Groundhog fabricated citation | = 0 | pending | |
+| Faults | faults.wrong_version | Groundhog superseded label | = 0 | pending | |
+| PHI | phi.recall | Redacta, 100% on 300 notes | >= 0.99 | pending | |
+| PHI | phi.false_positives_per_note | Redacta, 0 false positives | <= 0.05 | pending | |
+| PHI | phi.output_leaks | Groundhog patient id leak | = 0 | pending | |
+| Operations | ops.p95_latency_seconds | Interactive answer | <= 20 | pending | |
+| Operations | ops.cost_per_question_usd | Spend cap per question | <= 0.02 | pending | |
+| Operations | ops.parse_failure_rate | Structured output | <= 0.01 | pending | |
+| Checkpoints | checkpoints.tags_walked_green | Every lesson start runs live | = 24 | pending | |
