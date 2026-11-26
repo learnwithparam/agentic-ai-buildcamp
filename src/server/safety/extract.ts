@@ -24,7 +24,7 @@ export const EXTRACT_PROMPT = `You read one message sent to a pharmaceutical com
 - product_mention: named when the message names the medicine; unnamed when it speaks of a medicine the patient takes or took without naming it ("it", "the drug", "his tablet", "since she started", a dose to titrate); unknown when it says the name is not known; none when no medicine a patient takes comes up.
 - events: only what happened to the patient. A symptom, sign, test result, hospital stay or death. For each, reported_term is the words from the message and term is the closest term from the allowed list, or null if none fits. A lack of effect is an event: use the term for it. A hospital stay is not an event: it goes in seriousness. Code as MedDRA's term selection guide does: when the message gives a diagnosis, code the diagnosis and not the signs and tests it explains (acute kidney injury, not also a raised creatinine); never code the reason the medicine is taken, a problem from before it was started, or a baseline test result; code what the doctor reports, not a consequence the message only implies. An overdose, a medication error that was caught, or a pregnancy exposure with nothing yet wrong is not an event either: it goes in special_situation and situation_term.
 - special_situation: pregnancy_exposure, overdose, medication_error, lack_of_efficacy or off_label_use, or null.
-- situation_term: when there is a special situation other than lack of effect, the closest term from the allowed list for it ("Exposure during pregnancy", "Intentional overdose", "Wrong dose", "Exposure to contraindicated drug"), or null. Set it even when an event also happened: a medicine given with one it must not be given with, or a dose higher than the label allows for this patient, is a special situation on top of the reaction.
+- situation_term: when there is a special situation other than lack of effect, the closest term from the allowed list for it ("Exposure during pregnancy", "Intentional overdose", "Wrong dose", "Exposure to contraindicated drug"), or null. Set it even when an event also happened: a medicine given with one it must not be given with, or a dose higher than the label allows for this patient, is a special situation on top of the reaction. Decide those two against the label sections given after the message: a dose above the label's limit for this patient's kidney function, liver function or other medicines is "Wrong dose", and a medicine the label says must not be given with it, or a start inside the label's washout, is "Exposure to contraindicated drug".
 - seriousness: every criterion that applies to the events: death, life_threatening, hospitalization, disability, congenital_anomaly, other_medically_important. Empty when none.`;
 // checkpoint-sync:end safety-extract-prompt
 
@@ -96,14 +96,15 @@ export function buildCase(extracted: Extracted): SafetyCase {
   };
 }
 
-export async function extractCase(openai: OpenAI, model: string, message: string): Promise<SafetyCase> {
+// limits: the label sections the message is checked against (reference.ts), or none.
+export async function extractCase(openai: OpenAI, model: string, message: string, limits = ""): Promise<SafetyCase> {
   const nullable = { type: ["string", "null"] } as const;
   const completion = await openai.chat.completions.create({
     model,
     temperature: 0,
     messages: [
       { role: "system", content: EXTRACT_PROMPT },
-      { role: "user", content: `Message:\n${message}` }
+      { role: "user", content: limits ? `Message:\n${message}\n\nThe company's label in force, to check doses and contraindications against:\n${limits}` : `Message:\n${message}` }
     ],
     response_format: {
       type: "json_schema",
