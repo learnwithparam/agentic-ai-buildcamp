@@ -116,7 +116,9 @@ flowchart LR
 git checkout checkpoint/10-ai-gateway
 ```
 
-The checkpoint adds:
+This tag is where lesson 10 starts. It holds what the earlier lessons built and none of this lesson's own files.
+
+You add:
 
 - `src/server/gateway.ts`: the only file that creates a model client. It holds the input check, the spent-budget message and the traced decision call.
 - `scripts/langfuse-gateway-keys.ts`: turns the gateway on in your local Langfuse.
@@ -234,6 +236,17 @@ Set the budget back to $1 before you go on.
 The behavior decision uses OpenRouter's Decisions format, which the gateway does not carry. It answers `404 no_route`. So `decide()` in `gateway.ts` is the one call that still goes straight to OpenRouter, with `OPENAI_API_KEY`.
 
 It now runs inside a `behavior-decision` generation, with its model, its tokens and the cost OpenRouter reports. The decisions the 07 run made in the dark are now in each run's traces, with their cost.
+
+### Check your build
+
+Run the check. Then compare your files with the next tag, which holds this lesson's finished code.
+
+```bash
+npm run check
+git diff --stat checkpoint/11-sign-in
+```
+
+The check passes, except the tests that need a service from an earlier lesson. They fail when that service is not running. The diff lists only files you wrote in your own way.
 
 ## Prove it
 

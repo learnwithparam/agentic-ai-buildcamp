@@ -123,7 +123,9 @@ A stopped run is not a failure. The report says where it stopped, and the rest w
 git checkout checkpoint/17-autonomy
 ```
 
-The checkpoint adds:
+This tag is where lesson 17 starts. It holds what the earlier lessons built and none of this lesson's own files.
+
+You add:
 
 - `src/server/auto/sweep.ts`: the sweep. It reads the limits before every step. It hands each piece to the desk or the planner.
 - `src/server/auto/limits.ts`: the switch and budget row per company, and the spend reader.
@@ -256,6 +258,17 @@ npm run dataset:run -- --cases AUTO-01,AUTO-02,AUTO-03,AUTO-04,AUTO-05,STALENESS
 ```
 
 Your row goes to `my-scoreboard.md`. The scoreboard gains an `auto` column.
+
+### Check your build
+
+Run the check. Then compare your files with the next tag, which holds this lesson's finished code.
+
+```bash
+npm run check
+git diff --stat checkpoint/18-release-gate
+```
+
+The check passes, except the tests that need a service from an earlier lesson. They fail when that service is not running. The diff lists only files you wrote in your own way.
 
 ## Prove it
 

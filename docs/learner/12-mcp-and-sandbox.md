@@ -106,7 +106,9 @@ flowchart LR
 git checkout checkpoint/12-mcp-sandbox
 ```
 
-The checkpoint adds:
+This tag is where lesson 12 starts. It holds what the earlier lessons built and none of this lesson's own files.
+
+You add:
 
 - `src/server/mcp.ts`: the MCP server at `/api/mcp`, its two tools, and the metadata that names the sign-in service.
 - `.mcp.json`: tells the coding agent where the server is, and which sign-in client to use.
@@ -276,6 +278,17 @@ function evaluate() {
 ![An evaluator that eats memory: Evaluator exceeded the available memory limit](../images/mcp-sandbox/07-sandbox-out-of-memory.png)
 
 Each failure is the evaluator's. It is reported back to Langfuse, and the executor keeps running for the next job. The ALL CAPS evaluator from lesson 04 still scores as before.
+
+### Check your build
+
+Run the check. Then compare your files with the next tag, which holds this lesson's finished code.
+
+```bash
+npm run check
+git diff --stat checkpoint/13-durable-review
+```
+
+The check passes, except the tests that need a service from an earlier lesson. They fail when that service is not running. The diff lists only files you wrote in your own way.
 
 ## Prove it
 

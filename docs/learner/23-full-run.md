@@ -94,16 +94,24 @@ flowchart LR
 ```bash
 git checkout checkpoint/23-full-run
 npm install
-npm run dev
 ```
 
-The checkpoint changes these files. No new package and no new container.
+This tag is where lesson 23 starts. It holds what the earlier lessons built and none of this lesson's own files.
+
+You change these files. No new package and no new container.
 
 - `scripts/demo-turns.ts`: the repro set, run as `npm run demo:check`.
 - `src/server/tiers.ts`: `routerInput`, what the router reads.
 - `src/server/desk-prompt.ts`: `deskFacts` and `fillDeskPrompt`, one prompt per company.
-- `src/server/rag/search.ts`: search by the question's country, with scores.
 - `src/shared/run.ts` and `src/client/chat/RunSteps.tsx`: the run record and its panel.
+
+One change is already in the tag. `src/server/rag/search.ts` searches by the question's country and shows each score. It was cut with lesson 20's search, so the tags from lesson 21 on hold it already.
+
+Once the files are in place, start the parts this lesson needs:
+
+```bash
+npm run dev
+```
 
 ### Step 1: Replay the chats that broke
 
@@ -191,6 +199,17 @@ npm run dataset:run -- --chapter 23 --change "The whole desk, every case, after 
 ```
 
 The run adds a row to `docs/scoreboard.md`. Every miss prints with its answer.
+
+### Check your build
+
+Run the check. Then compare your files with the next tag, which holds this lesson's finished code.
+
+```bash
+npm run check
+git diff --stat main
+```
+
+The check passes, except the tests that need a service from an earlier lesson. They fail when that service is not running. The diff lists only files you wrote in your own way.
 
 ## Prove it
 

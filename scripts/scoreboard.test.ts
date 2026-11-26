@@ -70,10 +70,17 @@ test("every --cases id a lesson page names is a case in the dataset", () => {
   const learner = path.resolve(path.dirname(new URL(import.meta.url).pathname), "../docs/learner");
   const pages = readdirSync(learner).filter((name) => name.endsWith(".md"));
   let lists = 0;
+  // A tag holds the eval file of a lesson only after that lesson, so a page for a later lesson
+  // names cases the tag does not have yet. Those ids are skipped; main holds every file.
+  const later: Record<string, string> = { FACT: "fact-check", OUTREACH: "outreach", A2A: "a2a", EVENT: "events", AUTO: "autonomy", INSIGHTS: "insights" };
+  const absent = (id: string) => {
+    const file = later[id.replace(/-\d+$/, "")];
+    return file !== undefined && !readdirSync(evals).includes(`${file}.yaml`);
+  };
   for (const page of pages) {
     for (const [, list] of readFileSync(path.join(learner, page), "utf8").matchAll(/--cases\s+([A-Z0-9,-]+)/g)) {
       lists += 1;
-      for (const id of list.split(",")) assert.ok(ids.has(id), `${page} names ${id}, which is not in the dataset`);
+      for (const id of list.split(",")) assert.ok(ids.has(id) || absent(id), `${page} names ${id}, which is not in the dataset`);
     }
   }
   assert.ok(lists > 0, "no lesson page names a --cases list; the pattern no longer matches");

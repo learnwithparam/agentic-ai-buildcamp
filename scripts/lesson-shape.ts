@@ -3,6 +3,7 @@
 // not read like a tool tour. A product is named by its job inside the page, never in the title,
 // a heading or "The problem".
 import { readdirSync, readFileSync } from "node:fs";
+import { expand, holds, loadManifest, versionsOf, youAdd } from "./lesson-tags";
 import { withoutFrontMatter } from "./plain-english";
 
 export const LESSONS = "docs/learner";
@@ -88,12 +89,41 @@ export function shapeProblems(file: string, page: string): string[] {
   // The build starts from the lesson's checkpoint.
   if (number && !/git checkout checkpoint\/\d\d-/.test(build)) problems.push(`${file}: "## Build it" must start with git checkout of the lesson's checkpoint`);
 
+  // From lesson 10 each page is a build: start from the lesson's own tag, add the named files,
+  // run the check, compare with the next tag.
+  if (number && Number(number) >= 10) problems.push(...buildProblems(file, Number(number), build, markdown));
+
   for (const product of PRODUCTS) {
     for (const heading of headings.filter((line) => h2Or3.test(line) || line.startsWith("# "))) {
       if (named(heading, product)) problems.push(`${file}: heading "${heading}" names ${product}; name the job, not the product`);
     }
     if (named(sectionOf(markdown, "## The problem"), product)) problems.push(`${file}: "The problem" names ${product}; tell the problem, the product comes in the build`);
   }
+  return problems;
+}
+
+// The tag is the start of the lesson, so the files the page says you add must not be on it, and
+// must be on the next tag, which is where the lesson ends.
+export function buildProblems(file: string, lesson: number, build: string, markdown: string, manifest = loadManifest()): string[] {
+  const problems: string[] = [];
+  const named = youAdd(markdown);
+  if (named.length === 0) problems.push(`${file}: "## Build it" needs a line "You add" (or "You change") and one bullet per file the lesson adds`);
+  for (const name of named) {
+    const files = expand(manifest, name, lesson);
+    if (!(name in manifest.files) && files.length === 0) problems.push(`${file}: "You add" names ${name}, which this lesson adds or changes nothing under`);
+    for (const path of files) {
+      const entry = manifest.files[path];
+      if (!versionsOf(entry).includes(lesson)) {
+        problems.push(
+          holds(entry, lesson)
+            ? `${file}: tag ${lesson} already holds ${path}, so the page cannot ask you to add it`
+            : `${file}: ${path} is not added or changed by lesson ${lesson} (lessons ${versionsOf(entry).join(", ") || "none"})`
+        );
+      }
+    }
+  }
+  if (!/^npm run check$/m.test(build)) problems.push(`${file}: "## Build it" must tell the reader to run npm run check`);
+  if (!/^git diff --stat (checkpoint\/\d\d-\S+|main)$/m.test(build)) problems.push(`${file}: "## Build it" must compare with the next tag: git diff --stat checkpoint/<next>`);
   return problems;
 }
 

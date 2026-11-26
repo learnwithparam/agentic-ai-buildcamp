@@ -6,41 +6,19 @@ This file tells agents and maintainers how to change the Langfuse workshop repos
 
 ### Rule 1: Propagate changes across checkpoints
 
-`main` alone is not enough. Learners check out `checkpoint/*` tags during the workshop. If you change something those checkouts need, update every affected checkpoint tag before considering the work done.
+`main` alone is not enough. Learners check out `checkpoint/*` tags during the workshop. Tag N is the start of lesson N: it holds the files the lessons before N added, each at the version those lessons left, and none of lesson N's own files. If you change something those checkouts need, update every affected checkpoint tag before considering the work done.
 
-Canonical checkpoint tags:
+Canonical checkpoint tags: `checkpoint/00-setup` to `checkpoint/23-full-run`, one per lesson page in `docs/learner/`. The list is `TAGS` in `scripts/sync-checkpoints.sh`.
 
-- `checkpoint/00-setup`
-- `checkpoint/01-base-app`
-- `checkpoint/02-tracing`
-- `checkpoint/03-prompt-management`
-- `checkpoint/04-monitoring`
-- `checkpoint/05-dataset`
-- `checkpoint/06-experiments`
-- `checkpoint/07-evaluation`
-- `checkpoint/08-midpoint`
-- `checkpoint/09-advanced-evals`
-- `checkpoint/10-ai-gateway`
-- `checkpoint/11-sign-in`
-- `checkpoint/12-mcp-sandbox`
-- `checkpoint/13-durable-review`
-- `checkpoint/14-content-agents`
-- `checkpoint/15-a2a`
-- `checkpoint/16-events`
-- `checkpoint/17-autonomy`
-- `checkpoint/18-release-gate`
-- `checkpoint/19-cli`
-- `checkpoint/20-rag`
-- `checkpoint/21-citations`
-- `checkpoint/22-insights`
-
-What to propagate:
+`scripts/lesson-files.json` is the one list of who owns what. For every tracked file on main it gives the lesson that adds it. A file that later lessons change lists them too, for example `[0, 2, 3, 10, 13]`: added by lesson 0, changed by lessons 2, 3, 10 and 13. Lesson 0 is the starting repo, on every tag. `"main"` means the file stays off the tags (`.github/`, the sync script and its test, the scoreboard alignment, `docs/cloud/`).
 
 | Change type | Propagate to checkpoints? | How |
 | --- | --- | --- |
-| Anything outside the milestone files (`docs/`, `README.md`, `AGENTS.md`, `package.json`, `scripts/`, `data/`, client code, shared server code) | Yes: every tag | Automatic: the `Sync checkpoint tags` action copies `main` onto every tag |
-| Shared content inside a milestone file (for example the `SYSTEM_PROMPT`) | Yes: every tag | Keep it between `// checkpoint-sync:begin <name>` and `// checkpoint-sync:end <name>`; the sync copies that region |
-| Milestone-only app code (for example tracing wrappers that only exist from `02-tracing` onward) | Only tags that already contain that code path | Lives in the milestone files, which the sync leaves alone; patch those tags by hand and do not invent the feature on earlier milestones |
+| A new file | Yes, from the tag after its lesson | Add it to `scripts/lesson-files.json` with its lesson. `scripts/sync-checkpoints.test.ts` fails on a file with no owner. |
+| An edit to a file one lesson owns, or to its newest version | Yes: every tag after that lesson | Automatic: the `Sync checkpoint tags` action copies `main` onto each tag that holds the newest version. |
+| A lesson changes a file an earlier lesson added | Only tags after that lesson get the new version | Add the lesson to the file's list. Tags before it keep the version the earlier lessons left: the file as `main` stood when the lesson before the change ended (`lessonEnd` in the manifest). |
+| Shared content inside an older version (for example the `SYSTEM_PROMPT`) | Yes: every tag that holds it | Keep it between `// checkpoint-sync:begin <name>` and `// checkpoint-sync:end <name>`; the sync copies that region. |
+| Docs, `README.md`, `AGENTS.md`, `scripts/` tooling, `data/` | Every tag that holds the file | Owner 0 or the lesson that adds it; the action copies `main`. |
 
 Do not stop at a PR to `main` when checkpoints still carry the old shared state. After the merge, check that the action run succeeded. Document force-moved tag tips in the PR when you update tags by hand.
 
@@ -111,32 +89,19 @@ Recommended jump patterns:
 
 ## Syncing checkpoint tags
 
-Every `checkpoint/*` tag is `main`'s tree except for its milestone files: the files whose code the next lesson changes. `scripts/sync-checkpoints.sh` sets this list in `milestone_files()`:
+`scripts/sync-checkpoints.sh` builds every `checkpoint/*` tag from `scripts/lesson-files.json` (see Rule 1). `scripts/lesson-tags.ts` turns the manifest into a plan per tag. For tag N it:
 
-| Tags | Milestone files (kept from the tag) |
-| --- | --- |
-| `00-setup`, `01-base-app`, `02-tracing` | the untraced app (`index.ts`, `medinfo-agent.ts`, `tools.ts`), the runner, and the lesson 10 to 21 files |
-| `03-prompt-management` | `medinfo-agent.ts` with no Langfuse prompt fetch, the runner, and the lesson 10 to 21 files |
-| `04-monitoring` to `09-advanced-evals` | `medinfo-agent.ts`, the runner, and the lesson 10 to 21 files |
-| `10-ai-gateway` | the lesson 11 to 22 files |
-| `11-sign-in` | the lesson 12 to 22 files |
-| `12-mcp-sandbox` | the lesson 13 to 22 files |
-| `13-durable-review` | the lesson 14 to 22 files |
-| `14-content-agents` | the lesson 15 to 22 files |
-| `15-a2a` | the lesson 16 to 22 files |
-| `16-events` | the lesson 17 to 22 files |
-| `17-autonomy` | the lesson 18 to 22 files |
-| `18-release-gate` | the lesson 19 to 22 files |
-| `19-cli` | the lesson 20 to 22 files |
-| `20-rag` | the lesson 21 and 22 files |
-| `21-citations` | the lesson 22 files |
-| `22-insights` | none (equal to `main`) |
+- keeps the files owned by lesson 0 or by a lesson before N, and leaves out the rest;
+- reads each kept file at the version the lessons before N left. The newest version is `main`'s file. An older version is read from the commit named in `lessonEnd`, the last commit of the lesson before the next change. The untraced app of lessons 0 to 2 has no commit, so a tag keeps the copy it has;
+- cuts `package.json` down to the scripts whose files the tag holds (a `&&` step goes alone), and drops `bin` when `build:cli` goes;
+- lists in `data/hcp/dataset.lock.json` and `docs/coverage.md` only the files and cases the tag holds. Eval cases follow their file: `medinfo.yaml` comes with lesson 5 and each other agent's file with its own lesson;
+- runs `scripts/align-scoreboard.ts` on the tag's own `docs/scoreboard.md`: a slice added by a later lesson becomes a column of dashes there.
 
-The lesson 10 files are `GATEWAY_FILES` in the script, the lesson 11 files are `AUTH_FILES`, the lesson 12 files are `MCP_FILES`, the lesson 13 files are `TIER_FILES`, the lesson 14 files are `CONTENT_FILES`, the lesson 15 files are `A2A_FILES`, the lesson 16 files are `EVENT_FILES`, the lesson 17 files are `AUTO_FILES`, the lesson 18 files are `GATE_FILES`, the lesson 19 files are `CLI_FILES`, the lesson 20 files are `RAG_FILES`, the lesson 21 files are `CITE_FILES`, and the lesson 22 files are `BI_FILES`. A tag keeps its own `docs/scoreboard.md`, so the sync runs `scripts/align-scoreboard.ts` on it: a slice added by a later lesson becomes a column of dashes there. A milestone file a tag does not have stays absent on it, which is why `npm run check` finds its tests by glob, not by name.
+A file a tag does not hold stays absent on it, which is why `npm run check` finds its tests by glob, not by name, and why `scripts/check-repo.ts` runs the scoreboard and measures checks only when those modules exist. Inside an older version, regions marked `// checkpoint-sync:begin <name>` / `// checkpoint-sync:end <name>` still come from `main`. The sync fails if `main` has a region that an older version lacks.
 
-Inside a milestone file, regions marked `// checkpoint-sync:begin <name>` / `// checkpoint-sync:end <name>` still come from `main`. The sync fails if `main` has a region that a tag's milestone file lacks. When a new lesson starts editing a file, add it to `milestone_files()` for the earlier tags.
+`scripts/sync-checkpoints.test.ts` holds the offline proofs: every tracked file has an owner, every npm script on every tag names only files the tag holds, every import on every tag resolves to a file the tag holds, each lesson page's "You add" files are not on its own tag and are on the next, and no tag holds an eval file of a later lesson. `npm run check:pages` fails a page from lesson 10 on whose tag already holds a file the page says you add. The sync needs the full history (`git fetch --unshallow`), because an older version is read from a commit.
 
-The `Sync checkpoint tags` GitHub Action (`.github/workflows/sync-checkpoints.yml`) runs on every push to `main` (and by hand). It runs `npm ci`, then `./scripts/sync-checkpoints.sh --verify --push`. With `--verify`, every tag must pass `npm run check`, moved or not. Each changed tag gets one commit and is force-moved. With no `SOURCE_REF`, the script fetches and uses `origin/main`, never a local `main` that may be behind. All moved tags are pushed together, and only once every tag has passed. `.github/`, `scripts/sync-checkpoints.sh` and `scripts/align-scoreboard*.ts` stay on `main` only.
+The `Sync checkpoint tags` GitHub Action (`.github/workflows/sync-checkpoints.yml`) runs on every push to `main` (and by hand). It runs `npm ci`, then `./scripts/sync-checkpoints.sh --verify --push`. With `--verify`, every tag must pass `npm run check`, moved or not. Each changed tag gets one commit and is force-moved. With no `SOURCE_REF`, the script fetches and uses `origin/main`, never a local `main` that may be behind. All moved tags are pushed together, and only once every tag has passed. `.github/`, `scripts/sync-checkpoints.sh`, its test and `scripts/align-scoreboard*.ts` stay on `main` only.
 
 To run it locally (clean working tree required):
 

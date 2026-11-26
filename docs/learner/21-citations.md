@@ -124,10 +124,11 @@ There is one rewrite, not a loop. A model that failed twice on the same sections
 ```bash
 git checkout checkpoint/21-citations
 npm install
-npm run dev
 ```
 
-The checkpoint adds these files. No new package and no new container.
+This tag is where lesson 21 starts. It holds what the earlier lessons built and none of this lesson's own files.
+
+You add these files. No new package and no new container.
 
 - `src/server/citations.ts`: `checkCitations`, the check itself.
 - `src/server/graph.ts`: the `cite` node and `citeStep`, the one rewrite.
@@ -136,6 +137,12 @@ The checkpoint adds these files. No new package and no new container.
 - `scripts/citations-replay.ts`: the `cite` node on those answers, with the real model.
 - `src/server/citations.claims.ts`: the claim check. Code finds each quote in its section. A judge call asks if the quote backs the claim.
 - `scripts/citations-eval.ts`: `npm run citations:measure` runs 116 claim and quote pairs through that check and writes `docs/runs/citations.json`. Add `-- --fake` to run it with no model.
+
+Once the files are in place, start the parts this lesson needs:
+
+```bash
+npm run dev
+```
 
 ### Step 1: Find the answers that broke the rules
 
@@ -250,6 +257,17 @@ The search returned the label in force, the next label and the old one. The answ
 ![The trace ends in the cite span, and its header shows the score citations passed.](../images/citations/03-cite-span.png)
 
 The `cite` span comes last, and the header shows `citations: passed`. Filter traces by the `citations` score to see every rewritten or held answer. Or chart the score to watch the rate over time.
+
+### Check your build
+
+Run the check. Then compare your files with the next tag, which holds this lesson's finished code.
+
+```bash
+npm run check
+git diff --stat checkpoint/22-insights
+```
+
+The check passes, except the tests that need a service from an earlier lesson. They fail when that service is not running. The diff lists only files you wrote in your own way.
 
 ## Prove it
 
