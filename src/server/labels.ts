@@ -17,6 +17,9 @@ export type LabelSection = {
   status: string;
   effectiveDate: string;
   country: string;
+  // Fix 4. The vector search's cosine similarity, so a reader can see why a section was found.
+  // Word search and a short document's extra sections have none.
+  score?: number;
 };
 
 const DATA_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../data/hcp");

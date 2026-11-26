@@ -46,10 +46,13 @@ function mcpServerFor(user: Identity, canQuery: boolean) {
       title: "Search the label library",
       description:
         "Search prescribing information, trial summaries, the FAQ and the safety procedure. Returns only documents the signed-in doctor may read, for their company and country.",
-      inputSchema: { query: z.string().min(1).max(500).describe("What to look up, with the medicine and country when known.") },
+      inputSchema: {
+        query: z.string().min(1).max(500).describe("What to look up, in the doctor's own words."),
+        country: z.string().length(2).optional().describe("Two-letter code of the country the question is about. Leave out for the asker's own country.")
+      },
       annotations: { readOnlyHint: true, openWorldHint: false }
     },
-    ({ query }) => run("search_labels", { query })
+    ({ query, country }) => run("search_labels", country ? { query, country } : { query })
   );
   // Fix 0. The label lookups, from the same definitions the agent's model sees.
   for (const tool of TOOL_DEFINITIONS) {

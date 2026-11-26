@@ -27,6 +27,11 @@ export const CANDIDATES_PER_RESULT = 4;
 // after their hit: the nearest `limit` hits are never pushed out. Old versions bring nothing.
 export const SHORT_DOCUMENT_WORDS = 200;
 
+// Fix 4. No cut by score below the best hit. Measured on the 23 sections the dataset's ideal
+// answers cite: these 4 results find all 23; keeping only hits within 0.04 to 0.12 of the best
+// finds 19 to 22 (PV-01's cited section sits 0.16 below its best hit). So every result carries
+// its score instead, and the reader sees how close each one was.
+
 export function vectorSearch(
   store: Pick<LabelChunkStore, "nearest" | "shortDocuments">,
   embedQuery: (text: string) => Promise<number[]> = async (text) => (await embed([text]))[0],
@@ -38,7 +43,7 @@ export function vectorSearch(
     const hits = await store.nearest(await embedQuery(query), [...readable], limit * CANDIDATES_PER_RESULT, model);
     const sections = hits
       .filter((hit) => hit.similarity >= minSimilarity)
-      .map(({ similarity: _similarity, ...section }): LabelSection => ({ ...section, status: statusOn(section, today) }));
+      .map(({ similarity, ...section }): LabelSection => ({ ...section, status: statusOn(section, today), score: Math.round(similarity * 1000) / 1000 }));
     // A stable sort: in force first, each group still nearest first.
     const inForce = (section: LabelSection) => (section.status === "active" ? 0 : 1);
     sections.sort((a, b) => inForce(a) - inForce(b));

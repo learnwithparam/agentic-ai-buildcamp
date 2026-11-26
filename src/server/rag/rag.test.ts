@@ -52,3 +52,22 @@ test("a block lost on the way out of the PDF fails the check for its section", (
   const problems = missingFromExtraction(sourceOf("cardionex-uspi-v2"), sectionsFromMarkdown(readingOrder(doc)));
   assert.deepEqual(problems, ["section 2.2 lost words on the way out of the PDF"]);
 });
+
+// Fix 4. No model and no database: a store that returns fixed scores, to show what search hands on.
+test("each hit carries its score, and a section below the floor is not returned", async () => {
+  const at = (sectionId: string, similarity: number) => ({
+    docId: "test-a", section: sectionId, title: sectionId, text: "text", tenantId: "pharma_a", brandId: "brand_test",
+    status: "active", effectiveDate: "2026-01-01", country: "US", similarity
+  });
+  const store = { nearest: async () => [at("2.2", 0.71234), at("8.7", 0.52), at("9.9", MIN_SIMILARITY - 0.01)], shortDocuments: async () => [] };
+  const hits = await vectorSearch(store, async () => [0])("eGFR 24 dose", new Set(["test-a"]), 4, TODAY);
+  assert.deepEqual(hits.map((hit) => [hit.section, hit.score]), [["2.2", 0.712], ["8.7", 0.52]]);
+});
+
+test("a question about another country searches only the company's documents from that country", async () => {
+  const { documentsIn } = await import("../tools");
+  const company = new Set(["cardionex-uspi-v2", "cardionex-de-smpc", "cardionex-jp-label"]);
+  assert.deepEqual([...documentsIn(company, "DE")], ["cardionex-de-smpc"]);
+  assert.deepEqual([...documentsIn(company, "JP")], ["cardionex-jp-label"]);
+  assert.deepEqual([...documentsIn(new Set(["neurovex-uspi-v1"]), "DE")], []);
+});
