@@ -173,54 +173,75 @@ BI_FILES=".github/start-test-services.sh docs/scoreboard.md infra/docker-compose
   src/server/auth.ts src/server/bi/agent.ts src/server/bi/bi.test.ts src/server/bi/load.ts
   src/server/bi/query.ts src/server/env.ts src/server/inbox.test.ts src/server/index.ts
   src/server/mcp.ts src/server/migrations/009_sales.sql src/server/permissions.ts
-  src/server/routes.ts src/server/test-desk.ts src/server/users.ts"
+  src/server/routes.ts src/server/test-desk.ts src/server/users.ts src/client/nav.ts src/client/nav.test.ts"
+# The demo fixes after lesson 23 (DESK_FILES): one prompt per company, a router that sorts the latest
+# message, search by country, the run record under each answer and in the review queue. They use
+# lesson 21's citation check and lesson 22's roles, so tags before 22 keep their own copies.
+# labels.ts is not in the list: every tag reads the new label data, and only main's copy reads it right.
+DESK_FILES=".claude/skills/hcp-labels/SKILL.md scripts/citations-replay.ts scripts/demo-turns.ts
+  scripts/identity-setup.ts scripts/identity-smoke.ts scripts/open-questions.ts
+  scripts/prompt-variants.test.ts scripts/prompt-variants.ts scripts/rag-fixtures.ts scripts/setup.ts
+  scripts/sign-in.ts src/cli/cli.test.ts src/cli/turn.test.ts src/cli/turn.ts src/client/App.tsx
+  src/client/chat/RunSteps.tsx src/client/chat/Thread.tsx src/client/chat/api.ts
+  src/client/chat/parts.tsx src/client/content/Events.tsx src/client/inbox/Inbox.tsx
+  src/client/styles/app.css src/server/citations.test.ts src/server/citations.ts
+  src/server/desk-prompt.test.ts src/server/desk-prompt.ts src/server/gateway.test.ts
+  src/server/gateway.ts src/server/graph.ts src/server/inbox.test.ts
+  src/server/mcp.test.ts src/server/mcp.ts src/server/medinfo-agent.ts
+  src/server/migrations/010_review_run.sql src/server/permissions.ts src/server/rag/extract.ts
+  src/server/rag/fixtures/cardionex-clarion-hf-trial.docling.json
+  src/server/rag/fixtures/cardionex-clarion-hf-trial.docling.md
+  src/server/rag/fixtures/cardionex-uspi-v2.docling.json src/server/rag/rag.test.ts
+  src/server/rag/search.ts src/server/reviews.ts src/server/tiers.test.ts src/server/tiers.ts
+  src/server/tools.ts src/server/trace-identity.test.ts src/server/trace-shape.test.ts
+  src/shared/run.test.ts src/shared/run.ts"
 milestone_files() {
   case "$1" in
     checkpoint/00-setup | checkpoint/01-base-app | checkpoint/02-tracing)
-      echo "src/server/index.ts src/server/medinfo-agent.ts src/server/tools.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES"
+      echo "src/server/index.ts src/server/medinfo-agent.ts src/server/tools.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES $DESK_FILES"
       ;;
     checkpoint/03-prompt-management)
-      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES"
+      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES $DESK_FILES"
       ;;
     # Lessons 06 and 07 run the dataset with the correctness judge; lesson 09 replaces it.
     checkpoint/04-* | checkpoint/05-* | checkpoint/06-* | checkpoint/07-* | checkpoint/08-* | checkpoint/09-*)
-      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES"
+      echo "src/server/medinfo-agent.ts scripts/run-dataset.ts $GATEWAY_FILES $AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES $DESK_FILES"
       ;;
     checkpoint/10-*)
-      echo "$AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES"
+      echo "$AUTH_FILES $MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES $DESK_FILES"
       ;;
     checkpoint/11-*)
-      echo "$MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES"
+      echo "$MCP_FILES $TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES $DESK_FILES"
       ;;
     checkpoint/12-*)
-      echo "$TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES"
+      echo "$TIER_FILES $CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES $DESK_FILES"
       ;;
     checkpoint/13-*)
-      echo "$CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES"
+      echo "$CONTENT_FILES $A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES $DESK_FILES"
       ;;
     checkpoint/14-*)
-      echo "$A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES"
+      echo "$A2A_FILES $EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES $DESK_FILES"
       ;;
     checkpoint/15-*)
-      echo "$EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES"
+      echo "$EVENT_FILES $AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES $DESK_FILES"
       ;;
     checkpoint/16-*)
-      echo "$AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES"
+      echo "$AUTO_FILES $GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES $DESK_FILES"
       ;;
     checkpoint/17-*)
-      echo "$GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES"
+      echo "$GATE_FILES $CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES $DESK_FILES"
       ;;
     checkpoint/18-*)
-      echo "$CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES"
+      echo "$CLI_FILES $RAG_FILES $CITE_FILES $BI_FILES $DESK_FILES"
       ;;
     checkpoint/19-*)
-      echo "$RAG_FILES $CITE_FILES $BI_FILES"
+      echo "$RAG_FILES $CITE_FILES $BI_FILES $DESK_FILES"
       ;;
     checkpoint/20-*)
-      echo "$CITE_FILES $BI_FILES"
+      echo "$CITE_FILES $BI_FILES $DESK_FILES"
       ;;
     checkpoint/21-*)
-      echo "$BI_FILES"
+      echo "$BI_FILES $DESK_FILES"
       ;;
     *)
       echo ""
