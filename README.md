@@ -113,7 +113,7 @@ The server and the scripts read the repository's `.env` file first. So a key set
 
 ## Repository layout
 
-- [`docs/learner/`](./docs/learner/) holds the lessons, and [`docs/walkthrough.md`](./docs/walkthrough.md) the whole system.
+- [`docs/learner/`](./docs/learner/) holds the lessons, [`docs/walkthrough.md`](./docs/walkthrough.md) the whole system, and [`docs/one-question.md`](./docs/one-question.md) one question through every step.
 - [`docs/images/`](./docs/images/) holds the screenshots and diagrams, one folder per lesson.
 - [`langfuse/`](./langfuse/) holds the local trace store.
 - [`src/`](./src/) holds the app.
