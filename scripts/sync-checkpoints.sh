@@ -177,6 +177,7 @@ BI_FILES=".github/start-test-services.sh docs/scoreboard.md infra/docker-compose
 # The demo fixes after lesson 23 (DESK_FILES): one prompt per company, a router that sorts the latest
 # message, search by country, the run record under each answer and in the review queue. They use
 # lesson 21's citation check and lesson 22's roles, so tags before 22 keep their own copies.
+# labels.ts is not in the list: every tag reads the new label data, and only main's copy reads it right.
 DESK_FILES=".claude/skills/hcp-labels/SKILL.md scripts/citations-replay.ts scripts/demo-turns.ts
   scripts/identity-setup.ts scripts/identity-smoke.ts scripts/open-questions.ts
   scripts/prompt-variants.test.ts scripts/prompt-variants.ts scripts/rag-fixtures.ts scripts/setup.ts
@@ -185,8 +186,8 @@ DESK_FILES=".claude/skills/hcp-labels/SKILL.md scripts/citations-replay.ts scrip
   src/client/chat/parts.tsx src/client/content/Events.tsx src/client/inbox/Inbox.tsx
   src/client/styles/app.css src/server/citations.test.ts src/server/citations.ts
   src/server/desk-prompt.test.ts src/server/desk-prompt.ts src/server/gateway.test.ts
-  src/server/gateway.ts src/server/graph.ts src/server/inbox.test.ts src/server/labels.test.ts
-  src/server/labels.ts src/server/mcp.test.ts src/server/mcp.ts src/server/medinfo-agent.ts
+  src/server/gateway.ts src/server/graph.ts src/server/inbox.test.ts
+  src/server/mcp.test.ts src/server/mcp.ts src/server/medinfo-agent.ts
   src/server/migrations/010_review_run.sql src/server/permissions.ts src/server/rag/extract.ts
   src/server/rag/fixtures/cardionex-clarion-hf-trial.docling.json
   src/server/rag/fixtures/cardionex-clarion-hf-trial.docling.md
