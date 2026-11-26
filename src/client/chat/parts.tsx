@@ -72,28 +72,6 @@ export const SearchLabelsCard: ToolCallMessagePartComponent = ({ args, result, s
   );
 };
 
-export const DeskRulesCard: ToolCallMessagePartComponent = ({ result, status }) => {
-  const desk = parse<{ rules?: string[] }>(result);
-  return (
-    <details className="card thinking">
-      <summary className="card-head">
-        <span className="label">get_desk_rules</span>
-        <span>the desk's answering rules</span>
-        <StatusChip running={status.type === "running"} />
-      </summary>
-      {desk?.rules?.length ? (
-        <div className="card-body">
-          <ul className="rules">
-            {desk.rules.map((rule) => (
-              <li key={rule}>{rule}</li>
-            ))}
-          </ul>
-        </div>
-      ) : null}
-    </details>
-  );
-};
-
 export const OtherToolCard: ToolCallMessagePartComponent = ({ toolName, status }) => (
   <div className="card">
     <div className="card-head">
@@ -102,3 +80,45 @@ export const OtherToolCard: ToolCallMessagePartComponent = ({ toolName, status }
     </div>
   </div>
 );
+
+// Fix 0. One card for the label lookups: what was asked, then each section or version found.
+type LookupResult = Partial<LabelHit> & {
+  text?: string;
+  note?: string;
+  sections?: LabelHit[];
+  uses?: LabelHit[];
+  versions?: { doc_id: string; status: string; reason: string }[];
+};
+
+export const LookupCard: ToolCallMessagePartComponent = ({ toolName, args, result, status }) => {
+  const out = parse<LookupResult>(result);
+  const asked = Object.values((args ?? {}) as Record<string, unknown>).filter((value) => typeof value === "string").join(", ");
+  const rows = [
+    ...(out?.doc_id && out.section ? [{ id: `${out.doc_id}, ${out.section}`, meta: `${out.country} · ${out.status}`, title: out.title }] : []),
+    ...[...(out?.sections ?? []), ...(out?.uses ?? [])].map((hit) => ({ id: `${hit.doc_id}, ${hit.section}`, meta: `${hit.country} · ${hit.status}`, title: hit.title })),
+    ...(out?.versions ?? []).map((version) => ({ id: version.doc_id, meta: version.status, title: version.reason }))
+  ];
+  return (
+    <div className="card">
+      <div className="card-head">
+        <span className="label">{toolName}</span>
+        <span>{asked}</span>
+        <StatusChip running={status.type === "running"} />
+      </div>
+      {rows.length > 0 || out?.note ? (
+        <div className="card-body">
+          {out?.note ? <p>{out.note}</p> : null}
+          <ul className="sources">
+            {rows.map((row) => (
+              <li className="source" key={row.id}>
+                <span className="source-id">[{row.id}]</span>
+                <span>{row.title}</span>
+                <span className="source-meta">{row.meta}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+    </div>
+  );
+};

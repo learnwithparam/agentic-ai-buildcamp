@@ -14,7 +14,8 @@ import {
   type StreamEvent,
   type ToolMessage
 } from "../shared/messages";
-import { checkCitations, describeProblem, evidenceOf, WITHHELD_REPLY, type CitationProblem } from "./citations";
+import { answerRun, type AnswerRun } from "../shared/run";
+import { checkCitations, describeProblem, evidenceOf, EVIDENCE_TOOLS, WITHHELD_REPLY, type CitationProblem } from "./citations";
 import { env } from "./env";
 import { streamModelTurn, toOpenAIMessages } from "./stream-model";
 import type { Identity } from "./users";
@@ -41,7 +42,10 @@ export const State = Annotation.Root({
   route: Annotation<Route | null>({ reducer: (_current, next) => next, default: () => null }),
   dueAt: Annotation<string | null>({ reducer: (_current, next) => next, default: () => null }),
   // Lesson 16: the day this turn answers for. A chat is today; an event can name its own day.
-  today: Annotation<string>({ reducer: (_current, next) => next, default: () => TODAY })
+  today: Annotation<string>({ reducer: (_current, next) => next, default: () => TODAY }),
+  // Step 2B: how each reply was made (src/shared/run.ts), keyed by the reply's message id, so the
+  // chat shows it under that answer after a reload too.
+  runs: Annotation<Record<string, AnswerRun>>({ reducer: (current, next) => ({ ...current, ...next }), default: () => ({}) })
 });
 type GraphState = typeof State.State;
 type NodeResult = Promise<Partial<GraphState>> | Partial<GraphState>;
@@ -66,8 +70,12 @@ export async function agentStep(
 ): Promise<Partial<GraphState>> {
   const sinceQuestion = state.messages.slice(state.messages.lastIndexOf(lastHuman(state)!));
   const rounds = sinceQuestion.filter((message) => message.type === "ai").length;
-  // Gather first (desk rules, label searches), then answer with tools off.
-  const searched = sinceQuestion.some((message) => message.type === "tool" && message.name === "search_labels");
+  // Gather first, then answer with tools off. One round may follow the first evidence round, so
+  // the model can open a section or check a version the search turned up (fix 0).
+  const evidenceRounds = sinceQuestion.filter(
+    (message) => message.type === "ai" && message.tool_calls.some((call) => EVIDENCE_TOOLS.includes(call.name))
+  ).length;
+  const searched = evidenceRounds >= 2;
   const reply = await streamModelTurn(
     openai,
     {
@@ -93,6 +101,20 @@ export type CitationOutcome = {
   rewrite?: string;
 };
 
+// Fix 5. The rewrite answers from what was found, in this turn or an earlier one, and names any
+// fact the sections lack. It withholds only when no section found is about the question: told to
+// write INSUFFICIENT_CONTEXT whenever the sections "do not answer", a follow-up that needed one
+// more fact lost the whole answer (session 071bcc7a, 25 Nov 2026).
+export function rewriteFeedback(problems: CitationProblem[]): string {
+  return [
+    "The desk's citation check stopped your answer before it reached the doctor:",
+    ...problems.map((problem) => `- ${describeProblem(problem)}`),
+    "Write the whole answer again from the active label sections found so far in this conversation, citing each fact as [doc_id, section].",
+    "Keep every fact those sections support. If the question needs a fact they do not hold, say which fact the label sections found do not cover.",
+    "Write INSUFFICIENT_CONTEXT only when none of the sections found is about the question."
+  ].join("\n");
+}
+
 export async function citeStep(
   openai: OpenAI,
   system: string,
@@ -105,11 +127,7 @@ export async function citeStep(
   const { retrieved, asked } = evidenceOf(state.messages);
   const problems = checkCitations(aiText(answer), retrieved, asked);
   if (!problems.length) return (onChecked({ outcome: "passed", problems, afterRewrite: [] }), {});
-  const feedback = [
-    "The desk's citation check stopped your answer before it reached the doctor:",
-    ...problems.map((problem) => `- ${describeProblem(problem)}`),
-    "Write the whole answer again from the active label sections already found, citing each fact as [doc_id, section]. If those sections do not answer the question, write INSUFFICIENT_CONTEXT and say why."
-  ].join("\n");
+  const feedback = rewriteFeedback(problems);
   const rewrite = await streamModelTurn(
     openai,
     {
@@ -169,6 +187,8 @@ export type ReviewSubmission = {
   traceId?: string;
   question: string;
   body: string;
+  // Step 2B: how the answer was made, for the reviewer to read beside it.
+  run?: AnswerRun;
 };
 export interface ReviewInbox {
   // Must be safe to call twice with the same id: a node runs again when its thread resumes.
@@ -202,7 +222,8 @@ export async function submitDraftStep(state: GraphState, config: LangGraphRunnab
     tenantId: user.tenantId,
     traceId,
     question,
-    body: stamped
+    body: stamped,
+    run: state.runs[answer.id]
   });
   const message: AiMessage = { ...answer, content: [{ type: "text", text: stamped }] };
   return { messages: [message], dueAt: submitted?.dueAt.toISOString() ?? null };
@@ -255,7 +276,8 @@ export async function submitAdverseEvent(state: GraphState, config: LangGraphRun
     tenantId: user.tenantId,
     traceId,
     question: question?.content ?? "",
-    body: reply
+    body: reply,
+    run: answerRun([], state.route, null)
   });
 }
 
@@ -359,6 +381,7 @@ export async function readThread(graph: Graph, threadId: string) {
   const state = await graph.getState({ configurable: { thread_id: threadId } });
   return {
     messages: ((state.values as Partial<GraphState>).messages ?? []) as ChatMessage[],
+    runs: (state.values as Partial<GraphState>).runs ?? {},
     interrupts: state.tasks.flatMap((task) =>
       task.interrupts.map((item) => ({ id: item.id, value: item.value, resumable: true }))
     )

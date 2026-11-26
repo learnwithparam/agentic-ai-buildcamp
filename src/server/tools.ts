@@ -1,22 +1,37 @@
 import type OpenAI from "openai";
 import { observe, updateActiveObservation } from "@langfuse/tracing";
-import { approvedCountries, searchLabels, TODAY, type LabelSection } from "./labels";
-import { readableDocuments } from "./permissions";
+import {
+  approvalStatus,
+  checkInteraction,
+  LABEL_SECTIONS,
+  labelVersions,
+  readSection,
+  searchLabels,
+  TODAY,
+  trialResults,
+  type LabelSection
+} from "./labels";
+import { companyDocuments, readableDocuments } from "./permissions";
 import { TENANTS, type Identity } from "./users";
 
 type ToolResult = Record<string, unknown>;
 
 export { TODAY };
 
-export const TOOL_DEFINITIONS: OpenAI.Chat.Completions.ChatCompletionTool[] = [
-  {
-    type: "function",
-    function: {
-      name: "get_desk_rules",
-      description: "Read the desk rules: today's date, the company and medicines this desk covers, the asker's country, and how to cite.",
-      parameters: { type: "object", properties: {}, additionalProperties: false }
+const MEDICINE = { type: "string", description: "The medicine, for example NeuroVex." };
+const COUNTRY = { type: "string", description: "Two-letter country code. Leave out for the asker's own country." };
+
+function lookupTool(name: string, description: string, properties: Record<string, { type: string; description: string }>) {
+  const required = Object.keys(properties).filter((key) => key !== "country");
+  return [
+    {
+      type: "function" as const,
+      function: { name, description, parameters: { type: "object", properties, required, additionalProperties: false } }
     }
-  },
+  ];
+}
+
+export const TOOL_DEFINITIONS: OpenAI.Chat.Completions.ChatCompletionTool[] = [
   {
     type: "function",
     function: {
@@ -25,34 +40,36 @@ export const TOOL_DEFINITIONS: OpenAI.Chat.Completions.ChatCompletionTool[] = [
       parameters: {
         type: "object",
         properties: {
-          query: { type: "string", description: "What to look up, with the medicine and country when known." }
+          query: { type: "string", description: "What to look up, in the doctor's own words." },
+          country: { type: "string", description: "Two-letter code of the country the question is about. Leave out for the asker's own country." }
         },
         required: ["query"],
         additionalProperties: false
       }
     }
-  }
+  },
+  ...lookupTool("read_section", "Read the full text of one label section, for example to quote it.", {
+    doc_id: { type: "string", description: "The document id, for example cardionex-uspi-v2." },
+    section: { type: "string", description: "The section number, for example 2.2." }
+  }),
+  ...lookupTool("label_versions", "List every version of a medicine's label in one country, with its status on today's date and why.", {
+    medicine: MEDICINE,
+    country: COUNTRY
+  }),
+  ...lookupTool("approval_status", "Say whether a medicine has a label in force in one country, and what it is approved for there.", {
+    medicine: MEDICINE,
+    country: COUNTRY
+  }),
+  ...lookupTool("check_interaction", "Find what the label in force says about taking the medicine with another drug.", {
+    medicine: MEDICINE,
+    other_drug: { type: "string", description: "The other drug, for example spironolactone." },
+    country: COUNTRY
+  }),
+  ...lookupTool("trial_results", "Quote the trial summary sections about one outcome, for example potassium or dizziness.", {
+    medicine: MEDICINE,
+    endpoint: { type: "string", description: "The outcome asked about." }
+  })
 ];
-
-// Lesson 11: both tools answer for the signed-in user. The company, its medicines and the
-// country come from the token, so no question and no prompt can change them.
-// Lesson 16: an event can set the day the desk answers for, so the rules and the search say
-// which label is in force on that day.
-function deskRules(user: Identity, today: string): ToolResult {
-  const countries = approvedCountries(user.tenantId, today);
-  return {
-    ok: true,
-    company: user.tenantId,
-    medicines: TENANTS[user.tenantId]?.medicines ?? [],
-    asker_country: user.country,
-    approved_in_asker_country: countries.includes(user.country),
-    today,
-    rules: [
-      "Answer only from label text returned by search_labels whose status is active: that text is in force today.",
-      "Cite every fact as [doc_id, section], for example [cardionex-uspi-v2, 2.2]."
-    ]
-  };
-}
 
 // Lesson 20. How search_labels finds sections. The server and the dataset runner plug in the
 // pgvector index over the label PDFs (src/server/rag/search.ts, connectLabelIndex); until then,
@@ -65,10 +82,23 @@ export function useLabelSearch(next: LabelSearch) {
   search = next;
 }
 
-async function labelSearch(input: { query: string }, user: Identity, today: string): Promise<ToolResult> {
-  const readable = await readableDocuments(user);
+// Fix 4. A question about another country searches that country's documents of the doctor's own
+// company (OpenFGA can_read_abroad), so "a patient in Germany" finds the German label, not the
+// asker's own. Without a country, only the documents the asker may read at home.
+export function documentsIn(ids: ReadonlySet<string>, country: string): Set<string> {
+  const inCountry = new Set(LABEL_SECTIONS.filter((section) => section.country === country).map((section) => section.docId));
+  return new Set([...ids].filter((id) => inCountry.has(id)));
+}
+
+type SearchInput = { query: string; country?: string };
+
+async function labelSearch(input: SearchInput, user: Identity, today: string): Promise<ToolResult> {
+  const country = (input.country ?? "").trim().toUpperCase() || user.country;
+  const readable = country === user.country ? await readableDocuments(user) : documentsIn(await companyDocuments(user), country);
   return {
     ok: true,
+    country,
+    asker_country: country === user.country,
     results: (await search(input.query, readable, 4, today)).map((hit) => ({
       doc_id: hit.docId,
       section: hit.section,
@@ -76,6 +106,7 @@ async function labelSearch(input: { query: string }, user: Identity, today: stri
       status: hit.status,
       effective_date: hit.effectiveDate,
       country: hit.country,
+      score: hit.score,
       text: hit.text
     }))
   };
@@ -84,28 +115,87 @@ async function labelSearch(input: { query: string }, user: Identity, today: stri
 // The tool spans record what the model asked for and which company and country it was answered
 // for. The doctor's name and email are not in the trace (src/server/trace-identity.test.ts).
 const asker = (user: Identity) => ({ tenantId: user.tenantId, country: user.country });
-const getDeskRulesTool = observe(
-  (user: Identity, today: string) => {
-    updateActiveObservation({ input: { asker: asker(user), today } }, { asType: "tool" });
-    return deskRules(user, today);
-  },
-  { name: "get_desk_rules", asType: "tool", captureInput: false }
-);
 const searchLabelsTool = observe(
-  (input: { query: string }, user: Identity, today: string) => {
+  (input: SearchInput, user: Identity, today: string) => {
     updateActiveObservation({ input: { ...input, asker: asker(user), today } }, { asType: "tool" });
     return labelSearch(input, user, today);
   },
   { name: "search_labels", asType: "tool", captureInput: false }
 );
 
+// Fix 0. The label lookups a medical information desk uses beside search. They read the
+// company's own documents in any country (OpenFGA can_read_abroad) and mark each answer with its
+// country, so the agent can say "the Japan label says". Another company's documents never appear.
+const LOOKUPS = ["read_section", "label_versions", "approval_status", "check_interaction", "trial_results"] as const;
+type Lookup = (typeof LOOKUPS)[number];
+
+const sectionOut = (section: LabelSection, user: Identity) => ({
+  doc_id: section.docId,
+  section: section.section,
+  title: section.title,
+  status: section.status,
+  country: section.country,
+  asker_country: section.country === user.country,
+  text: section.text
+});
+
+async function lookup(name: Lookup, input: Record<string, unknown>, user: Identity, today: string): Promise<ToolResult> {
+  const readable = await companyDocuments(user);
+  const arg = (key: string) => String(input[key] ?? "").trim();
+  const country = (arg("country") || user.country).toUpperCase();
+  const covered = (TENANTS[user.tenantId]?.medicines ?? []).map((medicine) => medicine.toLowerCase());
+  if (input.medicine !== undefined && !covered.includes(arg("medicine").toLowerCase())) {
+    return { ok: true, found: false, note: `This desk has no label for ${arg("medicine")}. It covers ${TENANTS[user.tenantId]?.medicines.join(", ")}.` };
+  }
+  switch (name) {
+    case "read_section": {
+      const hit = readSection(arg("doc_id"), arg("section"), readable, today);
+      return hit ? { ok: true, found: true, ...sectionOut(hit, user) } : { ok: true, found: false, note: `No section ${arg("section")} in ${arg("doc_id")}.` };
+    }
+    case "label_versions": {
+      const versions = labelVersions(arg("medicine"), country, readable, today);
+      return { ok: true, country, asker_country: country === user.country, today, versions: versions.map((v) => ({ doc_id: v.docId, status: v.status, effective_date: v.effectiveDate, reason: v.reason })) };
+    }
+    case "approval_status": {
+      const status = approvalStatus(arg("medicine"), country, readable, today);
+      return { ok: true, country, asker_country: country === user.country, approved: status.approved, label_in_force: status.docId ?? null, uses: status.uses.map((s) => sectionOut(s, user)) };
+    }
+    case "check_interaction": {
+      const found = checkInteraction(arg("medicine"), arg("other_drug"), country, readable, today);
+      return {
+        ok: true,
+        country,
+        label_in_force: found.docId ?? null,
+        named_in_label: found.named,
+        ...(found.named ? {} : { note: `The label does not name ${arg("other_drug")}. These are its interaction sections.` }),
+        sections: found.sections.map((s) => sectionOut(s, user))
+      };
+    }
+    case "trial_results":
+      return { ok: true, sections: trialResults(arg("medicine"), arg("endpoint"), readable, today).map((s) => sectionOut(s, user)) };
+  }
+}
+
+const lookupTools = Object.fromEntries(
+  LOOKUPS.map((name) => [
+    name,
+    observe(
+      (input: Record<string, unknown>, user: Identity, today: string) => {
+        updateActiveObservation({ input: { ...input, asker: asker(user), today } }, { asType: "tool" });
+        return lookup(name, input, user, today);
+      },
+      { name, asType: "tool", captureInput: false }
+    )
+  ])
+) as Record<Lookup, (input: Record<string, unknown>, user: Identity, today: string) => Promise<ToolResult>>;
+
+const isLookup = (name: string): name is Lookup => (LOOKUPS as readonly string[]).includes(name);
+
 export async function executeTool(name: string, input: Record<string, unknown>, user: Identity, today = TODAY): Promise<ToolResult> {
   switch (name) {
-    case "get_desk_rules":
-      return getDeskRulesTool(user, today);
     case "search_labels":
-      return searchLabelsTool({ query: String(input.query ?? "") }, user, today);
+      return searchLabelsTool({ query: String(input.query ?? ""), ...(input.country ? { country: String(input.country) } : {}) }, user, today);
     default:
-      return { ok: false, error: `Unsupported tool: ${name}` };
+      return isLookup(name) ? lookupTools[name](input, user, today) : { ok: false, error: `Unsupported tool: ${name}` };
   }
 }

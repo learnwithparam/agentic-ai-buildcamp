@@ -35,7 +35,8 @@ export function modelClient(): OpenAI {
     client = new OpenAI({
       baseURL: `${env.gatewayUrl}/openai/v1`,
       apiKey: gatewayKey(current),
-      // A 429 from the gateway means the key's budget is spent. Retrying it only waits.
+      // A 429 from the gateway means the key's budget is spent. Retrying it only waits, so the SDK
+      // retries nothing; retryingOn504 below asks again only when no answer came back.
       maxRetries: 0,
       fetch: withConnection
     });
@@ -89,8 +90,24 @@ export function withConnectionName(body: string): string {
   return JSON.stringify({ ...parsed, model: `${CONNECTION}:${parsed.model}` });
 }
 
-const withConnection: typeof fetch = (url, init) =>
-  fetch(url, typeof init?.body === "string" ? { ...init, body: withConnectionName(init.body) } : init);
+// A 504 means the gateway gave up before any answer came back, most often while it looked up the
+// key in Langfuse on a busy laptop. No answer was sent, so asking again cannot bill twice. Every
+// other status, a 429 above all, goes straight back to the caller.
+export function retryingOn504(send: typeof fetch, waits = [1000, 3000]): typeof fetch {
+  return async (url, init) => {
+    for (const wait of waits) {
+      const response = await send(url, init);
+      if (response.status !== 504) return response;
+      await response.body?.cancel();
+      await new Promise((resolve) => setTimeout(resolve, wait));
+    }
+    return send(url, init);
+  };
+}
+
+const withConnection: typeof fetch = retryingOn504((url, init) =>
+  fetch(url, typeof init?.body === "string" ? { ...init, body: withConnectionName(init.body) } : init)
+);
 
 // --- The input check. The gateway has no guardrails yet (they are on its roadmap), so the
 //     check runs here, before any model call. Each rule is narrow and named; the dataset test

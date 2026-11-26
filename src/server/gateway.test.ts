@@ -6,7 +6,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import OpenAI from "openai";
 import { loadMedinfoCases } from "../../scripts/hcp-cases";
-import { checkInput, isBudgetSpent, withConnectionName } from "./gateway";
+import { checkInput, isBudgetSpent, retryingOn504, withConnectionName } from "./gateway";
 import { answerConversation } from "./medinfo-agent";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
@@ -59,4 +59,25 @@ test("only the gateway's spent-budget refusal counts as a spent budget", () => {
   assert.equal(isBudgetSpent(refusal("spend_limit_exceeded")), true);
   assert.equal(isBudgetSpent(refusal("rate_limit_exceeded")), false);
   assert.equal(isBudgetSpent(new Error("spend_limit_exceeded")), false);
+});
+
+test("a 504 is asked again, and a 429 goes straight back", async () => {
+  const replies = (statuses: number[]) => {
+    const sent: number[] = [];
+    const send: typeof fetch = async () => {
+      const status = statuses[sent.length] ?? 200;
+      sent.push(status);
+      return new Response("{}", { status });
+    };
+    return { send, sent };
+  };
+  const timeout = replies([504, 504, 200]);
+  assert.equal((await retryingOn504(timeout.send, [0, 0])("http://gateway")).status, 200);
+  assert.deepEqual(timeout.sent, [504, 504, 200]);
+  const spent = replies([429]);
+  assert.equal((await retryingOn504(spent.send, [0, 0])("http://gateway")).status, 429);
+  assert.deepEqual(spent.sent, [429]);
+  const down = replies([504, 504, 504, 504]);
+  assert.equal((await retryingOn504(down.send, [0, 0])("http://gateway")).status, 504);
+  assert.equal(down.sent.length, 3);
 });

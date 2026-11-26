@@ -8,11 +8,13 @@ import { decodeJwt } from "jose";
 import { z } from "zod";
 import { AuthError, type Auth } from "./auth";
 import { PUBLISHED_TABLE, runQuery } from "./bi/query";
-import { executeTool } from "./tools";
+import { executeTool, TOOL_DEFINITIONS } from "./tools";
 import { canQuerySales } from "./permissions";
+import { deskFacts } from "./desk-prompt";
+import { TODAY } from "./labels";
 import type { Identity } from "./users";
 
-// Lesson 12. The same two tools the chat agent uses, behind the Model Context Protocol, so Claude
+// Lesson 12. The same tools the chat agent uses, behind the Model Context Protocol, so Claude
 // Code or another agent can look up a label. Every call carries a Keycloak access token, and the
 // tools answer for the user in that token, exactly as they do in the chat (lesson 11):
 //   - Bearer tokens only. A browser cookie is never accepted here, so no other site's page can
@@ -30,30 +32,44 @@ export const MCP_PUBLIC_ROUTES = [`GET ${METADATA_PATH}`];
 type Verified = { identity: Identity };
 
 function mcpServerFor(user: Identity, canQuery: boolean) {
-  const server = new McpServer({ name: "medinfo", version: "1.0.0" });
+  // Fix 3: the desk facts the chat agent gets in its prompt, as the server's instructions, filled
+  // in from the token. A client never chooses the company or the country.
+  const facts = deskFacts(user, TODAY);
+  const instructions = `This desk answers for ${facts.company}: ${facts.medicines}. The asker is in ${facts.country}. ${facts.approval} Today is ${facts.today}. Cite each fact as [doc_id, section], for example ${facts.example}.`;
+  const server = new McpServer({ name: "medinfo", version: "1.0.0" }, { instructions });
   const run = (name: string, input: Record<string, unknown>) =>
     traced(name, input, user).then((result) => ({ content: [{ type: "text" as const, text: JSON.stringify(result) }] }));
 
-  server.registerTool(
-    "get_desk_rules",
-    {
-      title: "Desk rules",
-      description: "Today's date, the company and medicines this desk covers, the asker's country, and how to cite.",
-      annotations: { readOnlyHint: true, openWorldHint: false }
-    },
-    () => run("get_desk_rules", {})
-  );
   server.registerTool(
     "search_labels",
     {
       title: "Search the label library",
       description:
         "Search prescribing information, trial summaries, the FAQ and the safety procedure. Returns only documents the signed-in doctor may read, for their company and country.",
-      inputSchema: { query: z.string().min(1).max(500).describe("What to look up, with the medicine and country when known.") },
+      inputSchema: {
+        query: z.string().min(1).max(500).describe("What to look up, in the doctor's own words."),
+        country: z.string().length(2).optional().describe("Two-letter code of the country the question is about. Leave out for the asker's own country.")
+      },
       annotations: { readOnlyHint: true, openWorldHint: false }
     },
-    ({ query }) => run("search_labels", { query })
+    ({ query, country }) => run("search_labels", country ? { query, country } : { query })
   );
+  // Fix 0. The label lookups, from the same definitions the agent's model sees.
+  for (const tool of TOOL_DEFINITIONS) {
+    if (tool.type !== "function" || tool.function.name === "search_labels") continue;
+    const { name, description = "" } = tool.function;
+    const props = (tool.function.parameters?.properties ?? {}) as Record<string, { description: string }>;
+    const required = new Set((tool.function.parameters?.required ?? []) as string[]);
+    const inputSchema = Object.fromEntries(
+      Object.entries(props).map(([key, prop]) => {
+        const field = z.string().min(1).max(200).describe(prop.description);
+        return [key, required.has(key) ? field : field.optional()];
+      })
+    );
+    server.registerTool(name, { title: name, description, inputSchema, annotations: { readOnlyHint: true, openWorldHint: false } }, (input) =>
+      run(name, input as Record<string, unknown>)
+    );
+  }
   // Lesson 22. Only an analyst's server lists the sales tool, and it runs as the login of the
   // company in the token, through the same parser and row rule as the insights page.
   if (canQuery) {

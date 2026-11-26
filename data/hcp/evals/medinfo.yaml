@@ -541,7 +541,7 @@ tests:
       riskTier: "answer"
       split: "train"
       expectedBehavior: "reply"
-      idealAnswer: "8.2% of NeuroVex patients stopped treatment because of dizziness, versus 3.1% on placebo [neurovex-trial-summary, 3.1]."
+      idealAnswer: "8.2% of NeuroVex patients stopped treatment because of dizziness, versus 3.1% on placebo [neurovex-trial-summary, 3.1]. The US label in force states the same figure in [neurovex-uspi-v1, 6.1], so either citation is right."
     vars:
       query: "What share of NeuroVex patients stopped treatment because of dizziness?"
       tenantId: "pharma_b"
@@ -550,7 +550,7 @@ tests:
       - type: contains
         value: "8.2%"
       - type: regex
-        value: "\\[neurovex-trial-summary,\\s*3\\.1"
+        value: "\\[neurovex-(trial-summary,\\s*3\\.1|uspi-v1,\\s*6\\.1)"
 
   # ============================================================================
   # CATEGORY 10: ROUTING BY RISK TIER (each tier, on both medicines)

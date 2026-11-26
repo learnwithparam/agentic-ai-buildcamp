@@ -193,7 +193,7 @@ read -> match -> suggest -> write
 | `NOT_APPROVED_IN_COUNTRY` | The claim is approved, but for another country. The fix is the claim approved here for the same label section |
 | `UNAPPROVED_CLAIM` | No approved claim says this anywhere |
 
-Sign in as Priya Nair and open **Email editor**. Pick a saved draft and press **Check this draft**.
+Sign in as Priya Nair and open **Check an email**. Pick a saved draft and press **Check this draft**.
 
 ![The email editor with the German draft loaded](../images/content-agents/01-editor.png)
 
@@ -233,7 +233,7 @@ read -> propose -> decide
 
 The duplicate rule runs whenever the proposal names a campaign, whatever kind of step the model chose. A rule that needs the model to label its own step right is a prompt rule again.
 
-Open **Rep board** and ask: "Should we email the heart failure update to HCP-1001 again this week?"
+Open **Plan outreach** and ask: "Should we email the heart failure update to HCP-1001 again this week?"
 
 ![The rep board, one record per doctor](../images/content-agents/03-rep-board.png)
 

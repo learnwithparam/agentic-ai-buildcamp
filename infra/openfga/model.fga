@@ -31,6 +31,10 @@ type document
     define approved_in: [country]
     # Both must hold: your company owns it, and it is approved where you practise.
     define can_read: member from owner and doctor from approved_in
+    # The desk's lookup tools (label_versions, approval_status, read_section and the others in
+    # src/server/tools.ts) answer about the company's label in another country too, and mark it
+    # as that country's. Search stays on can_read; another company's labels stay out of both.
+    define can_read_abroad: member from owner
     # Lesson 14. The fact-checker reads every country's claims of its own company, so it can say
     # "approved in the US, not in Germany". Only the staff who send and approve emails use it;
     # a doctor does not, and another company's claims stay out.

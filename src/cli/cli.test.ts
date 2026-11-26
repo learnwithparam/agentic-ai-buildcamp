@@ -57,7 +57,7 @@ test("a draft that waits for a reviewer shows the inbox item, never the draft", 
 });
 
 test("a doctor who is not a reviewer sees no decision keys", () => {
-  const item = { id: "d-1", kind: "draft" as const, question: "Dose?", body: "Draft", createdAt: "", dueAt: "2099-01-01T00:00:00Z", status: "waiting" as const, decidedAt: null, note: null };
+  const item = { id: "d-1", kind: "draft" as const, question: "Dose?", body: "Draft", createdAt: "", dueAt: "2099-01-01T00:00:00Z", status: "waiting" as const, decidedAt: null, note: null, run: null };
   const render = (reviewer: boolean) =>
     renderToString(createElement(InboxScreen, { inbox: { reviewer, items: [item] }, decide: async () => item }), { columns: 90 });
   assert.match(render(true), /a approve {2}r reject/);

@@ -1,8 +1,9 @@
 import { AuiIf, ComposerPrimitive, MessagePrimitive, ThreadPrimitive } from "@assistant-ui/react";
 import { useLangGraphInterruptState } from "@assistant-ui/react-langgraph";
 import { formatDue } from "../inbox/format";
+import { RunSteps } from "./RunSteps";
 import { SUGGESTIONS } from "./suggestions";
-import { DeskRulesCard, MarkdownText, OtherToolCard, SearchLabelsCard, Thinking } from "./parts";
+import { LookupCard, MarkdownText, OtherToolCard, SearchLabelsCard, Thinking } from "./parts";
 
 function UserMessage() {
   return (
@@ -20,11 +21,19 @@ function AssistantMessage() {
           Text: MarkdownText,
           Reasoning: Thinking,
           tools: {
-            by_name: { search_labels: SearchLabelsCard, get_desk_rules: DeskRulesCard },
+            by_name: {
+              search_labels: SearchLabelsCard,
+              read_section: LookupCard,
+              label_versions: LookupCard,
+              approval_status: LookupCard,
+              check_interaction: LookupCard,
+              trial_results: LookupCard
+            },
             Fallback: OtherToolCard
           }
         }}
       />
+      <RunSteps />
     </MessagePrimitive.Root>
   );
 }
