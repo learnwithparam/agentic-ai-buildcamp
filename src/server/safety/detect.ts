@@ -24,7 +24,7 @@ Answer yes when the message tells of any of these, even when it is indirect, mix
 - a medicine that did not work for the patient (lack of effect)
 - the medicine used for something the label does not cover, when it describes what happened
 
-Answer no when the message only asks about the medicine in general, about what the label says, about a patient who has not started it, or about how to report. A side effect named only as a topic of a question ("is cough listed?") is no. A past event that is only a reason for a question about starting the medicine ("angioedema on an ACE inhibitor in 2019, does that rule out it?") is no unless it followed this company's medicine.
+Answer no when the message only asks about the medicine in general, about what the label says, about a patient who has not started it, or about how to report. A side effect named only as a topic of a question ("is cough listed?") is no. So is a question about how often something happened across patients or in a trial ("what share stopped because of dizziness?"). A past event that is only a reason for a question about starting the medicine ("angioedema on an ACE inhibitor in 2019, does that rule out it?") is no unless it followed this company's medicine.
 
 Reply with the JSON only.`;
 // checkpoint-sync:end safety-detect-prompt

@@ -37,3 +37,9 @@ test("the second pass asks one question and names the special situations", () =>
   for (const text of ["pregnan", "overdose", "medication error", "lack of effect"]) assert.ok(DETECT_PROMPT.includes(text), text);
   assert.deepEqual([...SPECIAL_SITUATIONS], ["pregnancy_exposure", "overdose", "medication_error", "lack_of_efficacy", "off_label_use"]);
 });
+
+// Measured on 2026-11-26: "what share stopped because of dizziness?" was raised as an adverse
+// event, twice in 66 messages. A rate across patients or a trial is a question, not a report.
+test("the second pass treats a question about rates across patients or a trial as no report", () => {
+  assert.match(DETECT_PROMPT, /across patients or in a trial/);
+});
