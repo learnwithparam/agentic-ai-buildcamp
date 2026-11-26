@@ -18,6 +18,7 @@ import { answerRun, type AnswerRun } from "../shared/run";
 import type { ClaimCheck } from "./citations.claims";
 import { checkCitations, describeProblem, evidenceOf, EVIDENCE_TOOLS, WITHHELD_REPLY, type CitationProblem } from "./citations";
 import { env } from "./env";
+import { timed } from "./ops/meter";
 import { streamModelTurn, toOpenAIMessages } from "./stream-model";
 import type { Identity } from "./users";
 import type { Route } from "./tiers";
@@ -77,15 +78,17 @@ export async function agentStep(
     (message) => message.type === "ai" && message.tool_calls.some((call) => EVIDENCE_TOOLS.includes(call.name))
   ).length;
   const searched = evidenceRounds >= 2;
-  const reply = await streamModelTurn(
-    openai,
-    {
-      model: env.openaiModel,
-      messages: toOpenAIMessages(system, state.messages),
-      tools: TOOL_DEFINITIONS,
-      allowTools: !searched && rounds < MAX_TOOL_ROUNDS
-    },
-    (partial) => config.writer?.(partial)
+  const reply = await timed("answer", () =>
+    streamModelTurn(
+      openai,
+      {
+        model: env.openaiModel,
+        messages: toOpenAIMessages(system, state.messages),
+        tools: TOOL_DEFINITIONS,
+        allowTools: !searched && rounds < MAX_TOOL_ROUNDS
+      },
+      (partial) => config.writer?.(partial)
+    )
   );
   return { messages: [reply] };
 }
@@ -129,20 +132,22 @@ export async function citeStep(
   const { retrieved, asked } = evidenceOf(state.messages);
   // The number check, then each claim's quote and the support judge (citations.claims.ts).
   const checked = async (text: string) => [...checkCitations(text, retrieved, asked), ...((await claimCheck?.(text, retrieved, asked, state.today)) ?? [])];
-  const problems = await checked(aiText(answer));
+  const problems = await timed("claim_check", () => checked(aiText(answer)));
   if (!problems.length) return (onChecked({ outcome: "passed", problems, afterRewrite: [] }), {});
   const feedback = rewriteFeedback(problems);
-  const rewrite = await streamModelTurn(
-    openai,
-    {
-      model: env.openaiModel,
-      messages: [...toOpenAIMessages(system, state.messages), { role: "user", content: feedback }],
-      tools: TOOL_DEFINITIONS,
-      allowTools: false
-    },
-    (partial) => config.writer?.({ ...partial, id: answer.id })
+  const rewrite = await timed("citation_retry", () =>
+    streamModelTurn(
+      openai,
+      {
+        model: env.openaiModel,
+        messages: [...toOpenAIMessages(system, state.messages), { role: "user", content: feedback }],
+        tools: TOOL_DEFINITIONS,
+        allowTools: false
+      },
+      (partial) => config.writer?.({ ...partial, id: answer.id })
+    )
   );
-  const afterRewrite = await checked(aiText(rewrite));
+  const afterRewrite = await timed("claim_check_retry", () => checked(aiText(rewrite)));
   if (!afterRewrite.length) {
     onChecked({ outcome: "rewritten", problems, afterRewrite, rewrite: aiText(rewrite) });
     return { messages: [{ ...rewrite, id: answer.id, tool_calls: [] }] };
@@ -164,18 +169,21 @@ export async function toolsStep(
   runTool: (name: string, args: Record<string, unknown>) => Promise<Record<string, unknown>>
 ): Promise<Partial<GraphState>> {
   const request = last(state, "ai");
-  const results: ToolMessage[] = [];
-  for (const call of request?.tool_calls ?? []) {
-    const result = await runTool(call.name, call.args);
-    results.push({
-      id: `tool-${call.id}`,
-      type: "tool",
-      tool_call_id: call.id,
-      name: call.name,
-      content: JSON.stringify(result),
-      status: result.ok === false ? "error" : "success"
-    });
-  }
+  // The calls of one model message do not depend on each other, so they run at the same time.
+  // Promise.all keeps the order of the calls, so the results sit in the thread as the model asked.
+  const results: ToolMessage[] = await Promise.all(
+    (request?.tool_calls ?? []).map(async (call): Promise<ToolMessage> => {
+      const result = await timed(`tool:${call.name}`, () => runTool(call.name, call.args));
+      return {
+        id: `tool-${call.id}`,
+        type: "tool",
+        tool_call_id: call.id,
+        name: call.name,
+        content: JSON.stringify(result),
+        status: result.ok === false ? "error" : "success"
+      };
+    })
+  );
   return { messages: results };
 }
 

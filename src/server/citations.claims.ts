@@ -1,6 +1,8 @@
 import { observeOpenAI } from "@langfuse/openai";
 import type OpenAI from "openai";
 import { env } from "./env";
+import { OUTPUT_CAP } from "./gateway";
+import { timed } from "./ops/meter";
 import { inForceDocuments, LABEL_SECTIONS } from "./labels";
 import type { CitationProblem, ClaimReason, RetrievedSection } from "./citations";
 
@@ -93,6 +95,7 @@ export function judgeWithModel(client: OpenAI): Judge {
     const completion = await openai.chat.completions.create({
       model: env.openaiModel,
       temperature: 0,
+      max_tokens: OUTPUT_CAP.judge,
       messages: [
         { role: "system", content: JUDGE_PROMPT },
         { role: "user", content: `Claim: ${claim.text}\n\nQuote: ${claim.quote}\n\n${sourceOf(claim)}` }
@@ -125,10 +128,11 @@ Quote only a section listed below. If no section states a claim, still list it, 
 // The answer's claims, read by one json_schema call. The agent's answer is streamed to the doctor
 // as text, so its claims are listed after it is written, from the answer and the sections found.
 export async function extractClaims(client: OpenAI, answer: string, retrieved: RetrievedSection[]): Promise<Claim[]> {
-  if (!retrieved.length) return [];
+  // Nothing found, or nothing written: there is no claim to list, so no model is asked.
+  if (!retrieved.length || !answer.trim()) return [];
   const openai = observeOpenAI(client, { generationName: "answer-claims" });
   const sections = retrieved.map((s) => `[${s.doc_id}, ${s.section}]\n${s.text}`).join("\n\n");
-  const completion = await openai.chat.completions.create({
+  const completion = await timed("claim_extract", () => openai.chat.completions.create({
     model: env.openaiModel,
     temperature: 0,
     messages: [
@@ -158,7 +162,7 @@ export async function extractClaims(client: OpenAI, answer: string, retrieved: R
         }
       }
     }
-  });
+  }));
   const parsed = JSON.parse(completion.choices[0]?.message.content ?? "{}") as { claims?: Claim[] };
   return parsed.claims ?? [];
 }
@@ -171,6 +175,6 @@ export function claimCheckWith(client: OpenAI): ClaimCheck {
   return async (answer, retrieved, asked, today) => {
     const claims = await extractClaims(client, answer, retrieved);
     const given = new Set(numbersIn(asked));
-    return reviewClaims(claims, { retrieved, today, given }, judge);
+    return timed("claim_judge", () => reviewClaims(claims, { retrieved, today, given }, judge));
   };
 }

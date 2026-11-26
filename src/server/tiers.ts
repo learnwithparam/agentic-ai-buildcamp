@@ -2,6 +2,7 @@ import type OpenAI from "openai";
 import { z } from "zod";
 import type { ChatMessage } from "../shared/messages";
 import { aiText } from "../shared/messages";
+import { OUTPUT_CAP } from "./gateway";
 import type { LabelSection } from "./labels";
 
 // Lesson 13. Before the agent writes a word, every message is sorted into a risk tier, and the
@@ -133,6 +134,7 @@ export async function routeRequest(openai: OpenAI, model: string, messages: Chat
   const completion = await openai.chat.completions.create({
     model,
     temperature: 0,
+    max_tokens: OUTPUT_CAP.router,
     messages: [
       { role: "system", content: `${ROUTER_PROMPT}\n\nApproved uses:\n${useList}` },
       { role: "user", content: routerInput(messages) }

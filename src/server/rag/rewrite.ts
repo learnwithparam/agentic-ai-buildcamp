@@ -1,6 +1,7 @@
 import { observeOpenAI } from "@langfuse/openai";
 import { env } from "../env";
-import { modelClient } from "../gateway";
+import { modelClient, OUTPUT_CAP } from "../gateway";
+import { timed } from "../ops/meter";
 
 // Lesson 20. "How long do I have to wait when switching?" means nothing to a search on its own:
 // no medicine, no drug to switch from. When the doctor has said things before, the model writes
@@ -20,9 +21,10 @@ export async function standaloneQuery(query: string, earlier: Turn[]): Promise<s
   const said = earlier.filter((turn) => turn.content.trim()).slice(-6);
   if (!said.length) return query;
   const openai = observeOpenAI(modelClient(), { generationName: "search-rewrite" });
-  const completion = await openai.chat.completions.create({
+  const completion = await timed("query_rewrite", () => openai.chat.completions.create({
     model: env.openaiModel,
     temperature: 0,
+    max_tokens: OUTPUT_CAP.rewrite,
     messages: [
       { role: "system", content: REWRITE_PROMPT },
       {
@@ -30,7 +32,7 @@ export async function standaloneQuery(query: string, earlier: Turn[]): Promise<s
         content: `Earlier turns:\n${said.map((turn) => `${turn.role === "user" ? "Doctor" : "Desk"}: ${turn.content}`).join("\n")}\n\nLatest question: ${query}`
       }
     ]
-  });
+  }));
   const rewritten = completion.choices[0]?.message.content?.trim();
   if (!rewritten) throw new Error("The search rewriter returned nothing.");
   return rewritten;

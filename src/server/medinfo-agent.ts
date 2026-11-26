@@ -32,7 +32,7 @@ import type { ReviewItem } from "./reviews";
 import { scriptUser, type Identity } from "./users";
 import { DESK_PROMPT, deskFacts, fillDeskPrompt } from "./desk-prompt";
 import { claimCheckWith } from "./citations.claims";
-import { measureTurn } from "./ops/meter";
+import { measureTurn, timed } from "./ops/meter";
 import { scoreTurn } from "./ops/metrics";
 import { answerRun } from "../shared/run";
 
@@ -151,7 +151,7 @@ export function createMedinfoAgent(checkpointer: BaseCheckpointSaver) {
       }
           const readable = await readableDocuments(userOf(config));
           const openai = observeOpenAI(modelClient(), { generationName: "route" });
-          const chosen = await routeRequest(openai, env.openaiModel, state.messages, approvedUses(readable, LABEL_SECTIONS));
+          const chosen = await timed("router", () => routeRequest(openai, env.openaiModel, state.messages, approvedUses(readable, LABEL_SECTIONS)));
           const route = withFloor(chosen, latestQuestion(state.messages));
           updateActiveObservation({ output: route });
           return { route };
@@ -192,7 +192,7 @@ export function createMedinfoAgent(checkpointer: BaseCheckpointSaver) {
             removedIdentifiers: REMOVED.test(latestQuestion(state.messages)) ? 1 : 0,
             procedure: reportingProcedure(readable, LABEL_SECTIONS)
           });
-          await submitAdverseEvent(state, config, reply, getActiveTraceId());
+          await timed("safety_report", () => submitAdverseEvent(state, config, reply, getActiveTraceId()));
           return withRun(state, fixedReply(state, reply));
         },
         { name: "safety", asType: "span", captureInput: false }

@@ -1,7 +1,8 @@
 import { observeOpenAI } from "@langfuse/openai";
 import { z } from "zod";
 import { env } from "../env";
-import { modelClient } from "../gateway";
+import { modelClient, OUTPUT_CAP } from "../gateway";
+import { timed } from "../ops/meter";
 
 // Lesson 20, step 4 of search_labels. Two searches find what is near the question; they cannot
 // tell a section that answers it from one that only shares its words. "Can a patient have a
@@ -50,10 +51,10 @@ export class GradeCountError extends Error {}
 export const retryOnMiscount = (once: Grader): Grader => async (question, passages) => {
   if (!passages.length) return { grades: [], best: [] };
   try {
-    return await once(question, passages);
+    return await timed("search_grading", () => once(question, passages));
   } catch (error) {
     if (!(error instanceof GradeCountError)) throw error;
-    return once(question, passages);
+    return timed("search_grading_retry", () => once(question, passages));
   }
 };
 
@@ -64,6 +65,7 @@ const gradeOnce: Grader = async (question, passages) => {
     // The desk's chat model: grading needs reading, not a bigger model.
     model: env.openaiModel,
     temperature: 0,
+    max_tokens: OUTPUT_CAP.grade,
     messages: [
       { role: "system", content: GRADER_PROMPT },
       { role: "user", content: `Question: ${question}\n\n${passages.length} passages, so return exactly ${passages.length} grades:\n\n${list}` }

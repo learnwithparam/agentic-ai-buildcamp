@@ -13,9 +13,18 @@ export type TurnMetrics = {
   structuredCalls: number;
   // Of those, the ones whose JSON did not parse, or that returned no tool call when one was forced.
   parseFailures: number;
+  // Where the turn's time went, one entry per run of a stage, in the order they finished.
+  stages: StageTiming[];
 };
 
-type Meter = Omit<TurnMetrics, "seconds"> & { pending: Promise<void>[] };
+// startedAt is seconds after the turn began, so two stages that overlap can be told from two that
+// ran in turn.
+export type StageTiming = { stage: string; seconds: number; startedAt: number };
+
+// A turn inside a turn (runTurn measures its graph, and so does the script around it) reports its
+// calls to every meter around it. Without the parent, the outer turn counted nothing: the real run
+// of npm run ops:measure read 0 model calls and $0.
+type Meter = Omit<TurnMetrics, "seconds"> & { pending: Promise<void>[]; parent?: Meter; began: number };
 
 const current = new AsyncLocalStorage<Meter>();
 
@@ -86,7 +95,9 @@ export function readStreamCall(kind: "json" | "tool" | null, text: string): Call
   return { cost, structured: kind !== null, parsed: judge(kind, message) };
 }
 
-function add(meter: Meter, call: Call) {
+function add(meter: Meter | undefined, call: Call) {
+  if (!meter) return;
+  add(meter.parent, call);
   meter.calls += 1;
   if (call.cost === null) meter.callsWithoutCost += 1;
   else meter.costUsd += call.cost;
@@ -111,7 +122,7 @@ export function meteredFetch(send: typeof fetch): typeof fetch {
     }
     const copy = response.clone();
     const streamed = (response.headers.get("content-type") ?? "").includes("text/event-stream");
-    meter.pending.push(
+    const promise = (
       (streamed ? copy.text().then((text) => readStreamCall(kind, text)) : copy.json().then((body) => readJsonCall(kind, body)))
         .then((call) => add(meter, call))
         .catch(() => {
@@ -119,21 +130,41 @@ export function meteredFetch(send: typeof fetch): typeof fetch {
           add(meter, { cost: null, structured: kind !== null, parsed: false });
         })
     );
+    for (let at: Meter | undefined = meter; at; at = at.parent) at.pending.push(promise);
     return response;
   };
 }
 
 // Runs one turn and returns what it cost. The metrics are reported even when the turn throws.
 export async function measureTurn<T>(run: () => Promise<T>, report: (metrics: TurnMetrics) => void | Promise<void>): Promise<T> {
-  const meter: Meter = { calls: 0, costUsd: 0, callsWithoutCost: 0, structuredCalls: 0, parseFailures: 0, pending: [] };
   const started = performance.now();
+  const meter: Meter = { calls: 0, costUsd: 0, callsWithoutCost: 0, structuredCalls: 0, parseFailures: 0, stages: [], pending: [], parent: current.getStore(), began: started };
   try {
     return await current.run(meter, run);
   } finally {
     await Promise.allSettled(meter.pending);
-    const { pending: _pending, ...counts } = meter;
+    const { pending: _pending, parent: _parent, began: _began, ...counts } = meter;
     await Promise.resolve(report({ seconds: (performance.now() - started) / 1000, ...counts })).catch((error: Error) =>
       console.warn(`The turn metrics were not recorded: ${error.message}`)
     );
   }
 }
+
+// Times one stage of the turn that is running (the router, the search, the answer, a check) and
+// records it on that turn and every turn around it. Outside a turn it only runs the work. A stage
+// that throws is still timed.
+export async function timed<T>(stage: string, work: () => Promise<T>): Promise<T> {
+  const meter = current.getStore();
+  const start = performance.now();
+  try {
+    return await work();
+  } finally {
+    if (meter) {
+      for (let at: Meter | undefined = meter; at; at = at.parent) {
+        at.stages.push({ stage, seconds: round3((performance.now() - start) / 1000), startedAt: round3((start - at.began) / 1000) });
+      }
+    }
+  }
+}
+
+const round3 = (value: number) => Math.round(value * 1000) / 1000;
