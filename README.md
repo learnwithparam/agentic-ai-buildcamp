@@ -119,7 +119,7 @@ The server and the scripts read the repository's `.env` file first. So a key set
 - [`src/`](./src/) holds the app.
 - [`scripts/`](./scripts/) holds the prompt, seed, dataset and page check scripts.
 - [`data/hcp/`](./data/hcp/) is a pinned copy of the dataset repo. It has the labels, the desk rules and the eval cases. [`docs/coverage.md`](./docs/coverage.md) maps each case to the promise it tests.
-- [`docs/measures.md`](./docs/measures.md) lists every number the desk must reach, each against a bar from a real pharma tool, with the run that measured it.
+- [`docs/measures.md`](./docs/measures.md) lists every number the desk must reach. Each has a bar from a real pharma tool and the run that measured it.
 
 ## Where to go next
 
