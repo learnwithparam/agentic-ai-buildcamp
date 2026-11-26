@@ -24,7 +24,7 @@ import {
 } from "./graph";
 import { LABEL_SECTIONS } from "./labels";
 import { readableDocuments } from "./permissions";
-import { scrubPhi } from "./phi";
+import { PhiVault, pseudonymise, type SpanFinder } from "./phi";
 import { approvedUses, reportingProcedure, routeRequest, routerInput, safetyReply, stopReply, withFloor } from "./tiers";
 import type { Turn as SearchTurn } from "./rag/rewrite";
 import { executeTool, TOOL_DEFINITIONS } from "./tools";
@@ -86,9 +86,31 @@ const toolName = (tool: (typeof TOOL_DEFINITIONS)[number]) => (tool.type === "fu
 const outOfScope = (text: string): AiMessage => ({ id: `out-of-scope-${randomUUID()}`, type: "ai", content: [{ type: "text", text }], tool_calls: [] });
 
 // Lesson 13. Identifiers leave the doctor's words before the trace, the model or the checkpoint
-// sees them. Only the newest human messages arrive here; older ones were scrubbed on their turn.
-function scrubbed(messages: ChatMessage[] | undefined): ChatMessage[] | undefined {
-  return messages?.map((message) => (message.type === "human" ? { ...message, content: scrubPhi(message.content).text } : message));
+// sees them: each becomes a placeholder ([PATIENT_1]) that stays the same for the whole thread.
+// Only the newest human messages arrive here; older ones were scrubbed on their turn. The map from
+// placeholder back to the words stays in this process (the vault), and restore() reads it on the
+// way out, so the doctor reads their own words and nothing stored holds them.
+const vaults = new Map<string, PhiVault>();
+const MAX_VAULTS = 5000;
+
+function vaultFor(threadId: string): PhiVault {
+  let vault = vaults.get(threadId);
+  if (!vault) {
+    vault = new PhiVault();
+    if (vaults.size >= MAX_VAULTS) vaults.delete(vaults.keys().next().value!);
+  }
+  vaults.delete(threadId);
+  vaults.set(threadId, vault);
+  return vault;
+}
+
+async function scrubbed(messages: ChatMessage[] | undefined, vault: PhiVault, find?: SpanFinder): Promise<ChatMessage[] | undefined> {
+  if (!messages) return messages;
+  const out: ChatMessage[] = [];
+  for (const message of messages) {
+    out.push(message.type === "human" ? { ...message, content: (await pseudonymise(message.content, vault, find)).text } : message);
+  }
+  return out;
 }
 // Step 2B. Adds the record of how the reply in this update was made, under the reply's id.
 type GraphUpdate = Partial<Parameters<typeof citeStep>[2]>;
@@ -103,7 +125,7 @@ function withRun(state: Parameters<typeof citeStep>[2], update: GraphUpdate, rou
   const run = answerRun(state.messages, route, check);
   return { ...update, runs: Object.fromEntries([...ids].map((id) => [id, run])) };
 }
-const REMOVED = /\[(?:record number|email|ID number|phone number) removed\]/;
+const REMOVED = /\[(?:record number|email|ID number|phone number) removed\]|\[(?:MRN|EMAIL|ID|PHONE|PATIENT|DOB|ADDRESS)_\d+\]/;
 
 // Lesson 21: the check's outcome is the span's output and a score on the trace, so Langfuse can
 // count how often an answer was rewritten or withheld. Exported for npm run citations:replay,
@@ -134,7 +156,7 @@ export const citeNode = observe(
 
 // One agent, two homes for its threads. The web app passes PostgresSaver, so a paused draft
 // survives a restart; scripts pass MemorySaver, because their threads are thrown away after one answer.
-export function createMedinfoAgent(checkpointer: BaseCheckpointSaver) {
+export function createMedinfoAgent(checkpointer: BaseCheckpointSaver, options: { phiFinder?: SpanFinder } = {}) {
   const graph = buildGraph(
     {
       router: observe(
@@ -201,12 +223,15 @@ export function createMedinfoAgent(checkpointer: BaseCheckpointSaver) {
   );
 
   const runTurn = observe(
-    (turn: Turn, emit: (event: StreamEvent) => void) => {
-      const cleaned = { ...turn, messages: scrubbed(turn.messages) };
+    async (turn: Turn, emit: (event: StreamEvent) => void) => {
+      const vault = vaultFor(turn.threadId);
+      const cleaned = { ...turn, messages: await scrubbed(turn.messages, vault, options.phiFinder) };
       // Lesson 11: the trace records who asked by id, company and country only. The doctor's
       // name and email stay in Keycloak; the trace input is the thread and the new messages.
       updateActiveObservation({ input: { threadId: turn.threadId, messages: cleaned.messages, resume: turn.resume } });
-      return propagateAttributes(
+      // The doctor reads their own words: placeholders go back in on the way out, after the trace and the checkpoint have what they keep.
+      const emitRestored = (event: StreamEvent) => emit(vault.restoreDeep(event));
+      const result = await propagateAttributes(
         {
           sessionId: turn.threadId,
           // Lesson 11: filter Langfuse by user, company or country to see one desk's traffic.
@@ -215,13 +240,21 @@ export function createMedinfoAgent(checkpointer: BaseCheckpointSaver) {
           traceName: turn.resume ? "hcp-medinfo-review-decision" : "hcp-medinfo-chat-turn",
           tags: ["langfuse-workshop", "hcp-medinfo"]
         },
-        () => runGraph(graph, cleaned, emit)
+        () => runGraph(graph, cleaned, emitRestored)
       );
+      return result;
     },
     { name: "hcp-medinfo-chat-turn", asType: "agent", captureInput: false }
   );
 
-  return { runTurn, readThread: (threadId: string) => readThread(graph, threadId) };
+  return {
+    runTurn,
+    readThread: async (threadId: string) => {
+      const thread = await readThread(graph, threadId);
+      const vault = vaults.get(threadId);
+      return vault ? vault.restoreDeep(thread) : thread;
+    }
+  };
 }
 
 export type MedinfoAgent = ReturnType<typeof createMedinfoAgent>;

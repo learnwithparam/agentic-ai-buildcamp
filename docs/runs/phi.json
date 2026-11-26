@@ -1,0 +1,60 @@
+{
+  "measures": {
+    "phi.recall": 1,
+    "phi.false_positives_per_note": 0.01,
+    "phi.output_leaks": 0
+  },
+  "commit": "26d09cd",
+  "at": "2026-11-26T20:14:10.230Z",
+  "notes": 100,
+  "spans": 201,
+  "model": "gateway",
+  "configs": {
+    "rules": {
+      "recall": 1,
+      "recall_by_type": {
+        "name": 1,
+        "dob": 1,
+        "address": 1,
+        "mrn": 1,
+        "phone": 1,
+        "email": 1,
+        "national_id": 1
+      },
+      "false_positives_per_note": 0,
+      "output_leaks": 0
+    },
+    "rules_model": {
+      "recall": 1,
+      "recall_by_type": {
+        "name": 1,
+        "dob": 1,
+        "address": 1,
+        "mrn": 1,
+        "phone": 1,
+        "email": 1,
+        "national_id": 1
+      },
+      "false_positives_per_note": 0.01,
+      "output_leaks": 0
+    }
+  },
+  "misses": {
+    "rules": [],
+    "rules_model": []
+  },
+  "false_positives": {
+    "rules": [],
+    "rules_model": [
+      {
+        "id": "phi-064",
+        "type": "dob",
+        "text": "1948"
+      }
+    ]
+  },
+  "leaks": {
+    "rules": [],
+    "rules_model": []
+  }
+}

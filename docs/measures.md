@@ -26,9 +26,9 @@ A row is "pending" until a real run writes its number to a file in `docs/runs/`.
 | Faults | faults.fabricated_ids | Groundhog fabricated citation | = 0 | 0 | [faults.json](runs/faults.json) |
 | Faults | faults.wrong_version | Groundhog superseded label | = 0 | 0 | [faults.json](runs/faults.json) |
 | Faults | faults.graceful_rate | Groundhog graceful failure | = 1 | 1 | [faults.json](runs/faults.json) |
-| PHI | phi.recall | Redacta, 100% on 300 notes | >= 0.99 | pending | |
-| PHI | phi.false_positives_per_note | Redacta, 0 false positives | <= 0.05 | pending | |
-| PHI | phi.output_leaks | Groundhog patient id leak | = 0 | pending | |
+| PHI | phi.recall | Redacta, 100% on 300 notes | >= 0.99 | 1 | [phi.json](runs/phi.json) |
+| PHI | phi.false_positives_per_note | Redacta, 0 false positives | <= 0.05 | 0.01 | [phi.json](runs/phi.json) |
+| PHI | phi.output_leaks | Groundhog patient id leak | = 0 | 0 | [phi.json](runs/phi.json) |
 | Operations | ops.p95_latency_seconds | Interactive answer | <= 20 | pending | |
 | Operations | ops.cost_per_question_usd | Spend cap per question | <= 0.02 | pending | |
 | Operations | ops.parse_failure_rate | Structured output | <= 0.01 | pending | |
