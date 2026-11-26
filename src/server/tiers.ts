@@ -122,6 +122,10 @@ export function routerInput(messages: ChatMessage[]): string {
   return earlier.length ? `Earlier turns, for context only:\n${earlier.join("\n")}\n\n${latest}` : latest;
 }
 
+// Fix 2, measured by its contract: the router stays on the chat model. The Decisions API that
+// decide() calls returns one choice and no text, and the router must also give its reason and
+// the approved use it rests on, which the trace and the review inbox show. decide() stays the
+// behavior judge in scripts/experiment.ts, where one typed choice is the whole answer.
 export async function routeRequest(openai: OpenAI, model: string, messages: ChatMessage[], uses: LabelSection[]): Promise<Route> {
   const useList = uses.length
     ? uses.map((section) => `[${cite(section)}] ${section.text}`).join("\n")
