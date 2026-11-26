@@ -45,6 +45,7 @@ const PARTS: Record<ReviewItem["kind"], [string, string]> = {
 };
 const STATUS: Record<ReviewItem["status"], string> = {
   waiting: "Waiting",
+  escalated: "Overdue, escalated to the safety team",
   approved: "Approved",
   rejected: "Rejected",
   filed: "Filed",
@@ -140,7 +141,7 @@ function Item({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const late =
-    item.status === "waiting" && new Date(item.dueAt).getTime() < Date.now();
+    (item.status === "waiting" || item.status === "escalated") && new Date(item.dueAt).getTime() < Date.now();
   const send = async (decision: ReviewItem["status"]) => {
     setBusy(true);
     setError("");
@@ -161,7 +162,7 @@ function Item({
     >
       <div className="card-head">
         <span>{KIND[item.kind]}</span>
-        {item.status === "waiting" ? (
+        {item.status === "waiting" || item.status === "escalated" ? (
           <span className={`status ${late ? "status-fail" : "status-wait"}`}>
             Due {formatDue(item.dueAt)}, {timeLeft(item.dueAt)} (
             {ruleHours(item)}-hour rule)
@@ -186,7 +187,7 @@ function Item({
               <p className="inbox-question">{item.note}</p>
             </>
           )}
-          {reviewer && item.status === "waiting" && (
+          {reviewer && (item.status === "waiting" || item.status === "escalated") && (
             <>
               <label className="label" htmlFor={`note-${item.id}`}>
                 Note (optional)

@@ -25,7 +25,8 @@ import {
 import { LABEL_SECTIONS } from "./labels";
 import { readableDocuments } from "./permissions";
 import { PhiVault, pseudonymise, type SpanFinder } from "./phi";
-import { approvedUses, reportingProcedure, routeRequest, routerInput, safetyReply, stopReply, withFloor } from "./tiers";
+import { reviewerDraft } from "./safety/draft";
+import { approvedUses, reportingProcedure, routeRequest, routerInput, safetyReply, stopReply, withFloor, withSecondPass } from "./tiers";
 import type { Turn as SearchTurn } from "./rag/rewrite";
 import { executeTool, TOOL_DEFINITIONS } from "./tools";
 import type { ReviewItem } from "./reviews";
@@ -172,7 +173,8 @@ export function createMedinfoAgent(checkpointer: BaseCheckpointSaver, options: {
           const readable = await readableDocuments(userOf(config));
           const openai = observeOpenAI(modelClient(), { generationName: "route" });
           const chosen = await routeRequest(openai, env.openaiModel, state.messages, approvedUses(readable, LABEL_SECTIONS));
-          const route = withFloor(chosen, latestQuestion(state.messages));
+          const second = await withSecondPass(chosen, observeOpenAI(modelClient(), { generationName: "safety-second-pass" }), env.openaiModel, latestQuestion(state.messages));
+          const route = withFloor(second, latestQuestion(state.messages));
           updateActiveObservation({ output: route });
           return { route };
         },
@@ -212,7 +214,9 @@ export function createMedinfoAgent(checkpointer: BaseCheckpointSaver, options: {
             removedIdentifiers: REMOVED.test(latestQuestion(state.messages)) ? 1 : 0,
             procedure: reportingProcedure(readable, LABEL_SECTIONS)
           });
-          await submitAdverseEvent(state, config, reply, getActiveTraceId());
+          // A failed extraction never stops the report: the reviewer then reads the doctor's words alone.
+          const draft = await reviewerDraft(observeOpenAI(modelClient(), { generationName: "safety-extract" }), env.openaiModel, latestQuestion(state.messages), `ae-${String(config.configurable?.thread_id ?? "unknown")}`).catch((error: Error) => `CASE DRAFT NOT MADE: ${error.message}`);
+          await submitAdverseEvent(state, config, `${reply}\n\n${draft}`, getActiveTraceId());
           return withRun(state, fixedReply(state, reply));
         },
         { name: "safety", asType: "span", captureInput: false }
