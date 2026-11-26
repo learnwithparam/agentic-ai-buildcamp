@@ -138,6 +138,9 @@ stateDiagram-v2
     waiting --> rejected : reviewer rejects it
     waiting --> filed : safety reviewer files an adverse event
     waiting --> dismissed : safety reviewer says it is not one
+    waiting --> escalated : an adverse event passes its due time
+    escalated --> filed : safety reviewer files it
+    escalated --> dismissed : safety reviewer says it is not one
     approved --> [*]
     rejected --> [*]
     filed --> [*]
