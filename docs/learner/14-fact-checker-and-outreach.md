@@ -34,6 +34,10 @@ For example, "the best-in-class option for heart failure" reads well and was nev
 
 A new agent is a graph and its data. The gateway, the sign-in, the permissions and the inbox are already built. Both agents borrow them, so the hard parts have one copy.
 
+![Check facts and plan outreach: the parts this lesson adds.](../images/diagrams/checkpoint-14.svg)
+
+Step through it one part at a time in the [live drawing](https://canvas.learnwithparam.com/case.html#buildcamp/16).
+
 The model reads and suggests. Code decides. A claim passes only on a word for word match with an approved claim. The claim must be approved for the email's country.
 
 ### The flow
