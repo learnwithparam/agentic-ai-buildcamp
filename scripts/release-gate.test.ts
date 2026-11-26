@@ -64,13 +64,14 @@ test("a push is gated only when it changes an agent, the runner or the dataset",
   }
 });
 
-test("the hook reads branch pushes, skips tags and deletes, and compares a new branch with main", () => {
+test("the hook reads branch pushes, skips tags, deletes and cloud drafts, and compares a new branch with main", () => {
   const base = (sha: string) => `base-of-${sha}`;
   const stdin = [
     `refs/heads/ch18 ${B} refs/heads/ch18 ${A}`,
     `refs/heads/new ${B} refs/heads/new ${ZERO}`,
     `refs/tags/checkpoint/18-release-gate ${B} refs/tags/checkpoint/18-release-gate ${A}`,
     `(delete) ${ZERO} refs/heads/old ${A}`,
+    `refs/heads/cloud/ae ${B} refs/heads/cloud/ae ${ZERO}`,
     ""
   ].join("\n");
   assert.deepEqual(pushedRanges(stdin, base), [
