@@ -31,7 +31,7 @@
     "flows:capture": "tsx scripts/flows-capture.ts",
     "check:live": "tsx --test --test-concurrency=1 'src/**/*.live.ts' 'scripts/**/*.live.ts'",
     "check:pages": "tsx scripts/plain-english.ts README.md docs/walkthrough.md docs/one-question.md docs/learner/*.md docs/learner/*/*.md && tsx scripts/lesson-shape.ts && tsx scripts/glossary.ts && tsx scripts/mermaid.ts",
-    "check": "npm run typecheck && tsx --test 'scripts/**/*.test.ts' 'src/**/*.test.ts' && tsx scripts/check-repo.ts",
+    "check": "npm run typecheck && tsx --test 'scripts/**/*.test.ts' 'src/**/*.test.ts' && tsx scripts/check-repo.ts && tsx scripts/syllabus.ts --check",
     "langfuse:gateway-keys": "tsx scripts/langfuse-gateway-keys.ts",
     "langfuse:code-eval": "tsx scripts/langfuse-code-eval.ts",
     "identity:setup": "tsx scripts/identity-setup.ts",
