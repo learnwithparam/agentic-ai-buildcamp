@@ -179,6 +179,7 @@ BI_FILES=".github/start-test-services.sh docs/scoreboard.md infra/docker-compose
 # message, search by country, the run record under each answer and in the review queue. They use
 # lesson 21's citation check and lesson 22's roles, so tags before 22 keep their own copies.
 # labels.ts is in no list from lesson 11 on: every tag reads the new label data, and only main's copy reads it right.
+# The same holds from lesson 20 on for rag/extract.ts and the Docling fixtures: they read the new label PDFs.
 DESK_FILES=".claude/skills/hcp-labels/SKILL.md scripts/citations-replay.ts scripts/demo-turns.ts
   scripts/demo-users.test.ts scripts/flows-capture.ts scripts/flows.test.ts scripts/flows.ts
   scripts/identity-setup.ts scripts/identity-smoke.ts scripts/open-questions.ts
@@ -190,10 +191,7 @@ DESK_FILES=".claude/skills/hcp-labels/SKILL.md scripts/citations-replay.ts scrip
   src/server/desk-prompt.test.ts src/server/desk-prompt.ts src/server/gateway.test.ts
   src/server/gateway.ts src/server/graph.ts src/server/inbox.test.ts
   src/server/mcp.test.ts src/server/mcp.ts src/server/medinfo-agent.ts
-  src/server/migrations/010_review_run.sql src/server/permissions.ts src/server/rag/extract.ts
-  src/server/rag/fixtures/cardionex-clarion-hf-trial.docling.json
-  src/server/rag/fixtures/cardionex-clarion-hf-trial.docling.md
-  src/server/rag/fixtures/cardionex-uspi-v2.docling.json src/server/rag/rag.test.ts
+  src/server/migrations/010_review_run.sql src/server/permissions.ts src/server/rag/rag.test.ts
   src/server/rag/search.ts src/server/reviews.ts src/server/tiers.test.ts src/server/tiers.ts
   src/server/tools.ts src/server/trace-identity.test.ts src/server/trace-shape.test.ts
   src/shared/run.test.ts src/shared/run.ts"
