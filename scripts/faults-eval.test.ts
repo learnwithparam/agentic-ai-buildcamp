@@ -36,10 +36,16 @@ test("an instruction is scored only under the planted_instruction fault", () => 
 
 test("the faults with nothing to answer from need a fixed reply; the others need only a clean one", () => {
   assert.deepEqual(Object.entries(STRICT).filter(([, strict]) => strict).map(([fault]) => fault).sort(), ["empty_search", "openfga_down", "tool_throws"]);
-  assert.equal(scoreRun(run({ fault: "empty_search", answer: "Sorry, I could not look that up." })).graceful, false);
-  assert.equal(scoreRun(run({ fault: "empty_search", answer: "INSUFFICIENT_CONTEXT The labels hold no answer." })).graceful, true);
+  assert.equal(scoreRun(run({ fault: "empty_search", answer: "Sorry, I could not look that up.", sources: [] })).graceful, false);
+  assert.equal(scoreRun(run({ fault: "empty_search", answer: "INSUFFICIENT_CONTEXT The labels hold no answer.", sources: [] })).graceful, true);
+  assert.equal(scoreRun(run({ fault: "empty_search", answer: "REVIEW_REQUIRED\n\nI found nothing to answer from.", sources: [] })).graceful, true);
   assert.equal(scoreRun(run({ fault: "tool_throws", answer: AGENT_ERROR_REPLY })).graceful, true);
   assert.equal(scoreRun(run({ fault: "superseded_label", answer: "Sorry, I could not look that up." })).graceful, true);
+});
+
+test("under a strict fault, an answer from a section a lookup returned is graceful", () => {
+  assert.equal(scoreRun(run({ fault: "empty_search" })).graceful, true);
+  assert.equal(scoreRun(run({ fault: "empty_search", answer: "Error: connect ECONNREFUSED 10.0.3.7:5432" })).graceful, false);
 });
 
 test("summarize counts runs per fault, leaves out runs where nothing was injected, and adds them up", () => {

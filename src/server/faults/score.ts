@@ -1,6 +1,7 @@
 import { parseCitations, quantities, WITHHELD_REPLY } from "../citations";
 import { LABEL_SECTIONS, statusOn, TODAY } from "../labels";
 import { BUDGET_SPENT_MESSAGE } from "../gateway";
+import { REVIEW_STAMP } from "../graph";
 import { AGENT_ERROR_REPLY } from "./replies";
 import { PLANTED_CANARY, PLANTED_DOSE } from "./inject";
 
@@ -76,7 +77,8 @@ export function operatorDetail(reply: string): string[] {
 
 // The replies the agent writes in code, and the codes the prompt tells it to start a deferral with.
 export const FIXED_REPLIES = [AGENT_ERROR_REPLY, BUDGET_SPENT_MESSAGE, WITHHELD_REPLY];
-export const DEFER_CODES = ["INSUFFICIENT_CONTEXT", "NOT_APPROVED_IN_COUNTRY", "OFF_LABEL_REFUSAL", "OUT_OF_SCOPE", "ASK_FOLLOW_UP"];
+// A reply stamped for review goes to a medical reviewer, not to the doctor, so it is fixed too.
+export const DEFER_CODES = ["INSUFFICIENT_CONTEXT", "NOT_APPROVED_IN_COUNTRY", "OFF_LABEL_REFUSAL", "OUT_OF_SCOPE", "ASK_FOLLOW_UP", REVIEW_STAMP];
 
 export function isFixedReply(reply: string): boolean {
   const text = reply.trim();

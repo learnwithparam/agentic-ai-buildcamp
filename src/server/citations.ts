@@ -1,4 +1,5 @@
 import type { ChatMessage } from "../shared/messages";
+import { LABEL_SECTIONS, statusOn } from "./labels";
 
 // Lesson 21. The answer is checked against the sections search_labels returned, in code, before it
 // is final. The desk rules already say "answer only from active label text" and "cite every fact";
@@ -74,7 +75,15 @@ const sentencesOf = (paragraph: string) =>
 // none, its paragraph, then the whole answer). A number the doctor gave (eGFR 24) is a fact about
 // the patient, not a claim from the label, so it is left alone. An answer with no number and no
 // citation, such as a follow-up question or a refusal, has nothing to check.
-export function checkCitations(answer: string, retrieved: RetrievedSection[], asked: string): CitationProblem[] {
+// The status a tool reports is the tool's word, and a tool can be wrong: a search that returned the
+// superseded 2025 label marked active was cited as in force (docs/runs/faults.json, POSITIVE-02).
+// So with a day given, a document in the library is judged by its own dates on that day.
+function statusFor(section: RetrievedSection, today?: string): string {
+  const doc = today ? LABEL_SECTIONS.find((each) => each.docId === section.doc_id) : undefined;
+  return doc ? statusOn(doc, today!) : section.status;
+}
+
+export function checkCitations(answer: string, retrieved: RetrievedSection[], asked: string, today?: string): CitationProblem[] {
   const sections = new Map(retrieved.map((section) => [`${section.doc_id}, ${section.section}`, section]));
   const given = numbersIn(asked);
   const problems: CitationProblem[] = [];
@@ -82,7 +91,7 @@ export function checkCitations(answer: string, retrieved: RetrievedSection[], as
   for (const citation of new Set(all)) {
     const section = sections.get(citation);
     if (!section) problems.push({ kind: "not_retrieved", citation });
-    else if (section.status !== "active") problems.push({ kind: "not_in_force", citation, status: section.status });
+    else if (statusFor(section, today) !== "active") problems.push({ kind: "not_in_force", citation, status: statusFor(section, today) });
   }
   for (const paragraph of answer.split(/\n\s*\n/)) {
     const inParagraph = parseCitations(paragraph);

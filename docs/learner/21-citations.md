@@ -272,6 +272,15 @@ npx tsx --test src/server/citations.test.ts scripts/citations-audit.test.ts scri
 
 Break it on purpose. Skip the `cite` edge in `graph.ts`, and drop the status check in `citations.ts`. Four of these tests fail.
 
+Then make the tools lie. The fault run gives the real agent five broken tools. Search returns the old label marked active, or a planted order, or nothing. A tool throws, or OpenFGA does not answer:
+
+```bash
+npm run faults:measure
+```
+
+- **A tool's word is not enough.** The check reads each document's own dates. An old label marked active still fails.
+- **`docs/runs/faults.json`** holds the counts `docs/measures.md` compares, and each failure with the reply the doctor would have read.
+
 ## Stuck points
 
 In a correct run, `npm run citations:audit` prints a count. A new chat trace ends in a `cite` span with a `citations` score.
