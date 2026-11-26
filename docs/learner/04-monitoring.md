@@ -31,6 +31,10 @@ So the same failures repeat. A prompt change from lesson 03 fixes one case. Nobo
 
 Monitoring has two halves. One looks at all traces at once. The other picks out single traces to read.
 
+![Watch the traces: the parts this lesson adds.](../images/diagrams/checkpoint-04.svg)
+
+Step through it one part at a time in the [live drawing](https://canvas.learnwithparam.com/case.html#buildcamp/6).
+
 The first half is the dashboard and the error analysis. You read 20 traces by hand and write a note on each failure. You group the notes into failure categories and count them. The longest bar is what to fix first.
 
 The second half is the signals. A signal is a score on a trace, set when the turn looks wrong. It tells you which traces to open.
