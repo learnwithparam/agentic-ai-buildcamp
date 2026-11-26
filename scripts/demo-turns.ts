@@ -26,17 +26,17 @@ const WITHHELD = /INSUFFICIENT_CONTEXT|ASK_FOLLOW_UP|OFF_LABEL_REFUSAL/;
 const DOSE = /\d+ mg/;
 // Words the prompt once forced into every dose search, so every search read the same.
 const FORCED = /titration.*weeks|weeks.*titration/i;
-// The hepatic section answers no kidney question.
-const HEPATIC = /cardionex-uspi-v2 8\.7/;
+// Fix 4. A kidney question may also find the hepatic section 8.7: a score cut that drops it also
+// drops sections the dataset's answers cite (19 to 22 of 23 found, against 23 of 23 uncut).
 
 const CONVERSATIONS: Conversation[] = [
   {
     name: "a good question after a refused one",
     email: ANA,
     turns: [
-      { ask: "What is the CardioNex dose for a US patient with eGFR 24 who is not on dialysis?", why: "a plain dose question", expect: { tier: "answer", reply: /5 mg/, sections: /cardionex-uspi-v2 2\.2/, noSection: HEPATIC } },
+      { ask: "What is the CardioNex dose for a US patient with eGFR 24 who is not on dialysis?", why: "a plain dose question", expect: { tier: "answer", reply: /5 mg/, sections: /cardionex-uspi-v2 2\.2/ } },
       { ask: "what is the dose for kids below 12 years old?", why: "children are outside the approved use", expect: { tier: "stop" } },
-      { ask: "US patient with eGFR 32?", why: "an adult dose question again; the refusal before it must not stick", expect: { tier: "answer", reply: DOSE, notReply: WITHHELD, sections: /cardionex-uspi-v2 2\.2/, noSection: HEPATIC } }
+      { ask: "US patient with eGFR 32?", why: "an adult dose question again; the refusal before it must not stick", expect: { tier: "answer", reply: DOSE, notReply: WITHHELD, sections: /cardionex-uspi-v2 2\.2/ } }
     ]
   },
   {
@@ -44,7 +44,7 @@ const CONVERSATIONS: Conversation[] = [
     email: ANA,
     turns: [
       { ask: "US patient with eGFR 32?, then", why: "unclear on its own, so asking back is fine", expect: { tier: "answer" } },
-      { ask: "I want to know about their dosage", why: "the turn before says which patient; the desk sells one medicine", expect: { tier: "answer", reply: DOSE, notReply: WITHHELD, sections: /cardionex-uspi-v2 2\.2/, noSection: HEPATIC } }
+      { ask: "I want to know about their dosage", why: "the turn before says which patient; the desk sells one medicine, and the section found then may be cited again", expect: { tier: "answer", reply: /\d+ mg[^]*\[cardionex-uspi-v2, 2\.2\]/, notReply: WITHHELD } }
     ]
   },
   {
@@ -126,7 +126,7 @@ function misses(seen: Seen, expect: Expect): string[] {
 
 async function play(conversation: Conversation): Promise<number> {
   const cookie = sessionHeader(await signIn(conversation.email));
-  const created = await fetch(`${APP}/api/threads`, { method: "POST", headers: { Cookie: cookie, Origin: APP }, signal: AbortSignal.timeout(15_000) });
+  const created = await fetch(`${APP}/api/threads`, { method: "POST", headers: { Cookie: cookie, Origin: APP }, signal: AbortSignal.timeout(60_000) });
   const { thread_id: threadId } = (await created.json()) as { thread_id: string };
   console.log(`\n${conversation.name} (${conversation.email.split("@")[0]}), session ${threadId}`);
   let failed = 0;
@@ -154,7 +154,14 @@ const conversations: Conversation[] = open
   ? OPEN_QUESTIONS.map((question) => ({ name: "open question", email: question.email, turns: [{ ask: question.ask, why: "a cited answer or the right refusal", expect: question.expect as Expect }] }))
   : CONVERSATIONS;
 let failed = 0;
-for (const conversation of conversations) failed += await play(conversation);
+// A request that times out fails its own conversation, not the run: on a busy laptop one slow
+// sign-in would otherwise throw away every turn already played.
+for (const conversation of conversations) {
+  failed += await play(conversation).catch((error: Error) => {
+    console.log(`\n${conversation.name}: FAIL, ${error.message}`);
+    return conversation.turns.length;
+  });
+}
 const total = conversations.reduce((sum, conversation) => sum + conversation.turns.length, 0);
 const right = total - failed;
 console.log(`\n${right} of ${total} turns right${open ? `, ${Math.round((100 * right) / total)} percent; the bar is 90` : ""}.`);

@@ -3,6 +3,7 @@ import { observe, updateActiveObservation } from "@langfuse/tracing";
 import {
   approvalStatus,
   checkInteraction,
+  LABEL_SECTIONS,
   labelVersions,
   readSection,
   searchLabels,
@@ -39,7 +40,8 @@ export const TOOL_DEFINITIONS: OpenAI.Chat.Completions.ChatCompletionTool[] = [
       parameters: {
         type: "object",
         properties: {
-          query: { type: "string", description: "What to look up, with the medicine and country when known." }
+          query: { type: "string", description: "What to look up, in the doctor's own words." },
+          country: { type: "string", description: "Two-letter code of the country the question is about. Leave out for the asker's own country." }
         },
         required: ["query"],
         additionalProperties: false
@@ -80,10 +82,23 @@ export function useLabelSearch(next: LabelSearch) {
   search = next;
 }
 
-async function labelSearch(input: { query: string }, user: Identity, today: string): Promise<ToolResult> {
-  const readable = await readableDocuments(user);
+// Fix 4. A question about another country searches that country's documents of the doctor's own
+// company (OpenFGA can_read_abroad), so "a patient in Germany" finds the German label, not the
+// asker's own. Without a country, only the documents the asker may read at home.
+export function documentsIn(ids: ReadonlySet<string>, country: string): Set<string> {
+  const inCountry = new Set(LABEL_SECTIONS.filter((section) => section.country === country).map((section) => section.docId));
+  return new Set([...ids].filter((id) => inCountry.has(id)));
+}
+
+type SearchInput = { query: string; country?: string };
+
+async function labelSearch(input: SearchInput, user: Identity, today: string): Promise<ToolResult> {
+  const country = (input.country ?? "").trim().toUpperCase() || user.country;
+  const readable = country === user.country ? await readableDocuments(user) : documentsIn(await companyDocuments(user), country);
   return {
     ok: true,
+    country,
+    asker_country: country === user.country,
     results: (await search(input.query, readable, 4, today)).map((hit) => ({
       doc_id: hit.docId,
       section: hit.section,
@@ -91,6 +106,7 @@ async function labelSearch(input: { query: string }, user: Identity, today: stri
       status: hit.status,
       effective_date: hit.effectiveDate,
       country: hit.country,
+      score: hit.score,
       text: hit.text
     }))
   };
@@ -100,7 +116,7 @@ async function labelSearch(input: { query: string }, user: Identity, today: stri
 // for. The doctor's name and email are not in the trace (src/server/trace-identity.test.ts).
 const asker = (user: Identity) => ({ tenantId: user.tenantId, country: user.country });
 const searchLabelsTool = observe(
-  (input: { query: string }, user: Identity, today: string) => {
+  (input: SearchInput, user: Identity, today: string) => {
     updateActiveObservation({ input: { ...input, asker: asker(user), today } }, { asType: "tool" });
     return labelSearch(input, user, today);
   },
@@ -178,7 +194,7 @@ const isLookup = (name: string): name is Lookup => (LOOKUPS as readonly string[]
 export async function executeTool(name: string, input: Record<string, unknown>, user: Identity, today = TODAY): Promise<ToolResult> {
   switch (name) {
     case "search_labels":
-      return searchLabelsTool({ query: String(input.query ?? "") }, user, today);
+      return searchLabelsTool({ query: String(input.query ?? ""), ...(input.country ? { country: String(input.country) } : {}) }, user, today);
     default:
       return isLookup(name) ? lookupTools[name](input, user, today) : { ok: false, error: `Unsupported tool: ${name}` };
   }

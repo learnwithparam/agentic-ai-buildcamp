@@ -90,7 +90,9 @@ export const citeNode = observe(
     const traceId = getActiveTraceId();
     if (traceId && outcome) {
       langfuse.score.create({ traceId, name: "citations", value: outcome.outcome, dataType: "CATEGORICAL" });
-      await langfuse.score.flush();
+      // Sent in the background: the doctor's answer never waits on Langfuse. Awaited, a slow or
+      // dropped Langfuse connection failed the whole turn (seen 26 Nov 2026, status 0 on the flush).
+      void langfuse.score.flush().catch((error: Error) => console.warn(`The citations score was not sent: ${error.message}`));
     }
     return { update, outcome };
   },
