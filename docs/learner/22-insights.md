@@ -39,6 +39,10 @@ For example, these go wrong on a shared connection:
 
 The model writes SQL, and it never holds a connection. Three layers decide what runs, and each one is enough on its own for some attacks. If one has a gap, the next still holds.
 
+![Answer sales questions with safe SQL: the parts this lesson adds.](../images/diagrams/checkpoint-22.svg)
+
+Step through it one part at a time in the [live drawing](https://canvas.learnwithparam.com/case.html#buildcamp/24).
+
 ### The flow
 
 This follows Rosa's question, and one attack inside a question.
