@@ -1,6 +1,7 @@
 import { AuiIf, ComposerPrimitive, MessagePrimitive, ThreadPrimitive } from "@assistant-ui/react";
 import { useLangGraphInterruptState } from "@assistant-ui/react-langgraph";
 import { formatDue } from "../inbox/format";
+import { RunSteps } from "./RunSteps";
 import { SUGGESTIONS } from "./suggestions";
 import { LookupCard, MarkdownText, OtherToolCard, SearchLabelsCard, Thinking } from "./parts";
 
@@ -32,6 +33,7 @@ function AssistantMessage() {
           }
         }}
       />
+      <RunSteps />
     </MessagePrimitive.Root>
   );
 }
