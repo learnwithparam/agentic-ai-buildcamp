@@ -14,7 +14,7 @@ import {
   type StreamEvent,
   type ToolMessage
 } from "../shared/messages";
-import type { AnswerRun } from "../shared/run";
+import { answerRun, type AnswerRun } from "../shared/run";
 import { checkCitations, describeProblem, evidenceOf, EVIDENCE_TOOLS, WITHHELD_REPLY, type CitationProblem } from "./citations";
 import { env } from "./env";
 import { streamModelTurn, toOpenAIMessages } from "./stream-model";
@@ -187,6 +187,8 @@ export type ReviewSubmission = {
   traceId?: string;
   question: string;
   body: string;
+  // Step 2B: how the answer was made, for the reviewer to read beside it.
+  run?: AnswerRun;
 };
 export interface ReviewInbox {
   // Must be safe to call twice with the same id: a node runs again when its thread resumes.
@@ -220,7 +222,8 @@ export async function submitDraftStep(state: GraphState, config: LangGraphRunnab
     tenantId: user.tenantId,
     traceId,
     question,
-    body: stamped
+    body: stamped,
+    run: state.runs[answer.id]
   });
   const message: AiMessage = { ...answer, content: [{ type: "text", text: stamped }] };
   return { messages: [message], dueAt: submitted?.dueAt.toISOString() ?? null };
@@ -273,7 +276,8 @@ export async function submitAdverseEvent(state: GraphState, config: LangGraphRun
     tenantId: user.tenantId,
     traceId,
     question: question?.content ?? "",
-    body: reply
+    body: reply,
+    run: answerRun([], state.route, null)
   });
 }
 

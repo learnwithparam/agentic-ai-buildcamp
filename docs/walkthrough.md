@@ -379,6 +379,7 @@ A pass rate on its own says little. Compare every run with the last one on the s
 
 ## Where to go next
 
+- [Follow one question through the desk](./one-question.md): one real trace, span by span.
 - The case study the course is built from: `case-studies/enterprise-agentic-hcp-system.md` in the dataset repo.
 - [OpenTelemetry GenAI conventions](https://opentelemetry.io/docs/specs/semconv/gen-ai/), the shape the traces follow.
 - [OAuth 2.0 for native apps (RFC 8252)](https://www.rfc-editor.org/rfc/rfc8252) and [protected resource metadata (RFC 9728)](https://www.rfc-editor.org/rfc/rfc9728), behind the sign-in.
