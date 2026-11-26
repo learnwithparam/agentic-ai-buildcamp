@@ -18,6 +18,7 @@ import { env } from "../src/server/env";
 import { usePromptVersion } from "../src/server/medinfo-agent";
 import { failedScores, flag, reportCases, startExperiment, type CaseRow } from "./experiment";
 import { appendScoreboardRow, LEARNER_SCOREBOARD_FILE, SCOREBOARD_FILE, scoreboardRow } from "./scoreboard";
+import { runMain } from "./run-main";
 
 export const RELEASE_CASES = [
   "STALENESS-01", // the label in force, never a superseded dose (lesson 07)
@@ -165,4 +166,4 @@ async function main() {
 }
 
 // Run only as a command, so the test can import the rules without starting the agents.
-if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(new URL(import.meta.url).pathname)) void main();
+if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(new URL(import.meta.url).pathname)) void runMain(main, { name: "Release gate" });

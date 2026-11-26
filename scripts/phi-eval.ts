@@ -22,6 +22,7 @@ import { execSync } from "node:child_process";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { runMain } from "./run-main";
 import { MemorySaver } from "@langchain/langgraph";
 import { PHI_TYPES, PhiVault, leakedFrom, pseudonymise, type PhiType, type SpanFinder } from "../src/server/phi";
 
@@ -178,4 +179,4 @@ async function main() {
   console.log(out ? `Wrote ${path.relative(root, out)}.` : "Wrote no file (--fake without --out).");
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) await main();
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) void runMain(main, { name: "PHI measure" });

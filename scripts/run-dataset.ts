@@ -15,6 +15,7 @@ import { env } from "../src/server/env";
 import { usePromptVersion } from "../src/server/medinfo-agent";
 import { flag, reportCases, startExperiment } from "./experiment";
 import { appendScoreboardRow, buildScoreboard, LEARNER_SCOREBOARD_FILE, loadRuns, SCOREBOARD_FILE, scoreboardRow, writeRunFile } from "./scoreboard";
+import { runMain } from "./run-main";
 
 async function main() {
   const experiment = await startExperiment();
@@ -61,4 +62,4 @@ async function main() {
   }
 }
 
-void main();
+void runMain(main, { name: "Dataset run" });

@@ -23,6 +23,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { env } from "../src/server/env";
 import { TRAFFIC, type TrafficTurn } from "./error-analysis-traffic";
+import { runMain } from "./run-main";
 
 const SEED_TAG = "error-analysis-seed";
 const DEFAULT_QUEUE_NAME = "error analysis";
@@ -279,9 +280,4 @@ async function main() {
 }
 
 const isDirectRun = Boolean(process.argv[1]) && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
-if (isDirectRun) {
-  void main().catch((error: unknown) => {
-    console.error(error instanceof Error ? error.message : error);
-    process.exit(1);
-  });
-}
+if (isDirectRun) void runMain(main, { name: "Error analysis annotations seed" });

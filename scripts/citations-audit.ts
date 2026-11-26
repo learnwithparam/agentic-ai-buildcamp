@@ -14,6 +14,7 @@ import { fileURLToPath } from "node:url";
 import { checkCitations, type CitationProblem, type RetrievedSection } from "../src/server/citations";
 import { env } from "../src/server/env";
 import { sinceTime } from "./judge-calibrate";
+import { runMain } from "./run-main";
 
 type Observation = { traceId: string; name: string; startTime: string; input?: unknown; output?: unknown };
 export type StoredSearch = { query: string; results: RetrievedSection[] };
@@ -111,4 +112,4 @@ async function main() {
 }
 
 const isDirectRun = Boolean(process.argv[1]) && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
-if (isDirectRun) await main();
+if (isDirectRun) void runMain(main, { name: "Citations audit" });

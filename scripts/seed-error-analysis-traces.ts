@@ -19,6 +19,7 @@ import { LangfuseSpanProcessor } from "@langfuse/otel";
 import { startObservation, type LangfuseObservation } from "@langfuse/tracing";
 import { TRAFFIC } from "./error-analysis-traffic";
 import { TRAFFIC_FILE, type RecordedSpan, type RecordedTurn } from "./error-analysis-replay";
+import { runMain } from "./run-main";
 
 export const SEED_TAG = "error-analysis-seed";
 const ROOT_NAME = "hcp-medinfo-chat-turn";
@@ -89,4 +90,4 @@ async function main() {
   console.log(`Seeded ${recorded.length} traces tagged ${SEED_TAG}.`);
 }
 
-if (process.argv[1]?.endsWith("seed-error-analysis-traces.ts")) await main();
+if (process.argv[1]?.endsWith("seed-error-analysis-traces.ts")) void runMain(main, { name: "Error analysis seed" });

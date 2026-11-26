@@ -26,6 +26,7 @@ import { randomUUID } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { runMain } from "./run-main";
 import type pg from "pg";
 import { createPool, migrate } from "../src/server/db";
 import { env } from "../src/server/env";
@@ -273,4 +274,4 @@ async function main() {
   console.log(`${misses.length} rows called wrongly${out ? `; written to ${path.relative(root, out)}` : "; nothing written"}.`);
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) await main();
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) void runMain(main, { name: "Adverse event measure" });

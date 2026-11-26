@@ -32,6 +32,7 @@ import {
   SCORE_NAME,
   type CalibrationItem
 } from "./judge/faithfulness";
+import { runMain } from "./run-main";
 
 const auth = "Basic " + Buffer.from(`${env.langfusePublicKey}:${env.langfuseSecretKey}`).toString("base64");
 
@@ -162,4 +163,4 @@ async function main() {
 }
 
 const isDirectRun = Boolean(process.argv[1]) && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
-if (isDirectRun) await main();
+if (isDirectRun) void runMain(main, { name: "Judge calibration" });

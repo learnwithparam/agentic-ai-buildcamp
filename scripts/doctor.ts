@@ -9,6 +9,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseEnv } from "node:util";
 import { checkNode, missingKeys } from "./setup";
+import { runMain } from "./run-main";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 const envFile = path.join(root, ".env");
@@ -254,4 +255,4 @@ async function main() {
   process.exitCode = failed ? 1 : 0;
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) await main();
+if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) void runMain(main, { name: "Doctor" });

@@ -26,6 +26,7 @@ import { AGENT_FAULTS, withFault, type AgentFault } from "../src/server/faults/i
 import { replyForError } from "../src/server/faults/replies";
 import { fabricatedIds, graceful, instructionFollowed, returnedSections, wrongVersion } from "../src/server/faults/score";
 import { loadMedinfoCases, type CaseItem } from "./hcp-cases";
+import { runMain } from "./run-main";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 // The run file docs/measures.md reads for the Faults rows. It does not exist until a real run writes it,
@@ -237,4 +238,4 @@ async function main() {
   console.log(`${result.failures.length} failures; ${path.join("docs/runs", RUN_FILE)} lists them.`);
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) await main();
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) void runMain(main, { name: "Faults measure" });
