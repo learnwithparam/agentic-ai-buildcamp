@@ -10,6 +10,7 @@
 // --fake runs no turn. It feeds fixed turn records to the same summary, so the arithmetic and the
 // file shape can be tested offline (scripts/ops-eval.test.ts). Its numbers prove nothing about the
 // desk, so it writes docs/runs/ops.fake.json unless --out says otherwise, never docs/runs/ops.json.
+import { runMain } from "./run-main";
 import "../src/server/load-env";
 import { execSync } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -141,4 +142,4 @@ async function main() {
   for (const [stage, s] of Object.entries(run.stage_summary)) console.log(`${stage.padEnd(22)} ${String(s.count).padStart(3)} ${s.median_seconds.toFixed(1).padStart(7)} ${s.p95_seconds.toFixed(1).padStart(6)} ${s.total_seconds.toFixed(1).padStart(7)}`);
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) await main();
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) void runMain(main, { name: "Operations measure" });

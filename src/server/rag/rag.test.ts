@@ -10,7 +10,7 @@ import { inForceDocuments, LABEL_SECTIONS, parseLabelDoc, TODAY, type LabelSecti
 import { passages, sectionPath } from "./chunk";
 import { missingFromExtraction, pdfToMarkdown, sectionsFromMarkdown } from "./extract";
 import type { ManifestDoc } from "./ingest";
-import { GradeCountError, retryOnMiscount } from "./grade";
+import { GradeCountError, GradeReplyError, readGrades, retryOnMiscount } from "./grade";
 import { candidatePool, fuse, hybridSearch } from "./search";
 import { LabelChunkStore, type LabelChunk } from "./store";
 
@@ -240,4 +240,19 @@ test("a miscounted grade list is asked for once more, and a second miscount fail
   calls = 0;
   await assert.rejects(other("q", passages), /gateway down/);
   assert.equal(calls, 1);
+});
+
+test("an empty or broken grader reply is a retryable error that names why, and a good one reads in order", async () => {
+  assert.throws(() => readGrades({ message: { content: null }, finish_reason: "length" }, 2), (e: Error) => e instanceof GradeReplyError && /finish_reason length/.test(e.message));
+  assert.throws(() => readGrades({ message: { content: "{\"grades\": [3" } }, 1), GradeReplyError);
+  assert.throws(() => readGrades({ message: { content: '{"grades":[3],"best":[1]}' } }, 2), GradeCountError);
+  assert.deepEqual(readGrades({ message: { content: '{"grades":[0,3],"best":[2,2,1]}' } }, 2), { grades: [0, 3], best: [1] });
+  let calls = 0;
+  const once = retryOnMiscount(async () => {
+    calls++;
+    if (calls === 1) readGrades({ message: { content: "" } }, 1);
+    return { grades: [3], best: [0] };
+  });
+  assert.deepEqual(await once("q", [{ source: "s", path: "p", text: "t" } as never]), { grades: [3], best: [0] });
+  assert.equal(calls, 2);
 });

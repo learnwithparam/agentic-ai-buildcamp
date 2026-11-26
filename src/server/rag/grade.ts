@@ -42,21 +42,41 @@ Return one grade per passage, in the order given. Then, in best, list the number
 
 const Graded = z.object({ grades: z.array(z.number().int().min(0).max(3)), best: z.array(z.number().int()) });
 
-export class GradeCountError extends Error {}
+// A reply the desk cannot use: empty, not JSON, or the wrong shape (GradeReplyError), or a list of
+// the wrong length (GradeCountError).
+export class GradeReplyError extends Error {}
+export class GradeCountError extends GradeReplyError {}
 
 // A list of the wrong length is a broken answer, and guessing which grade belongs to which
 // passage would cite the wrong section. Measured on 2026-11-26: 32 grades for 30 passages, once,
 // 20 questions into a run. The schema pins the length and the request states it; if the model
-// still miscounts, it is asked once more, and a second miscount fails the search.
+// still miscounts, it is asked once more, and a second miscount fails the search. An empty reply is
+// treated the same way. Measured on 2026-11-27: the grader returned no content once in an ops run.
 export const retryOnMiscount = (once: Grader): Grader => async (question, passages) => {
   if (!passages.length) return { grades: [], best: [] };
   try {
     return await timed("search_grading", () => once(question, passages));
   } catch (error) {
-    if (!(error instanceof GradeCountError)) throw error;
+    if (!(error instanceof GradeReplyError)) throw error;
     return timed("search_grading_retry", () => once(question, passages));
   }
 };
+
+// The model's reply as grades, or a GradeReplyError the caller may retry.
+export function readGrades(choice: { message: { content: string | null }; finish_reason?: string | null } | undefined, count: number) {
+  let reply: z.infer<typeof Graded>;
+  try {
+    reply = Graded.parse(JSON.parse(choice?.message.content ?? ""));
+  } catch {
+    throw new GradeReplyError(`The grader's reply was not a grade list (finish_reason ${choice?.finish_reason ?? "none"}).`);
+  }
+  const { grades, best } = reply;
+  if (grades.length !== count) throw new GradeCountError(`The grader returned ${grades.length} grades for ${count} passages.`);
+  // best counts from 1, as the passages were numbered. A number that names no answering passage,
+  // or names one twice, is dropped: the grades alone still decide what is an answer.
+  const order = [...new Set(best.map((n) => n - 1))].filter((i) => (grades[i] ?? 0) >= 2);
+  return { grades, best: order };
+}
 
 const gradeOnce: Grader = async (question, passages) => {
   const openai = observeOpenAI(modelClient(), { generationName: "search-grade" });
@@ -87,12 +107,7 @@ const gradeOnce: Grader = async (question, passages) => {
       }
     }
   });
-  const { grades, best } = Graded.parse(JSON.parse(completion.choices[0]?.message.content ?? "{}"));
-  if (grades.length !== passages.length) throw new GradeCountError(`The grader returned ${grades.length} grades for ${passages.length} passages.`);
-  // best counts from 1, as the passages were numbered. A number that names no answering passage,
-  // or names one twice, is dropped: the grades alone still decide what is an answer.
-  const order = [...new Set(best.map((n) => n - 1))].filter((i) => (grades[i] ?? 0) >= 2);
-  return { grades, best: order };
+  return readGrades(completion.choices[0], passages.length);
 };
 
 export const gradePassages: Grader = retryOnMiscount(gradeOnce);
