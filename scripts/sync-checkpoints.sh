@@ -179,6 +179,7 @@ BI_FILES=".github/start-test-services.sh docs/scoreboard.md infra/docker-compose
 # lesson 21's citation check and lesson 22's roles, so tags before 22 keep their own copies.
 # labels.ts is not in the list: every tag reads the new label data, and only main's copy reads it right.
 DESK_FILES=".claude/skills/hcp-labels/SKILL.md scripts/citations-replay.ts scripts/demo-turns.ts
+  scripts/demo-users.test.ts scripts/flows-capture.ts scripts/flows.test.ts scripts/flows.ts
   scripts/identity-setup.ts scripts/identity-smoke.ts scripts/open-questions.ts
   scripts/prompt-variants.test.ts scripts/prompt-variants.ts scripts/rag-fixtures.ts scripts/setup.ts
   scripts/sign-in.ts src/cli/cli.test.ts src/cli/turn.test.ts src/cli/turn.ts src/client/App.tsx
