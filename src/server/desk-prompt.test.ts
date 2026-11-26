@@ -37,4 +37,6 @@ test("the prompt says when the asker's country has no label in force", () => {
 test("the prompt adds no fixed search words and no desk-rules call", () => {
   assert.doesNotMatch(DESK_PROMPT, /get_desk_rules|include the words/);
   assert.match(DESK_PROMPT, /no earlier turn says which medicine or patient/);
+  // A refused child question must not make the next patient a child (demo-turns, first chat).
+  assert.match(DESK_PROMPT, /adult unless this message gives an age under 18/);
 });
