@@ -28,7 +28,7 @@ import { readableDocuments } from "./permissions";
 import { PhiVault, pseudonymise, type SpanFinder } from "./phi";
 import { reviewerDraft } from "./safety/draft";
 import { labelLimits, limitsText } from "./safety/reference";
-import { approvedUses, reportingProcedure, routeRequest, routerInput, whichMedicineFirst, safetyReply, stopReply, withFloor, withSecondPass } from "./tiers";
+import { approvedUses, reportingProcedure, routeRequest, routerInput, followUpFirst, safetyReply, stopReply, withFloor, withSecondPass } from "./tiers";
 import type { Turn as SearchTurn } from "./rag/rewrite";
 import { executeTool, TOOL_DEFINITIONS } from "./tools";
 import type { ReviewItem } from "./reviews";
@@ -186,7 +186,7 @@ export function createMedinfoAgent(checkpointer: BaseCheckpointSaver, options: {
           );
           const route = withFloor(chosen, latestQuestion(state.messages));
           updateActiveObservation({ output: route });
-          const ask = route.tier === "answer" ? whichMedicineFirst(state.messages) : null;
+          const ask = followUpFirst(route, state.messages);
           if (ask) {
             const reply = outOfScope(ask);
             const asked = { ...route, reason: `${route.reason} (asked which medicine first: the question names none)` };

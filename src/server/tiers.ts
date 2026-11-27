@@ -81,6 +81,12 @@ export function withFloor(route: Route, question: string): Route {
 const DOSE_WORDS = /\b(dose|doses|dosing|dosage|how much)\b/i;
 const ALL_MEDICINES = new RegExp(`\\b(${Object.values(TENANTS).flatMap((tenant) => tenant.medicines).join("|")})\\b`, "i");
 
+// The floor as the router node applies it: only on the answer tier, and never when a report is due,
+// since the report node runs after the agent and a fixed reply here would skip it.
+export function followUpFirst(route: Route, messages: ChatMessage[]): string | null {
+  return route.tier === "answer" && !route.report ? whichMedicineFirst(messages) : null;
+}
+
 export function whichMedicineFirst(messages: ChatMessage[]): string | null {
   const asked = messages.filter((message) => message.type === "human").map((message) => message.content);
   const latest = asked.at(-1) ?? "";

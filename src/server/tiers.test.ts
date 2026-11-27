@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { LABEL_SECTIONS } from "./labels";
 import { scrubPhi } from "./phi";
-import { approvedUses, reportingProcedure, routerInput, routeTool, safetyReply, stopReply, SAFETY_HOURS, withFloor, whichMedicineFirst, type Route } from "./tiers";
+import { approvedUses, reportingProcedure, routerInput, routeTool, safetyReply, stopReply, SAFETY_HOURS, followUpFirst, withFloor, whichMedicineFirst, type Route } from "./tiers";
 
 // Lesson 13. The parts of the tiers that are code, not a model: no model calls.
 
@@ -94,4 +94,13 @@ test("a dose question that names no medicine asks which one, and gives no dose",
   assert.equal(whichMedicineFirst([human("What is the NeuroVex dosing?")]), null);
   assert.equal(whichMedicineFirst([human("Is CardioNex approved in Japan?", "a"), { id: "r", type: "ai" as const, content: [{ type: "text" as const, text: "Yes." }], tool_calls: [] }, human("And the dose for eGFR 32?")]), null);
   assert.equal(whichMedicineFirst([human("Suggest the next step for HCP-1001.")]), null);
+});
+
+test("the follow-up floor never replaces a safety path or a report that is due", () => {
+  const ask = [{ id: "q", type: "human" as const, content: "She is 9 weeks pregnant. What dose should she take?" }];
+  const route: Route = { tier: "answer", reason: "test", asksForAdvice: false };
+  assert.match(followUpFirst(route, ask) ?? "", /^ASK_FOLLOW_UP/);
+  assert.equal(followUpFirst({ ...route, report: "pregnancy_exposure" }, ask), null);
+  assert.equal(followUpFirst({ ...route, tier: "safety" }, ask), null);
+  assert.equal(followUpFirst({ ...route, tier: "review" }, ask), null);
 });
