@@ -80,7 +80,10 @@ export async function realAgent(): Promise<Agent> {
         metadata: { promptName: prompt.name, promptVersion: prompt.version, promptLabel: label }
       });
       // A case the SDK skipped on a provider error is absent here, which the summary counts as a failure.
-      return result.itemResults.map((row) => ({ caseId: (row.item as { metadata?: { caseId?: string } }).metadata?.caseId ?? "", passed: failedScores(row).length === 0 }));
+      return result.itemResults.map((row) => {
+        const failed = failedScores(row);
+        return { caseId: (row.item as { metadata?: { caseId?: string } }).metadata?.caseId ?? "", passed: failed.length === 0, failed };
+      });
     },
     async sabotageCaught() {
       const broken = sabotage(prompt.prompt as string);

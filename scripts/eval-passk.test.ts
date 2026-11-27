@@ -88,3 +88,12 @@ test("a run that loses a case, or an agent the sabotage does not turn red, shows
   assert.equal(blind.measures["evals.sabotage_caught"], 0);
 });
 
+
+test("the run file says why each failing case failed, run by run, and leaves passing cases out", () => {
+  const expected = [{ caseId: "A", slice: "s" }, { caseId: "B", slice: "s" }];
+  const run = (bPassed: boolean): CaseRun[] => [{ caseId: "A", passed: true }, { caseId: "B", passed: bPassed, failed: bPassed ? [] : [{ name: "label_checks", comment: "no citation to 8.1" }] }];
+  const s = summarize([run(true), run(false), run(true), run(false), [{ caseId: "A", passed: true }]], expected);
+  assert.deepEqual(Object.keys(s.failures), ["B"]);
+  assert.equal(s.failures.B!.passed, 2);
+  assert.deepEqual(s.failures.B!.runs, [[{ name: "label_checks", comment: "no citation to 8.1" }], [{ name: "label_checks", comment: "no citation to 8.1" }], [{ name: "missing", comment: "the run did not report this case" }]]);
+});

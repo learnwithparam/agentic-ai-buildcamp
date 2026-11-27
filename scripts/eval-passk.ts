@@ -30,7 +30,9 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 export const RUN_FILE = path.join(ROOT, "docs/runs", "evals.json");
 export const FLOOR_FILE = path.join(ROOT, "data/evals/floor.json");
 
-export type CaseRun = { caseId: string; passed: boolean };
+// failed: the scores that were not 1 and their comments, so the run file says why without a
+// trace read (the hosted score API has stalled on reads more than once).
+export type CaseRun = { caseId: string; passed: boolean; failed?: Array<{ name: string; comment: string }> };
 export type Expected = { caseId: string; slice: string };
 
 const round = (value: number) => Math.round(value * 1000) / 1000;
@@ -55,6 +57,8 @@ export type Summary = {
   pass_hat_5: number;
   per_slice: Record<string, { cases: number; pass_rate: number; pass_hat_5: number }>;
   flaky: string[]; // cases that passed on some runs and failed on others
+  // Each case that failed at least once: how many runs it passed, and the failed scores of each failing run.
+  failures: Record<string, { passed: number; runs: Array<Array<{ name: string; comment: string }>> }>;
 };
 
 // `runs[i]` is the outcome of run i. A case an expected list names that a run did not report counts as a failure in it.
@@ -71,7 +75,22 @@ export function summarize(runs: CaseRun[][], expected: Expected[], k = K): Summa
     cases: expected.length,
     ...(({ pass_rate, pass_hat_5 }) => ({ pass_rate, pass_hat_5 }))(stat(expected)),
     per_slice: Object.fromEntries(slices.map((slice) => [slice, stat(expected.filter((e) => e.slice === slice))])),
-    flaky: expected.filter((e) => passes.get(e.caseId)! > 0 && passes.get(e.caseId)! < runs.length).map((e) => e.caseId)
+    flaky: expected.filter((e) => passes.get(e.caseId)! > 0 && passes.get(e.caseId)! < runs.length).map((e) => e.caseId),
+    failures: Object.fromEntries(
+      expected
+        .filter((e) => passes.get(e.caseId)! < runs.length)
+        .map((e) => [
+          e.caseId,
+          {
+            passed: passes.get(e.caseId)!,
+            runs: runs.flatMap((run) => {
+              const row = run.find((r) => r.caseId === e.caseId);
+              if (row?.passed) return [];
+              return [row ? (row.failed ?? []).map((f) => ({ name: f.name, comment: f.comment.slice(0, 400) })) : [{ name: "missing", comment: "the run did not report this case" }]];
+            })
+          }
+        ])
+    )
   };
 }
 
