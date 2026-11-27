@@ -179,6 +179,14 @@ test("a version date is checked against the label's real effective dates, never 
   assert.equal(reasonOf(wrong), "date_not_a_version");
   const [year] = await reviewClaims([at("The 2028 label is approved.")], context, noModelCall);
   assert.equal(reasonOf(year), "date_not_a_version");
+  // The model's tag alone skips nothing: a dose, or a date with a dose, gets the text checks.
+  const [dose] = await reviewClaims([at("Raise to 80 mg once daily.")], context, noModelCall);
+  assert.equal(reasonOf(dose), "quote_not_in_section");
+  const [mixed] = await reviewClaims([at("From March 1, 2027 the dose is 80 mg.")], context, noModelCall);
+  assert.equal(reasonOf(mixed), "quote_not_in_section");
+  // The retrieved check still runs for a version claim.
+  const [unfound] = await reviewClaims([at("It takes effect March 1, 2027.")], { ...context, retrieved: [] }, noModelCall);
+  assert.equal(reasonOf(unfound), "not_retrieved");
   // A NeuroVex date is not a CardioNex version.
   const neurovex = LABEL_SECTIONS.find((s) => s.docId.startsWith("neurovex") && s.country === "US")!;
   const [other] = await reviewClaims([at(`The label takes effect ${neurovex.effectiveDate}.`)], context, noModelCall);

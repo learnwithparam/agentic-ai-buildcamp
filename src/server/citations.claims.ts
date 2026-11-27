@@ -83,10 +83,10 @@ export function quoteFrom(sentences: string[], numbers: number[]): string {
 export function checkClaim(claim: Claim, context: ClaimContext): ClaimReason | null {
   const found = sectionText(claim.docId, claim.section);
   if (!found) return "unknown_section";
-  if (claim.about === "version_date") return checkVersionDate(claim);
   if (context.retrieved && !context.retrieved.some((r) => r.doc_id === claim.docId && r.section === claim.section)) return "not_retrieved";
   if (!inForceDocuments(new Set([claim.docId]), context.today).has(claim.docId)) return "not_in_force";
   if (context.country && found.country !== context.country) return "wrong_country";
+  if (isVersionDate(claim)) return checkVersionDate(claim);
   if (!quoteIsVerbatim(claim)) return "quote_not_in_section";
   const inQuote = new Set(numbersIn(claim.quote));
   if (numbersIn(claim.text).some((n) => !inQuote.has(n) && !context.given?.has(n))) return "number_not_in_quote";
@@ -97,6 +97,17 @@ export function checkClaim(claim: Claim, context: ClaimContext): ClaimReason | n
 // label: the same medicine, company and country as the document it names. A year alone must be
 // the year of one. The status words (in force, not yet) are checked by the number check, which
 // refuses a citation of a document that is not in force.
+// The model names a claim's kind, so the kind alone never skips a check. A claim is read as a
+// version date only when it gives a date and no number but that date's parts; a dose tagged
+// version_date ("raise to 80 mg") gets the quote check and the judge like any text claim.
+export function isVersionDate(claim: Pick<Claim, "text" | "about">): boolean {
+  if (claim.about !== "version_date") return false;
+  const { days, years } = datesIn(claim.text);
+  if (!days.length && !years.length) return false;
+  const dateParts = new Set([...days.flatMap((day) => day.split("-").map(Number)), ...years.map(Number)]);
+  return numbersIn(claim.text).every((n) => dateParts.has(n));
+}
+
 export function checkVersionDate(claim: Pick<Claim, "text" | "docId" | "section">): ClaimReason | null {
   const found = sectionText(claim.docId, claim.section);
   if (!found) return "unknown_section";
@@ -113,7 +124,7 @@ export async function reviewClaims(claims: Claim[], context: ClaimContext, judge
       const citation = `${claim.docId}, ${claim.section}`;
       const reason = checkClaim(claim, context);
       if (reason) return { kind: "claim", reason, citation, claim: claim.text };
-      if (claim.about === "version_date") return null;
+      if (isVersionDate(claim)) return null;
       return (await judge(claim)) === "supported" ? null : { kind: "claim", reason: "quote_does_not_support", citation, claim: claim.text };
     })
   );
