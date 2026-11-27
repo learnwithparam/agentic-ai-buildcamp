@@ -17,6 +17,7 @@
 // A walk block is a fenced block tagged `walk`, one JSON object per line:
 //   { "user": "ana.rivera@pharma-a.example.com", "ask": "...", "route": "answer", "sections": ["cardionex-uspi-v2 2.2"], "cites": true }
 // `user` is a demo user's email, or its first name. `sections` and `cites` are optional.
+import { runMain } from "./run-main";
 import { execFileSync, spawn, spawnSync, type ChildProcess } from "node:child_process";
 import { existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import os from "node:os";
@@ -350,4 +351,4 @@ async function main() {
   process.exitCode = failed ? 1 : 0;
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) await main();
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) void runMain(main, { name: "Checkpoint walk" });

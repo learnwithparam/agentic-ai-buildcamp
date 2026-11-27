@@ -7,6 +7,7 @@
 // For each turn it prints the tier the router chose and why, each search and the sections it
 // returned, the first line of the reply, and the session id to open in Langfuse.
 
+import { runMain } from "./run-main";
 import { randomUUID } from "node:crypto";
 import { fileURLToPath } from "node:url";
 import { readEvents } from "../src/shared/sse";
@@ -178,4 +179,4 @@ console.log(`\n${right} of ${total} turns right${open ? `, ${Math.round((100 * r
 process.exitCode = (open ? right / total >= 0.9 : failed === 0) ? 0 : 1;
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) await main();
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) void runMain(main, { name: "Demo turns" });

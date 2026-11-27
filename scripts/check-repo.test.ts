@@ -142,6 +142,6 @@ test("an import by repo path, from another folder, counts as use", () => {
 });
 
 test("an import of a file in a subfolder, from the folder above, counts as use", () => {
-  const changes = { "scripts/judge/rubric.ts": "export const rubric = 1;\n", "scripts/seed.ts": 'import { load } from "./lib";\nimport { rubric } from "./judge/rubric";\nconst file = resolve("../data/items.json");\n' };
+  const changes = { "scripts/checks/rule.ts": "export const rubric = 1;\n", "scripts/seed.ts": 'import { load } from "./lib";\nimport { rubric } from "./checks/rule";\nconst file = resolve("../data/items.json");\n' };
   assert.deepEqual(run(changes), []);
 });

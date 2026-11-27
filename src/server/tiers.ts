@@ -4,6 +4,7 @@ import type { ChatMessage } from "../shared/messages";
 import { aiText } from "../shared/messages";
 import { shortStage } from "./gateway";
 import type { LabelSection } from "./labels";
+import { TENANTS } from "./users";
 import { detectEvent, type Detection, type SpecialSituation } from "./safety/detect";
 
 // Lesson 13. Before the agent writes a word, every message is sorted into a risk tier, and the
@@ -69,6 +70,22 @@ export const DRAFT_REQUEST = /\b(draft|write)\b[\s\S]*\b(reply|email|letter|resp
 export function withFloor(route: Route, question: string): Route {
   if (route.tier !== "answer" || !DRAFT_REQUEST.test(question)) return route;
   return { ...route, tier: "review", reason: `${route.reason} (raised to review: the message asks for a draft)` };
+}
+
+// A second floor, after the router. A dose question that names no medicine, in this message or an
+// earlier one, gets one fixed question back and no model call: the model once picked CardioNex for
+// "what dose should I give my patient?" and gave 20mg (AMBIGUOUS-01, 3 of 5 runs, 27 Nov 2026).
+// Every company's medicines count as named, so a question about another company's medicine still
+// reaches the agent, which says it cannot answer it. It runs only on the answer tier, so a message
+// that reports harm still goes to safety first.
+const DOSE_WORDS = /\b(dose|doses|dosing|dosage|how much)\b/i;
+const ALL_MEDICINES = new RegExp(`\\b(${Object.values(TENANTS).flatMap((tenant) => tenant.medicines).join("|")})\\b`, "i");
+
+export function whichMedicineFirst(messages: ChatMessage[]): string | null {
+  const asked = messages.filter((message) => message.type === "human").map((message) => message.content);
+  const latest = asked.at(-1) ?? "";
+  if (!DOSE_WORDS.test(latest) || asked.some((text) => ALL_MEDICINES.test(text))) return null;
+  return "ASK_FOLLOW_UP Which medicine is this about? Please also tell me what you know about the patient, such as their kidney function and the other medicines they take.";
 }
 
 // The second layer. A message the router sent to "answer" is read once more with one question
