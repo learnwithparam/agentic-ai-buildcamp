@@ -121,6 +121,9 @@ export function findProblems(files: Map<string, string>, tracked: string[]): str
     if (rule && !used.has(path)) problems.push(`${path}: nothing in use reads, links or calls it. Use it or delete it.`);
   }
 
+  // A file a script writes on its first full run. Its own check fails a release while it is
+  // missing (checkWalk with --release), so it is never left out unnoticed.
+  const FIRST_WRITTEN_BY_A_RUN = new Set(["docs/checkpoint-walk.md"]);
   const known = new Set(tracked.flatMap((path) => path.split("/").map((_, index, parts) => parts.slice(0, index + 1).join("/"))));
   for (const [path, body] of bodies) {
     // Test fixtures name made-up paths on purpose.
@@ -130,7 +133,7 @@ export function findProblems(files: Map<string, string>, tracked: string[]): str
       const target = raw.startsWith(".") ? posix.normalize(posix.join(posix.dirname(path), raw)) : raw;
       const clean = target.replace(/\/$/, "");
       const exists = ["", ".ts", ".tsx", ".json", "/index.ts"].some((ending) => known.has(clean + ending));
-      if (!exists) problems.push(`${path}: names ${raw}, which does not exist.`);
+      if (!exists && !FIRST_WRITTEN_BY_A_RUN.has(clean)) problems.push(`${path}: names ${raw}, which does not exist.`);
     }
   }
 
