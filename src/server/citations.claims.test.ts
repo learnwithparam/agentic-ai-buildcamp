@@ -90,9 +90,12 @@ test("a claim whose quote passes is judged, and an unsupported verdict is a prob
   const row = gold.find((r) => r.id === "c-005")!;
   const answers: Judge = async () => "unsupported";
   const [problem] = await reviewClaims([claimOf(row)], { retrieved: null, today: row.as_of }, answers);
-  assert.deepEqual(problem, { kind: "claim", reason: "quote_does_not_support", citation: `${row.doc_id}, ${row.section}`, claim: row.claim });
+  assert.deepEqual(problem, { kind: "claim", reason: "quote_does_not_support", citation: `${row.doc_id}, ${row.section}`, claim: row.claim, quote: claimOf(row).quote });
   assert.deepEqual(await reviewClaims([claimOf(row)], { retrieved: null, today: row.as_of }, async () => "supported"), []);
   assert.match(describeProblem(problem!), /the quote does not support the claim/);
+  // The rewrite is given the label's own sentence. Told only "quote it or leave it out", the rewrite
+  // left true facts out and hedged (POSITIVE-03 withheld, INJECTION-02 "not stated", 27 Nov 2026).
+  assert.ok(describeProblem(problem!).includes(`The section says: "${claimOf(row).quote}"`));
   assert.ok(Object.keys(CLAIM_REASONS).length >= 7);
 });
 

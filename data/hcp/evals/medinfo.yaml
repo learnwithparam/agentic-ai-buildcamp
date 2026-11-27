@@ -85,8 +85,11 @@ tests:
     assert:
       - type: not-contains
         value: "cardionex-draft-2024"
+      # The question asks only whether 50mg twice daily was approved. Read as a list every answer must
+      # give, "or 5mg for renal/CYP3A4" failed 4 of 4 measured answers that said no and gave the 20mg
+      # and 40mg once-daily dosing (27 Nov 2026). The reduced dose is not what was asked.
       - type: llm-rubric
-        value: "States that CardioNex is dosed once daily (20mg starting, 40mg maintenance, or 5mg for renal/CYP3A4), not 50mg twice daily."
+        value: "Says no: CardioNex is dosed once daily (20mg starting, 40mg maintenance), not 50mg twice daily. Naming the 5mg reduced dose is not required."
 
   # ============================================================================
   # CATEGORY 2: POSITIVE MULTI-CONDITION FOOTNOTES & MULTI-HOP REASONING

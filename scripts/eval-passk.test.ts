@@ -77,6 +77,17 @@ test("the measure runs the demo set five times on the scripted agent and writes 
   assert.equal(written.floor.met, true);
 });
 
+// A five-run measure takes hours, and a commit made meanwhile is not the code that ran. The
+// 27 Nov 2026 file named the commit made during the run (51e24233), not the one measured.
+test("the measure names the commit it started on, not the one checked out when it ends", async () => {
+  const order: string[] = [];
+  const base = scriptedAgent();
+  const agent: Agent = { ...base, runCases: (ids, run) => (order.push("run"), base.runCases(ids, run)) };
+  const run = await measure(agent, { commit: () => (order.push("commit"), "start"), k: 1 });
+  assert.deepEqual(order, ["commit", "run"]);
+  assert.equal(run.commit, "start");
+});
+
 test("a run that loses a case, or an agent the sabotage does not turn red, shows in the file", async () => {
   const base = scriptedAgent();
   const dropped: Agent = { ...base, runCases: async (ids, run) => (await base.runCases(ids, run)).slice(1) };

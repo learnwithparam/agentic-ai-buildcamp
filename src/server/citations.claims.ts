@@ -125,7 +125,7 @@ export async function reviewClaims(claims: Claim[], context: ClaimContext, judge
       const reason = checkClaim(claim, context);
       if (reason) return { kind: "claim", reason, citation, claim: claim.text };
       if (isVersionDate(claim)) return null;
-      return (await judge(claim)) === "supported" ? null : { kind: "claim", reason: "quote_does_not_support", citation, claim: claim.text };
+      return (await judge(claim)) === "supported" ? null : { kind: "claim", reason: "quote_does_not_support", citation, claim: claim.text, quote: claim.quote };
     })
   );
   return results.filter((problem): problem is CitationProblem => problem !== null);

@@ -15,7 +15,7 @@ export type CitationProblem =
   | { kind: "uncited"; quantity: string; sentence: string }
   | { kind: "unsupported"; quantity: string; citations: string[]; sentence: string }
   // A claim (src/server/citations.claims.ts) whose quote failed a check or the support judge.
-  | { kind: "claim"; reason: ClaimReason; citation: string; claim: string };
+  | { kind: "claim"; reason: ClaimReason; citation: string; claim: string; quote?: string };
 
 export type ClaimReason =
   | "unknown_section"
@@ -122,7 +122,10 @@ export function describeProblem(problem: CitationProblem): string {
     case "unsupported":
       return `"${problem.quantity}" is not in ${problem.citations.map((citation) => `[${citation}]`).join(" ")}: "${problem.sentence}". Cite the section that states it, or leave the number out.`;
     case "claim":
-      return `The claim "${problem.claim}" cites [${problem.citation}] but ${CLAIM_REASONS[problem.reason].model}. Quote the section word for word, or leave the claim out.`;
+      // A judged claim's quote is the label's own sentence: the rewrite states that, rather than drop the fact.
+      return problem.reason === "quote_does_not_support" && problem.quote
+        ? `The claim "${problem.claim}" cites [${problem.citation}] but ${CLAIM_REASONS[problem.reason].model}. The section says: "${problem.quote}". Say what that sentence says, in its words, or cite the section that states the claim.`
+        : `The claim "${problem.claim}" cites [${problem.citation}] but ${CLAIM_REASONS[problem.reason].model}. Quote the section word for word, or leave the claim out.`;
   }
 }
 

@@ -1,11 +1,12 @@
 import assert from "node:assert/strict";
+import { createServer } from "node:http";
 import { after, before, test } from "node:test";
-import type { OpenFgaClient } from "@openfga/sdk";
+import { OpenFgaClient } from "@openfga/sdk";
 import { loadMedinfoCases } from "../../scripts/hcp-cases";
 import { createTestStore } from "../../scripts/fga-model";
 import { env } from "./env";
 import { LABEL_SECTIONS, searchLabels } from "./labels";
-import { readableDocuments } from "./permissions";
+import { FGA_TIMEOUT_MS, fgaOptions, readableDocuments } from "./permissions";
 import { SEED_USERS, type Identity } from "./users";
 
 // Lesson 11. The real OpenFGA server with the real rules (infra/openfga/model.fga) and the real
@@ -58,4 +59,21 @@ test("each company still finds its own medicine, and never the other's", async (
 test("a country with no approved text, or an unknown company, reads nothing", async () => {
   assert.equal((await readableDocuments(doctor("pharma_a", "BR"), client)).size, 0);
   assert.equal((await readableDocuments(doctor("pharma_z", "US"), client)).size, 0);
+});
+
+// The access check waits FGA_TIMEOUT_MS, not the SDK's 10 s, and the SDK does apply the option:
+// against a server that never answers, a client with a short timeout gives up at that timeout.
+test("an access check that gets no answer times out at the client's own timeout", async () => {
+  assert.equal(fgaOptions().baseOptions.timeout, FGA_TIMEOUT_MS);
+  assert.ok(FGA_TIMEOUT_MS > 10_000);
+  const silent = createServer(() => {});
+  await new Promise<void>((done) => silent.listen(0, "127.0.0.1", done));
+  const { port } = silent.address() as { port: number };
+  try {
+    const stalled = new OpenFgaClient({ ...fgaOptions(), apiUrl: `http://127.0.0.1:${port}`, baseOptions: { timeout: 200 } });
+    await assert.rejects(stalled.check({ user: "user:a", relation: "can_read", object: "document:b" }), /timeout of 200ms exceeded/);
+  } finally {
+    silent.closeAllConnections();
+    silent.close();
+  }
 });

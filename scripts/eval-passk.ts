@@ -109,8 +109,10 @@ export function floor(file = FLOOR_FILE): { "evals.pass_rate": number; "evals.pa
   return JSON.parse(readFileSync(file, "utf8"));
 }
 
-export async function measure(agent: Agent, options: { out?: string; k?: number; commit?: string; now?: Date } = {}) {
+export async function measure(agent: Agent, options: { out?: string; k?: number; commit?: string | (() => string); now?: Date } = {}) {
   const k = options.k ?? K;
+  // Read before the first run: a run takes most of an hour, and a commit made meanwhile did not run.
+  const commit = typeof options.commit === "function" ? options.commit() : options.commit ?? execSync("git rev-parse --short HEAD", { cwd: ROOT }).toString().trim();
   const all = loadAllCases();
   const ids = demoCaseIds(all);
   const expected = ids.map((caseId) => ({ caseId, slice: all.find((c) => c.metadata.caseId === caseId)!.metadata.slice }));
@@ -138,7 +140,7 @@ export async function measure(agent: Agent, options: { out?: string; k?: number;
   };
   const run = {
     measures,
-    commit: options.commit ?? execSync("git rev-parse --short HEAD", { cwd: ROOT }).toString().trim(),
+    commit,
     at: (options.now ?? new Date()).toISOString(),
     agent: agent.name,
     k,
