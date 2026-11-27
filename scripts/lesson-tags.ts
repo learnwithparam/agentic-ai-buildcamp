@@ -7,7 +7,7 @@
 //
 // Nothing here reads git or the network. The sync script (scripts/sync-checkpoints.sh) calls the
 // "plan" command below; the tests in scripts/sync-checkpoints.test.ts call the functions.
-import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, realpathSync, statSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -17,6 +17,16 @@ export type Manifest = { lessonEnd: Record<string, string>; files: Record<string
 export const LESSONS = Array.from({ length: 24 }, (_, lesson) => lesson);
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const MANIFEST_FILE = path.join(HERE, "lesson-files.json");
+
+// The command this file was run with, or null when it is imported. Real paths on both sides: the sync
+// runs this file from $TMPDIR, which on macOS is a symlink (/var -> /private/var), and a plain
+// comparison there never matched, so "plan" printed nothing and the sync emptied the tag.
+export function commandOf(argv: string[], self: string): string | null {
+  if (!argv[1] || realpathSync(argv[1]) !== realpathSync(self)) return null;
+  if (argv[2] !== "plan" && argv[2] !== "derive") throw new Error(`lesson-tags: unknown command "${argv[2]}", expected plan or derive`);
+  return argv[2];
+}
+const RUN_AS = commandOf(process.argv, fileURLToPath(import.meta.url));
 
 export function loadManifest(file = MANIFEST_FILE): Manifest {
   return JSON.parse(readFileSync(file, "utf8")) as Manifest;
@@ -157,7 +167,7 @@ export function expand(manifest: Manifest, name: string, lesson: number): string
 // ---- the command the sync script calls -----------------------------------------------------------
 
 // plan <tag> [manifest]: one line per file the tag holds, "path<TAB>main|tag|commit <ref>".
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url) && process.argv[2] === "plan") {
+if (RUN_AS === "plan") {
   const tag = Number(process.argv[3]);
   const manifest = loadManifest(process.argv[4] ?? MANIFEST_FILE);
   for (const file of tagFiles(manifest, tag)) {
@@ -188,6 +198,6 @@ export function derive(dir: string) {
   edit("docs/coverage.md", (text) => tagCoverage(text, caseIds));
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url) && process.argv[2] === "derive") {
+if (RUN_AS === "derive") {
   derive(process.argv[3]);
 }

@@ -9,6 +9,7 @@
 import "../src/server/load-env";
 import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { randomUUID } from "node:crypto";
 import { LangfuseClient } from "@langfuse/client";
 import { hopsOf, type Observation } from "./flows";
@@ -23,7 +24,7 @@ export const EXAMPLES = [
 ];
 
 const root = path.resolve(import.meta.dirname, "..");
-const api = new LangfuseClient().api;
+
 
 async function ask(email: string, question: string): Promise<string> {
   const cookie = sessionHeader(await signIn(email));
@@ -43,7 +44,7 @@ async function ask(email: string, question: string): Promise<string> {
 // Langfuse indexes a trace's spans and their inputs a few seconds apart, so the turn is polled
 // until the root's reply, the router's input and (on an answer) the citation check are all in.
 // The session id of a chat trace is its thread id.
-async function spansOf(threadId: string): Promise<Observation[]> {
+async function spansOf(api: LangfuseClient["api"], threadId: string): Promise<Observation[]> {
   for (let tries = 0; tries < 30; tries++) {
     const page = await api.observations.getMany({ sessionId: threadId, limit: 100, fields: "core,basic,io" } as never);
     const spans = (page as { data: Observation[] }).data;
@@ -57,15 +58,27 @@ async function spansOf(threadId: string): Promise<Observation[]> {
   throw new Error(`no finished trace for session ${threadId} after a minute`);
 }
 
-const [checkpoint = "main", only] = process.argv.slice(2);
-const folder = path.join(root, "docs/flows", checkpoint);
-mkdirSync(folder, { recursive: true });
-for (const example of EXAMPLES.filter((each) => !only || each.id === only)) {
-  const threadId = await ask(example.email, example.ask);
-  const spans = await spansOf(threadId);
-  const flow = hopsOf(spans);
-  const trace = spans[0] && (spans[0] as { traceId?: string }).traceId;
-  const file = path.join(folder, `${example.id}.json`);
-  writeFileSync(file, `${JSON.stringify({ q: example.ask, who: example.who, tier: flow.tier, trace, captured: new Date().toISOString().slice(0, 10), hops: flow.hops }, null, 2)}\n`);
-  console.log(`${example.id}: ${flow.tier}, ${flow.hops.length} hops, trace ${trace}, ${path.relative(root, file)}`);
+// Captures each example into docs/flows/<checkpoint> (under `into`, default the repo) and returns
+// the trace id of each. scripts/checkpoints-walk.ts calls it for the tag it walks.
+export async function captureFlows(checkpoint = "main", only?: string, into = root): Promise<Array<{ id: string; trace: string | undefined }>> {
+  const api = new LangfuseClient().api;
+  const folder = path.join(into, "docs/flows", checkpoint);
+  mkdirSync(folder, { recursive: true });
+  const captured: Array<{ id: string; trace: string | undefined }> = [];
+  for (const example of EXAMPLES.filter((each) => !only || each.id === only)) {
+    const threadId = await ask(example.email, example.ask);
+    const spans = await spansOf(api, threadId);
+    const flow = hopsOf(spans);
+    const trace = spans[0] && (spans[0] as { traceId?: string }).traceId;
+    const file = path.join(folder, `${example.id}.json`);
+    writeFileSync(file, `${JSON.stringify({ q: example.ask, who: example.who, tier: flow.tier, trace, captured: new Date().toISOString().slice(0, 10), hops: flow.hops }, null, 2)}\n`);
+    console.log(`${example.id}: ${flow.tier}, ${flow.hops.length} hops, trace ${trace}, ${path.relative(into, file)}`);
+    captured.push({ id: example.id, trace });
+  }
+  return captured;
+}
+
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+  const [checkpoint, only] = process.argv.slice(2);
+  await captureFlows(checkpoint, only);
 }

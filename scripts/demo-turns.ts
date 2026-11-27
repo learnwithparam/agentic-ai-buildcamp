@@ -7,7 +7,9 @@
 // For each turn it prints the tier the router chose and why, each search and the sections it
 // returned, the first line of the reply, and the session id to open in Langfuse.
 
+import { runMain } from "./run-main";
 import { randomUUID } from "node:crypto";
+import { fileURLToPath } from "node:url";
 import { readEvents } from "../src/shared/sse";
 import type { AiMessage, ChatMessage } from "../src/shared/messages";
 import { aiText } from "../src/shared/messages";
@@ -15,7 +17,7 @@ import { evidenceOf } from "../src/server/citations";
 import { OPEN_QUESTIONS } from "./open-questions";
 import { APP, sessionHeader, signIn } from "./sign-in";
 
-type Seen = { tier: string; reason: string; searches: string[]; sections: string[]; reply: string };
+export type Seen = { tier: string; reason: string; searches: string[]; sections: string[]; reply: string };
 type Expect = { tier?: string | RegExp; reply?: RegExp; notReply?: RegExp; sections?: RegExp; noSection?: RegExp };
 type Turn = { ask: string; expect: Expect; why: string };
 type Conversation = { name: string; email: string; turns: Turn[] };
@@ -76,7 +78,7 @@ const CONVERSATIONS: Conversation[] = [
   }
 ];
 
-async function ask(cookie: string, threadId: string, text: string, seenBefore: number): Promise<Seen> {
+export async function ask(cookie: string, threadId: string, text: string, seenBefore: number): Promise<Seen> {
   const response = await fetch(`${APP}/api/threads/${threadId}/runs/stream`, {
     method: "POST",
     headers: { Cookie: cookie, Origin: APP, "Content-Type": "application/json" },
@@ -124,6 +126,14 @@ function misses(seen: Seen, expect: Expect): string[] {
   return found;
 }
 
+// One signed-in person's new chat thread. The walk (scripts/checkpoints-walk.ts) reuses it.
+export async function newThread(email: string): Promise<{ cookie: string; threadId: string }> {
+  const cookie = sessionHeader(await signIn(email));
+  const created = await fetch(`${APP}/api/threads`, { method: "POST", headers: { Cookie: cookie, Origin: APP }, signal: AbortSignal.timeout(60_000) });
+  const { thread_id: threadId } = (await created.json()) as { thread_id: string };
+  return { cookie, threadId };
+}
+
 async function play(conversation: Conversation): Promise<number> {
   const cookie = sessionHeader(await signIn(conversation.email));
   const created = await fetch(`${APP}/api/threads`, { method: "POST", headers: { Cookie: cookie, Origin: APP }, signal: AbortSignal.timeout(60_000) });
@@ -149,6 +159,7 @@ async function play(conversation: Conversation): Promise<number> {
   return failed;
 }
 
+async function main() {
 const open = process.argv[2] === "open";
 const conversations: Conversation[] = open
   ? OPEN_QUESTIONS.map((question) => ({ name: "open question", email: question.email, turns: [{ ask: question.ask, why: "a cited answer or the right refusal", expect: question.expect as Expect }] }))
@@ -166,3 +177,6 @@ const total = conversations.reduce((sum, conversation) => sum + conversation.tur
 const right = total - failed;
 console.log(`\n${right} of ${total} turns right${open ? `, ${Math.round((100 * right) / total)} percent; the bar is 90` : ""}.`);
 process.exitCode = (open ? right / total >= 0.9 : failed === 0) ? 0 : 1;
+}
+
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) void runMain(main, { name: "Demo turns" });

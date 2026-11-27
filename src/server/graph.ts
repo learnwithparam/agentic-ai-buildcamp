@@ -16,12 +16,13 @@ import {
 } from "../shared/messages";
 import { answerRun, type AnswerRun } from "../shared/run";
 import type { ClaimCheck } from "./citations.claims";
-import { checkCitations, describeProblem, evidenceOf, EVIDENCE_TOOLS, WITHHELD_REPLY, type CitationProblem } from "./citations";
+import { checkCitations, describeProblem, evidenceOf, EVIDENCE_TOOLS, parseCitations, WITHHELD_REPLY, type CitationProblem } from "./citations";
 import { env } from "./env";
 import { timed } from "./ops/meter";
 import { streamModelTurn, toOpenAIMessages } from "./stream-model";
 import type { Identity } from "./users";
 import type { Route } from "./tiers";
+import type { SpecialSituation } from "./safety/detect";
 import { TODAY, TOOL_DEFINITIONS } from "./tools";
 
 // The agent graph. The router sorts the question into a risk tier (lesson 13, see buildGraph).
@@ -114,9 +115,30 @@ export function rewriteFeedback(problems: CitationProblem[]): string {
     "The desk's citation check stopped your answer before it reached the doctor:",
     ...problems.map((problem) => `- ${describeProblem(problem)}`),
     "Write the whole answer again from the active label sections found so far in this conversation, citing each fact as [doc_id, section].",
-    "Keep every fact those sections support. If the question needs a fact they do not hold, say which fact the label sections found do not cover.",
+    "Keep every fact those sections support. If the question needs a fact they do not hold, say which fact the label sections found do not cover, in a sentence with no number.",
     "Write INSUFFICIENT_CONTEXT only when none of the sections found is about the question."
   ].join("\n");
+}
+
+// A reply that cites nothing, starts with no code and ends by asking the doctor something is a
+// follow-up question, so code starts it with ASK_FOLLOW_UP. The prompt says to, and the model left
+// it out on 1 of 3 AMBIGUOUS-01 runs (27 Nov 2026); the chat and the evals read the code. A code is
+// any leading UPPER_SNAKE word (faults/score.ts lists them; it imports this file, so it is not imported here).
+export const FOLLOW_UP_CODE = "ASK_FOLLOW_UP";
+export function stampFollowUp(text: string): string {
+  const reply = text.trim();
+  if (!reply.endsWith("?") || parseCitations(reply).length || /^[A-Z]+(?:_[A-Z]+)+\b/.test(reply)) return text;
+  return `${FOLLOW_UP_CODE} ${reply}`;
+}
+
+// The checked answer, with the follow-up code added when it is a question (stampFollowUp).
+function stamped(message: AiMessage, config: LangGraphRunnableConfig): Partial<GraphState> {
+  const text = aiText(message);
+  const final = stampFollowUp(text);
+  if (final === text) return { messages: [message] };
+  const replaced: AiMessage = { ...message, content: [{ type: "text", text: final }], tool_calls: [] };
+  config.writer?.(replaced);
+  return { messages: [replaced] };
 }
 
 export async function citeStep(
@@ -133,7 +155,10 @@ export async function citeStep(
   // The number check, then each claim's quote and the support judge (citations.claims.ts).
   const checked = async (text: string) => [...checkCitations(text, retrieved, asked, state.today), ...((await claimCheck?.(text, retrieved, asked, state.today)) ?? [])];
   const problems = await timed("claim_check", () => checked(aiText(answer)));
-  if (!problems.length) return (onChecked({ outcome: "passed", problems, afterRewrite: [] }), {});
+  if (!problems.length) {
+    onChecked({ outcome: "passed", problems, afterRewrite: [] });
+    return stampFollowUp(aiText(answer)) === aiText(answer) ? {} : stamped(answer, config);
+  }
   const feedback = rewriteFeedback(problems);
   const rewrite = await timed("citation_retry", () =>
     streamModelTurn(
@@ -150,7 +175,7 @@ export async function citeStep(
   const afterRewrite = await timed("claim_check_retry", () => checked(aiText(rewrite)));
   if (!afterRewrite.length) {
     onChecked({ outcome: "rewritten", problems, afterRewrite, rewrite: aiText(rewrite) });
-    return { messages: [{ ...rewrite, id: answer.id, tool_calls: [] }] };
+    return stamped({ ...rewrite, id: answer.id, tool_calls: [] }, config);
   }
   onChecked({ outcome: "withheld", problems, afterRewrite, rewrite: aiText(rewrite) });
   const withheld: AiMessage = { id: answer.id, type: "ai", content: [{ type: "text", text: WITHHELD_REPLY }], tool_calls: [] };
@@ -277,6 +302,30 @@ export function fixedReply(state: GraphState, text: string): Partial<GraphState>
   return { messages: [{ id: `reply-${question?.id ?? randomUUID()}`, type: "ai", content: [{ type: "text", text }], tool_calls: [] }] };
 }
 
+// Issue #122. A special situation with no harm (a pregnancy exposure, an overdose with the patient
+// well) is answered and reported. After the citation check, whatever it decided, the answer gets
+// one sentence saying a report was opened, and the safety inbox gets the case. The case is opened
+// even when the answer was withheld: the report never depends on the answer.
+const SITUATION_WORDS: Record<SpecialSituation, string> = {
+  pregnancy_exposure: "exposure in pregnancy",
+  overdose: "overdose",
+  medication_error: "medication error",
+  lack_of_efficacy: "lack of effect",
+  off_label_use: "use outside the label"
+};
+
+export const reportNotice = (situation: SpecialSituation) =>
+  `I have also passed this to the safety team as a report of ${SITUATION_WORDS[situation]}: the company records every one, even when the patient is well. They may contact you for follow-up.`;
+
+export async function reportStep(state: GraphState, config: LangGraphRunnableConfig, caseDraft: string, traceId?: string): Promise<Partial<GraphState>> {
+  const situation = state.route?.report;
+  const answer = last(state, "ai");
+  if (!situation || !answer) return {};
+  const notice = reportNotice(situation);
+  await submitAdverseEvent(state, config, `${notice}\n\n${caseDraft}`, traceId);
+  return { messages: [{ ...answer, content: [...answer.content, { type: "text", text: `\n\n${notice}` }] }] };
+}
+
 // The report holds the doctor's (scrubbed) words and the fixed reply the desk gave them.
 export async function submitAdverseEvent(state: GraphState, config: LangGraphRunnableConfig, reply: string, traceId?: string) {
   const question = lastHuman(state);
@@ -293,9 +342,10 @@ export async function submitAdverseEvent(state: GraphState, config: LangGraphRun
   });
 }
 
-type Nodes = { router: Node; agent: Node; tools: Node; cite: Node; submit: Node; review: Node; safety: Node; stop: Node };
+type Nodes = { router: Node; agent: Node; tools: Node; cite: Node; submit: Node; review: Node; report: Node; safety: Node; stop: Node };
 
 // START -> router -> answer: agent <-> tools -> cite -> END
+//                    (a special situation with no harm: cite -> report, to the safety inbox -> END, or -> submit on review)
 //                 -> review: agent <-> tools -> cite -> submit -> review (waits for a human) -> END
 //                 -> safety: fixed reply, report to the safety inbox -> END
 //                 -> stop:   fixed refusal -> END
@@ -308,6 +358,7 @@ export function buildGraph(nodes: Nodes, checkpointer: BaseCheckpointSaver) {
     .addNode("cite", nodes.cite)
     .addNode("submit", nodes.submit)
     .addNode("review", nodes.review)
+    .addNode("report", nodes.report)
     .addNode("safety", nodes.safety)
     .addNode("stop", nodes.stop)
     .addEdge(START, "router")
@@ -329,7 +380,9 @@ export function buildGraph(nodes: Nodes, checkpointer: BaseCheckpointSaver) {
     )
     .addEdge("tools", "agent")
     // Lesson 21: a reviewer only ever sees a draft that passed the citation check.
-    .addConditionalEdges("cite", (state) => (state.route?.tier === "review" ? "submit" : END), ["submit", END])
+    // A report runs first whatever the tier, so a draft request (raised to review) never drops it.
+    .addConditionalEdges("cite", (state) => (state.route?.report ? "report" : state.route?.tier === "review" ? "submit" : END), ["submit", "report", END])
+    .addConditionalEdges("report", (state) => (state.route?.tier === "review" ? "submit" : END), ["submit", END])
     .addEdge("submit", "review")
     .addEdge("review", END)
     .addEdge("safety", END)

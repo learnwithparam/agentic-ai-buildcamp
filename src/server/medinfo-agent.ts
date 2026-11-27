@@ -16,6 +16,7 @@ import {
   reviewStep,
   runGraph,
   submitAdverseEvent,
+  reportStep,
   submitDraftStep,
   toolsStep,
   userOf,
@@ -27,7 +28,7 @@ import { readableDocuments } from "./permissions";
 import { PhiVault, pseudonymise, type SpanFinder } from "./phi";
 import { reviewerDraft } from "./safety/draft";
 import { labelLimits, limitsText } from "./safety/reference";
-import { approvedUses, reportingProcedure, routeRequest, routerInput, safetyReply, stopReply, withFloor, withSecondPass } from "./tiers";
+import { approvedUses, reportingProcedure, routeRequest, routerInput, followUpFirst, safetyReply, stopReply, withFloor, withSecondPass } from "./tiers";
 import type { Turn as SearchTurn } from "./rag/rewrite";
 import { executeTool, TOOL_DEFINITIONS } from "./tools";
 import type { ReviewItem } from "./reviews";
@@ -185,6 +186,12 @@ export function createMedinfoAgent(checkpointer: BaseCheckpointSaver, options: {
           );
           const route = withFloor(chosen, latestQuestion(state.messages));
           updateActiveObservation({ output: route });
+          const ask = followUpFirst(route, state.messages);
+          if (ask) {
+            const reply = outOfScope(ask);
+            const asked = { ...route, reason: `${route.reason} (asked which medicine first: the question names none)` };
+            return { route: asked, messages: [reply], runs: { [reply.id]: answerRun(state.messages, asked, null) } };
+          }
           return { route };
         },
         { name: "router", asType: "chain", captureInput: false }
@@ -214,6 +221,16 @@ export function createMedinfoAgent(checkpointer: BaseCheckpointSaver, options: {
       cite: async (state, config) => (await citeNode(state, config)).update,
       submit: (state, config) => submitDraftStep(state, config, getActiveTraceId()),
       review: reviewStep,
+      report: observe(
+        async (state, config) => {
+          const readable = await readableDocuments(userOf(config));
+          const draft = await timed("safety_report", () =>
+            reviewerDraft(observeOpenAI(modelClient(), { generationName: "safety-extract" }), env.openaiModel, latestQuestion(state.messages), `ae-${String(config.configurable?.thread_id ?? "unknown")}`, limitsText(labelLimits(readable, userOf(config).country, state.today))).catch((error: Error) => `CASE DRAFT NOT MADE: ${error.message}`)
+          );
+          return reportStep(state, config, draft, getActiveTraceId());
+        },
+        { name: "report", asType: "span", captureInput: false }
+      ),
       safety: observe(
         async (state, config) => {
           updateActiveObservation({ input: state.messages.at(-1) });

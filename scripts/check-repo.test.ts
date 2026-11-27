@@ -140,3 +140,8 @@ test("an import by repo path, from another folder, counts as use", () => {
   assert.deepEqual(run(changes), []);
   assert.deepEqual(run({ ...changes, "scripts/seed.ts": base["scripts/seed.ts"] }), ["scripts/guard.ts: nothing in use reads, links or calls it. Use it or delete it."]);
 });
+
+test("an import of a file in a subfolder, from the folder above, counts as use", () => {
+  const changes = { "scripts/checks/rule.ts": "export const rubric = 1;\n", "scripts/seed.ts": 'import { load } from "./lib";\nimport { rubric } from "./checks/rule";\nconst file = resolve("../data/items.json");\n' };
+  assert.deepEqual(run(changes), []);
+});

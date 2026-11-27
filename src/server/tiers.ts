@@ -4,7 +4,8 @@ import type { ChatMessage } from "../shared/messages";
 import { aiText } from "../shared/messages";
 import { shortStage } from "./gateway";
 import type { LabelSection } from "./labels";
-import { detectEvent, type Detection } from "./safety/detect";
+import { TENANTS } from "./users";
+import { detectEvent, type Detection, type SpecialSituation } from "./safety/detect";
 
 // Lesson 13. Before the agent writes a word, every message is sorted into a risk tier, and the
 // tier decides who must look before the doctor reads anything:
@@ -25,7 +26,9 @@ export type Tier = (typeof TIERS)[number];
 export const SAFETY_HOURS = 24;
 export const REVIEW_HOURS = 48;
 
-export type Route = { tier: Tier; reason: string; basis?: string; asksForAdvice: boolean };
+// report: a special situation with no harm (a pregnancy exposure, an overdose with the patient
+// well). The doctor gets the label's answer and a safety case is opened beside it (issue #122).
+export type Route = { tier: Tier; reason: string; basis?: string; asksForAdvice: boolean; report?: SpecialSituation };
 
 // The approved uses the router compares a question with: the indication text of each label the
 // signed-in user may read and that is in force.
@@ -69,11 +72,41 @@ export function withFloor(route: Route, question: string): Route {
   return { ...route, tier: "review", reason: `${route.reason} (raised to review: the message asks for a draft)` };
 }
 
+// A second floor, after the router. A dose question that names no medicine, in this message or an
+// earlier one, gets one fixed question back and no model call: the model once picked CardioNex for
+// "what dose should I give my patient?" and gave 20mg (AMBIGUOUS-01, 3 of 5 runs, 27 Nov 2026).
+// Every company's medicines count as named, so a question about another company's medicine still
+// reaches the agent, which says it cannot answer it. It runs only on the answer tier, so a message
+// that reports harm still goes to safety first.
+const DOSE_WORDS = /\b(dose|doses|dosing|dosage|how much)\b/i;
+const ALL_MEDICINES = new RegExp(`\\b(${Object.values(TENANTS).flatMap((tenant) => tenant.medicines).join("|")})\\b`, "i");
+
+// The floor as the router node applies it: only on the answer tier, and never when a report is due,
+// since the report node runs after the agent and a fixed reply here would skip it.
+export function followUpFirst(route: Route, messages: ChatMessage[]): string | null {
+  return route.tier === "answer" && !route.report ? whichMedicineFirst(messages) : null;
+}
+
+export function whichMedicineFirst(messages: ChatMessage[]): string | null {
+  const asked = messages.filter((message) => message.type === "human").map((message) => message.content);
+  const latest = asked.at(-1) ?? "";
+  if (!DOSE_WORDS.test(latest) || asked.some((text) => ALL_MEDICINES.test(text))) return null;
+  return "ASK_FOLLOW_UP Which medicine is this about? Please also tell me what you know about the patient, such as their kidney function and the other medicines they take.";
+}
+
 // The second layer. A message the router sent to "answer" is read once more with one question
-// only: did something happen to a patient after a medicine? A yes from either layer is safety.
-// It only raises answer to safety, never lowers a tier. Its own function (detectEvent) so it can
-// be measured alone.
+// only: did something happen to a patient after a medicine? A yes from either layer reaches the
+// safety inbox. Its own function (detectEvent) so it can be measured alone.
+// A special situation with no harm is still reported, and the doctor also gets the answer, as EU
+// GVP Module VI asks: "she is 9 weeks pregnant on CardioNex, should she stay on it?" needs the
+// label's 8.1 as much as it needs a report. Every other yes gets the fixed safety reply alone.
 export function raiseToSafety(route: Route, seen: Detection): Route {
+  const reportOnly = seen.happened && !seen.harm && seen.specialSituation !== null;
+  // Only an answer is kept an answer. A router that said safety is never lowered: two layers
+  // must both read no harm, and the safety node files the report anyway.
+  if (reportOnly && route.tier === "answer") {
+    return { ...route, tier: "answer", report: seen.specialSituation!, reason: `${route.reason} (answered, and a ${seen.specialSituation} report opened by the second pass: ${seen.reason})` };
+  }
   if (route.tier !== "answer" || !seen.happened) return route;
   return { ...route, tier: "safety", reason: `${route.reason} (raised to safety by the second pass: ${seen.reason})` };
 }

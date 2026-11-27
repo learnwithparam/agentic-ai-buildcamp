@@ -14,6 +14,7 @@
  *   3. Attach callback evaluators:
  *      - behavior_match (decision model + deterministic match)
  *      - label_checks (the dataset's exact text checks and reason codes)
+ *      - rubric_match (scripts/judge/rubric.ts), on every case whose yaml has an llm-rubric assert
  *      - faithfulness (the judge lesson 09 calibrated), only on the slices in JUDGED_SLICES
  *      - risk_tier (lesson 13), the router's tier against the case's, only on TIERED_SLICES
  *   A case passes when every score it got is 1.
@@ -38,8 +39,20 @@ import { decide, useService } from "../src/server/gateway";
 import { createPool, migrate } from "../src/server/db";
 import { connectLabelIndex } from "../src/server/rag/search";
 import { JUDGED_SLICES, judgeFaithfulness, SCORE_NAME } from "./judge/faithfulness";
-import { BEHAVIORS, failedChecks, type AgentName, type Behavior, type CaseExpectation, type CaseInput } from "./hcp-cases";
+import { judgeRubrics, RUBRIC_SCORE } from "./judge/rubric";
+import { loadAllCases, BEHAVIORS, failedChecks, type AgentName, type Behavior, type CaseExpectation, type CaseInput } from "./hcp-cases";
 import { TIERED_SLICES } from "./scoreboard";
+
+// The hosted items whose rubrics differ from data/hcp/evals, named with the rubric count each side holds.
+export function staleRubrics(items: Array<{ metadata?: unknown; expectedOutput?: unknown }>, local = loadAllCases()): string[] {
+  const wanted = new Map(local.map((item) => [item.metadata.caseId, item.expectedOutput.rubrics]));
+  return items.flatMap((item) => {
+    const id = caseIdOf(item);
+    const have = (item.expectedOutput as { rubrics?: string[] } | undefined)?.rubrics ?? [];
+    const want = wanted.get(id) ?? [];
+    return JSON.stringify(have) === JSON.stringify(want) ? [] : [`${id} has ${have.length} rubric(s) in Langfuse and ${want.length} in the yaml`];
+  });
+}
 
 export function caseIdOf(item: { metadata?: unknown }) {
   return (item.metadata as { caseId?: string } | undefined)?.caseId ?? "";
@@ -60,7 +73,8 @@ export type CaseRow = ExperimentItemResult;
 export function failedScores(row: Pick<CaseRow, "evaluations" | "item">): Array<{ name: string; comment: string }> {
   const score = (name: string) => row.evaluations.find((evaluation) => evaluation.name === name);
   const slice = ((row.item as { metadata?: { slice?: string } }).metadata ?? {}).slice ?? "";
-  const required = ["behavior_match", "label_checks", ...(JUDGED_SLICES.includes(slice) ? [SCORE_NAME] : []), ...(TIERED_SLICES.includes(slice) ? ["risk_tier"] : [])];
+  const rubrics = (row.item as { expectedOutput?: { rubrics?: string[] } }).expectedOutput?.rubrics ?? [];
+  const required = ["behavior_match", "label_checks", ...(rubrics.length ? [RUBRIC_SCORE] : []), ...(JUDGED_SLICES.includes(slice) ? [SCORE_NAME] : []), ...(TIERED_SLICES.includes(slice) ? ["risk_tier"] : [])];
   return required
     .filter((name) => score(name)?.value !== 1)
     .map((name) => ({ name, comment: score(name)?.comment ?? "no score, the evaluator failed" }));
@@ -164,6 +178,9 @@ export async function startExperiment() {
   });
   // Pull the hosted dataset by DATASET_NAME from .env.
   const dataset = await langfuse.dataset.get(env.datasetName);
+  // A hosted item written before the rubrics were kept would run without them. Say so, by case.
+  const stale = staleRubrics(dataset.items);
+  if (stale.length) throw new Error(`The hosted dataset is out of date: ${stale.join("; ")}. Run npm run dataset:seed.`);
 
   // The cases a run names, or all of them. An id that is not in the dataset is an error, so a
   // typo never runs fewer cases than the command says.
@@ -226,6 +243,15 @@ export async function startExperiment() {
               confidence === undefined ? "" : ` (confidence ${confidence.toFixed(2)})`
             }.`
           };
+        },
+        // Every llm-rubric assert of the case, through the rubric judge. A judge that cannot score throws,
+        // and a case with no score fails (failedScores), so a rubric is never skipped.
+        async ({ input, output, expectedOutput }) => {
+          const rubrics = (expectedOutput as DatasetExpectation).rubrics ?? [];
+          if (!rubrics.length) return [];
+          const question = (input as DatasetInput).messages.map((message) => `${message.role}: ${message.content}`).join("\n");
+          const verdict = await judgeRubrics(question, rubrics, output as string);
+          return { name: RUBRIC_SCORE, value: verdict.score ? 1 : 0, comment: verdict.comment };
         },
         // The dataset repo's exact text checks: a dose, a citation, a phrase that must not appear.
         async ({ output, expectedOutput }) => {

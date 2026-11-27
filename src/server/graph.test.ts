@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { MemorySaver } from "@langchain/langgraph";
 import { aiText, type AiMessage, type ChatMessage } from "../shared/messages";
-import { buildGraph, fixedReply, reviewStep, runGraph, submitAdverseEvent, submitDraftStep, type ReviewSubmission } from "./graph";
+import { buildGraph, fixedReply, reportNotice, reportStep, reviewStep, runGraph, submitAdverseEvent, submitDraftStep, type ReviewSubmission } from "./graph";
 import type { Route, Tier } from "./tiers";
 import { scriptUser } from "./users";
 
@@ -11,8 +11,8 @@ import { scriptUser } from "./users";
 
 const draft: AiMessage = { id: "draft", type: "ai", content: [{ type: "text", text: "Give 5mg once daily." }], tool_calls: [] };
 
-function routedGraph(tier: Tier, visited: string[]) {
-  const route: Route = { tier, reason: "test", asksForAdvice: false };
+function routedGraph(tier: Tier, visited: string[], report?: Route["report"]) {
+  const route: Route = { tier, reason: "test", asksForAdvice: false, report };
   const seen = (name: string) => visited.push(name);
   return buildGraph(
     {
@@ -22,6 +22,7 @@ function routedGraph(tier: Tier, visited: string[]) {
       cite: () => (seen("cite"), {}),
       submit: (state, config) => (seen("submit"), submitDraftStep(state, config, "trace-1")),
       review: (state, config) => (seen("review"), reviewStep(state, config)),
+      report: (state, config) => (seen("report"), reportStep(state, config, "CASE DRAFT", "trace-1")),
       safety: async (state, config) => (seen("safety"), await submitAdverseEvent(state, config, "PV_ESCALATION", "trace-1"), fixedReply(state, "PV_ESCALATION")),
       stop: (state) => (seen("stop"), fixedReply(state, "OFF_LABEL_REFUSAL"))
     },
@@ -98,6 +99,7 @@ test("a turn with no tier stops instead of answering", async () => {
       tools: () => ({}),
       cite: () => ({}),
       submit: () => ({}),
+      report: () => ({}),
       review: () => ({}),
       safety: () => ({}),
       stop: () => ({})
@@ -105,4 +107,48 @@ test("a turn with no tier stops instead of answering", async () => {
     new MemorySaver()
   );
   await assert.rejects(runGraph(graph, { threadId: "t-none", user: scriptUser(), messages: ask("A question") }, () => {}), /no tier/);
+});
+
+// Issue #122. A pregnancy exposure with nothing wrong: the doctor gets the checked answer, with one
+// sentence saying a report was opened, and the safety inbox gets the case. One answer message, not two.
+test("a special situation with no harm is answered and reported", async () => {
+  const visited: string[] = [];
+  const inbox = fakeInbox();
+  const result = await runGraph(routedGraph("answer", visited, "pregnancy_exposure"), { threadId: "t-report", user: scriptUser(), inbox, messages: ask("She is 9 weeks pregnant on CardioNex. Should she stay on it?") }, () => {});
+  assert.deepEqual(visited, ["router", "agent", "cite", "report"]);
+  assert.deepEqual(inbox.items.map((item) => item.kind), ["adverse_event"]);
+  assert.equal(result.waitingForApproval, false);
+  assert.equal(result.route?.tier, "answer");
+  const answers = result.messages.filter((message): message is AiMessage => message.type === "ai");
+  assert.equal(answers.length, 1);
+  assert.equal(lastText(result.messages), `Give 5mg once daily.\n\n${reportNotice("pregnancy_exposure")}`);
+  assert.match(inbox.items[0].body, /exposure in pregnancy[\s\S]*CASE DRAFT/);
+});
+
+test("a report on a draft request is filed before the draft waits for review", async () => {
+  const visited: string[] = [];
+  const inbox = fakeInbox();
+  const result = await runGraph(routedGraph("review", visited, "pregnancy_exposure"), { threadId: "t-report-review", user: scriptUser(), inbox, messages: ask("Draft a reply: she is pregnant on CardioNex") }, () => {});
+  assert.deepEqual(visited, ["router", "agent", "cite", "report", "submit", "review"]);
+  assert.deepEqual(inbox.items.map((item) => item.kind), ["adverse_event", "draft"]);
+  assert.equal(result.waitingForApproval, true);
+});
+
+// AMBIGUOUS-01, 27 Nov 2026: the model asked for the patient's details without the code, so the
+// chat showed a question the evals read as an answer.
+test("a question back to the doctor starts with ASK_FOLLOW_UP, and nothing else is changed", async () => {
+  const { stampFollowUp, citeStep } = await import("./graph");
+  assert.equal(stampFollowUp("What is the patient's eGFR?"), "ASK_FOLLOW_UP What is the patient's eGFR?");
+  assert.equal(stampFollowUp("ASK_FOLLOW_UP What is the patient's eGFR?"), "ASK_FOLLOW_UP What is the patient's eGFR?");
+  assert.equal(stampFollowUp("NOT_APPROVED_IN_COUNTRY Is there another country you meant?"), "NOT_APPROVED_IN_COUNTRY Is there another country you meant?");
+  assert.equal(stampFollowUp("Start at 20 mg once daily [cardionex-uspi-v2, 2.2]. Is she on dialysis?"), "Start at 20 mg once daily [cardionex-uspi-v2, 2.2]. Is she on dialysis?");
+  assert.equal(stampFollowUp("Start at 20 mg once daily."), "Start at 20 mg once daily.");
+  // In the graph: the cite node replaces the streamed message under the same id.
+  const question: AiMessage = { id: "a1", type: "ai", content: [{ type: "text", text: "Which medicine is it about?" }], tool_calls: [] };
+  const written: unknown[] = [];
+  const state = { messages: [{ id: "q", type: "human", content: "What dose?" }, question], today: "2026-11-23" } as never;
+  const result = await citeStep(null as never, "", state, { writer: (x: unknown) => written.push(x) } as never);
+  assert.equal(aiText(result.messages![0] as AiMessage), "ASK_FOLLOW_UP Which medicine is it about?");
+  assert.equal((result.messages![0] as AiMessage).id, "a1");
+  assert.equal(written.length, 1);
 });

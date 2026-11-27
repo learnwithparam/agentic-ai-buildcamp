@@ -85,6 +85,7 @@ for (const tier of ["answer", "review"] as const) {
         cite: () => (visited.push("cite"), { messages: [{ id: "answer-1", type: "ai", content: [{ type: "text", text: WITHHELD_REPLY }], tool_calls: [] }] }),
         submit: (state) => (visited.push(`submit:${aiText(state.messages.at(-1) as AiMessage)}`), {}),
         review: () => ({}),
+        report: () => ({}),
         safety: () => ({}),
         stop: () => ({})
       },

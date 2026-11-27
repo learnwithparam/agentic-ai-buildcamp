@@ -34,6 +34,7 @@ function serverGraph(checkpointer: BaseCheckpointSaver) {
       cite: () => ({}),
       submit: (state, config) => submitDraftStep(state, config),
       review: reviewStep,
+      report: () => ({}),
       safety: (state) => fixedReply(state, ""),
       stop: (state) => fixedReply(state, "")
     },

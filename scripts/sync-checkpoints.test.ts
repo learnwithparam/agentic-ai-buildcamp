@@ -1,11 +1,13 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, symlinkSync } from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { test } from "node:test";
 import { parse } from "yaml";
 import {
   caseIdsIn,
+  commandOf,
   expand,
   holds,
   LESSONS,
@@ -204,4 +206,30 @@ test("where a file's version comes from", () => {
   assert.equal(sourceOf(manifest, "src/server/medinfo-agent.ts", 24).kind, "main");
   assert.equal(versionOn(entry, 0), 0);
   assert.equal(versionOn(manifest.files["src/server/gateway.ts"], 10), null);
+});
+
+// The sync runs lesson-tags.ts from $TMPDIR, a symlink on macOS (/var -> /private/var). The plan once
+// came back empty there, and the sync deleted every file of tag 00 and staged node_modules instead.
+test("the plan prints through a symlinked path, and an unknown command fails", () => {
+  const dir = mkdtempSync(path.join(os.tmpdir(), "lesson-tags-"));
+  try {
+    const link = path.join(dir, "repo");
+    symlinkSync(ROOT, link);
+    const tsx = path.join(ROOT, "node_modules/.bin/tsx");
+    const out = execFileSync(tsx, [path.join(link, "scripts/lesson-tags.ts"), "plan", "0", path.join(ROOT, "scripts/lesson-files.json")], { encoding: "utf8" });
+    assert.match(out, /^package\.json\tmain$/m);
+    assert.match(out, /^\.gitignore\tmain$/m);
+    const self = path.join(ROOT, "scripts/lesson-tags.ts");
+    assert.equal(commandOf(["node", path.join(link, "scripts/lesson-tags.ts"), "derive"], self), "derive");
+    assert.equal(commandOf(["node", path.join(ROOT, "scripts/sync-checkpoints.test.ts"), "plan"], self), null);
+    assert.throws(() => commandOf(["node", self, "plna"], self), /unknown command "plna"/);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test("the sync refuses an empty plan and a staged node_modules", { skip: !onMain }, () => {
+  const script = read("scripts/sync-checkpoints.sh");
+  assert.match(script, /if \[\[ -z "\$plan" \]\]; then[\s\S]*?exit 1/);
+  assert.match(script, /git diff --cached --name-only -- node_modules[\s\S]*?exit 1/);
 });

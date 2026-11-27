@@ -244,6 +244,12 @@ async function main() {
     const called = p.router_safety || p.second_pass_safety;
     return (gold.expected_route === "safety") === called ? [] : [{ id: gold.id, expected: gold.expected_route, router: p.router_safety, second_pass: p.second_pass_safety }];
   });
+  // The rows whose preferred terms differ, so a drop in coding_accuracy names its rows.
+  const codingMisses = golds.flatMap((gold, i) => {
+    const expected = [...new Set(gold.meddra.map((m) => m.pt))].sort();
+    const found = [...new Set(predictions[i]!.pts)].sort();
+    return expected.length && expected.join("|") !== found.join("|") ? [{ id: gold.id, expected, found }] : [];
+  });
   const run = {
     measures: {
       "ae.recall": scores.recall,
@@ -259,7 +265,8 @@ async function main() {
     layers: { router_only: scores.router_only, second_pass_only: scores.second_pass_only },
     criteria_all_four: scores.criteria_all_four,
     clock,
-    misses
+    misses,
+    coding_misses: codingMisses
   };
   if (out) {
     mkdirSync(path.dirname(out), { recursive: true });

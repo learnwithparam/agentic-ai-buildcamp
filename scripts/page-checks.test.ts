@@ -127,6 +127,10 @@ test("the prose check does not read a from-comment as words or sentences", () =>
 
 test("every `npm run` a page names is a script in package.json", (t) => {
   if (!existsSync("docs/learner")) return t.skip("no lessons here");
+  // A checkpoint tag holds main's copy of every page (lesson-files.json versions none of them), but
+  // only the scripts its lessons have reached, so page 18 on tag 05 names scripts that come later.
+  // Main checks the same text against every script.
+  if (!existsSync("scripts/sync-checkpoints.sh")) return t.skip("pages are main's copy; checked on main");
   const scripts = JSON.parse(readFileSync("package.json", "utf8")).scripts as Record<string, string>;
   const pages = ["README.md", "docs/walkthrough.md", ...readdirSync("docs/learner", { recursive: true, encoding: "utf8" }).filter((name) => name.endsWith(".md")).map((name) => `docs/learner/${name}`)];
   for (const file of pages) {

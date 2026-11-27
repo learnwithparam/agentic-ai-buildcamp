@@ -15,7 +15,7 @@ export type CitationProblem =
   | { kind: "uncited"; quantity: string; sentence: string }
   | { kind: "unsupported"; quantity: string; citations: string[]; sentence: string }
   // A claim (src/server/citations.claims.ts) whose quote failed a check or the support judge.
-  | { kind: "claim"; reason: ClaimReason; citation: string; claim: string };
+  | { kind: "claim"; reason: ClaimReason; citation: string; claim: string; quote?: string };
 
 export type ClaimReason =
   | "unknown_section"
@@ -24,6 +24,7 @@ export type ClaimReason =
   | "wrong_country"
   | "quote_not_in_section"
   | "number_not_in_quote"
+  | "date_not_a_version"
   | "quote_does_not_support";
 
 const BRACKET = /\[([^\]]+)\]/g;
@@ -121,7 +122,10 @@ export function describeProblem(problem: CitationProblem): string {
     case "unsupported":
       return `"${problem.quantity}" is not in ${problem.citations.map((citation) => `[${citation}]`).join(" ")}: "${problem.sentence}". Cite the section that states it, or leave the number out.`;
     case "claim":
-      return `The claim "${problem.claim}" cites [${problem.citation}] but ${CLAIM_REASONS[problem.reason].model}. Quote the section word for word, or leave the claim out.`;
+      // A judged claim's quote is the label's own sentence: the rewrite states that, rather than drop the fact.
+      return problem.reason === "quote_does_not_support" && problem.quote
+        ? `The claim "${problem.claim}" cites [${problem.citation}] but ${CLAIM_REASONS[problem.reason].model}. The section says: "${problem.quote}". Say what that sentence says, in its words, or cite the section that states the claim.`
+        : `The claim "${problem.claim}" cites [${problem.citation}] but ${CLAIM_REASONS[problem.reason].model}. Quote the section word for word, or leave the claim out.`;
   }
 }
 
@@ -133,6 +137,7 @@ export const CLAIM_REASONS: Record<ClaimReason, { model: string; plain: string }
   wrong_country: { model: "that document is for another country", plain: "cites a document for another country" },
   quote_not_in_section: { model: "the quote is not in that section's text", plain: "gives a quote that is not in the section" },
   number_not_in_quote: { model: "a number in the claim is not in the quote", plain: "gives a number that is not in its quote" },
+  date_not_a_version: { model: "a date in the claim is not the date any version of that label takes effect", plain: "gives a label date that no version of the label has" },
   quote_does_not_support: { model: "the quote does not support the claim", plain: "gives a quote that does not support it" }
 };
 

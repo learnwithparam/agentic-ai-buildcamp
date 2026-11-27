@@ -8,6 +8,8 @@ import type { Identity, Role } from "./users";
 // infra/openfga/model.fga. The search asks here first and never scores text outside the answer,
 // so text the agent never receives, it cannot leak.
 
+export const FGA_TIMEOUT_MS = 30_000;
+
 let client: OpenFgaClient | undefined;
 let override: OpenFgaClient | undefined;
 
@@ -16,18 +18,26 @@ export function useFgaClient(next: OpenFgaClient | undefined) {
   override = next;
 }
 
-export function fga() {
-  if (override) return override;
+// The client's options. The SDK's own request timeout is 10 s: an access check stalled that long
+// when the laptop was loaded, and the eval skipped 24 rows of a five-run measure as failures
+// (27 Nov 2026). A check that answers takes under 200 ms; one silent for 30 s is down, and fails closed.
+export function fgaOptions() {
   if (!env.fgaStoreId || !env.fgaModelId || !env.fgaApiToken) {
     throw new Error("OpenFGA is not configured. Run npm run identity:setup (lesson 11).");
   }
-  client ??= new OpenFgaClient({
+  return {
     apiUrl: env.fgaApiUrl,
     storeId: env.fgaStoreId,
     // Pinned: a model written later never changes what this build allows until you pin it here.
     authorizationModelId: env.fgaModelId,
-    credentials: { method: CredentialsMethod.ApiToken, config: { token: env.fgaApiToken } }
-  });
+    credentials: { method: CredentialsMethod.ApiToken as const, config: { token: env.fgaApiToken } },
+    baseOptions: { timeout: FGA_TIMEOUT_MS }
+  };
+}
+
+export function fga() {
+  if (override) return override;
+  client ??= new OpenFgaClient(fgaOptions());
   return client;
 }
 

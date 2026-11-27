@@ -93,7 +93,11 @@ export function findProblems(files: Map<string, string>, tracked: string[]): str
   const tokensFor = (path: string) => {
     const tokens = [path, basename(path)];
     // An import names the file without .ts: "./limits", or a path such as "../../../scripts/no-model-call".
-    if (path.endsWith(".ts")) tokens.push(`./${basename(path, ".ts")}`, path.slice(0, -3));
+    // An import from a parent folder names the subfolder too: "./judge/rubric" from scripts/.
+    if (path.endsWith(".ts")) {
+      const parts = path.slice(0, -3).split("/");
+      tokens.push(path.slice(0, -3), ...parts.slice(1).map((_, i) => `./${parts.slice(i + 1).join("/")}`));
+    }
     return tokens;
   };
   for (let grew = true; grew; ) {
@@ -117,6 +121,13 @@ export function findProblems(files: Map<string, string>, tracked: string[]): str
     if (rule && !used.has(path)) problems.push(`${path}: nothing in use reads, links or calls it. Use it or delete it.`);
   }
 
+  // A file a script writes on its first full run. Its own check fails a release while it is
+  // missing (checkWalk with --release), so it is never left out unnoticed.
+  const FIRST_WRITTEN_BY_A_RUN = new Set(["docs/checkpoint-walk.md"]);
+  // The files the checkpoint sync strips from every tag. On a tag (no sync script) naming one is
+  // fine; on main they must exist, and the walk check below reads the sync script.
+  const MAIN_ONLY = new Set(["scripts/sync-checkpoints.sh", "scripts/align-scoreboard.ts"]);
+  const onTag = !existsSync("scripts/sync-checkpoints.sh");
   const known = new Set(tracked.flatMap((path) => path.split("/").map((_, index, parts) => parts.slice(0, index + 1).join("/"))));
   for (const [path, body] of bodies) {
     // Test fixtures name made-up paths on purpose.
@@ -126,7 +137,7 @@ export function findProblems(files: Map<string, string>, tracked: string[]): str
       const target = raw.startsWith(".") ? posix.normalize(posix.join(posix.dirname(path), raw)) : raw;
       const clean = target.replace(/\/$/, "");
       const exists = ["", ".ts", ".tsx", ".json", "/index.ts"].some((ending) => known.has(clean + ending));
-      if (!exists) problems.push(`${path}: names ${raw}, which does not exist.`);
+      if (!exists && !FIRST_WRITTEN_BY_A_RUN.has(clean) && !(onTag && MAIN_ONLY.has(clean))) problems.push(`${path}: names ${raw}, which does not exist.`);
     }
   }
 
@@ -218,17 +229,44 @@ async function checksFrom(module: "scoreboard" | "measures", check: "checkScoreb
   return ((await import(pathToFileURL(file).href)) as Record<string, () => string[]>)[check]();
 }
 
+// Every tag the sync script publishes has a row in docs/checkpoint-walk.md at the tag's commit.
+// The sync's own `npm run check` runs on a checked-out tag, whose commit is new by then, so a tag
+// checkout skips this: the walk is checked from main. A tag before the walk has no module.
+async function walkProblems(release: boolean): Promise<string[]> {
+  const file = fileURLToPath(new URL("./checkpoints-walk.ts", import.meta.url));
+  if (!existsSync(file)) return [];
+  const git = (...args: string[]) => {
+    try {
+      return execFileSync("git", args, { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+    } catch {
+      return undefined;
+    }
+  };
+  if (git("describe", "--exact-match", "--tags", "HEAD")?.startsWith("checkpoint/")) return [];
+  const { checkWalk, syncTags, WALK_FILE } = (await import(pathToFileURL(file).href)) as {
+    checkWalk: (options: { text?: string; tags: string[]; commitOf: (tag: string) => string | undefined; release?: boolean }) => string[];
+    syncTags: (script: string) => string[];
+    WALK_FILE: string;
+  };
+  return checkWalk({
+    text: existsSync(WALK_FILE) ? readFileSync(WALK_FILE, "utf8") : undefined,
+    tags: syncTags(readFileSync("scripts/sync-checkpoints.sh", "utf8")),
+    commitOf: (tag) => git("rev-parse", "--verify", "--quiet", `${tag}^{commit}`) || undefined,
+    release
+  });
+}
+
 async function main() {
   const tracked = execFileSync("git", ["ls-files"], { encoding: "utf8" }).split("\n").filter(Boolean);
   const files = new Map(
     tracked.filter((path) => (TEXT.test(path) || path === NODE_PIN) && path !== "package-lock.json").map((path) => [path, readFileSync(path, "utf8")]),
   );
-  const problems = [...findProblems(files, tracked), ...verifyDatasetCopy(), ...(await checksFrom("scoreboard", "checkScoreboard")), ...(await checksFrom("measures", "checkMeasures"))];
+  const problems = [...findProblems(files, tracked), ...verifyDatasetCopy(), ...(await checksFrom("scoreboard", "checkScoreboard")), ...(await checksFrom("measures", "checkMeasures")), ...(await walkProblems(process.argv.includes("--release")))];
   if (problems.length > 0) {
     console.error(problems.join("\n"));
     process.exit(1);
   }
-  console.log("check-repo: every watched file and npm script is in use, every named path exists, every dependency is pinned, the chat app is clean, data/hcp matches its lock, docs/scoreboard.md has one cell per slice, every measured row in docs/measures.md matches its run");
+  console.log("check-repo: every watched file and npm script is in use, every named path exists, every dependency is pinned, the chat app is clean, data/hcp matches its lock, docs/scoreboard.md has one cell per slice, every measured row in docs/measures.md matches its run, every checkpoint tag has a fresh row in docs/checkpoint-walk.md");
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) void runMain(main, { name: "check-repo" });

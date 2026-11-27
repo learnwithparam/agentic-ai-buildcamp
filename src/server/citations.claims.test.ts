@@ -90,9 +90,12 @@ test("a claim whose quote passes is judged, and an unsupported verdict is a prob
   const row = gold.find((r) => r.id === "c-005")!;
   const answers: Judge = async () => "unsupported";
   const [problem] = await reviewClaims([claimOf(row)], { retrieved: null, today: row.as_of }, answers);
-  assert.deepEqual(problem, { kind: "claim", reason: "quote_does_not_support", citation: `${row.doc_id}, ${row.section}`, claim: row.claim });
+  assert.deepEqual(problem, { kind: "claim", reason: "quote_does_not_support", citation: `${row.doc_id}, ${row.section}`, claim: row.claim, quote: claimOf(row).quote });
   assert.deepEqual(await reviewClaims([claimOf(row)], { retrieved: null, today: row.as_of }, async () => "supported"), []);
   assert.match(describeProblem(problem!), /the quote does not support the claim/);
+  // The rewrite is given the label's own sentence. Told only "quote it or leave it out", the rewrite
+  // left true facts out and hedged (POSITIVE-03 withheld, INJECTION-02 "not stated", 27 Nov 2026).
+  assert.ok(describeProblem(problem!).includes(`The section says: "${claimOf(row).quote}"`));
   assert.ok(Object.keys(CLAIM_REASONS).length >= 7);
 });
 
@@ -119,6 +122,12 @@ test("every sentence of every search passage, alone or with its neighbour, is ve
     }
   }
   assert.ok(count > 500, `only ${count} sentences: the labels did not load`);
+});
+
+test("a table row, a list item and a paragraph are each their own sentence, in every label", () => {
+  assert.deepEqual(sentencesOf("| Dose | Note |\n| 5mg once daily | Do not titrate |\n\n**Footnote:** Applies to all."), ["| Dose | Note |", "| 5mg once daily | Do not titrate |", "**Footnote:** Applies to all."]);
+  const spanning = LABEL_SECTIONS.flatMap((section) => sentencesOf(section.text).filter((sentence) => sentence.includes("\n")).map(() => `${section.docId} ${section.section}`));
+  assert.deepEqual(spanning, []);
 });
 
 test("sentences split at a full stop before a capital, never inside 2.5 mg or a bracketed reference", () => {
@@ -153,4 +162,65 @@ test("the claim listing is offered only sections in force, so a current fact is 
   // v3 comes into force on 2027-03-01: before it only v2 is offered, after it only v3.
   assert.deepEqual(offeredSections(retrieved, "2026-11-23").map((s) => s.doc_id), ["cardionex-uspi-v2"]);
   assert.deepEqual(offeredSections(retrieved, "2027-03-02").map((s) => s.doc_id), ["cardionex-uspi-v3"]);
+});
+
+test("the dates of a sentence are read in the forms a doctor writes them", async () => {
+  const { datesIn } = await import("./citations.dates");
+  assert.deepEqual(datesIn("It takes effect March 1, 2027; today's took effect 15 September 2026."), { days: ["2027-03-01", "2026-09-15"], years: [] });
+  assert.deepEqual(datesIn("The 2027 label, in force from 2027-03-01."), { days: ["2027-03-01"], years: ["2027"] });
+  assert.deepEqual(datesIn("Raise to 40 mg after 4 weeks."), { days: [], years: [] });
+});
+
+// FUTURE-01, 27 Nov 2026: "the approved 2027 label takes effect March 1, 2027" has no sentence in
+// any section, so it was withheld for a quote that cannot exist. It is checked against the dates.
+test("a version date is checked against the label's real effective dates, never by the judge", async () => {
+  const reasonOf = (problem: unknown) => (problem as { reason?: string } | undefined)?.reason;
+  const at = (text: string): Claim => ({ text, quote: "", docId: "cardionex-uspi-v2", section: "2.2", about: "version_date" });
+  const context = { retrieved: null, today: "2026-11-23" };
+  assert.deepEqual(await reviewClaims([at("The approved 2027 label takes effect March 1, 2027."), at("Today's label took effect September 15, 2026.")], context, noModelCall), []);
+  const [wrong] = await reviewClaims([at("The approved label takes effect June 1, 2027.")], context, noModelCall);
+  assert.equal(reasonOf(wrong), "date_not_a_version");
+  const [year] = await reviewClaims([at("The 2028 label is approved.")], context, noModelCall);
+  assert.equal(reasonOf(year), "date_not_a_version");
+  // The model's tag alone skips nothing: a dose, or a date with a dose, gets the text checks.
+  const [dose] = await reviewClaims([at("Raise to 80 mg once daily.")], context, noModelCall);
+  assert.equal(reasonOf(dose), "quote_not_in_section");
+  const [mixed] = await reviewClaims([at("From March 1, 2027 the dose is 80 mg.")], context, noModelCall);
+  assert.equal(reasonOf(mixed), "quote_not_in_section");
+  // The retrieved check still runs for a version claim.
+  const [unfound] = await reviewClaims([at("It takes effect March 1, 2027.")], { ...context, retrieved: [] }, noModelCall);
+  assert.equal(reasonOf(unfound), "not_retrieved");
+  // A NeuroVex date is not a CardioNex version.
+  const neurovex = LABEL_SECTIONS.find((s) => s.docId.startsWith("neurovex") && s.country === "US")!;
+  const [other] = await reviewClaims([at(`The label takes effect ${neurovex.effectiveDate}.`)], context, noModelCall);
+  assert.equal(reasonOf(other), "date_not_a_version", neurovex.effectiveDate);
+});
+
+// INJECTION-02, 27 Nov 2026: the rewrite said "the label does not explicitly state a maximum dose"
+// and cited 2.2. That sentence gives no fact from the label, so it has no quote, and a right
+// answer was withheld. It is not reviewed; one that gives a number still is.
+test("a sentence that only says what the label does not state is not a claim, unless it gives a number its section lacks", async () => {
+  const claim = (text: string): Claim => ({ text, quote: "", docId: "cardionex-uspi-v2", section: "2.2", about: "label_text" });
+  const context = { retrieved: null, today: "2026-11-26" };
+  assert.deepEqual(await reviewClaims([claim("For standard adult HFrEF the label does not explicitly state a maximum dose.")], context, noModelCall), []);
+  assert.deepEqual(await reviewClaims([claim("The label doesn't say whether to take it with food.")], context, noModelCall), []);
+  // The sentence the rewrite wrote on 27 Nov 2026: 30 is the eGFR the section's table names.
+  assert.deepEqual(await reviewClaims([claim("For standard adult HFrEF with eGFR ≥30 mL/min, the label does not explicitly state a maximum dose.")], context, noModelCall), []);
+  const [withNumber] = await reviewClaims([claim("The label does not call 80 mg the maximum daily dose.")], context, noModelCall);
+  assert.equal(withNumber?.kind === "claim" && withNumber.reason, "quote_not_in_section");
+  const [stated] = await reviewClaims([claim("Do not take two doses on the same day.")], context, noModelCall);
+  assert.equal(stated?.kind === "claim" && stated.reason, "quote_not_in_section");
+  // An instruction, a second clause or a spelled-out number is a fact to check, not an absence.
+  for (const text of [
+    "Do not give CardioNex with an ACE inhibitor.",
+    "The label does not say to take it with food, but give it twice daily.",
+    "The label does not state a maximum; it is forty milligrams.",
+    "Doctors do not call this dose a maximum."
+  ]) {
+    const [problem] = await reviewClaims([claim(text)], context, noModelCall);
+    assert.equal(problem?.kind === "claim" && problem.reason, "quote_not_in_section", text);
+  }
+  // An absence still cites a section the search returned, in force today.
+  const [unseen] = await reviewClaims([claim("The label does not state a maximum dose.")], { retrieved: [], today: "2026-11-26" }, noModelCall);
+  assert.equal(unseen?.kind === "claim" && unseen.reason, "not_retrieved");
 });
