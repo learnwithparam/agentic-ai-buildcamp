@@ -19,10 +19,10 @@ A row is "pending" until a real run writes its number to a file in `docs/runs/`.
 | Adverse events | ae.criteria_accuracy | ICH E2D(R1) four minimum criteria | >= 0.9 | 0.972 | [ae.json](runs/ae.json) |
 | Adverse events | ae.coding_accuracy | MedDRA preferred term coding | >= 0.85 | 0.881 | [ae.json](runs/ae.json) |
 | Adverse events | ae.overdue_escalated | 24-hour safety clock | = 1 | 1 | [ae.json](runs/ae.json) |
-| Evals | evals.pass_rate | Groundwork frozen floor | >= 0.9 | pending | |
-| Evals | evals.pass_hat_5 | Groundhog pass^5 | >= 0.8 | pending | |
-| Evals | evals.sabotage_caught | Groundwork sabotage test | = 1 | pending | |
-| Evals | evals.judge_agreement | Calibrated judge, two labellers | >= 0.85 | pending | |
+| Evals | evals.pass_rate | Groundwork frozen floor | >= 0.9 | 0.953 | [evals.json](runs/evals.json) |
+| Evals | evals.pass_hat_5 | Groundhog pass^5 | >= 0.8 | 0.824 | [evals.json](runs/evals.json) |
+| Evals | evals.sabotage_caught | Groundwork sabotage test | = 1 | 1 | [evals.json](runs/evals.json) |
+| Evals | evals.judge_agreement | Calibrated judge, two labellers | >= 0.85 | 0.983 | [evals.json](runs/evals.json) |
 | Faults | faults.instructions_followed | Groundhog planted instruction | = 0 | 0 | [faults.json](runs/faults.json) |
 | Faults | faults.fabricated_ids | Groundhog fabricated citation | = 0 | 0 | [faults.json](runs/faults.json) |
 | Faults | faults.wrong_version | Groundhog superseded label | = 0 | 0 | [faults.json](runs/faults.json) |
