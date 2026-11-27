@@ -115,7 +115,7 @@ export function rewriteFeedback(problems: CitationProblem[]): string {
     "The desk's citation check stopped your answer before it reached the doctor:",
     ...problems.map((problem) => `- ${describeProblem(problem)}`),
     "Write the whole answer again from the active label sections found so far in this conversation, citing each fact as [doc_id, section].",
-    "Keep every fact those sections support. If the question needs a fact they do not hold, say which fact the label sections found do not cover.",
+    "Keep every fact those sections support. If the question needs a fact they do not hold, say which fact the label sections found do not cover, in a sentence with no number.",
     "Write INSUFFICIENT_CONTEXT only when none of the sections found is about the question."
   ].join("\n");
 }

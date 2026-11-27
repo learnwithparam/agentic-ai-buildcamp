@@ -117,10 +117,16 @@ export function checkVersionDate(claim: Pick<Claim, "text" | "docId" | "section"
   return days.every((day) => versions.has(day)) && yearsOnly.every((year) => years.has(year)) ? null : "date_not_a_version";
 }
 
+// A sentence that only says the label does not state something gives no fact from it, so it has
+// no quote to check. Listed as a claim, it withheld a right answer (INJECTION-02, 27 Nov 2026).
+// One that gives a number still gets every check: the number could be a dose the label lacks.
+const ABSENCE = /\b(?:does not|doesn't|do not|don't)\s+(?:\w+ly\s+)?(?:state|give|say|list|specify|mention|cover|call|name|set)\b/i;
+export const isAbsence = (claim: Pick<Claim, "text">) => ABSENCE.test(claim.text) && numbersIn(claim.text).length === 0;
+
 // Every claim, checked. A claim that passes the code checks goes to the judge.
 export async function reviewClaims(claims: Claim[], context: ClaimContext, judge: Judge): Promise<CitationProblem[]> {
   const results = await Promise.all(
-    claims.map(async (claim): Promise<CitationProblem | null> => {
+    claims.filter((claim) => !isAbsence(claim)).map(async (claim): Promise<CitationProblem | null> => {
       const citation = `${claim.docId}, ${claim.section}`;
       const reason = checkClaim(claim, context);
       if (reason) return { kind: "claim", reason, citation, claim: claim.text };

@@ -195,3 +195,17 @@ test("a version date is checked against the label's real effective dates, never 
   const [other] = await reviewClaims([at(`The label takes effect ${neurovex.effectiveDate}.`)], context, noModelCall);
   assert.equal(reasonOf(other), "date_not_a_version", neurovex.effectiveDate);
 });
+
+// INJECTION-02, 27 Nov 2026: the rewrite said "the label does not explicitly state a maximum dose"
+// and cited 2.2. That sentence gives no fact from the label, so it has no quote, and a right
+// answer was withheld. It is not reviewed; one that gives a number still is.
+test("a sentence that only says what the label does not state is not a claim, unless it gives a number", async () => {
+  const claim = (text: string): Claim => ({ text, quote: "", docId: "cardionex-uspi-v2", section: "2.2", about: "label_text" });
+  const context = { retrieved: null, today: "2026-11-26" };
+  assert.deepEqual(await reviewClaims([claim("For standard adult HFrEF the label does not explicitly state a maximum dose.")], context, noModelCall), []);
+  assert.deepEqual(await reviewClaims([claim("The label doesn't say whether to take it with food.")], context, noModelCall), []);
+  const [withNumber] = await reviewClaims([claim("Section 2.2 does not call 40 mg the maximum daily dose.")], context, noModelCall);
+  assert.equal(withNumber?.kind === "claim" && withNumber.reason, "quote_not_in_section");
+  const [stated] = await reviewClaims([claim("Do not take two doses on the same day.")], context, noModelCall);
+  assert.equal(stated?.kind === "claim" && stated.reason, "quote_not_in_section");
+});
