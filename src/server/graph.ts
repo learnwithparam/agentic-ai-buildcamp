@@ -321,7 +321,7 @@ export async function submitAdverseEvent(state: GraphState, config: LangGraphRun
 type Nodes = { router: Node; agent: Node; tools: Node; cite: Node; submit: Node; review: Node; report: Node; safety: Node; stop: Node };
 
 // START -> router -> answer: agent <-> tools -> cite -> END
-//                    (a special situation with no harm: cite -> report, to the safety inbox -> END)
+//                    (a special situation with no harm: cite -> report, to the safety inbox -> END, or -> submit on review)
 //                 -> review: agent <-> tools -> cite -> submit -> review (waits for a human) -> END
 //                 -> safety: fixed reply, report to the safety inbox -> END
 //                 -> stop:   fixed refusal -> END
@@ -356,8 +356,9 @@ export function buildGraph(nodes: Nodes, checkpointer: BaseCheckpointSaver) {
     )
     .addEdge("tools", "agent")
     // Lesson 21: a reviewer only ever sees a draft that passed the citation check.
-    .addConditionalEdges("cite", (state) => (state.route?.tier === "review" ? "submit" : state.route?.report ? "report" : END), ["submit", "report", END])
-    .addEdge("report", END)
+    // A report runs first whatever the tier, so a draft request (raised to review) never drops it.
+    .addConditionalEdges("cite", (state) => (state.route?.report ? "report" : state.route?.tier === "review" ? "submit" : END), ["submit", "report", END])
+    .addConditionalEdges("report", (state) => (state.route?.tier === "review" ? "submit" : END), ["submit", END])
     .addEdge("submit", "review")
     .addEdge("review", END)
     .addEdge("safety", END)

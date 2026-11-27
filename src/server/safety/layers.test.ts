@@ -48,11 +48,11 @@ test("the second pass treats a question about rates across patients or a trial a
 // doctor's question is still answered. A harm, or any other yes, gets the safety reply alone.
 test("a special situation with no harm stays an answer and opens a report, from either layer", () => {
   const exposure: Detection = { happened: true, harm: false, specialSituation: "pregnancy_exposure", reason: "9 weeks pregnant on CardioNex" };
-  for (const tier of ["answer", "safety"] as const) {
-    const raised = raiseToSafety(route(tier), exposure);
-    assert.equal(raised.tier, "answer", tier);
-    assert.equal(raised.report, "pregnancy_exposure", tier);
-  }
+  const raised = raiseToSafety(route("answer"), exposure);
+  assert.equal(raised.tier, "answer");
+  assert.equal(raised.report, "pregnancy_exposure");
+  // A router that said safety is never lowered by the second pass.
+  assert.deepEqual(raiseToSafety(route("safety"), exposure), route("safety"));
   assert.equal(raiseToSafety(route("answer"), { ...exposure, harm: true }).tier, "safety", "an exposure with harm");
   assert.equal(raiseToSafety(route("answer"), { ...exposure, harm: true }).report, undefined);
   assert.equal(raiseToSafety(route("stop"), exposure).tier, "stop", "stop keeps its tier");

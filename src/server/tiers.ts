@@ -79,7 +79,9 @@ export function withFloor(route: Route, question: string): Route {
 // label's 8.1 as much as it needs a report. Every other yes gets the fixed safety reply alone.
 export function raiseToSafety(route: Route, seen: Detection): Route {
   const reportOnly = seen.happened && !seen.harm && seen.specialSituation !== null;
-  if (reportOnly && (route.tier === "answer" || route.tier === "safety")) {
+  // Only an answer is kept an answer. A router that said safety is never lowered: two layers
+  // must both read no harm, and the safety node files the report anyway.
+  if (reportOnly && route.tier === "answer") {
     return { ...route, tier: "answer", report: seen.specialSituation!, reason: `${route.reason} (answered, and a ${seen.specialSituation} report opened by the second pass: ${seen.reason})` };
   }
   if (route.tier !== "answer" || !seen.happened) return route;

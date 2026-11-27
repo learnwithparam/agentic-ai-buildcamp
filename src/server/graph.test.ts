@@ -124,3 +124,12 @@ test("a special situation with no harm is answered and reported", async () => {
   assert.equal(lastText(result.messages), `Give 5mg once daily.\n\n${reportNotice("pregnancy_exposure")}`);
   assert.match(inbox.items[0].body, /exposure in pregnancy[\s\S]*CASE DRAFT/);
 });
+
+test("a report on a draft request is filed before the draft waits for review", async () => {
+  const visited: string[] = [];
+  const inbox = fakeInbox();
+  const result = await runGraph(routedGraph("review", visited, "pregnancy_exposure"), { threadId: "t-report-review", user: scriptUser(), inbox, messages: ask("Draft a reply: she is pregnant on CardioNex") }, () => {});
+  assert.deepEqual(visited, ["router", "agent", "cite", "report", "submit", "review"]);
+  assert.deepEqual(inbox.items.map((item) => item.kind), ["adverse_event", "draft"]);
+  assert.equal(result.waitingForApproval, true);
+});
