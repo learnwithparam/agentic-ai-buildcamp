@@ -145,6 +145,11 @@ for tag in "${TAGS[@]}"; do
   number="${tag#checkpoint/}"
   number=$((10#${number:0:2}))
   plan="$(npx tsx "$STAGE/source/scripts/lesson-tags.ts" plan "$number" "$STAGE/source/scripts/lesson-files.json")"
+  # An empty plan would delete every tracked file below and commit an empty tag.
+  if [[ -z "$plan" ]]; then
+    echo "$tag: the plan from scripts/lesson-tags.ts is empty; refusing to empty the tag." >&2
+    exit 1
+  fi
 
   # Build the tag's tree aside first: it reads this tag's own files and older commits, and the
   # next step removes the files on disk.
@@ -196,6 +201,12 @@ for tag in "${TAGS[@]}"; do
   fi
 
   git add -A
+  # A tag never holds installed packages: without its .gitignore, add -A would stage them, and the
+  # exit checkout would then delete them from the working copy.
+  if [[ -n "$(git diff --cached --name-only -- node_modules | head -1)" ]]; then
+    echo "$tag: node_modules is staged; the tag's tree has no working .gitignore." >&2
+    exit 1
+  fi
   # --verify checks every tag, moved or not: a tag already in sync is still what a learner checks out.
   if [[ "$VERIFY" -eq 1 ]]; then
     echo "    npm run check"
