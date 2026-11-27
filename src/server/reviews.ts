@@ -3,6 +3,7 @@ import { ClientWriteRequestOnDuplicateWrites, type OpenFgaClient } from "@openfg
 import type pg from "pg";
 import type { AnswerRun } from "../shared/run";
 import type { ReviewInbox, ReviewSubmission } from "./graph";
+import { DECIDE_SQL, REOPEN_SQL } from "./ops/review-events";
 import { fga, reviewerTuples } from "./permissions";
 import { REVIEW_HOURS, SAFETY_HOURS } from "./tiers";
 import type { Identity } from "./users";
@@ -185,18 +186,16 @@ export class ReviewStore implements ReviewInbox {
   }
 
   // Records the decision once. A second reviewer deciding the same item gets null, not a rewrite.
+  // The same statement adds the audit row (review_events, migration 013): who, what it was, what it is.
   async decide(id: string, reviewer: Identity, status: ReviewStatus, note: string): Promise<ReviewItem | null> {
-    const { rows } = await this.pool.query<Row>(
-      `UPDATE review_items SET status = $2, decided_by = $3, decided_at = now(), note = $4
-       WHERE id = $1 AND status IN ('waiting', 'escalated') RETURNING *`,
-      [id, status, reviewer.userId, note || null]
-    );
+    const { rows } = await this.pool.query<Row>(DECIDE_SQL, [id, status, reviewer.userId, note || null]);
     return rows[0] ? toItem(rows[0]) : null;
   }
 
-  // Puts a decided item back in the inbox, for when its thread could not continue.
+  // Puts a decided item back in the inbox, for when its thread could not continue. The audit trail
+  // keeps the decision and adds a "reopened" row by the system.
   async reopen(id: string) {
-    await this.pool.query("UPDATE review_items SET status = 'waiting', escalated_at = NULL, decided_by = NULL, decided_at = NULL, note = NULL WHERE id = $1", [id]);
+    await this.pool.query(REOPEN_SQL, [id]);
   }
 
   private async decidable(reviewer: Identity): Promise<string[]> {

@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { CLAIM_REASONS, describeProblem } from "./citations";
-import { checkClaim, quoteIsVerbatim, reviewClaims, sectionText, type Claim, type Judge, sourceOf } from "./citations.claims";
+import { checkClaim, ELISION, offeredSections, quoteFrom, quoteIsVerbatim, reviewClaims, sectionText, sentencesOf, type Claim, type Judge, sourceOf } from "./citations.claims";
+import { LABEL_SECTIONS } from "./labels";
+import { passages } from "./rag/chunk";
 import { noModelCall } from "../../scripts/no-model-call";
 import { readGold, type GoldClaim } from "../../scripts/citations-eval";
 
@@ -99,4 +101,56 @@ test("the judge reads the quote inside its section: the document, its country an
   assert.match(source, /neurovex-jp-label \(JP\) 2\.1/);
   assert.match(source, /25mg twice daily/);
   assert.match(sourceOf({ docId: "nope", section: "9" }), /not found/);
+});
+
+// The claim listing names sentence numbers and code copies the sentences. That only holds if every
+// sentence code cuts from a search passage is in its section word for word, for every label.
+test("every sentence of every search passage, alone or with its neighbour, is verbatim in its section", () => {
+  let count = 0;
+  for (const section of LABEL_SECTIONS) {
+    for (const passage of passages(section.text)) {
+      const sentences = sentencesOf(passage);
+      for (let n = 1; n <= sentences.length; n++) {
+        const at = { docId: section.docId, section: section.section };
+        assert.ok(quoteIsVerbatim({ ...at, quote: quoteFrom(sentences, [n]) }), `${section.docId} ${section.section} sentence ${n}`);
+        if (n > 1) assert.ok(quoteIsVerbatim({ ...at, quote: quoteFrom(sentences, [n - 1, n]) }), `${section.docId} ${section.section} sentences ${n - 1}-${n}`);
+        count++;
+      }
+    }
+  }
+  assert.ok(count > 500, `only ${count} sentences: the labels did not load`);
+});
+
+test("sentences split at a full stop before a capital, never inside 2.5 mg or a bracketed reference", () => {
+  assert.deepEqual(sentencesOf("Start at 2.5 mg once daily. Do not exceed 10 mg [see Warnings (5.1)]. Monitor potassium."), [
+    "Start at 2.5 mg once daily.",
+    "Do not exceed 10 mg [see Warnings (5.1)].",
+    "Monitor potassium."
+  ]);
+});
+
+test("a quote is built from sentence numbers: neighbours joined, a gap elided, a number out of range dropped", () => {
+  const sentences = ["One.", "Two.", "Three.", "Four."];
+  assert.equal(quoteFrom(sentences, [2, 1]), "One. Two.");
+  assert.equal(quoteFrom(sentences, [1, 3, 4]), `One.${ELISION}Three. Four.`);
+  assert.equal(quoteFrom(sentences, [0, 9, 2.5]), "");
+});
+
+test("an elided quote passes only when every part is in the section", () => {
+  const section = LABEL_SECTIONS.find((s) => sentencesOf(s.text).length >= 3)!;
+  const [first, , third] = sentencesOf(section.text);
+  const at = { docId: section.docId, section: section.section };
+  assert.ok(quoteIsVerbatim({ ...at, quote: `${first}${ELISION}${third}` }));
+  assert.equal(quoteIsVerbatim({ ...at, quote: `${first}${ELISION}A sentence the label never had.` }), false);
+});
+
+test("the claim listing is offered only sections in force, so a current fact is never credited to an old label", () => {
+  const section = (docId: string) => {
+    const found = LABEL_SECTIONS.find((s) => s.docId === docId)!;
+    return { doc_id: found.docId, section: found.section, status: "active", text: found.text };
+  };
+  const retrieved = [section("cardionex-uspi-v2"), section("cardionex-uspi-v3")];
+  // v3 comes into force on 2027-03-01: before it only v2 is offered, after it only v3.
+  assert.deepEqual(offeredSections(retrieved, "2026-11-23").map((s) => s.doc_id), ["cardionex-uspi-v2"]);
+  assert.deepEqual(offeredSections(retrieved, "2027-03-02").map((s) => s.doc_id), ["cardionex-uspi-v3"]);
 });

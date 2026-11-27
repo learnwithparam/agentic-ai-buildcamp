@@ -7,10 +7,11 @@ import { FactCheckExecutor, OutreachExecutor } from "./a2a/executors";
 import { createA2aRouter } from "./a2a/server";
 import { createEventRouter } from "./events/webhook";
 import { createMcpRouter } from "./mcp";
+import { chatLimit, type ChatLimiter } from "./ops/limits";
 import { createRoutes, type Desk } from "./routes";
 
 // The whole HTTP surface in one place, so src/server/auth.test.ts can walk the same app the server runs.
-export function createApp(auth: Auth, desk: Desk) {
+export function createApp(auth: Auth, desk: Desk, limiter?: Pick<ChatLimiter, "take">) {
   const app = express();
   // Behind a TLS proxy in production, so request.protocol reads the original https.
   app.set("trust proxy", "loopback");
@@ -30,6 +31,12 @@ export function createApp(auth: Auth, desk: Desk) {
   app.use("/api", auth.sameOrigin);
   app.use(express.json({ limit: "1mb" }));
   app.use(auth.router);
+  // Per-user limits on the two chat streams (src/server/ops/limits.ts). Each is a model call, so each
+  // counts; a review decision and the other routes do not. The sign-in check runs first: a limit
+  // needs to know who asked.
+  if (limiter) {
+    app.post(["/api/threads/:threadId/runs/stream", "/api/insights/threads/:threadId/runs/stream"], auth.requireUser, chatLimit(limiter));
+  }
   app.get("/api/health", (_request, response) => {
     response.json({ ok: true, tracingConfigured: isLangfuseConfigured() });
   });

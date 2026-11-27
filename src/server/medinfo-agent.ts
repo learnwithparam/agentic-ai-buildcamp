@@ -34,6 +34,8 @@ import type { ReviewItem } from "./reviews";
 import { scriptUser, type Identity } from "./users";
 import { DESK_PROMPT, deskFacts, fillDeskPrompt } from "./desk-prompt";
 import { claimCheckWith } from "./citations.claims";
+import { measureTurn, timed } from "./ops/meter";
+import { scoreTurn } from "./ops/metrics";
 import { answerRun } from "../shared/run";
 
 // Lesson 01's prompt. The variants in scripts/prompt-variants.ts grow from it; since fix 3 the app
@@ -173,9 +175,15 @@ export function createMedinfoAgent(checkpointer: BaseCheckpointSaver, options: {
       }
           const readable = await readableDocuments(userOf(config));
           const openai = observeOpenAI(modelClient(), { generationName: "route" });
-          const chosen = await routeRequest(openai, env.openaiModel, state.messages, approvedUses(readable, LABEL_SECTIONS));
-          const second = await withSecondPass(chosen, observeOpenAI(modelClient(), { generationName: "safety-second-pass" }), env.openaiModel, latestQuestion(state.messages));
-          const route = withFloor(second, latestQuestion(state.messages));
+          const chosen = await timed("router", async () =>
+            withSecondPass(
+              routeRequest(openai, state.messages, approvedUses(readable, LABEL_SECTIONS)),
+              observeOpenAI(modelClient(), { generationName: "safety-second-pass" }),
+              env.openaiModel,
+              latestQuestion(state.messages)
+            )
+          );
+          const route = withFloor(chosen, latestQuestion(state.messages));
           updateActiveObservation({ output: route });
           return { route };
         },
@@ -215,9 +223,11 @@ export function createMedinfoAgent(checkpointer: BaseCheckpointSaver, options: {
             removedIdentifiers: REMOVED.test(latestQuestion(state.messages)) ? 1 : 0,
             procedure: reportingProcedure(readable, LABEL_SECTIONS)
           });
-          // A failed extraction never stops the report: the reviewer then reads the doctor's words alone.
-          const draft = await reviewerDraft(observeOpenAI(modelClient(), { generationName: "safety-extract" }), env.openaiModel, latestQuestion(state.messages), `ae-${String(config.configurable?.thread_id ?? "unknown")}`, limitsText(labelLimits(readable, userOf(config).country, state.today))).catch((error: Error) => `CASE DRAFT NOT MADE: ${error.message}`);
-          await submitAdverseEvent(state, config, `${reply}\n\n${draft}`, getActiveTraceId());
+          await timed("safety_report", async () => {
+            // A failed extraction never stops the report: the reviewer then reads the doctor's words alone.
+            const draft = await reviewerDraft(observeOpenAI(modelClient(), { generationName: "safety-extract" }), env.openaiModel, latestQuestion(state.messages), `ae-${String(config.configurable?.thread_id ?? "unknown")}`, limitsText(labelLimits(readable, userOf(config).country, state.today))).catch((error: Error) => `CASE DRAFT NOT MADE: ${error.message}`);
+            await submitAdverseEvent(state, config, `${reply}\n\n${draft}`, getActiveTraceId());
+          });
           return withRun(state, fixedReply(state, reply));
         },
         { name: "safety", asType: "span", captureInput: false }
@@ -231,6 +241,7 @@ export function createMedinfoAgent(checkpointer: BaseCheckpointSaver, options: {
     async (turn: Turn, emit: (event: StreamEvent) => void) => {
       const vault = vaultFor(turn.threadId);
       const cleaned = { ...turn, messages: await scrubbed(turn.messages, vault, options.phiFinder) };
+      const traceId = getActiveTraceId();
       // Lesson 11: the trace records who asked by id, company and country only. The doctor's
       // name and email stay in Keycloak; the trace input is the thread and the new messages.
       updateActiveObservation({ input: { threadId: turn.threadId, messages: cleaned.messages, resume: turn.resume } });
@@ -245,7 +256,8 @@ export function createMedinfoAgent(checkpointer: BaseCheckpointSaver, options: {
           traceName: turn.resume ? "hcp-medinfo-review-decision" : "hcp-medinfo-chat-turn",
           tags: ["langfuse-workshop", "hcp-medinfo"]
         },
-        () => runGraph(graph, cleaned, emitRestored)
+        // Lesson 23: latency, cost and structured-output failures of this turn, as scores on its trace.
+        () => measureTurn(() => runGraph(graph, cleaned, emitRestored), (metrics) => scoreTurn(langfuse, traceId, metrics))
       );
       return result;
     },
