@@ -1,0 +1,1685 @@
+{
+  "measures": {
+    "ops.p95_latency_seconds": 27.57,
+    "ops.cost_per_question_usd": 0.00168,
+    "ops.parse_failure_rate": 0
+  },
+  "commit": "3810c56",
+  "at": "2026-11-27T00:10:44.949Z",
+  "fake": false,
+  "questions": 30,
+  "structured_calls": 211,
+  "model_calls": 296,
+  "turns": [
+    {
+      "ask": "Can she take CardioNex with spironolactone?",
+      "seconds": 12.727,
+      "calls": 10,
+      "cost_usd": 0.001,
+      "stages": [
+        {
+          "stage": "router",
+          "seconds": 1.559,
+          "startedAt": 0.144
+        },
+        {
+          "stage": "answer",
+          "seconds": 1.014,
+          "startedAt": 1.732
+        },
+        {
+          "stage": "embedding",
+          "seconds": 0.365,
+          "startedAt": 2.754
+        },
+        {
+          "stage": "search_grading",
+          "seconds": 5.853,
+          "startedAt": 3.132
+        },
+        {
+          "stage": "tool:search_labels",
+          "seconds": 6.238,
+          "startedAt": 2.748
+        },
+        {
+          "stage": "answer",
+          "seconds": 1.202,
+          "startedAt": 8.989
+        },
+        {
+          "stage": "claim_extract",
+          "seconds": 1.625,
+          "startedAt": 10.196
+        },
+        {
+          "stage": "claim_judge",
+          "seconds": 0.904,
+          "startedAt": 11.821
+        },
+        {
+          "stage": "claim_check",
+          "seconds": 2.531,
+          "startedAt": 10.194
+        }
+      ]
+    },
+    {
+      "ask": "What happened to potassium in the CLARION-HF trial?",
+      "seconds": 28.482,
+      "calls": 13,
+      "cost_usd": 0.004,
+      "stages": [
+        {
+          "stage": "router",
+          "seconds": 2.778,
+          "startedAt": 0.008
+        },
+        {
+          "stage": "answer",
+          "seconds": 0.843,
+          "startedAt": 2.789
+        },
+        {
+          "stage": "embedding",
+          "seconds": 0.366,
+          "startedAt": 3.638
+        },
+        {
+          "stage": "search_grading",
+          "seconds": 8.08,
+          "startedAt": 4.016
+        },
+        {
+          "stage": "tool:search_labels",
+          "seconds": 8.464,
+          "startedAt": 3.633
+        },
+        {
+          "stage": "answer",
+          "seconds": 1.026,
+          "startedAt": 12.1
+        },
+        {
+          "stage": "tool:read_section",
+          "seconds": 0.003,
+          "startedAt": 13.127
+        },
+        {
+          "stage": "answer",
+          "seconds": 3.221,
+          "startedAt": 13.132
+        },
+        {
+          "stage": "claim_extract",
+          "seconds": 1.91,
+          "startedAt": 16.356
+        },
+        {
+          "stage": "claim_judge",
+          "seconds": 0.843,
+          "startedAt": 18.265
+        },
+        {
+          "stage": "claim_check",
+          "seconds": 2.754,
+          "startedAt": 16.355
+        },
+        {
+          "stage": "citation_retry",
+          "seconds": 6.656,
+          "startedAt": 19.109
+        },
+        {
+          "stage": "claim_extract",
+          "seconds": 1.899,
+          "startedAt": 25.766
+        },
+        {
+          "stage": "claim_judge",
+          "seconds": 0.815,
+          "startedAt": 27.665
+        },
+        {
+          "stage": "claim_check_retry",
+          "seconds": 2.716,
+          "startedAt": 25.764
+        }
+      ]
+    },
+    {
+      "ask": "Is CardioNex approved in Japan for HFrEF?",
+      "seconds": 18.688,
+      "calls": 11,
+      "cost_usd": 0.002,
+      "stages": [
+        {
+          "stage": "router",
+          "seconds": 1.302,
+          "startedAt": 0.016
+        },
+        {
+          "stage": "answer",
+          "seconds": 0.896,
+          "startedAt": 1.321
+        },
+        {
+          "stage": "embedding",
+          "seconds": 0.442,
+          "startedAt": 2.221
+        },
+        {
+          "stage": "search_grading",
+          "seconds": 3.986,
+          "startedAt": 2.669
+        },
+        {
+          "stage": "tool:search_labels",
+          "seconds": 4.437,
+          "startedAt": 2.218
+        },
+        {
+          "stage": "answer",
+          "seconds": 0.949,
+          "startedAt": 6.657
+        },
+        {
+          "stage": "claim_extract",
+          "seconds": 1.3,
+          "startedAt": 7.61
+        },
+        {
+          "stage": "claim_judge",
+          "seconds": 1.125,
+          "startedAt": 8.911
+        },
+        {
+          "stage": "claim_check",
+          "seconds": 2.426,
+          "startedAt": 7.609
+        },
+        {
+          "stage": "citation_retry",
+          "seconds": 6.444,
+          "startedAt": 10.036
+        },
+        {
+          "stage": "claim_extract",
+          "seconds": 1.457,
+          "startedAt": 16.481
+        },
+        {
+          "stage": "claim_judge",
+          "seconds": 0.749,
+          "startedAt": 17.938
+        },
+        {
+          "stage": "claim_check_retry",
+          "seconds": 2.207,
+          "startedAt": 16.48
+        }
+      ]
+    },
+    {
+      "ask": "How long should a patient wait after stopping an ACE inhibitor before starting CardioNex?",
+      "seconds": 13.344,
+      "calls": 9,
+      "cost_usd": 0.002,
+      "stages": [
+        {
+          "stage": "router",
+          "seconds": 1.38,
+          "startedAt": 0.012
+        },
+        {
+          "stage": "answer",
+          "seconds": 1.033,
+          "startedAt": 1.398
+        },
+        {
+          "stage": "embedding",
+          "seconds": 0.477,
+          "startedAt": 2.442
+        },
+        {
+          "stage": "search_grading",
+          "seconds": 7.046,
+          "startedAt": 2.934
+        },
+        {
+          "stage": "tool:search_labels",
+          "seconds": 7.548,
+          "startedAt": 2.432
+        },
+        {
+          "stage": "answer",
+          "seconds": 0.983,
+          "startedAt": 9.983
+        },
+        {
+          "stage": "claim_extract",
+          "seconds": 1.257,
+          "startedAt": 10.97
+        },
+        {
+          "stage": "claim_judge",
+          "seconds": 1.115,
+          "startedAt": 12.228
+        },
+        {
+          "stage": "claim_check",
+          "seconds": 2.374,
+          "startedAt": 10.969
+        }
+      ]
+    },
+    {
+      "ask": "Can CardioNex be used during pregnancy?",
+      "seconds": 12.68,
+      "calls": 9,
+      "cost_usd": 0.001,
+      "stages": [
+        {
+          "stage": "router",
+          "seconds": 1.316,
+          "startedAt": 0.007
+        },
+        {
+          "stage": "answer",
+          "seconds": 0.868,
+          "startedAt": 1.326
+        },
+        {
+          "stage": "embedding",
+          "seconds": 0.336,
+          "startedAt": 2.201
+        },
+        {
+          "stage": "search_grading",
+          "seconds": 6.908,
+          "startedAt": 2.548
+        },
+        {
+          "stage": "tool:search_labels",
+          "seconds": 7.26,
+          "startedAt": 2.195
+        },
+        {
+          "stage": "answer",
+          "seconds": 1.019,
+          "startedAt": 9.459
+        },
+        {
+          "stage": "claim_extract",
+          "seconds": 1.419,
+          "startedAt": 10.482
+        },
+        {
+          "stage": "claim_judge",
+          "seconds": 0.777,
+          "startedAt": 11.901
+        },
+        {
+          "stage": "claim_check",
+          "seconds": 2.197,
+          "startedAt": 10.481
+        }
+      ]
+    },
+    {
+      "ask": "Is there a dose change for moderate liver impairment?",
+      "seconds": 9.601,
+      "calls": 8,
+      "cost_usd": 0.002,
+      "stages": [
+        {
+          "stage": "router",
+          "seconds": 1.376,
+          "startedAt": 0.013
+        },
+        {
+          "stage": "answer",
+          "seconds": 0.948,
+          "startedAt": 1.391
+        },
+        {
+          "stage": "embedding",
+          "seconds": 0.357,
+          "startedAt": 2.343
+        },
+        {
+          "stage": "search_grading",
+          "seconds": 3.794,
+          "startedAt": 2.708
+        },
+        {
+          "stage": "tool:search_labels",
+          "seconds": 4.163,
+          "startedAt": 2.339
+        },
+        {
+          "stage": "answer",
+          "seconds": 1.008,
+          "startedAt": 6.505
+        },
+        {
+          "stage": "claim_extract",
+          "seconds": 1.334,
+          "startedAt": 7.518
+        },
+        {
+          "stage": "claim_judge",
+          "seconds": 0.747,
+          "startedAt": 8.852
+        },
+        {
+          "stage": "claim_check",
+          "seconds": 2.082,
+          "startedAt": 7.517
+        }
+      ]
+    },
+    {
+      "ask": "What should I do about a missed dose of CardioNex?",
+      "seconds": 8.08,
+      "calls": 3,
+      "cost_usd": 0,
+      "stages": [
+        {
+          "stage": "router",
+          "seconds": 5.884,
+          "startedAt": 0.009
+        },
+        {
+          "stage": "safety_report",
+          "seconds": 2.176,
+          "startedAt": 5.903
+        }
+      ]
+    },
+    {
+      "ask": "How should CardioNex tablets be stored?",
+      "seconds": 10.323,
+      "calls": 11,
+      "cost_usd": 0.001,
+      "stages": [
+        {
+          "stage": "router",
+          "seconds": 1.171,
+          "startedAt": 0.006
+        },
+        {
+          "stage": "answer",
+          "seconds": 1.014,
+          "startedAt": 1.181
+        },
+        {
+          "stage": "embedding",
+          "seconds": 0.39,
+          "startedAt": 2.206
+        },
+        {
+          "stage": "search_grading",
+          "seconds": 3.334,
+          "startedAt": 2.604
+        },
+        {
+          "stage": "tool:search_labels",
+          "seconds": 3.741,
+          "startedAt": 2.196
+        },
+        {
+          "stage": "answer",
+          "seconds": 1.26,
+          "startedAt": 5.94
+        },
+        {
+          "stage": "claim_extract",
+          "seconds": 1.648,
+          "startedAt": 7.204
+        },
+        {
+          "stage": "claim_judge",
+          "seconds": 1.47,
+          "startedAt": 8.852
+        },
+        {
+          "stage": "claim_check",
+          "seconds": 3.119,
+          "startedAt": 7.203
+        }
+      ]
+    },
+    {
+      "ask": "Does rifampin change CardioNex levels?",
+      "seconds": 7.702,
+      "calls": 10,
+      "cost_usd": 0.002,
+      "stages": [
+        {
+          "stage": "router",
+          "seconds": 1.412,
+          "startedAt": 0.006
+        },
+        {
+          "stage": "answer",
+          "seconds": 1.026,
+          "startedAt": 1.421
+        },
+        {
+          "stage": "embedding",
+          "seconds": 0.311,
+          "startedAt": 2.453
+        },
+        {
+          "stage": "search_grading",
+          "seconds": 1.412,
+          "startedAt": 2.772
+        },
+        {
+          "stage": "tool:search_labels",
+          "seconds": 1.736,
+          "startedAt": 2.448
+        },
+        {
+          "stage": "answer",
+          "seconds": 1.19,
+          "startedAt": 4.186
+        },
+        {
+          "stage": "claim_extract",
+          "seconds": 1.407,
+          "startedAt": 5.38
+        },
+        {
+          "stage": "claim_judge",
+          "seconds": 0.913,
+          "startedAt": 6.787
+        },
+        {
+          "stage": "claim_check",
+          "seconds": 2.321,
+          "startedAt": 5.379
+        }
+      ]
+    },
+    {
+      "ask": "What does an overdose of CardioNex look like?",
+      "seconds": 21.081,
+      "calls": 16,
+      "cost_usd": 0.002,
+      "stages": [
+        {
+          "stage": "router",
+          "seconds": 1.555,
+          "startedAt": 0.012
+        },
+        {
+          "stage": "answer",
+          "seconds": 0.949,
+          "startedAt": 1.57
+        },
+        {
+          "stage": "embedding",
+          "seconds": 0.408,
+          "startedAt": 2.526
+        },
+        {
+          "stage": "search_grading",
+          "seconds": 4.709,
+          "startedAt": 2.941
+        },
+        {
+          "stage": "tool:search_labels",
+          "seconds": 5.131,
+          "startedAt": 2.52
+        },
+        {
+          "stage": "answer",
+          "seconds": 1.628,
+          "startedAt": 7.676
+        },
+        {
+          "stage": "claim_extract",
+          "seconds": 1.758,
+          "startedAt": 9.314
+        },
+        {
+          "stage": "claim_judge",
+          "seconds": 0.905,
+          "startedAt": 11.071
+        },
+        {
+          "stage": "claim_check",
+          "seconds": 2.665,
+          "startedAt": 9.311
+        },
+        {
+          "stage": "citation_retry",
+          "seconds": 6.267,
+          "startedAt": 11.977
+        },
+        {
+          "stage": "claim_extract",
+          "seconds": 2.013,
+          "startedAt": 18.245
+        },
+        {
+          "stage": "claim_judge",
+          "seconds": 0.821,
+          "startedAt": 20.257
+        },
+        {
+          "stage": "claim_check_retry",
+          "seconds": 2.834,
+          "startedAt": 18.244
+        }
+      ]
+    },
+    {
+      "ask": "Is CardioNex covered by insurers without prior authorization?",
+      "seconds": 15.019,
+      "calls": 11,
+      "cost_usd": 0.002,
+      "stages": [
+        {
+          "stage": "router",
+          "seconds": 3.313,
+          "startedAt": 0.011
+        },
+        {
+          "stage": "answer",
+          "seconds": 0.961,
+          "startedAt": 3.326
+        },
+        {
+          "stage": "embedding",
+          "seconds": 0.345,
+          "startedAt": 4.299
+        },
+        {
+          "stage": "search_grading",
+          "seconds": 5.664,
+          "startedAt": 4.658
+        },
+        {
+          "stage": "tool:search_labels",
+          "seconds": 6.033,
+          "startedAt": 4.289
+        },
+        {
+          "stage": "answer",
+          "seconds": 1.25,
+          "startedAt": 10.324
+        },
+        {
+          "stage": "claim_extract",
+          "seconds": 2.226,
+          "startedAt": 11.578
+        },
+        {
+          "stage": "claim_judge",
+          "seconds": 1.213,
+          "startedAt": 13.805
+        },
+        {
+          "stage": "claim_check",
+          "seconds": 3.441,
+          "startedAt": 11.577
+        }
+      ]
+    },
+    {
+      "ask": "Can I give CardioNex to a patient with HFpEF, LVEF 55 percent?",
+      "seconds": 1.487,
+      "calls": 2,
+      "cost_usd": 0,
+      "stages": [
+        {
+          "stage": "router",
+          "seconds": 1.477,
+          "startedAt": 0.008
+        }
+      ]
+    },
+    {
+      "ask": "My patient's lips swelled two days after starting CardioNex.",
+      "seconds": 3.499,
+      "calls": 3,
+      "cost_usd": 0,
+      "stages": [
+        {
+          "stage": "router",
+          "seconds": 1.202,
+          "startedAt": 0.005
+        },
+        {
+          "stage": "safety_report",
+          "seconds": 2.286,
+          "startedAt": 1.212
+        }
+      ]
+    },
+    {
+      "ask": "What is the starting dose of CardioNex in Germany?",
+      "seconds": 12.278,
+      "calls": 9,
+      "cost_usd": 0.001,
+      "stages": [
+        {
+          "stage": "router",
+          "seconds": 1.401,
+          "startedAt": 0.069
+        },
+        {
+          "stage": "answer",
+          "seconds": 0.879,
+          "startedAt": 1.472
+        },
+        {
+          "stage": "embedding",
+          "seconds": 0.453,
+          "startedAt": 2.357
+        },
+        {
+          "stage": "search_grading",
+          "seconds": 5.184,
+          "startedAt": 2.816
+        },
+        {
+          "stage": "tool:search_labels",
+          "seconds": 5.648,
+          "startedAt": 2.352
+        },
+        {
+          "stage": "answer",
+          "seconds": 1.503,
+          "startedAt": 8.002
+        },
+        {
+          "stage": "claim_extract",
+          "seconds": 1.952,
+          "startedAt": 9.508
+        },
+        {
+          "stage": "claim_judge",
+          "seconds": 0.817,
+          "startedAt": 11.46
+        },
+        {
+          "stage": "claim_check",
+          "seconds": 2.77,
+          "startedAt": 9.507
+        }
+      ]
+    },
+    {
+      "ask": "Which patients must not take CardioNex in Germany?",
+      "seconds": 24.852,
+      "calls": 26,
+      "cost_usd": 0.003,
+      "stages": [
+        {
+          "stage": "router",
+          "seconds": 2.574,
+          "startedAt": 0.004
+        },
+        {
+          "stage": "answer",
+          "seconds": 0.919,
+          "startedAt": 2.581
+        },
+        {
+          "stage": "embedding",
+          "seconds": 0.344,
+          "startedAt": 3.504
+        },
+        {
+          "stage": "search_grading",
+          "seconds": 4.854,
+          "startedAt": 3.86
+        },
+        {
+          "stage": "tool:search_labels",
+          "seconds": 5.213,
+          "startedAt": 3.501
+        },
+        {
+          "stage": "answer",
+          "seconds": 2.789,
+          "startedAt": 8.716
+        },
+        {
+          "stage": "tool:read_section",
+          "seconds": 0.004,
+          "startedAt": 11.505
+        },
+        {
+          "stage": "tool:read_section",
+          "seconds": 0.004,
+          "startedAt": 11.505
+        },
+        {
+          "stage": "tool:read_section",
+          "seconds": 0.005,
+          "startedAt": 11.505
+        },
+        {
+          "stage": "answer",
+          "seconds": 2.875,
+          "startedAt": 11.511
+        },
+        {
+          "stage": "claim_extract",
+          "seconds": 2.69,
+          "startedAt": 14.389
+        },
+        {
+          "stage": "claim_judge",
+          "seconds": 1.042,
+          "startedAt": 17.079
+        },
+        {
+          "stage": "claim_check",
+          "seconds": 3.733,
+          "startedAt": 14.388
+        },
+        {
+          "stage": "citation_retry",
+          "seconds": 3.143,
+          "startedAt": 18.121
+        },
+        {
+          "stage": "claim_extract",
+          "seconds": 2.64,
+          "startedAt": 21.265
+        },
+        {
+          "stage": "claim_judge",
+          "seconds": 0.945,
+          "startedAt": 23.905
+        },
+        {
+          "stage": "claim_check_retry",
+          "seconds": 3.587,
+          "startedAt": 21.264
+        }
+      ]
+    },
+    {
+      "ask": "What is the starting dose of NeuroVex?",
+      "seconds": 11.254,
+      "calls": 8,
+      "cost_usd": 0.001,
+      "stages": [
+        {
+          "stage": "router",
+          "seconds": 1.23,
+          "startedAt": 0.007
+        },
+        {
+          "stage": "answer",
+          "seconds": 1.148,
+          "startedAt": 1.238
+        },
+        {
+          "stage": "embedding",
+          "seconds": 0.345,
+          "startedAt": 2.39
+        },
+        {
+          "stage": "search_grading",
+          "seconds": 5.642,
+          "startedAt": 2.743
+        },
+        {
+          "stage": "tool:search_labels",
+          "seconds": 5.998,
+          "startedAt": 2.387
+        },
+        {
+          "stage": "answer",
+          "seconds": 1.05,
+          "startedAt": 8.387
+        },
+        {
+          "stage": "claim_extract",
+          "seconds": 1.05,
+          "startedAt": 9.439
+        },
+        {
+          "stage": "claim_judge",
+          "seconds": 0.764,
+          "startedAt": 10.489
+        },
+        {
+          "stage": "claim_check",
+          "seconds": 1.814,
+          "startedAt": 9.439
+        }
+      ]
+    },
+    {
+      "ask": "How fast can the NeuroVex dose go up?",
+      "seconds": 11.897,
+      "calls": 10,
+      "cost_usd": 0.002,
+      "stages": [
+        {
+          "stage": "router",
+          "seconds": 1.327,
+          "startedAt": 0.014
+        },
+        {
+          "stage": "answer",
+          "seconds": 1.097,
+          "startedAt": 1.343
+        },
+        {
+          "stage": "embedding",
+          "seconds": 0.372,
+          "startedAt": 2.444
+        },
+        {
+          "stage": "search_grading",
+          "seconds": 5.349,
+          "startedAt": 2.833
+        },
+        {
+          "stage": "tool:search_labels",
+          "seconds": 5.742,
+          "startedAt": 2.44
+        },
+        {
+          "stage": "answer",
+          "seconds": 1.255,
+          "startedAt": 8.184
+        },
+        {
+          "stage": "claim_extract",
+          "seconds": 1.611,
+          "startedAt": 9.443
+        },
+        {
+          "stage": "claim_judge",
+          "seconds": 0.842,
+          "startedAt": 11.054
+        },
+        {
+          "stage": "claim_check",
+          "seconds": 2.454,
+          "startedAt": 9.442
+        }
+      ]
+    },
+    {
+      "ask": "Does NeuroVex need a lower dose in kidney disease?",
+      "seconds": 16.006,
+      "calls": 13,
+      "cost_usd": 0.002,
+      "stages": [
+        {
+          "stage": "router",
+          "seconds": 1.334,
+          "startedAt": 0.004
+        },
+        {
+          "stage": "answer",
+          "seconds": 1.004,
+          "startedAt": 1.34
+        },
+        {
+          "stage": "embedding",
+          "seconds": 0.394,
+          "startedAt": 2.349
+        },
+        {
+          "stage": "search_grading",
+          "seconds": 5.254,
+          "startedAt": 2.763
+        },
+        {
+          "stage": "tool:search_labels",
+          "seconds": 5.672,
+          "startedAt": 2.345
+        },
+        {
+          "stage": "answer",
+          "seconds": 0.972,
+          "startedAt": 8.019
+        },
+        {
+          "stage": "tool:read_section",
+          "seconds": 0.006,
+          "startedAt": 8.992
+        },
+        {
+          "stage": "answer",
+          "seconds": 2.865,
+          "startedAt": 8.999
+        },
+        {
+          "stage": "claim_extract",
+          "seconds": 3.364,
+          "startedAt": 11.867
+        },
+        {
+          "stage": "claim_judge",
+          "seconds": 0.774,
+          "startedAt": 15.231
+        },
+        {
+          "stage": "claim_check",
+          "seconds": 4.138,
+          "startedAt": 11.866
+        }
+      ]
+    },
+    {
+      "ask": "What side effects were seen in the NeuroVex trial?",
+      "seconds": 27.571,
+      "calls": 13,
+      "cost_usd": 0.004,
+      "stages": [
+        {
+          "stage": "router",
+          "seconds": 2.317,
+          "startedAt": 0.007
+        },
+        {
+          "stage": "answer",
+          "seconds": 1.725,
+          "startedAt": 2.327
+        },
+        {
+          "stage": "embedding",
+          "seconds": 0.354,
+          "startedAt": 4.058
+        },
+        {
+          "stage": "search_grading",
+          "seconds": 4.679,
+          "startedAt": 4.421
+        },
+        {
+          "stage": "tool:search_labels",
+          "seconds": 5.047,
+          "startedAt": 4.053
+        },
+        {
+          "stage": "answer",
+          "seconds": 1.068,
+          "startedAt": 9.102
+        },
+        {
+          "stage": "tool:read_section",
+          "seconds": 0.003,
+          "startedAt": 10.17
+        },
+        {
+          "stage": "answer",
+          "seconds": 3.669,
+          "startedAt": 10.175
+        },
+        {
+          "stage": "claim_extract",
+          "seconds": 1.692,
+          "startedAt": 13.851
+        },
+        {
+          "stage": "claim_judge",
+          "seconds": 0.81,
+          "startedAt": 15.543
+        },
+        {
+          "stage": "claim_check",
+          "seconds": 2.504,
+          "startedAt": 13.849
+        },
+        {
+          "stage": "citation_retry",
+          "seconds": 8.438,
+          "startedAt": 16.353
+        },
+        {
+          "stage": "claim_extract",
+          "seconds": 2.008,
+          "startedAt": 24.793
+        },
+        {
+          "stage": "claim_judge",
+          "seconds": 0.77,
+          "startedAt": 26.8
+        },
+        {
+          "stage": "claim_check_retry",
+          "seconds": 2.778,
+          "startedAt": 24.791
+        }
+      ]
+    },
+    {
+      "ask": "Did NeuroVex reduce pain scores in the trial?",
+      "seconds": 20.262,
+      "calls": 12,
+      "cost_usd": 0.003,
+      "stages": [
+        {
+          "stage": "router",
+          "seconds": 2.136,
+          "startedAt": 0.006
+        },
+        {
+          "stage": "answer",
+          "seconds": 2.169,
+          "startedAt": 2.144
+        },
+        {
+          "stage": "embedding",
+          "seconds": 0.541,
+          "startedAt": 4.808
+        },
+        {
+          "stage": "search_grading",
+          "seconds": 5.693,
+          "startedAt": 5.369
+        },
+        {
+          "stage": "tool:search_labels",
+          "seconds": 6.4,
+          "startedAt": 4.662
+        },
+        {
+          "stage": "answer",
+          "seconds": 1.314,
+          "startedAt": 11.067
+        },
+        {
+          "stage": "claim_extract",
+          "seconds": 1.266,
+          "startedAt": 12.385
+        },
+        {
+          "stage": "claim_judge",
+          "seconds": 0.916,
+          "startedAt": 13.651
+        },
+        {
+          "stage": "claim_check",
+          "seconds": 2.183,
+          "startedAt": 12.384
+        },
+        {
+          "stage": "citation_retry",
+          "seconds": 2.388,
+          "startedAt": 14.567
+        },
+        {
+          "stage": "claim_extract",
+          "seconds": 2.259,
+          "startedAt": 16.956
+        },
+        {
+          "stage": "claim_judge",
+          "seconds": 1.043,
+          "startedAt": 19.215
+        },
+        {
+          "stage": "claim_check_retry",
+          "seconds": 3.302,
+          "startedAt": 16.955
+        }
+      ]
+    },
+    {
+      "ask": "Can NeuroVex be taken with opioids?",
+      "seconds": 15.751,
+      "calls": 10,
+      "cost_usd": 0.002,
+      "stages": [
+        {
+          "stage": "router",
+          "seconds": 5.93,
+          "startedAt": 0.012
+        },
+        {
+          "stage": "answer",
+          "seconds": 0.961,
+          "startedAt": 5.944
+        },
+        {
+          "stage": "embedding",
+          "seconds": 0.401,
+          "startedAt": 6.932
+        },
+        {
+          "stage": "search_grading",
+          "seconds": 4.759,
+          "startedAt": 7.347
+        },
+        {
+          "stage": "tool:search_labels",
+          "seconds": 5.2,
+          "startedAt": 6.906
+        },
+        {
+          "stage": "answer",
+          "seconds": 1.269,
+          "startedAt": 12.111
+        },
+        {
+          "stage": "claim_extract",
+          "seconds": 1.486,
+          "startedAt": 13.384
+        },
+        {
+          "stage": "claim_judge",
+          "seconds": 0.88,
+          "startedAt": 14.869
+        },
+        {
+          "stage": "claim_check",
+          "seconds": 2.367,
+          "startedAt": 13.383
+        }
+      ]
+    },
+    {
+      "ask": "Is NeuroVex safe in pregnancy?",
+      "seconds": 12.606,
+      "calls": 10,
+      "cost_usd": 0.002,
+      "stages": [
+        {
+          "stage": "router",
+          "seconds": 2.641,
+          "startedAt": 0.048
+        },
+        {
+          "stage": "answer",
+          "seconds": 1.027,
+          "startedAt": 2.691
+        },
+        {
+          "stage": "embedding",
+          "seconds": 0.349,
+          "startedAt": 3.724
+        },
+        {
+          "stage": "search_grading",
+          "seconds": 4.851,
+          "startedAt": 4.082
+        },
+        {
+          "stage": "tool:search_labels",
+          "seconds": 5.213,
+          "startedAt": 3.72
+        },
+        {
+          "stage": "answer",
+          "seconds": 1.263,
+          "startedAt": 8.935
+        },
+        {
+          "stage": "claim_extract",
+          "seconds": 1.674,
+          "startedAt": 10.2
+        },
+        {
+          "stage": "claim_judge",
+          "seconds": 0.731,
+          "startedAt": 11.874
+        },
+        {
+          "stage": "claim_check",
+          "seconds": 2.405,
+          "startedAt": 10.199
+        }
+      ]
+    },
+    {
+      "ask": "How should NeuroVex be stopped?",
+      "seconds": 11.023,
+      "calls": 10,
+      "cost_usd": 0.001,
+      "stages": [
+        {
+          "stage": "router",
+          "seconds": 1.212,
+          "startedAt": 0.006
+        },
+        {
+          "stage": "answer",
+          "seconds": 0.939,
+          "startedAt": 1.22
+        },
+        {
+          "stage": "embedding",
+          "seconds": 0.368,
+          "startedAt": 2.163
+        },
+        {
+          "stage": "search_grading",
+          "seconds": 4.241,
+          "startedAt": 2.539
+        },
+        {
+          "stage": "tool:search_labels",
+          "seconds": 4.62,
+          "startedAt": 2.16
+        },
+        {
+          "stage": "answer",
+          "seconds": 1.861,
+          "startedAt": 6.782
+        },
+        {
+          "stage": "claim_extract",
+          "seconds": 1.401,
+          "startedAt": 8.649
+        },
+        {
+          "stage": "claim_judge",
+          "seconds": 0.971,
+          "startedAt": 10.05
+        },
+        {
+          "stage": "claim_check",
+          "seconds": 2.375,
+          "startedAt": 8.647
+        }
+      ]
+    },
+    {
+      "ask": "Can older patients take the full NeuroVex dose?",
+      "seconds": 11.204,
+      "calls": 11,
+      "cost_usd": 0.001,
+      "stages": [
+        {
+          "stage": "router",
+          "seconds": 1.286,
+          "startedAt": 0.01
+        },
+        {
+          "stage": "answer",
+          "seconds": 0.927,
+          "startedAt": 1.298
+        },
+        {
+          "stage": "embedding",
+          "seconds": 0.327,
+          "startedAt": 2.23
+        },
+        {
+          "stage": "search_grading",
+          "seconds": 4.358,
+          "startedAt": 2.564
+        },
+        {
+          "stage": "tool:search_labels",
+          "seconds": 4.697,
+          "startedAt": 2.226
+        },
+        {
+          "stage": "answer",
+          "seconds": 1.433,
+          "startedAt": 6.924
+        },
+        {
+          "stage": "claim_extract",
+          "seconds": 1.879,
+          "startedAt": 8.36
+        },
+        {
+          "stage": "claim_judge",
+          "seconds": 0.964,
+          "startedAt": 10.239
+        },
+        {
+          "stage": "claim_check",
+          "seconds": 2.844,
+          "startedAt": 8.359
+        }
+      ]
+    },
+    {
+      "ask": "What is NeuroVex approved for?",
+      "seconds": 11.632,
+      "calls": 11,
+      "cost_usd": 0.001,
+      "stages": [
+        {
+          "stage": "router",
+          "seconds": 1.303,
+          "startedAt": 0.004
+        },
+        {
+          "stage": "answer",
+          "seconds": 0.943,
+          "startedAt": 1.311
+        },
+        {
+          "stage": "tool:approval_status",
+          "seconds": 0.011,
+          "startedAt": 2.255
+        },
+        {
+          "stage": "answer",
+          "seconds": 1.036,
+          "startedAt": 2.267
+        },
+        {
+          "stage": "claim_extract",
+          "seconds": 1.062,
+          "startedAt": 3.305
+        },
+        {
+          "stage": "claim_judge",
+          "seconds": 0.785,
+          "startedAt": 4.367
+        },
+        {
+          "stage": "claim_check",
+          "seconds": 1.847,
+          "startedAt": 3.304
+        },
+        {
+          "stage": "citation_retry",
+          "seconds": 3.667,
+          "startedAt": 5.152
+        },
+        {
+          "stage": "claim_extract",
+          "seconds": 1.552,
+          "startedAt": 8.819
+        },
+        {
+          "stage": "claim_judge",
+          "seconds": 1.26,
+          "startedAt": 10.371
+        },
+        {
+          "stage": "claim_check_retry",
+          "seconds": 2.812,
+          "startedAt": 8.818
+        }
+      ]
+    },
+    {
+      "ask": "Can I use NeuroVex for migraine?",
+      "seconds": 1.4,
+      "calls": 2,
+      "cost_usd": 0,
+      "stages": [
+        {
+          "stage": "router",
+          "seconds": 1.392,
+          "startedAt": 0.007
+        }
+      ]
+    },
+    {
+      "ask": "A patient fainted the day after a NeuroVex dose increase.",
+      "seconds": 5.735,
+      "calls": 3,
+      "cost_usd": 0,
+      "stages": [
+        {
+          "stage": "router",
+          "seconds": 1.186,
+          "startedAt": 0.005
+        },
+        {
+          "stage": "safety_report",
+          "seconds": 4.532,
+          "startedAt": 1.202
+        }
+      ]
+    },
+    {
+      "ask": "What is the dose of CardioNex in kidney disease?",
+      "seconds": 6.797,
+      "calls": 6,
+      "cost_usd": 0.001,
+      "stages": [
+        {
+          "stage": "router",
+          "seconds": 2.317,
+          "startedAt": 0.007
+        },
+        {
+          "stage": "answer",
+          "seconds": 1.104,
+          "startedAt": 2.326
+        },
+        {
+          "stage": "embedding",
+          "seconds": 0.471,
+          "startedAt": 3.436
+        },
+        {
+          "stage": "search_grading",
+          "seconds": 1.5,
+          "startedAt": 3.917
+        },
+        {
+          "stage": "tool:search_labels",
+          "seconds": 1.986,
+          "startedAt": 3.431
+        },
+        {
+          "stage": "answer",
+          "seconds": 1.376,
+          "startedAt": 5.418
+        },
+        {
+          "stage": "claim_judge",
+          "seconds": 0,
+          "startedAt": 6.796
+        },
+        {
+          "stage": "claim_check",
+          "seconds": 0,
+          "startedAt": 6.796
+        }
+      ]
+    },
+    {
+      "ask": "Is NeuroVex approved in Japan?",
+      "seconds": 5.729,
+      "calls": 6,
+      "cost_usd": 0,
+      "stages": [
+        {
+          "stage": "router",
+          "seconds": 1.656,
+          "startedAt": 0.004
+        },
+        {
+          "stage": "answer",
+          "seconds": 0.979,
+          "startedAt": 1.662
+        },
+        {
+          "stage": "tool:approval_status",
+          "seconds": 0.024,
+          "startedAt": 2.643
+        },
+        {
+          "stage": "answer",
+          "seconds": 1.089,
+          "startedAt": 2.669
+        },
+        {
+          "stage": "claim_extract",
+          "seconds": 1.33,
+          "startedAt": 3.761
+        },
+        {
+          "stage": "claim_judge",
+          "seconds": 0.637,
+          "startedAt": 5.091
+        },
+        {
+          "stage": "claim_check",
+          "seconds": 1.969,
+          "startedAt": 3.76
+        }
+      ]
+    },
+    {
+      "ask": "What is the NeuroVex dose in Japan?",
+      "seconds": 19.849,
+      "calls": 20,
+      "cost_usd": 0.003,
+      "stages": [
+        {
+          "stage": "router",
+          "seconds": 1.641,
+          "startedAt": 0.004
+        },
+        {
+          "stage": "answer",
+          "seconds": 1.03,
+          "startedAt": 1.647
+        },
+        {
+          "stage": "embedding",
+          "seconds": 0.326,
+          "startedAt": 2.69
+        },
+        {
+          "stage": "search_grading",
+          "seconds": 1.356,
+          "startedAt": 3.024
+        },
+        {
+          "stage": "tool:search_labels",
+          "seconds": 1.703,
+          "startedAt": 2.677
+        },
+        {
+          "stage": "answer",
+          "seconds": 1.207,
+          "startedAt": 4.384
+        },
+        {
+          "stage": "claim_extract",
+          "seconds": 1.586,
+          "startedAt": 5.593
+        },
+        {
+          "stage": "claim_judge",
+          "seconds": 1.172,
+          "startedAt": 7.179
+        },
+        {
+          "stage": "claim_check",
+          "seconds": 2.759,
+          "startedAt": 5.592
+        },
+        {
+          "stage": "citation_retry",
+          "seconds": 7.66,
+          "startedAt": 8.351
+        },
+        {
+          "stage": "claim_extract",
+          "seconds": 2.61,
+          "startedAt": 16.013
+        },
+        {
+          "stage": "claim_judge",
+          "seconds": 1.224,
+          "startedAt": 18.623
+        },
+        {
+          "stage": "claim_check_retry",
+          "seconds": 3.837,
+          "startedAt": 16.011
+        }
+      ]
+    }
+  ],
+  "stage_summary": {
+    "tool:search_labels": {
+      "count": 23,
+      "median_seconds": 5.213,
+      "p95_seconds": 7.548,
+      "total_seconds": 117.89
+    },
+    "search_grading": {
+      "count": 23,
+      "median_seconds": 4.851,
+      "p95_seconds": 7.046,
+      "total_seconds": 108.506
+    },
+    "answer": {
+      "count": 54,
+      "median_seconds": 1.036,
+      "p95_seconds": 2.875,
+      "total_seconds": 71.033
+    },
+    "claim_check": {
+      "count": 25,
+      "median_seconds": 2.426,
+      "p95_seconds": 3.733,
+      "total_seconds": 62.072
+    },
+    "router": {
+      "count": 30,
+      "median_seconds": 1.401,
+      "p95_seconds": 5.884,
+      "total_seconds": 58.608
+    },
+    "claim_extract": {
+      "count": 32,
+      "median_seconds": 1.625,
+      "p95_seconds": 2.69,
+      "total_seconds": 56.365
+    },
+    "citation_retry": {
+      "count": 8,
+      "median_seconds": 6.267,
+      "p95_seconds": 8.438,
+      "total_seconds": 44.663
+    },
+    "claim_judge": {
+      "count": 33,
+      "median_seconds": 0.88,
+      "p95_seconds": 1.26,
+      "total_seconds": 29.744
+    },
+    "claim_check_retry": {
+      "count": 8,
+      "median_seconds": 2.812,
+      "p95_seconds": 3.837,
+      "total_seconds": 24.073
+    },
+    "safety_report": {
+      "count": 3,
+      "median_seconds": 2.286,
+      "p95_seconds": 4.532,
+      "total_seconds": 8.994
+    },
+    "embedding": {
+      "count": 23,
+      "median_seconds": 0.366,
+      "p95_seconds": 0.477,
+      "total_seconds": 8.842
+    },
+    "tool:approval_status": {
+      "count": 2,
+      "median_seconds": 0.011,
+      "p95_seconds": 0.024,
+      "total_seconds": 0.035
+    },
+    "tool:read_section": {
+      "count": 6,
+      "median_seconds": 0.004,
+      "p95_seconds": 0.006,
+      "total_seconds": 0.025
+    }
+  }
+}

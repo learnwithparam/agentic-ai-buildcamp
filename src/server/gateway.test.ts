@@ -82,7 +82,7 @@ test("a 504 is asked again, and a 429 goes straight back", async () => {
   assert.equal(down.sent.length, 3);
 });
 
-test("every short structured stage sends its cap through shortStage, which also asks for low reasoning effort", () => {
+test("every short structured stage sends its cap through shortStage, which also names the stage model and its reasoning effort", () => {
   const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
   const files = execFileSync("git", ["ls-files", "src", "scripts"], { cwd: root, encoding: "utf8" }).split("\n").filter((f) => f.endsWith(".ts") && !f.endsWith(".test.ts") && f !== "src/server/gateway.ts");
   const bare = files.filter((f) => /max_tokens:\s*OUTPUT_CAP/.test(readFileSync(path.join(root, f), "utf8")));

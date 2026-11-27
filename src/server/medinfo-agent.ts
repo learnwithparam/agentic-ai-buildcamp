@@ -177,7 +177,7 @@ export function createMedinfoAgent(checkpointer: BaseCheckpointSaver, options: {
           const openai = observeOpenAI(modelClient(), { generationName: "route" });
           const chosen = await timed("router", async () =>
             withSecondPass(
-              await routeRequest(openai, env.openaiModel, state.messages, approvedUses(readable, LABEL_SECTIONS)),
+              routeRequest(openai, state.messages, approvedUses(readable, LABEL_SECTIONS)),
               observeOpenAI(modelClient(), { generationName: "safety-second-pass" }),
               env.openaiModel,
               latestQuestion(state.messages)

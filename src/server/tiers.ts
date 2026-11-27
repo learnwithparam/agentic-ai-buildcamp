@@ -78,10 +78,12 @@ export function raiseToSafety(route: Route, seen: Detection): Route {
   return { ...route, tier: "safety", reason: `${route.reason} (raised to safety by the second pass: ${seen.reason})` };
 }
 
-export async function withSecondPass(route: Route, openai: OpenAI, model: string, message: string): Promise<Route> {
-  // Only an answer is read again: every other tier already has a person or a fixed reply.
-  if (route.tier !== "answer") return route;
-  return raiseToSafety(route, await detectEvent(openai, model, message));
+// Both calls read only the message, so they run at the same time and a turn waits for the slower
+// one, not for both in a row. Only an answer is raised: every other tier already has a person or a
+// fixed reply, so for those the second pass's verdict is not used.
+export async function withSecondPass(routing: Promise<Route>, openai: OpenAI, model: string, message: string): Promise<Route> {
+  const [route, seen] = await Promise.all([routing, detectEvent(openai, model, message)]);
+  return raiseToSafety(route, seen);
 }
 
 const RouteArgs = z.object({
@@ -143,12 +145,11 @@ export function routerInput(messages: ChatMessage[]): string {
 // decide() calls returns one choice and no text, and the router must also give its reason and
 // the approved use it rests on, which the trace and the review inbox show. decide() stays the
 // behavior judge in scripts/experiment.ts, where one typed choice is the whole answer.
-export async function routeRequest(openai: OpenAI, model: string, messages: ChatMessage[], uses: LabelSection[]): Promise<Route> {
+export async function routeRequest(openai: OpenAI, messages: ChatMessage[], uses: LabelSection[]): Promise<Route> {
   const useList = uses.length
     ? uses.map((section) => `[${cite(section)}] ${section.text}`).join("\n")
     : "(none: this desk has no label in force for this user)";
   const completion = await openai.chat.completions.create({
-    model,
     temperature: 0,
     ...shortStage("router"),
     messages: [

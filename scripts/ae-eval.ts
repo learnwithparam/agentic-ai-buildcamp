@@ -126,7 +126,7 @@ async function predictWithModel(gold: Gold): Promise<Prediction> {
   const text = scrubPhi(gold.message).text;
   const readable = new Set(LABEL_SECTIONS.filter((section) => section.tenantId === gold.tenant_id).map((section) => section.docId));
   const [route, seen, extracted] = await Promise.all([
-    routeRequest(openai, env.openaiModel, [{ id: gold.id, type: "human", content: text }], approvedUses(readable, LABEL_SECTIONS)),
+    routeRequest(openai, [{ id: gold.id, type: "human", content: text }], approvedUses(readable, LABEL_SECTIONS)),
     detectEvent(openai, env.openaiModel, text),
     // The rows are reports to each company's US desk, on the day the measure pins.
     extractCase(openai, env.openaiModel, text, limitsText(labelLimits(readable, "US", TODAY)))

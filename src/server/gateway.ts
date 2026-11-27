@@ -57,13 +57,20 @@ export const EMBEDDING_DIMENSIONS = 1536;
 // The most a stage that gives a short answer may write. A cap only stops a runaway answer; each is
 // several times what a good answer needs (30 grades and a best list are about 150 tokens). They
 // sit here, beside the one door, so a reader sees every cap together.
-export const OUTPUT_CAP = { router: 800, rewrite: 400, grade: 1500, judge: 300 } as const;
+export const OUTPUT_CAP = { router: 800, rewrite: 400, grade: 1500, judge: 300, claims: 3000 } as const;
+
+// The model for those short stages. It defaults to the chat model; STAGE_MODEL picks a faster one.
+export const STAGE_MODEL = process.env.STAGE_MODEL ?? env.openaiModel;
 
 // The settings every short structured stage sends. The chat model reasons before it answers, and
 // that thinking counts against max_tokens: measured on 2026-11-27, the grader spent all 1500 on
 // reasoning for "Is CardioNex approved in Japan for HFrEF?" and returned no JSON, three runs in a
 // row. With low effort asked for, the same question graded on the next run. Spread into the request.
-export const shortStage = (stage: keyof typeof OUTPUT_CAP) => ({ max_tokens: OUTPUT_CAP[stage], ...({ reasoning: { effort: "low" } } as object) });
+// The claim listing only points at numbered sentences, so it asks for no reasoning: measured on 27
+// Nov 2026 over 8 stored answers, its median call fell from 2.7 to 1.4 seconds and as many of its
+// claims passed the code checks (9 of 15 against 8 of 14).
+export const STAGE_EFFORT: Record<keyof typeof OUTPUT_CAP, "none" | "low"> = { router: "low", rewrite: "low", grade: "low", judge: "low", claims: "none" };
+export const shortStage = (stage: keyof typeof OUTPUT_CAP) => ({ model: STAGE_MODEL, max_tokens: OUTPUT_CAP[stage], ...({ reasoning: { effort: STAGE_EFFORT[stage] } } as object) });
 
 export async function embed(texts: string[]): Promise<number[][]> {
   if (!texts.length) return [];

@@ -1,6 +1,5 @@
 import { observeOpenAI } from "@langfuse/openai";
 import { z } from "zod";
-import { env } from "../env";
 import { modelClient, shortStage } from "../gateway";
 import { timed } from "../ops/meter";
 
@@ -82,8 +81,6 @@ const gradeOnce: Grader = async (question, passages) => {
   const openai = observeOpenAI(modelClient(), { generationName: "search-grade" });
   const list = passages.map((passage, i) => `[${i + 1}] ${passage.source} > ${passage.path}\n${passage.text}`).join("\n\n");
   const completion = await openai.chat.completions.create({
-    // The desk's chat model: grading needs reading, not a bigger model.
-    model: env.openaiModel,
     temperature: 0,
     ...shortStage("grade"),
     messages: [

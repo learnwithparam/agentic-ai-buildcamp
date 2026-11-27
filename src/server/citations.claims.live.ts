@@ -5,7 +5,7 @@ import { test } from "node:test";
 import { readGold } from "../../scripts/citations-eval";
 import { claimCheckWith, extractClaims, judgeWithModel } from "./citations.claims";
 import { modelClient } from "./gateway";
-import { sectionText } from "./citations.claims";
+import { checkClaim, quoteIsVerbatim, sectionText } from "./citations.claims";
 
 const gold = readGold();
 
@@ -20,9 +20,15 @@ test("the judge says supported for a supported gold row and unsupported for one 
 test("every claim listed from an answer names a section that was given, and a copied quote passes the verbatim check", async () => {
   const section = sectionText("cardionex-uspi-v2", "2.2")!;
   const retrieved = [{ doc_id: section.docId, section: section.section, status: "active", text: section.text }];
-  const claims = await extractClaims(modelClient(), `The label gives the starting dose in its dosage section [${section.docId}, ${section.section}].`, retrieved);
+  // A fact the section states. An answer that states no fact has no claim to list.
+  const answer = `For a standard adult with an eGFR of 30 mL/min or more, the starting dose is 20 mg once daily [${section.docId}, ${section.section}].`;
+  const claims = await extractClaims(modelClient(), answer, retrieved);
   assert.ok(claims.length > 0);
-  for (const claim of claims) assert.deepEqual([claim.docId, claim.section], [section.docId, section.section]);
+  for (const claim of claims) {
+    assert.deepEqual([claim.docId, claim.section], [section.docId, section.section]);
+    assert.ok(quoteIsVerbatim(claim), claim.quote);
+    assert.equal(checkClaim(claim, { retrieved, today: "2026-11-23" }), null, claim.text);
+  }
 });
 
 test("an answer with a fact the label does not state is flagged by the claim check", async () => {

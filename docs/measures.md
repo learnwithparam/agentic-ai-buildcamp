@@ -30,6 +30,6 @@ A row is "pending" until a real run writes its number to a file in `docs/runs/`.
 | PHI | phi.false_positives_per_note | Redacta, 0 false positives | <= 0.05 | 0.01 | [phi.json](runs/phi.json) |
 | PHI | phi.output_leaks | Groundhog patient id leak | = 0 | 0 | [phi.json](runs/phi.json) |
 | Operations | ops.p95_latency_seconds | Interactive answer | <= 20 | pending | |
-| Operations | ops.cost_per_question_usd | Spend cap per question | <= 0.02 | pending | |
-| Operations | ops.parse_failure_rate | Structured output | <= 0.01 | pending | |
+| Operations | ops.cost_per_question_usd | Spend cap per question | <= 0.02 | 0.00168 | [ops.json](runs/ops.json) |
+| Operations | ops.parse_failure_rate | Structured output | <= 0.01 | 0 | [ops.json](runs/ops.json) |
 | Checkpoints | checkpoints.tags_walked_green | Every lesson start runs live | = 24 | pending | |

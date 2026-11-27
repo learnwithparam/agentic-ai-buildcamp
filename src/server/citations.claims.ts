@@ -1,6 +1,5 @@
 import { observeOpenAI } from "@langfuse/openai";
 import type OpenAI from "openai";
-import { env } from "./env";
 import { shortStage } from "./gateway";
 import { timed } from "./ops/meter";
 import { inForceDocuments, LABEL_SECTIONS } from "./labels";
@@ -37,10 +36,30 @@ const numbersIn = (text: string) => [...text.matchAll(/(?<![A-Za-z0-9.])\d+(?:\.
 
 export const sectionText = (docId: string, section: string) => LABEL_SECTIONS.find((s) => s.docId === docId && s.section === section);
 
+// A quote may join sentences that are apart in the section, with an ellipsis between them, as a
+// reviewer writes an elision. Each part must be in the section word for word.
+export const ELISION = " … ";
+
 export function quoteIsVerbatim(claim: Pick<Claim, "quote" | "docId" | "section">): boolean {
   const found = sectionText(claim.docId, claim.section);
-  const quote = fold(claim.quote);
-  return !!found && quote !== "" && fold(found.text).includes(quote);
+  const parts = claim.quote.split(ELISION).map(fold);
+  return !!found && parts.every((part) => part !== "" && fold(found.text).includes(part));
+}
+
+// The sentences of a section, cut by code. The claim listing points at them by number and code
+// copies them, so a quote cannot be misremembered. Measured on 26 Nov 2026: of 195 answers
+// checked, 37 claims failed because the model's copy of the label was not word for word, and each
+// sent a true answer to a rewrite. A sentence ends at . ! or ? before a space and a capital or a
+// bracket, so 2.5 mg and e.g. stay inside one.
+export function sentencesOf(text: string): string[] {
+  return text.split(/(?<=[.!?])\s+(?=[A-Z([])/).map((sentence) => sentence.trim()).filter(Boolean);
+}
+
+// The quote a claim's sentence numbers stand for: neighbours joined by a space, a gap by ELISION.
+// A number that is not a sentence of the section is dropped; no number left means no quote.
+export function quoteFrom(sentences: string[], numbers: number[]): string {
+  const picked = [...new Set(numbers)].filter((n) => Number.isInteger(n) && n >= 1 && n <= sentences.length).sort((a, b) => a - b);
+  return picked.map((n, i) => (i === 0 ? "" : n === picked[i - 1]! + 1 ? " " : ELISION) + sentences[n - 1]).join("");
 }
 
 // The code checks, in the order a doctor would ask: is there such a section, did a search return
@@ -93,7 +112,6 @@ export function judgeWithModel(client: OpenAI): Judge {
   const openai = observeOpenAI(client, { generationName: "claim-support-judge" });
   return async (claim) => {
     const completion = await openai.chat.completions.create({
-      model: env.openaiModel,
       temperature: 0,
       ...shortStage("judge"),
       messages: [
@@ -120,21 +138,29 @@ export function judgeWithModel(client: OpenAI): Judge {
   };
 }
 
-export const CLAIMS_PROMPT = `You list the claims in a doctor's answer, each with the words of the label that state it.
-A claim is one fact the answer states about the medicine, from the label. Do not list advice to ask someone, refusals, or facts the doctor gave in the question.
-For each claim give: text (the claim, as the answer says it), quote (copied word for word from one section below, no changes, no Markdown marks added), docId and section of that section.
-Quote only a section listed below. If no section states a claim, still list it, with the closest section and an empty quote.`;
+export const CLAIMS_PROMPT = `You list the claims in a doctor's answer, each with the label sentences that state it.
+A claim is one fact the answer states about the medicine, from the label. Do not list advice to ask someone, refusals, facts the doctor gave in the question, or which label version is in force and when one takes effect (code checks those from the document dates).
+Each section below has its sentences numbered. For each claim give: text (the claim, as the answer says it), docId and section of one section below, and sentences (the numbers of that section's sentences that state the claim, as few as state it fully).
+If no section states a claim, still list it, with the closest section and no sentence numbers.`;
+
+// Which version is in force is not label text, so it is not a claim: citeStep's number check
+// already refuses a citation of a document that is not in force (citations.ts, statusFor). Listed
+// as a claim, each such sentence had no quote and sent a correct answer to a rewrite (26 Nov 2026).
 
 // The answer's claims, read by one json_schema call. The agent's answer is streamed to the doctor
 // as text, so its claims are listed after it is written, from the answer and the sections found.
+// The model names sentence numbers; code turns them into the quote (quoteFrom).
 export async function extractClaims(client: OpenAI, answer: string, retrieved: RetrievedSection[]): Promise<Claim[]> {
   // Nothing found, or nothing written: there is no claim to list, so no model is asked.
   if (!retrieved.length || !answer.trim()) return [];
   const openai = observeOpenAI(client, { generationName: "answer-claims" });
-  const sections = retrieved.map((s) => `[${s.doc_id}, ${s.section}]\n${s.text}`).join("\n\n");
+  const numbered = new Map(retrieved.map((s) => [`${s.doc_id}|${s.section}`, sentencesOf(s.text)]));
+  const sections = retrieved
+    .map((s) => `[${s.doc_id}, ${s.section}]\n${numbered.get(`${s.doc_id}|${s.section}`)!.map((sentence, i) => `(${i + 1}) ${sentence}`).join("\n")}`)
+    .join("\n\n");
   const completion = await timed("claim_extract", () => openai.chat.completions.create({
-    model: env.openaiModel,
     temperature: 0,
+    ...shortStage("claims"),
     messages: [
       { role: "system", content: CLAIMS_PROMPT },
       { role: "user", content: `Answer:\n${answer}\n\nSections:\n\n${sections}` }
@@ -151,8 +177,8 @@ export async function extractClaims(client: OpenAI, answer: string, retrieved: R
               type: "array",
               items: {
                 type: "object",
-                properties: { text: { type: "string" }, quote: { type: "string" }, docId: { type: "string" }, section: { type: "string" } },
-                required: ["text", "quote", "docId", "section"],
+                properties: { text: { type: "string" }, docId: { type: "string" }, section: { type: "string" }, sentences: { type: "array", items: { type: "integer" } } },
+                required: ["text", "docId", "section", "sentences"],
                 additionalProperties: false
               }
             }
@@ -163,9 +189,18 @@ export async function extractClaims(client: OpenAI, answer: string, retrieved: R
       }
     }
   }));
-  const parsed = JSON.parse(completion.choices[0]?.message.content ?? "{}") as { claims?: Claim[] };
-  return parsed.claims ?? [];
+  const parsed = JSON.parse(completion.choices[0]?.message.content ?? "{}") as { claims?: Array<Omit<Claim, "quote"> & { sentences: number[] }> };
+  // A section the search did not return has no numbered sentences, so its claim gets no quote and
+  // checkClaim says why (not_retrieved, or quote_not_in_section).
+  return (parsed.claims ?? []).map(({ sentences, ...claim }) => ({ ...claim, quote: quoteFrom(numbered.get(`${claim.docId}|${claim.section}`) ?? [], sentences) }));
 }
+
+// The sections the claim listing may point at: only those in force today. Offered a superseded
+// version beside the current one, the listing credited a current fact to the old label, and a true
+// answer was rewritten (5 of 29 claims, 27 Nov 2026). A claim that does come from the old label
+// then finds no sentence to point at, so it still fails.
+export const offeredSections = (retrieved: RetrievedSection[], today: string) =>
+  retrieved.filter((s) => inForceDocuments(new Set([s.doc_id]), today).has(s.doc_id));
 
 // What citeStep runs after the number check: list the claims, then review each.
 export type ClaimCheck = (answer: string, retrieved: RetrievedSection[], asked: string, today: string) => Promise<CitationProblem[]>;
@@ -173,7 +208,7 @@ export type ClaimCheck = (answer: string, retrieved: RetrievedSection[], asked: 
 export function claimCheckWith(client: OpenAI): ClaimCheck {
   const judge = judgeWithModel(client);
   return async (answer, retrieved, asked, today) => {
-    const claims = await extractClaims(client, answer, retrieved);
+    const claims = await extractClaims(client, answer, offeredSections(retrieved, today));
     const given = new Set(numbersIn(asked));
     return timed("claim_judge", () => reviewClaims(claims, { retrieved, today, given }, judge));
   };

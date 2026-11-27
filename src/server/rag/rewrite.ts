@@ -1,5 +1,4 @@
 import { observeOpenAI } from "@langfuse/openai";
-import { env } from "../env";
 import { modelClient, shortStage } from "../gateway";
 import { timed } from "../ops/meter";
 
@@ -22,7 +21,6 @@ export async function standaloneQuery(query: string, earlier: Turn[]): Promise<s
   if (!said.length) return query;
   const openai = observeOpenAI(modelClient(), { generationName: "search-rewrite" });
   const completion = await timed("query_rewrite", () => openai.chat.completions.create({
-    model: env.openaiModel,
     temperature: 0,
     ...shortStage("rewrite"),
     messages: [
