@@ -16,7 +16,7 @@ import {
 } from "../shared/messages";
 import { answerRun, type AnswerRun } from "../shared/run";
 import type { ClaimCheck } from "./citations.claims";
-import { checkCitations, describeProblem, evidenceOf, EVIDENCE_TOOLS, WITHHELD_REPLY, type CitationProblem } from "./citations";
+import { checkCitations, describeProblem, evidenceOf, EVIDENCE_TOOLS, parseCitations, WITHHELD_REPLY, type CitationProblem } from "./citations";
 import { env } from "./env";
 import { timed } from "./ops/meter";
 import { streamModelTurn, toOpenAIMessages } from "./stream-model";
@@ -120,6 +120,27 @@ export function rewriteFeedback(problems: CitationProblem[]): string {
   ].join("\n");
 }
 
+// A reply that cites nothing, starts with no code and ends by asking the doctor something is a
+// follow-up question, so code starts it with ASK_FOLLOW_UP. The prompt says to, and the model left
+// it out on 1 of 3 AMBIGUOUS-01 runs (27 Nov 2026); the chat and the evals read the code. A code is
+// any leading UPPER_SNAKE word (faults/score.ts lists them; it imports this file, so it is not imported here).
+export const FOLLOW_UP_CODE = "ASK_FOLLOW_UP";
+export function stampFollowUp(text: string): string {
+  const reply = text.trim();
+  if (!reply.endsWith("?") || parseCitations(reply).length || /^[A-Z]+(?:_[A-Z]+)+\b/.test(reply)) return text;
+  return `${FOLLOW_UP_CODE} ${reply}`;
+}
+
+// The checked answer, with the follow-up code added when it is a question (stampFollowUp).
+function stamped(message: AiMessage, config: LangGraphRunnableConfig): Partial<GraphState> {
+  const text = aiText(message);
+  const final = stampFollowUp(text);
+  if (final === text) return { messages: [message] };
+  const replaced: AiMessage = { ...message, content: [{ type: "text", text: final }], tool_calls: [] };
+  config.writer?.(replaced);
+  return { messages: [replaced] };
+}
+
 export async function citeStep(
   openai: OpenAI,
   system: string,
@@ -134,7 +155,10 @@ export async function citeStep(
   // The number check, then each claim's quote and the support judge (citations.claims.ts).
   const checked = async (text: string) => [...checkCitations(text, retrieved, asked, state.today), ...((await claimCheck?.(text, retrieved, asked, state.today)) ?? [])];
   const problems = await timed("claim_check", () => checked(aiText(answer)));
-  if (!problems.length) return (onChecked({ outcome: "passed", problems, afterRewrite: [] }), {});
+  if (!problems.length) {
+    onChecked({ outcome: "passed", problems, afterRewrite: [] });
+    return stampFollowUp(aiText(answer)) === aiText(answer) ? {} : stamped(answer, config);
+  }
   const feedback = rewriteFeedback(problems);
   const rewrite = await timed("citation_retry", () =>
     streamModelTurn(
@@ -151,7 +175,7 @@ export async function citeStep(
   const afterRewrite = await timed("claim_check_retry", () => checked(aiText(rewrite)));
   if (!afterRewrite.length) {
     onChecked({ outcome: "rewritten", problems, afterRewrite, rewrite: aiText(rewrite) });
-    return { messages: [{ ...rewrite, id: answer.id, tool_calls: [] }] };
+    return stamped({ ...rewrite, id: answer.id, tool_calls: [] }, config);
   }
   onChecked({ outcome: "withheld", problems, afterRewrite, rewrite: aiText(rewrite) });
   const withheld: AiMessage = { id: answer.id, type: "ai", content: [{ type: "text", text: WITHHELD_REPLY }], tool_calls: [] };

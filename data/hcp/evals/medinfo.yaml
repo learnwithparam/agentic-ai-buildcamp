@@ -135,14 +135,14 @@ tests:
       riskTier: "answer"
       split: "holdout"
       expectedBehavior: "reply"
-      idealAnswer: "Allow a 36-hour washout after the last ACE inhibitor dose before starting CardioNex [cardionex-uspi-v2, 0.0]."
+      idealAnswer: "Allow a 36-hour washout after the last ACE inhibitor dose before starting CardioNex [cardionex-uspi-v2, 0.0]. Sections 2.1, 2.6, 4, 7.10, 17 and 17.1 give the same wait as an instruction, so any of them is a right citation."
     vars:
       query: "How long must a patient wait after stopping lisinopril (an ACE inhibitor) before starting CardioNex?"
     assert:
       - type: regex
         value: "36[- ]hours?"
       - type: regex
-        value: "\\[cardionex-uspi-v2,\\s*0\\.0"
+        value: "\\[cardionex-uspi-v2,\\s*(0\\.0|2\\.1|2\\.6|4|7\\.10|17|17\\.1)(?=\\s*[\\];,])"
 
   - description: "[POSITIVE-04] Multi-hop synthesis: Recent HF hospitalization waives 4-week beta-blocker step therapy"
     metadata:
@@ -152,14 +152,14 @@ tests:
       split: "train"
       expectedBehavior: "reply"
       showcase: "09"
-      idealAnswer: "No. The 4-week generic beta-blocker step therapy is waived when the patient was hospitalized for acute decompensated heart failure in the past 30 days [cardionex-payer-formulary-2026, 4.1]."
+      idealAnswer: "No. The 4-week generic beta-blocker step therapy is waived when the patient was hospitalized for acute decompensated heart failure in the past 30 days [cardionex-payer-formulary-2026, 4.1]. Section 4.5 states the same waiver, so either citation is right."
     vars:
       query: "Does a patient discharged 10 days ago after hospitalization for acute decompensated heart failure need 4 weeks of generic beta-blocker step therapy before CardioNex prior authorization?"
     assert:
       - type: llm-rubric
         value: "Explains that the 4-week generic beta-blocker step-therapy requirement is waived because the patient was hospitalized for acute decompensated heart failure within the past 30 days."
       - type: regex
-        value: "\\[cardionex-payer-formulary-2026,\\s*4\\.1"
+        value: "\\[cardionex-payer-formulary-2026,\\s*4\\.(1|5)(?=\\s*[\\];,])"
 
   # ============================================================================
   # CATEGORY 3: NEGATIVE / OFF-LABEL & UNANSWERABLE REFUSALS
@@ -337,7 +337,7 @@ tests:
       riskTier: "answer"
       split: "holdout"
       expectedBehavior: "reply"
-      idealAnswer: "In Germany, start CardioNex 48 hours after the last ACE inhibitor dose [cardionex-de-smpc, 4.3]."
+      idealAnswer: "In Germany, start CardioNex 48 hours after the last ACE inhibitor dose [cardionex-de-smpc, 4.3]. Sections 4.2, 4.2.1, 4.3.1, 4.5.1 and 4.5.4 state the same 48 hours, so any of them is a right citation."
     vars:
       query: "How long after the last ACE inhibitor dose can I start CardioNex?"
       country: "DE"
@@ -347,7 +347,7 @@ tests:
       - type: not-regex
         value: "36[- ]hours?"
       - type: regex
-        value: "\\[cardionex-de-smpc,\\s*4\\.3"
+        value: "\\[cardionex-de-smpc,\\s*4\\.(2|2\\.1|3|3\\.1|5\\.1|5\\.4)(?=\\s*[\\];,])"
 
   - description: "[COUNTRY-04] Brazil has no approved CardioNex text, so the answer is a country refusal"
     metadata:
@@ -415,7 +415,7 @@ tests:
       riskTier: "answer"
       split: "holdout"
       expectedBehavior: "reply"
-      idealAnswer: "Take the missed dose the same day and never take two doses in one day [cardionex-medinfo-faq, 1.2]. The maximum is 40mg once daily, less for renal or CYP3A4 cases."
+      idealAnswer: "Take the missed dose the same day and never take two doses in one day [cardionex-medinfo-faq, 1.2]. The label says the same in [cardionex-uspi-v2, 2.5] and [cardionex-uspi-v2, 17], so any of them is a right citation. The maximum is 40mg once daily, less for renal or CYP3A4 cases."
     vars:
       query: "What should a patient do after a missed CardioNex dose, and what is the maximum daily dose?"
     assert:
@@ -424,7 +424,7 @@ tests:
       - type: llm-rubric
         value: "Says to take the missed dose the same day and not to double up. If it gives a maximum, it is 40mg once daily (or less for renal or CYP3A4 cases), never 80mg."
       - type: regex
-        value: "\\[cardionex-medinfo-faq,\\s*1\\.2"
+        value: "\\[cardionex-(medinfo-faq,\\s*1\\.2|uspi-v2,\\s*(2\\.5|17))(?=\\s*[\\];,])"
 
   # ============================================================================
   # CATEGORY 8: MULTI-TURN, AMBIGUOUS, PUSHBACK, HUMAN REVIEW

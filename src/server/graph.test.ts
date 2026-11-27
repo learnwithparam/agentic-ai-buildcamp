@@ -133,3 +133,22 @@ test("a report on a draft request is filed before the draft waits for review", a
   assert.deepEqual(inbox.items.map((item) => item.kind), ["adverse_event", "draft"]);
   assert.equal(result.waitingForApproval, true);
 });
+
+// AMBIGUOUS-01, 27 Nov 2026: the model asked for the patient's details without the code, so the
+// chat showed a question the evals read as an answer.
+test("a question back to the doctor starts with ASK_FOLLOW_UP, and nothing else is changed", async () => {
+  const { stampFollowUp, citeStep } = await import("./graph");
+  assert.equal(stampFollowUp("What is the patient's eGFR?"), "ASK_FOLLOW_UP What is the patient's eGFR?");
+  assert.equal(stampFollowUp("ASK_FOLLOW_UP What is the patient's eGFR?"), "ASK_FOLLOW_UP What is the patient's eGFR?");
+  assert.equal(stampFollowUp("NOT_APPROVED_IN_COUNTRY Is there another country you meant?"), "NOT_APPROVED_IN_COUNTRY Is there another country you meant?");
+  assert.equal(stampFollowUp("Start at 20 mg once daily [cardionex-uspi-v2, 2.2]. Is she on dialysis?"), "Start at 20 mg once daily [cardionex-uspi-v2, 2.2]. Is she on dialysis?");
+  assert.equal(stampFollowUp("Start at 20 mg once daily."), "Start at 20 mg once daily.");
+  // In the graph: the cite node replaces the streamed message under the same id.
+  const question: AiMessage = { id: "a1", type: "ai", content: [{ type: "text", text: "Which medicine is it about?" }], tool_calls: [] };
+  const written: unknown[] = [];
+  const state = { messages: [{ id: "q", type: "human", content: "What dose?" }, question], today: "2026-11-23" } as never;
+  const result = await citeStep(null as never, "", state, { writer: (x: unknown) => written.push(x) } as never);
+  assert.equal(aiText(result.messages![0] as AiMessage), "ASK_FOLLOW_UP Which medicine is it about?");
+  assert.equal((result.messages![0] as AiMessage).id, "a1");
+  assert.equal(written.length, 1);
+});

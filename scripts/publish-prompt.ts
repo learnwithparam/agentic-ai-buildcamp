@@ -24,7 +24,9 @@ function resolvePromptVariant(variantName: string): {
 }
 
 async function main() {
-  const variant = resolvePromptVariant(env.workshopPromptVariant);
+  // A variant for one publish is a flag, since the env file wins over the shell.
+  const variantFlag = process.argv.indexOf("--variant");
+  const variant = resolvePromptVariant((variantFlag >= 0 ? process.argv[variantFlag + 1] : "") || env.workshopPromptVariant);
 
   if (!env.langfusePublicKey || !env.langfuseSecretKey) {
     throw new Error("Langfuse credentials are required to publish prompts.");

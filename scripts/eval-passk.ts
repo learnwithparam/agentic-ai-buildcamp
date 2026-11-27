@@ -115,7 +115,12 @@ export async function measure(agent: Agent, options: { out?: string; k?: number;
   const ids = demoCaseIds(all);
   const expected = ids.map((caseId) => ({ caseId, slice: all.find((c) => c.metadata.caseId === caseId)!.metadata.slice }));
   const runs: CaseRun[][] = [];
-  for (let run = 0; run < k; run++) runs.push(await agent.runCases(ids, run));
+  for (let run = 0; run < k; run++) {
+    const started = Date.now();
+    runs.push(await agent.runCases(ids, run));
+    // A run takes most of an hour on the real model, so each one says when it is done.
+    console.log(`run ${run + 1} of ${k}: ${runs[run]!.filter((r) => r.passed).length} of ${ids.length} passed, ${Math.round((Date.now() - started) / 60000)} min`);
+  }
   const summary = summarize(runs, expected, k);
 
   const caught = await agent.sabotageCaught();

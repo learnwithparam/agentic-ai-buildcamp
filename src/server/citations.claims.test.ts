@@ -160,3 +160,27 @@ test("the claim listing is offered only sections in force, so a current fact is 
   assert.deepEqual(offeredSections(retrieved, "2026-11-23").map((s) => s.doc_id), ["cardionex-uspi-v2"]);
   assert.deepEqual(offeredSections(retrieved, "2027-03-02").map((s) => s.doc_id), ["cardionex-uspi-v3"]);
 });
+
+test("the dates of a sentence are read in the forms a doctor writes them", async () => {
+  const { datesIn } = await import("./citations.dates");
+  assert.deepEqual(datesIn("It takes effect March 1, 2027; today's took effect 15 September 2026."), { days: ["2027-03-01", "2026-09-15"], years: [] });
+  assert.deepEqual(datesIn("The 2027 label, in force from 2027-03-01."), { days: ["2027-03-01"], years: ["2027"] });
+  assert.deepEqual(datesIn("Raise to 40 mg after 4 weeks."), { days: [], years: [] });
+});
+
+// FUTURE-01, 27 Nov 2026: "the approved 2027 label takes effect March 1, 2027" has no sentence in
+// any section, so it was withheld for a quote that cannot exist. It is checked against the dates.
+test("a version date is checked against the label's real effective dates, never by the judge", async () => {
+  const reasonOf = (problem: unknown) => (problem as { reason?: string } | undefined)?.reason;
+  const at = (text: string): Claim => ({ text, quote: "", docId: "cardionex-uspi-v2", section: "2.2", about: "version_date" });
+  const context = { retrieved: null, today: "2026-11-23" };
+  assert.deepEqual(await reviewClaims([at("The approved 2027 label takes effect March 1, 2027."), at("Today's label took effect September 15, 2026.")], context, noModelCall), []);
+  const [wrong] = await reviewClaims([at("The approved label takes effect June 1, 2027.")], context, noModelCall);
+  assert.equal(reasonOf(wrong), "date_not_a_version");
+  const [year] = await reviewClaims([at("The 2028 label is approved.")], context, noModelCall);
+  assert.equal(reasonOf(year), "date_not_a_version");
+  // A NeuroVex date is not a CardioNex version.
+  const neurovex = LABEL_SECTIONS.find((s) => s.docId.startsWith("neurovex") && s.country === "US")!;
+  const [other] = await reviewClaims([at(`The label takes effect ${neurovex.effectiveDate}.`)], context, noModelCall);
+  assert.equal(reasonOf(other), "date_not_a_version", neurovex.effectiveDate);
+});

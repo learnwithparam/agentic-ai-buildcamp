@@ -4,6 +4,7 @@
  */
 import type { Evaluation } from "@langfuse/client";
 import { env } from "../src/server/env";
+import { DESK_PROMPT } from "../src/server/desk-prompt";
 import { usePromptVersion } from "../src/server/medinfo-agent";
 import { PROMPT_VARIANTS } from "./prompt-variants";
 import type { Agent, CaseRun } from "./eval-passk";
@@ -63,10 +64,23 @@ export function scriptedAgent(prompt: string = PROMPT_VARIANTS["per-company"]): 
   };
 }
 
+// Why a measured prompt is not the code's desk prompt, or null when it is. Only production must
+// match: --label staging measures a candidate on purpose. Production v26 once lagged the code by a
+// whole tool (no find_label_text), and every run measured the old text without a word.
+export function promptDrift(published: string, label: string): string | null {
+  if (label !== "production" || published === DESK_PROMPT) return null;
+  const ours = DESK_PROMPT.split("\n");
+  const theirs = published.split("\n");
+  const line = ours.findIndex((text, i) => text !== theirs[i]);
+  return `The production prompt in Langfuse is not src/server/desk-prompt.ts (first difference at line ${line + 1}). Publish it first: npm run prompt:publish -- --variant per-company`;
+}
+
 export async function realAgent(): Promise<Agent> {
   const experiment = await startExperiment();
   const label = process.argv.includes("--label") ? process.argv[process.argv.indexOf("--label") + 1]! : "production";
   const prompt = await experiment.langfuse.prompt.get(env.langfusePromptName, { label, cacheTtlSeconds: 0 });
+  const drift = promptDrift(prompt.prompt, label);
+  if (drift) throw new Error(drift);
   usePromptVersion(prompt.version);
   console.log(`Measuring prompt "${prompt.name}" version ${prompt.version} (label ${label}).`);
   return {

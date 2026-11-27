@@ -97,3 +97,11 @@ test("the run file says why each failing case failed, run by run, and leaves pas
   assert.equal(s.failures.B!.passed, 2);
   assert.deepEqual(s.failures.B!.runs, [[{ name: "label_checks", comment: "no citation to 8.1" }], [{ name: "label_checks", comment: "no citation to 8.1" }], [{ name: "missing", comment: "the run did not report this case" }]]);
 });
+
+test("a measure of production refuses a prompt that is not the code's desk prompt", async () => {
+  const { promptDrift } = await import("./eval-agents");
+  const { DESK_PROMPT } = await import("../src/server/desk-prompt");
+  assert.equal(promptDrift(DESK_PROMPT, "production"), null);
+  assert.match(promptDrift(DESK_PROMPT.replace("find_label_text", "x"), "production")!, /not src\/server\/desk-prompt.ts \(first difference at line \d+\)/);
+  assert.equal(promptDrift("a staging candidate", "staging"), null);
+});

@@ -3,20 +3,20 @@
     "citations.hallucination_precision": 1,
     "citations.hallucination_recall": 1,
     "citations.quote_verbatim_rate": 1,
-    "citations.true_answer_pass_rate": 1
+    "citations.true_answer_pass_rate": 0.983
   },
-  "commit": "90f928b3",
-  "at": "2026-11-27T01:25:47.793Z",
+  "commit": "e75b0895",
+  "at": "2026-11-27T03:16:12.040Z",
   "rows": 116,
   "judge": "gateway model",
-  "judge_agreement": 0.879,
+  "judge_agreement": 0.897,
   "judge_by_label": {
     "fabricated_quote": {
       "rows": 18,
       "flagged": 18,
       "flagged_by_code": 18,
-      "judge_agrees": 15,
-      "judge_agreement": 0.833
+      "judge_agrees": 18,
+      "judge_agreement": 1
     },
     "supported": {
       "rows": 45,
@@ -50,14 +50,21 @@
       "rows": 10,
       "flagged": 10,
       "flagged_by_code": 10,
-      "judge_agrees": 1,
-      "judge_agreement": 0.1
+      "judge_agrees": 0,
+      "judge_agreement": 0
     }
   },
   "misses": [],
   "true_answers": {
     "answers": 20,
     "listings": 60,
-    "stopped": []
+    "stopped": [
+      {
+        "caseId": "ROUTING-07",
+        "problems": [
+          "The claim \"In the US, CardioNex starts at 20 mg once daily in adults with HFrEF.\" cites [cardionex-uspi-v2, 2.2] but the quote does not support the claim. Quote the section word for word, or leave the claim out."
+        ]
+      }
+    ]
   }
 }
