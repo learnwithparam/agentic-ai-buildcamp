@@ -13,6 +13,7 @@ A row is "pending" until a real run writes its number to a file in `docs/runs/`.
 | Citations | citations.hallucination_precision | LitRAG, F1 0.986 | >= 0.95 | 1 | [citations.json](runs/citations.json) |
 | Citations | citations.hallucination_recall | LitRAG, F1 0.986 | >= 0.95 | 1 | [citations.json](runs/citations.json) |
 | Citations | citations.quote_verbatim_rate | PubCrawl, 255 of 255 | = 1 | 1 | [citations.json](runs/citations.json) |
+| Citations | citations.true_answer_pass_rate | LitRAG, F1 0.986 | >= 0.95 | 1 | [citations.json](runs/citations.json) |
 | Adverse events | ae.recall | ICH E2D(R1) reporting | >= 0.98 | 1 | [ae.json](runs/ae.json) |
 | Adverse events | ae.precision | ICH E2D(R1) reporting | >= 0.9 | 0.968 | [ae.json](runs/ae.json) |
 | Adverse events | ae.criteria_accuracy | ICH E2D(R1) four minimum criteria | >= 0.9 | 0.965 | [ae.json](runs/ae.json) |

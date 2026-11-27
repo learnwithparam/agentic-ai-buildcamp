@@ -49,10 +49,18 @@ export function quoteIsVerbatim(claim: Pick<Claim, "quote" | "docId" | "section"
 // The sentences of a section, cut by code. The claim listing points at them by number and code
 // copies them, so a quote cannot be misremembered. Measured on 26 Nov 2026: of 195 answers
 // checked, 37 claims failed because the model's copy of the label was not word for word, and each
-// sent a true answer to a rewrite. A sentence ends at . ! or ? before a space and a capital or a
-// bracket, so 2.5 mg and e.g. stay inside one.
+// sent a true answer to a rewrite. Each line is cut on its own first: a table row, a list item or a
+// paragraph has no full stop to end it, and read as one sentence, the dose table of
+// cardionex-uspi-v2 2.2 and its footnote were a single 892-character "sentence" the listing could
+// only point at whole or not at all (27 Nov 2026: 2 to 5 of 21 gold answers stopped). Within a
+// line, a sentence ends at . ! or ? before a space and a capital or a bracket, so 2.5 mg and e.g.
+// stay inside one.
 export function sentencesOf(text: string): string[] {
-  return text.split(/(?<=[.!?])\s+(?=[A-Z([])/).map((sentence) => sentence.trim()).filter(Boolean);
+  return text
+    .split(/\n+/)
+    .flatMap((line) => line.split(/(?<=[.!?])\s+(?=[A-Z([])/))
+    .map((sentence) => sentence.trim())
+    .filter(Boolean);
 }
 
 // The quote a claim's sentence numbers stand for: neighbours joined by a space, a gap by ELISION.
@@ -140,7 +148,9 @@ export function judgeWithModel(client: OpenAI): Judge {
 
 export const CLAIMS_PROMPT = `You list the claims in a doctor's answer, each with the label sentences that state it.
 A claim is one fact the answer states about the medicine, from the label. Do not list advice to ask someone, refusals, facts the doctor gave in the question, or which label version is in force and when one takes effect (code checks those from the document dates).
-Each section below has its sentences numbered. For each claim give: text (the claim, as the answer says it), docId and section of one section below, and sentences (the numbers of that section's sentences that state the claim, as few as state it fully).
+Do not list what the answer says about its own citations (that a figure is also in another section, that either citation is right): the citations are checked by code.
+When the answer compares a number the doctor gave with a limit in the label, the claim is the limit as the label states it (for "5.3 is above the 5.0 limit", the claim is the 5.0 limit).
+Each section below has its sentences numbered. A table row, a list item and a footnote are sentences too. For each claim give: text (the claim, as the answer says it), docId and section of one section below, and sentences (the numbers of that section's sentences that state the claim, as few as state it fully).
 If no section states a claim, still list it, with the closest section and no sentence numbers.`;
 
 // Which version is in force is not label text, so it is not a claim: citeStep's number check

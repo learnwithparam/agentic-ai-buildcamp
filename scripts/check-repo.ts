@@ -93,7 +93,11 @@ export function findProblems(files: Map<string, string>, tracked: string[]): str
   const tokensFor = (path: string) => {
     const tokens = [path, basename(path)];
     // An import names the file without .ts: "./limits", or a path such as "../../../scripts/no-model-call".
-    if (path.endsWith(".ts")) tokens.push(`./${basename(path, ".ts")}`, path.slice(0, -3));
+    // An import from a parent folder names the subfolder too: "./judge/rubric" from scripts/.
+    if (path.endsWith(".ts")) {
+      const parts = path.slice(0, -3).split("/");
+      tokens.push(path.slice(0, -3), ...parts.slice(1).map((_, i) => `./${parts.slice(i + 1).join("/")}`));
+    }
     return tokens;
   };
   for (let grew = true; grew; ) {

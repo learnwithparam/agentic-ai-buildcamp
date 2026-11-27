@@ -12,6 +12,11 @@
 //   hallucination_recall     not-supported rows that are flagged, over not-supported rows
 //   quote_verbatim_rate      rows with a real quote (every label but fabricated_quote) that the
 //                            verbatim check accepts
+//   true_answer_pass_rate    the other side: the dataset's own ideal answers, which are true and
+//                            cited, each run LISTINGS times through the claim listing and the
+//                            checks the app runs (claimCheckWith). A stop on one is a true answer
+//                            the doctor would not get. An ideal answer the number check already
+//                            stops (a number with no citation) is left out: that stop is right.
 // Also written: how often the judge agrees with the label, per label (judge_by_label), and the
 // rows the check got wrong (misses).
 //
@@ -22,7 +27,10 @@ import { execSync } from "node:child_process";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { checkClaim, quoteIsVerbatim, type Judge, type Verdict } from "../src/server/citations.claims";
+import { checkCitations, describeProblem, type RetrievedSection } from "../src/server/citations";
+import { checkClaim, quoteIsVerbatim, type ClaimCheck, type Judge, type Verdict } from "../src/server/citations.claims";
+import { LABEL_SECTIONS, statusOn, TODAY } from "../src/server/labels";
+import { loadAllCases } from "./hcp-cases";
 import { runMain } from "./run-main";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -101,6 +109,37 @@ export const labelJudge = (rows: GoldClaim[]): Judge => async ({ text, quote }) 
   return expected(row);
 };
 
+// The dataset's ideal answers for the cases that expect a cited reply, each with the sections it
+// cites as the search results, so the claim listing sees what it would see in the app.
+export type TrueAnswer = { caseId: string; answer: string; asked: string; retrieved: RetrievedSection[] };
+const CITATION = /\[([a-z0-9-]+),\s*([\d.]+)\]/g;
+
+export function trueAnswers(today = TODAY): TrueAnswer[] {
+  return loadAllCases()
+    .filter((item) => item.expectedOutput.expectedBehavior === "reply" && item.expectedOutput.idealAnswer.match(CITATION))
+    .map((item) => {
+      const answer = item.expectedOutput.idealAnswer;
+      const cited = [...answer.matchAll(CITATION)].map(([, docId, section]) => `${docId}|${section}`);
+      const retrieved = LABEL_SECTIONS.filter((s) => cited.includes(`${s.docId}|${s.section}`)).map((s) => ({ doc_id: s.docId, section: s.section, status: statusOn(s, today), text: s.text }));
+      const asked = (item.input.messages as Array<{ role: string; content: string }>).filter((m) => m.role === "user").map((m) => m.content).join("\n");
+      return { caseId: item.metadata.caseId, answer, asked, retrieved };
+    })
+    .filter((row) => checkCitations(row.answer, row.retrieved, row.asked, today).length === 0);
+}
+
+export const LISTINGS = 3;
+
+export async function trueAnswerPassRate(check: ClaimCheck, rows = trueAnswers(), today = TODAY) {
+  const runs = await Promise.all(rows.flatMap((row) => Array.from({ length: LISTINGS }, async () => ({ row, problems: await check(row.answer, row.retrieved, row.asked, today) }))));
+  const stopped = runs.filter((run) => run.problems.length);
+  return {
+    rate: ratio(runs.length - stopped.length, runs.length),
+    answers: rows.length,
+    listings: runs.length,
+    stopped: stopped.map((run) => ({ caseId: run.row.caseId, problems: run.problems.map(describeProblem) }))
+  };
+}
+
 async function mapLimit<T, R>(items: T[], limit: number, run: (item: T) => Promise<R>): Promise<R[]> {
   const out: R[] = new Array(items.length);
   let next = 0;
@@ -119,6 +158,7 @@ async function main() {
   const fake = process.argv.includes("--fake");
   const rows = readGold();
   let judge: Judge;
+  let truth: Awaited<ReturnType<typeof trueAnswerPassRate>> | undefined;
   if (fake) {
     judge = labelJudge(rows);
   } else {
@@ -127,6 +167,8 @@ async function main() {
     const { judgeWithModel } = await import("../src/server/citations.claims");
     useService("eval-runner");
     judge = judgeWithModel(modelClient());
+    const { claimCheckWith } = await import("../src/server/citations.claims");
+    truth = await trueAnswerPassRate(claimCheckWith(modelClient()));
   }
   const results = await mapLimit(rows, 4, (row) => runRow(row, judge));
   const scored = score(results);
@@ -135,7 +177,9 @@ async function main() {
     measures: {
       "citations.hallucination_precision": scored.hallucination_precision,
       "citations.hallucination_recall": scored.hallucination_recall,
-      "citations.quote_verbatim_rate": scored.quote_verbatim_rate
+      "citations.quote_verbatim_rate": scored.quote_verbatim_rate,
+      // The listing needs the model, so --fake has no number for it.
+      ...(truth ? { "citations.true_answer_pass_rate": truth.rate } : {})
     },
     commit: execSync("git rev-parse --short HEAD", { cwd: root }).toString().trim(),
     at: new Date().toISOString(),
@@ -143,7 +187,8 @@ async function main() {
     judge: fake ? "label (--fake: no model was called)" : "gateway model",
     judge_agreement: scored.judge_agreement,
     judge_by_label: scored.by_label,
-    misses: scored.misses
+    misses: scored.misses,
+    ...(truth ? { true_answers: { answers: truth.answers, listings: truth.listings, stopped: truth.stopped } } : {})
   };
   mkdirSync(path.join(root, "docs/runs"), { recursive: true });
   // --fake writes beside the real file, never over it: measures.md reads citations.json.

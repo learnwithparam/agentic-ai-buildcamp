@@ -121,6 +121,12 @@ test("every sentence of every search passage, alone or with its neighbour, is ve
   assert.ok(count > 500, `only ${count} sentences: the labels did not load`);
 });
 
+test("a table row, a list item and a paragraph are each their own sentence, in every label", () => {
+  assert.deepEqual(sentencesOf("| Dose | Note |\n| 5mg once daily | Do not titrate |\n\n**Footnote:** Applies to all."), ["| Dose | Note |", "| 5mg once daily | Do not titrate |", "**Footnote:** Applies to all."]);
+  const spanning = LABEL_SECTIONS.flatMap((section) => sentencesOf(section.text).filter((sentence) => sentence.includes("\n")).map(() => `${section.docId} ${section.section}`));
+  assert.deepEqual(spanning, []);
+});
+
 test("sentences split at a full stop before a capital, never inside 2.5 mg or a bracketed reference", () => {
   assert.deepEqual(sentencesOf("Start at 2.5 mg once daily. Do not exceed 10 mg [see Warnings (5.1)]. Monitor potassium."), [
     "Start at 2.5 mg once daily.",

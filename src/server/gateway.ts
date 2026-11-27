@@ -68,7 +68,9 @@ export const STAGE_MODEL = process.env.STAGE_MODEL ?? env.openaiModel;
 // row. With low effort asked for, the same question graded on the next run. Spread into the request.
 // The claim listing only points at numbered sentences, so it asks for no reasoning: measured on 27
 // Nov 2026 over 8 stored answers, its median call fell from 2.7 to 1.4 seconds and as many of its
-// claims passed the code checks (9 of 15 against 8 of 14).
+// claims passed the code checks (9 of 15 against 8 of 14). Once each table row and list item was its
+// own sentence, none and low effort both passed 20 of 21 cited gold answers (27 Nov 2026), so the
+// faster setting stays.
 export const STAGE_EFFORT: Record<keyof typeof OUTPUT_CAP, "none" | "low"> = { router: "low", rewrite: "low", grade: "low", judge: "low", claims: "none" };
 export const shortStage = (stage: keyof typeof OUTPUT_CAP) => ({ model: STAGE_MODEL, max_tokens: OUTPUT_CAP[stage], ...({ reasoning: { effort: STAGE_EFFORT[stage] } } as object) });
 
