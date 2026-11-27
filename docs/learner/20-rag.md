@@ -407,6 +407,13 @@ They read every PDF in `data/hcp/pdf` and pin what used to go wrong. The CLARION
 
 Break it on purpose. In `extract.ts`, stop joining a table that runs onto the next page. Two tests fail.
 
+`npm run walk -- checkpoint/20-rag` asks these questions through the running app. Each is asked as the doctor named. The walk checks the route, the sections found and the citation:
+
+```walk
+{ "user": "ana", "ask": "What is the recommended starting dose of CardioNex for a standard adult?", "route": "answer", "sections": ["cardionex-uspi-v2 2.2"], "cites": true }
+{ "user": "ana", "ask": "How long must a patient wait after the last ACE inhibitor dose before starting CardioNex?", "route": "answer", "sections": ["cardionex-uspi-v2 2.6"], "cites": true }
+```
+
 ## Stuck points
 
 In a correct run, `npm run rag:ingest` prints "unchanged" for all 13 PDFs on its second run. Asking about a nursing mother cites section 8.2 of `cardionex-uspi-v2`. A pharma_b doctor asking the same question finds no CardioNex section.

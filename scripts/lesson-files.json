@@ -303,6 +303,8 @@
     "scripts/bi-setup.ts": 22,
     "scripts/check-repo.test.ts": 0,
     "scripts/check-repo.ts": 0,
+    "scripts/checkpoints-walk.test.ts": 23,
+    "scripts/checkpoints-walk.ts": 23,
     "scripts/citations-audit.test.ts": 21,
     "scripts/citations-audit.ts": 21,
     "scripts/citations-eval.test.ts": 21,
