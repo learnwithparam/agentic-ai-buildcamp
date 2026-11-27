@@ -124,6 +124,10 @@ export function findProblems(files: Map<string, string>, tracked: string[]): str
   // A file a script writes on its first full run. Its own check fails a release while it is
   // missing (checkWalk with --release), so it is never left out unnoticed.
   const FIRST_WRITTEN_BY_A_RUN = new Set(["docs/checkpoint-walk.md"]);
+  // The files the checkpoint sync strips from every tag. On a tag (no sync script) naming one is
+  // fine; on main they must exist, and the walk check below reads the sync script.
+  const MAIN_ONLY = new Set(["scripts/sync-checkpoints.sh", "scripts/align-scoreboard.ts"]);
+  const onTag = !existsSync("scripts/sync-checkpoints.sh");
   const known = new Set(tracked.flatMap((path) => path.split("/").map((_, index, parts) => parts.slice(0, index + 1).join("/"))));
   for (const [path, body] of bodies) {
     // Test fixtures name made-up paths on purpose.
@@ -133,7 +137,7 @@ export function findProblems(files: Map<string, string>, tracked: string[]): str
       const target = raw.startsWith(".") ? posix.normalize(posix.join(posix.dirname(path), raw)) : raw;
       const clean = target.replace(/\/$/, "");
       const exists = ["", ".ts", ".tsx", ".json", "/index.ts"].some((ending) => known.has(clean + ending));
-      if (!exists && !FIRST_WRITTEN_BY_A_RUN.has(clean)) problems.push(`${path}: names ${raw}, which does not exist.`);
+      if (!exists && !FIRST_WRITTEN_BY_A_RUN.has(clean) && !(onTag && MAIN_ONLY.has(clean))) problems.push(`${path}: names ${raw}, which does not exist.`);
     }
   }
 
