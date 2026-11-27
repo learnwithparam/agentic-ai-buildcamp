@@ -4,7 +4,7 @@ import type { ChatMessage } from "../shared/messages";
 import { aiText } from "../shared/messages";
 import { shortStage } from "./gateway";
 import type { LabelSection } from "./labels";
-import { detectEvent, type Detection } from "./safety/detect";
+import { detectEvent, type Detection, type SpecialSituation } from "./safety/detect";
 
 // Lesson 13. Before the agent writes a word, every message is sorted into a risk tier, and the
 // tier decides who must look before the doctor reads anything:
@@ -25,7 +25,9 @@ export type Tier = (typeof TIERS)[number];
 export const SAFETY_HOURS = 24;
 export const REVIEW_HOURS = 48;
 
-export type Route = { tier: Tier; reason: string; basis?: string; asksForAdvice: boolean };
+// report: a special situation with no harm (a pregnancy exposure, an overdose with the patient
+// well). The doctor gets the label's answer and a safety case is opened beside it (issue #122).
+export type Route = { tier: Tier; reason: string; basis?: string; asksForAdvice: boolean; report?: SpecialSituation };
 
 // The approved uses the router compares a question with: the indication text of each label the
 // signed-in user may read and that is in force.
@@ -70,10 +72,16 @@ export function withFloor(route: Route, question: string): Route {
 }
 
 // The second layer. A message the router sent to "answer" is read once more with one question
-// only: did something happen to a patient after a medicine? A yes from either layer is safety.
-// It only raises answer to safety, never lowers a tier. Its own function (detectEvent) so it can
-// be measured alone.
+// only: did something happen to a patient after a medicine? A yes from either layer reaches the
+// safety inbox. Its own function (detectEvent) so it can be measured alone.
+// A special situation with no harm is still reported, and the doctor also gets the answer, as EU
+// GVP Module VI asks: "she is 9 weeks pregnant on CardioNex, should she stay on it?" needs the
+// label's 8.1 as much as it needs a report. Every other yes gets the fixed safety reply alone.
 export function raiseToSafety(route: Route, seen: Detection): Route {
+  const reportOnly = seen.happened && !seen.harm && seen.specialSituation !== null;
+  if (reportOnly && (route.tier === "answer" || route.tier === "safety")) {
+    return { ...route, tier: "answer", report: seen.specialSituation!, reason: `${route.reason} (answered, and a ${seen.specialSituation} report opened by the second pass: ${seen.reason})` };
+  }
   if (route.tier !== "answer" || !seen.happened) return route;
   return { ...route, tier: "safety", reason: `${route.reason} (raised to safety by the second pass: ${seen.reason})` };
 }

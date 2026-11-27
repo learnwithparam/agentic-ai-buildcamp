@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { MemorySaver } from "@langchain/langgraph";
 import { aiText, type AiMessage, type ChatMessage } from "../shared/messages";
-import { buildGraph, fixedReply, reviewStep, runGraph, submitAdverseEvent, submitDraftStep, type ReviewSubmission } from "./graph";
+import { buildGraph, fixedReply, reportNotice, reportStep, reviewStep, runGraph, submitAdverseEvent, submitDraftStep, type ReviewSubmission } from "./graph";
 import type { Route, Tier } from "./tiers";
 import { scriptUser } from "./users";
 
@@ -11,8 +11,8 @@ import { scriptUser } from "./users";
 
 const draft: AiMessage = { id: "draft", type: "ai", content: [{ type: "text", text: "Give 5mg once daily." }], tool_calls: [] };
 
-function routedGraph(tier: Tier, visited: string[]) {
-  const route: Route = { tier, reason: "test", asksForAdvice: false };
+function routedGraph(tier: Tier, visited: string[], report?: Route["report"]) {
+  const route: Route = { tier, reason: "test", asksForAdvice: false, report };
   const seen = (name: string) => visited.push(name);
   return buildGraph(
     {
@@ -22,6 +22,7 @@ function routedGraph(tier: Tier, visited: string[]) {
       cite: () => (seen("cite"), {}),
       submit: (state, config) => (seen("submit"), submitDraftStep(state, config, "trace-1")),
       review: (state, config) => (seen("review"), reviewStep(state, config)),
+      report: (state, config) => (seen("report"), reportStep(state, config, "CASE DRAFT", "trace-1")),
       safety: async (state, config) => (seen("safety"), await submitAdverseEvent(state, config, "PV_ESCALATION", "trace-1"), fixedReply(state, "PV_ESCALATION")),
       stop: (state) => (seen("stop"), fixedReply(state, "OFF_LABEL_REFUSAL"))
     },
@@ -98,6 +99,7 @@ test("a turn with no tier stops instead of answering", async () => {
       tools: () => ({}),
       cite: () => ({}),
       submit: () => ({}),
+      report: () => ({}),
       review: () => ({}),
       safety: () => ({}),
       stop: () => ({})
@@ -105,4 +107,20 @@ test("a turn with no tier stops instead of answering", async () => {
     new MemorySaver()
   );
   await assert.rejects(runGraph(graph, { threadId: "t-none", user: scriptUser(), messages: ask("A question") }, () => {}), /no tier/);
+});
+
+// Issue #122. A pregnancy exposure with nothing wrong: the doctor gets the checked answer, with one
+// sentence saying a report was opened, and the safety inbox gets the case. One answer message, not two.
+test("a special situation with no harm is answered and reported", async () => {
+  const visited: string[] = [];
+  const inbox = fakeInbox();
+  const result = await runGraph(routedGraph("answer", visited, "pregnancy_exposure"), { threadId: "t-report", user: scriptUser(), inbox, messages: ask("She is 9 weeks pregnant on CardioNex. Should she stay on it?") }, () => {});
+  assert.deepEqual(visited, ["router", "agent", "cite", "report"]);
+  assert.deepEqual(inbox.items.map((item) => item.kind), ["adverse_event"]);
+  assert.equal(result.waitingForApproval, false);
+  assert.equal(result.route?.tier, "answer");
+  const answers = result.messages.filter((message): message is AiMessage => message.type === "ai");
+  assert.equal(answers.length, 1);
+  assert.equal(lastText(result.messages), `Give 5mg once daily.\n\n${reportNotice("pregnancy_exposure")}`);
+  assert.match(inbox.items[0].body, /exposure in pregnancy[\s\S]*CASE DRAFT/);
 });

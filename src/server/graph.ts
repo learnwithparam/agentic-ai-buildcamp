@@ -22,6 +22,7 @@ import { timed } from "./ops/meter";
 import { streamModelTurn, toOpenAIMessages } from "./stream-model";
 import type { Identity } from "./users";
 import type { Route } from "./tiers";
+import type { SpecialSituation } from "./safety/detect";
 import { TODAY, TOOL_DEFINITIONS } from "./tools";
 
 // The agent graph. The router sorts the question into a risk tier (lesson 13, see buildGraph).
@@ -277,6 +278,30 @@ export function fixedReply(state: GraphState, text: string): Partial<GraphState>
   return { messages: [{ id: `reply-${question?.id ?? randomUUID()}`, type: "ai", content: [{ type: "text", text }], tool_calls: [] }] };
 }
 
+// Issue #122. A special situation with no harm (a pregnancy exposure, an overdose with the patient
+// well) is answered and reported. After the citation check, whatever it decided, the answer gets
+// one sentence saying a report was opened, and the safety inbox gets the case. The case is opened
+// even when the answer was withheld: the report never depends on the answer.
+const SITUATION_WORDS: Record<SpecialSituation, string> = {
+  pregnancy_exposure: "exposure in pregnancy",
+  overdose: "overdose",
+  medication_error: "medication error",
+  lack_of_efficacy: "lack of effect",
+  off_label_use: "use outside the label"
+};
+
+export const reportNotice = (situation: SpecialSituation) =>
+  `I have also passed this to the safety team as a report of ${SITUATION_WORDS[situation]}: the company records every one, even when the patient is well. They may contact you for follow-up.`;
+
+export async function reportStep(state: GraphState, config: LangGraphRunnableConfig, caseDraft: string, traceId?: string): Promise<Partial<GraphState>> {
+  const situation = state.route?.report;
+  const answer = last(state, "ai");
+  if (!situation || !answer) return {};
+  const notice = reportNotice(situation);
+  await submitAdverseEvent(state, config, `${notice}\n\n${caseDraft}`, traceId);
+  return { messages: [{ ...answer, content: [...answer.content, { type: "text", text: `\n\n${notice}` }] }] };
+}
+
 // The report holds the doctor's (scrubbed) words and the fixed reply the desk gave them.
 export async function submitAdverseEvent(state: GraphState, config: LangGraphRunnableConfig, reply: string, traceId?: string) {
   const question = lastHuman(state);
@@ -293,9 +318,10 @@ export async function submitAdverseEvent(state: GraphState, config: LangGraphRun
   });
 }
 
-type Nodes = { router: Node; agent: Node; tools: Node; cite: Node; submit: Node; review: Node; safety: Node; stop: Node };
+type Nodes = { router: Node; agent: Node; tools: Node; cite: Node; submit: Node; review: Node; report: Node; safety: Node; stop: Node };
 
 // START -> router -> answer: agent <-> tools -> cite -> END
+//                    (a special situation with no harm: cite -> report, to the safety inbox -> END)
 //                 -> review: agent <-> tools -> cite -> submit -> review (waits for a human) -> END
 //                 -> safety: fixed reply, report to the safety inbox -> END
 //                 -> stop:   fixed refusal -> END
@@ -308,6 +334,7 @@ export function buildGraph(nodes: Nodes, checkpointer: BaseCheckpointSaver) {
     .addNode("cite", nodes.cite)
     .addNode("submit", nodes.submit)
     .addNode("review", nodes.review)
+    .addNode("report", nodes.report)
     .addNode("safety", nodes.safety)
     .addNode("stop", nodes.stop)
     .addEdge(START, "router")
@@ -329,7 +356,8 @@ export function buildGraph(nodes: Nodes, checkpointer: BaseCheckpointSaver) {
     )
     .addEdge("tools", "agent")
     // Lesson 21: a reviewer only ever sees a draft that passed the citation check.
-    .addConditionalEdges("cite", (state) => (state.route?.tier === "review" ? "submit" : END), ["submit", END])
+    .addConditionalEdges("cite", (state) => (state.route?.tier === "review" ? "submit" : state.route?.report ? "report" : END), ["submit", "report", END])
+    .addEdge("report", END)
     .addEdge("submit", "review")
     .addEdge("review", END)
     .addEdge("safety", END)

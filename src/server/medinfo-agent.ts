@@ -16,6 +16,7 @@ import {
   reviewStep,
   runGraph,
   submitAdverseEvent,
+  reportStep,
   submitDraftStep,
   toolsStep,
   userOf,
@@ -214,6 +215,16 @@ export function createMedinfoAgent(checkpointer: BaseCheckpointSaver, options: {
       cite: async (state, config) => (await citeNode(state, config)).update,
       submit: (state, config) => submitDraftStep(state, config, getActiveTraceId()),
       review: reviewStep,
+      report: observe(
+        async (state, config) => {
+          const readable = await readableDocuments(userOf(config));
+          const draft = await timed("safety_report", () =>
+            reviewerDraft(observeOpenAI(modelClient(), { generationName: "safety-extract" }), env.openaiModel, latestQuestion(state.messages), `ae-${String(config.configurable?.thread_id ?? "unknown")}`, limitsText(labelLimits(readable, userOf(config).country, state.today))).catch((error: Error) => `CASE DRAFT NOT MADE: ${error.message}`)
+          );
+          return reportStep(state, config, draft, getActiveTraceId());
+        },
+        { name: "report", asType: "span", captureInput: false }
+      ),
       safety: observe(
         async (state, config) => {
           updateActiveObservation({ input: state.messages.at(-1) });

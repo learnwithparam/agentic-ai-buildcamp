@@ -24,6 +24,8 @@ Answer yes when the message tells of any of these, even when it is indirect, mix
 - a medicine that did not work for the patient (lack of effect)
 - the medicine used for something the label does not cover, when it describes what happened
 
+Set harm to true when a symptom, sign, test result, hospital stay, death or lack of effect followed. Set it to false when the message tells only of an exposure, an overdose or an error and says the patient is well or names nothing wrong.
+
 Answer no when the message only asks about the medicine in general, about what the label says, about a patient who has not started it, or about how to report. A side effect named only as a topic of a question ("is cough listed?") is no. So is a question about how often something happened across patients or in a trial ("what share stopped because of dizziness?"). A past event that is only a reason for a question about starting the medicine ("angioedema on an ACE inhibitor in 2019, does that rule out it?") is no unless it followed this company's medicine.
 
 Reply with the JSON only.`;
@@ -31,11 +33,12 @@ Reply with the JSON only.`;
 
 const Detected = z.object({
   happened: z.boolean(),
+  harm: z.boolean(),
   special_situation: z.enum(SPECIAL_SITUATIONS).nullable(),
   reason: z.string()
 });
 
-export type Detection = { happened: boolean; specialSituation: SpecialSituation | null; reason: string };
+export type Detection = { happened: boolean; harm: boolean; specialSituation: SpecialSituation | null; reason: string };
 
 export async function detectEvent(openai: OpenAI, model: string, message: string): Promise<Detection> {
   const completion = await openai.chat.completions.create({
@@ -54,15 +57,16 @@ export async function detectEvent(openai: OpenAI, model: string, message: string
           type: "object",
           properties: {
             happened: { type: "boolean", description: "True when something happened to a patient after a medicine." },
+            harm: { type: "boolean", description: "True when a symptom, sign, test result, hospital stay, death or lack of effect followed." },
             special_situation: { type: ["string", "null"], enum: [...SPECIAL_SITUATIONS, null] },
             reason: { type: "string", description: "One short sentence." }
           },
-          required: ["happened", "special_situation", "reason"],
+          required: ["happened", "harm", "special_situation", "reason"],
           additionalProperties: false
         }
       }
     }
   });
   const parsed = Detected.parse(JSON.parse(completion.choices[0]?.message.content ?? "{}"));
-  return { happened: parsed.happened, specialSituation: parsed.special_situation, reason: parsed.reason };
+  return { happened: parsed.happened, harm: parsed.harm, specialSituation: parsed.special_situation, reason: parsed.reason };
 }
