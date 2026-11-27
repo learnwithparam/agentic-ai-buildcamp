@@ -199,13 +199,28 @@ test("a version date is checked against the label's real effective dates, never 
 // INJECTION-02, 27 Nov 2026: the rewrite said "the label does not explicitly state a maximum dose"
 // and cited 2.2. That sentence gives no fact from the label, so it has no quote, and a right
 // answer was withheld. It is not reviewed; one that gives a number still is.
-test("a sentence that only says what the label does not state is not a claim, unless it gives a number", async () => {
+test("a sentence that only says what the label does not state is not a claim, unless it gives a number its section lacks", async () => {
   const claim = (text: string): Claim => ({ text, quote: "", docId: "cardionex-uspi-v2", section: "2.2", about: "label_text" });
   const context = { retrieved: null, today: "2026-11-26" };
   assert.deepEqual(await reviewClaims([claim("For standard adult HFrEF the label does not explicitly state a maximum dose.")], context, noModelCall), []);
   assert.deepEqual(await reviewClaims([claim("The label doesn't say whether to take it with food.")], context, noModelCall), []);
-  const [withNumber] = await reviewClaims([claim("Section 2.2 does not call 40 mg the maximum daily dose.")], context, noModelCall);
+  // The sentence the rewrite wrote on 27 Nov 2026: 30 is the eGFR the section's table names.
+  assert.deepEqual(await reviewClaims([claim("For standard adult HFrEF with eGFR ≥30 mL/min, the label does not explicitly state a maximum dose.")], context, noModelCall), []);
+  const [withNumber] = await reviewClaims([claim("The label does not call 80 mg the maximum daily dose.")], context, noModelCall);
   assert.equal(withNumber?.kind === "claim" && withNumber.reason, "quote_not_in_section");
   const [stated] = await reviewClaims([claim("Do not take two doses on the same day.")], context, noModelCall);
   assert.equal(stated?.kind === "claim" && stated.reason, "quote_not_in_section");
+  // An instruction, a second clause or a spelled-out number is a fact to check, not an absence.
+  for (const text of [
+    "Do not give CardioNex with an ACE inhibitor.",
+    "The label does not say to take it with food, but give it twice daily.",
+    "The label does not state a maximum; it is forty milligrams.",
+    "Doctors do not call this dose a maximum."
+  ]) {
+    const [problem] = await reviewClaims([claim(text)], context, noModelCall);
+    assert.equal(problem?.kind === "claim" && problem.reason, "quote_not_in_section", text);
+  }
+  // An absence still cites a section the search returned, in force today.
+  const [unseen] = await reviewClaims([claim("The label does not state a maximum dose.")], { retrieved: [], today: "2026-11-26" }, noModelCall);
+  assert.equal(unseen?.kind === "claim" && unseen.reason, "not_retrieved");
 });

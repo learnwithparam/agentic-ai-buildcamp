@@ -119,16 +119,30 @@ export function checkVersionDate(claim: Pick<Claim, "text" | "docId" | "section"
 
 // A sentence that only says the label does not state something gives no fact from it, so it has
 // no quote to check. Listed as a claim, it withheld a right answer (INJECTION-02, 27 Nov 2026).
-// One that gives a number still gets every check: the number could be a dose the label lacks.
-const ABSENCE = /\b(?:does not|doesn't|do not|don't)\s+(?:\w+ly\s+)?(?:state|give|say|list|specify|mention|cover|call|name|set)\b/i;
-export const isAbsence = (claim: Pick<Claim, "text">) => ABSENCE.test(claim.text) && numbersIn(claim.text).length === 0;
+// Only the whole sentence counts: the label or a section is its subject, it has one clause, and it
+// gives no number in words and no digit its section lacks. "Do not give it with an ACE inhibitor" is an instruction,
+// and "...does not say X, but give it twice daily" adds a fact, so both get every check.
+const ABSENCE =
+  /^(?:for [^;]+?,? )?(?:the |this |that |today's |these |its )?(?:(?:current |approved |us |de |jp )?label|section(?:s)?(?: [\w.]+)?|document|smpc|uspi)(?: [\w.]+)? (?:does not|doesn't|do not|don't) (?:\w+ly )?(?:state|give|say|list|specify|mention|cover|call|name|set)\b[^;,:]*\.?$/i;
+const NUMBER_WORDS = /\b(?:one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|twenty|thirty|forty|fifty|hundred|twice|thrice|half|double|single)\b/i;
+const CLAUSE = /\b(?:but|and|or|however|instead|so)\b/i;
+export const isAbsence = (claim: Pick<Claim, "text" | "docId" | "section">) => {
+  const text = claim.text.trim();
+  if (!ABSENCE.test(text) || CLAUSE.test(text) || NUMBER_WORDS.test(text)) return false;
+  // A number may only name what the section names (eGFR 30, a population): never a new dose.
+  const inSection = new Set(numbersIn(sectionText(claim.docId, claim.section)?.text ?? ""));
+  return numbersIn(text).every((n) => inSection.has(n));
+};
 
 // Every claim, checked. A claim that passes the code checks goes to the judge.
 export async function reviewClaims(claims: Claim[], context: ClaimContext, judge: Judge): Promise<CitationProblem[]> {
   const results = await Promise.all(
-    claims.filter((claim) => !isAbsence(claim)).map(async (claim): Promise<CitationProblem | null> => {
+    claims.map(async (claim): Promise<CitationProblem | null> => {
       const citation = `${claim.docId}, ${claim.section}`;
       const reason = checkClaim(claim, context);
+      // An absence has no quote, so only the quote rule is waived: its section must still exist,
+      // be one the search returned, be in force and be for the right country.
+      if (isAbsence(claim)) return reason && reason !== "quote_not_in_section" ? { kind: "claim", reason, citation, claim: claim.text } : null;
       if (reason) return { kind: "claim", reason, citation, claim: claim.text };
       if (isVersionDate(claim)) return null;
       return (await judge(claim)) === "supported" ? null : { kind: "claim", reason: "quote_does_not_support", citation, claim: claim.text, quote: claim.quote };
