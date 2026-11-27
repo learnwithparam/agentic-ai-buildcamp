@@ -8,7 +8,7 @@ process.env.GATEWAY_KEY_EVAL_RUNNER = "test-key";
 process.env.LANGFUSE_GATEWAY_URL = "http://gateway.test";
 
 const { measureTurn, timed } = await import("./meter");
-const { modelClient, useService, embed } = await import("../gateway");
+const { modelClient, useService, embed, OUTPUT_CAP } = await import("../gateway");
 const { standaloneQuery } = await import("../rag/rewrite");
 const { gradePassages } = await import("../rag/grade");
 const { extractClaims } = await import("../citations.claims");
@@ -103,10 +103,10 @@ test("a stage that needs a short answer asks the model for a short answer", asyn
   await gradePassages("dose?", [passage]);
   await extractClaims(modelClient(), "Start at 20 mg.", [{ doc_id: "d", section: "1.1", text: "Start at 20 mg." } as never]);
   const caps = sent.map((s) => s.body.max_tokens ?? s.body.max_completion_tokens);
-  // The rewrite and the grader are short. The claims list is as long as the answer, so it has no cap.
-  assert.equal(typeof caps[0], "number");
-  assert.equal(typeof caps[1], "number");
-  assert.equal(caps[2], undefined);
+  // Each sends its own cap from OUTPUT_CAP. The claims list is as long as the answer, so its cap is
+  // the largest: it only stops a runaway listing.
+  assert.deepEqual(caps, [OUTPUT_CAP.rewrite, OUTPUT_CAP.grade, OUTPUT_CAP.claims]);
+  assert.ok(OUTPUT_CAP.claims >= Math.max(OUTPUT_CAP.rewrite, OUTPUT_CAP.grade));
 });
 
 test("an answer with no words has no claims, and no model is asked", async () => {

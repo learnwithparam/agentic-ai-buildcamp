@@ -265,6 +265,7 @@
     "docs/runs/citations.json": 21,
     "docs/runs/faithfulness.json": 9,
     "docs/runs/faults.json": 21,
+    "docs/runs/ops.json": 23,
     "docs/runs/phi.json": 13,
     "docs/runs/scoreboard-06.json": 6,
     "docs/runs/scoreboard-07.json": 7,
